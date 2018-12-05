@@ -1,0 +1,12 @@
+[{
+  "modid": "tenshilib",
+  "name": "TenshiLib",
+  "description": "Core and library mod for most of my mods. Contains useful hooks and functions",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateJSON": "",
+  "authorList": ["Flemmli97"],
+  "credits": "",
+  "logoFile": ""
+}]
