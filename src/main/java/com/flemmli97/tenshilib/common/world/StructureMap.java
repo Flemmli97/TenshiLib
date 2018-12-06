@@ -1,23 +1,21 @@
 package com.flemmli97.tenshilib.common.world;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import com.google.common.collect.Lists;
+import com.flemmli97.tenshilib.common.network.PacketHandler;
+import com.flemmli97.tenshilib.common.network.PacketStructure;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.MapStorage;
 import net.minecraft.world.storage.WorldSavedData;
@@ -26,8 +24,12 @@ import net.minecraftforge.common.util.Constants;
 public class StructureMap extends WorldSavedData{
 
 	private static final String id = "Structures";
-	private Map<ResourceLocation, Long2ObjectMap<StructureBase>> map = Maps.newHashMap();
-	private List<StructureBase> structureToGenerate = Lists.newArrayList();
+	private Map<ResourceLocation, Set<StructureBase>> map = Maps.newHashMap();
+	
+	private Set<StructureBase> structureToGenerate = Sets.newHashSet();
+	//Cache current structure
+	private StructureBase currentStructure;
+	
 	public StructureMap(String id) {
 		super(id);
 	}
@@ -38,7 +40,7 @@ public class StructureMap extends WorldSavedData{
 	
 	public static StructureMap get(World world)
 	{
-		MapStorage storage = world.getMapStorage();
+		MapStorage storage = world.getPerWorldStorage();
 		StructureMap data = (StructureMap)storage.getOrLoadData(StructureMap.class, id);
 		if (data == null)
 		{
@@ -47,15 +49,33 @@ public class StructureMap extends WorldSavedData{
 		}
 		return data;
 	}
-
+	
 	public StructureBase getNearestStructure(ResourceLocation id, BlockPos pos, World world)
 	{
-		Long2ObjectMap<StructureBase> map = this.map.get(id);
-		if(map!=null)
+		if(id==null)
 		{
 			double dist = Double.MAX_VALUE;
 			StructureBase nearest = null;
-			for(StructureBase base : map.values())
+			for(Set<StructureBase> set : this.map.values())
+			{
+				for(StructureBase base : set)
+				{
+					double distTo = pos.distanceSq(base.getPos());
+					if(distTo<dist)
+					{
+						nearest=base;
+						dist=distTo;
+					}
+				}
+			}
+			return nearest;
+		}
+		Set<StructureBase> set = this.map.get(id);
+		if(set!=null)
+		{
+			double dist = Double.MAX_VALUE;
+			StructureBase nearest = null;
+			for(StructureBase base : set)
 			{
 				double distTo = pos.distanceSq(base.getPos());
 				if(distTo<dist)
@@ -68,108 +88,97 @@ public class StructureMap extends WorldSavedData{
 		}
 		return null;
 	}
-	//Cache current structure
-	private StructureBase base;
+
 	public boolean isInside(ResourceLocation id, BlockPos pos)
 	{
 		if(id==null)
 		{
-			for(Long2ObjectMap<StructureBase> e : this.map.values())
+			for(Set<StructureBase> set : this.map.values())
 			{
-				for(StructureBase struc: e.values())
+				for(StructureBase struc: set)
 					if(struc.isInside(pos))
 					{
-						this.base=struc;
+						this.currentStructure=struc;
 						return true;
 					}
 			}
 			return false;
 		}
-		Long2ObjectMap<StructureBase> map = this.map.get(id);
-		if(map!=null)
+		Set<StructureBase> set = this.map.get(id);
+		if(set!=null)
 		{
-			ObjectIterator<StructureBase> it = map.values().iterator();
-			while(it.hasNext())
-			{
-				StructureBase base = it.next();
-				if(base.isInside(pos))
+			for(StructureBase struc: set)
+				if(struc.isInside(pos))
 				{
-					this.base=base;
 					return true;
 				}
-			}
 			return false;
 		}
 		return false;
 	}
 	
 	@Nullable
+	public StructureBase current(EntityPlayer player, boolean forced)
+	{
+		StructureBase base = this.currentStructure;
+		this.current(player.getPosition());
+		if(((this.currentStructure!=null && base!=this.currentStructure)||forced) && player instanceof EntityPlayerMP)
+			PacketHandler.sendTo(new PacketStructure(this.currentStructure), (EntityPlayerMP) player);
+		return this.currentStructure;
+	}
+	
+	@Nullable
+	public StructureBase current(BlockPos pos)
+	{
+		if(this.currentStructure!=null && this.currentStructure.isInside(pos))
+		{
+			return this.currentStructure;
+		}
+		return this.isInside(null, pos)?this.currentStructure:null;
+	}
+	
+	@Nullable
 	public ResourceLocation currentStructure(BlockPos pos)
 	{
-		if(this.base==null)
-			this.isInside(null, pos);
-		if(this.base.isInside(pos))
-			return this.base.getStructureId();
-		this.base=null;
-		return null;
+		return this.current(pos)!=null?this.currentStructure.getStructureId():null;
 	}
 	
-	public void initStructure(StructureBase base, int chunkX, int chunkZ)
-	{
-		Long2ObjectMap<StructureBase> chunkMap = this.map.get(base.getStructureId());
-		if(chunkMap==null)
-			chunkMap = new Long2ObjectOpenHashMap<StructureBase>(1024);
-		if(!chunkMap.containsKey(ChunkPos.asLong(chunkX, chunkZ)))
-			chunkMap.put(ChunkPos.asLong(chunkX, chunkZ), base);
+	public void initStructure(StructureBase base)
+	{			
+		this.map.merge(base.getStructureId(), Sets.newHashSet(base), (old,val)->{old.addAll(val); return old;});
 		this.structureToGenerate.add(base);
-		this.map.put(base.getStructureId(), chunkMap);
-		this.markDirty();
+		this.markDirty();		
 	}
 	
-	public void removeStructureToProcess(StructureBase base)
+	public void generate(World world, int chunkX, int chunkZ)
 	{
-		this.structureToGenerate.remove(base);
+		this.structureToGenerate.removeIf(structure->structure.process(world, chunkX, chunkZ));
 		this.markDirty();
-	}
-	
-	public void generate(World world, Random rand, int chunkX, int chunkZ)
-	{
-		for(StructureBase base : this.structureToGenerate)
-		{
-			base.process(world, rand, chunkX, chunkZ);
-		}
 	}
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
-		for(String id : nbt.getKeySet())
-		{
-			Long2ObjectMap<StructureBase> map = new Long2ObjectOpenHashMap<StructureBase>(1024);
-			NBTTagCompound compound = nbt.getCompoundTag(id);
-			for(String chunkPos : compound.getKeySet())
-			{
-				map.put(Long.parseLong(chunkPos), new StructureBase(compound.getCompoundTag(chunkPos)));
-			}
-		}
+		nbt.getKeySet().forEach(key->{
+			NBTTagList tagList = nbt.getTagList(key, Constants.NBT.TAG_COMPOUND);
+			tagList.forEach(compound->{
+				this.map.merge(new ResourceLocation(key), Sets.newHashSet(new StructureBase((NBTTagCompound) compound)), (old,val)->{old.addAll(val); return old;});
+			});
+		});
 		NBTTagList list = nbt.getTagList("IncompleteStructures", Constants.NBT.TAG_COMPOUND);
-		for(int i = 0; i < list.tagCount(); i++)
-			this.structureToGenerate.add(new StructureBase(list.getCompoundTagAt(i)));
+		list.forEach(compound->this.structureToGenerate.add(new StructureBase((NBTTagCompound) compound)));
 	}
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-		for(Entry<ResourceLocation, Long2ObjectMap<StructureBase>> entry: this.map.entrySet())
-		{
-			NBTTagCompound tag = new NBTTagCompound();
-			for(Entry<Long, StructureBase> entry2: entry.getValue().entrySet())
-			{
-				tag.setTag(entry2.getKey().toString(), entry2.getValue().writeToNBT(new NBTTagCompound()));
-			}
-			compound.setTag(entry.getKey().toString(), tag);
-		}
+		this.map.entrySet().forEach(entry->{
+			NBTTagList tagList = new NBTTagList();
+			entry.getValue().forEach(structure->{
+				tagList.appendTag(structure.writeToNBT(new NBTTagCompound()));
+			});
+			compound.setTag(entry.getKey().toString(), tagList);
+		});
 		NBTTagList list = new NBTTagList();
-		for(StructureBase base : this.structureToGenerate)
-			list.appendTag(base.writeToNBT(new NBTTagCompound()));
+		this.structureToGenerate.forEach(base->list.appendTag(base.writeToNBT(new NBTTagCompound())));
 		compound.setTag("IncompleteStructures", list);
 		return compound;
 	}

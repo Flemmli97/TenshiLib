@@ -1,5 +1,7 @@
 package com.flemmli97.tenshilib.proxy;
 
+import com.flemmli97.tenshilib.common.world.StructureBase;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.IThreadListener;
@@ -9,6 +11,8 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class ClientProxy extends CommonProxy {
+	
+	public StructureBase currentStructure;
 
     @Override
     public void preInit(FMLPreInitializationEvent e) {
@@ -34,5 +38,11 @@ public class ClientProxy extends CommonProxy {
     public String translate(String s)
     {
     	return I18n.format(s);
+    }
+    
+    @Override
+    public void setStructureToRender(StructureBase base)
+    {
+    	this.currentStructure=base;
     }
 }

@@ -7,6 +7,8 @@ import com.flemmli97.tenshilib.asm.ConfigUtils.Init;
 import com.flemmli97.tenshilib.common.events.handler.ClientEvents;
 import com.flemmli97.tenshilib.common.events.handler.CommonEvents;
 import com.flemmli97.tenshilib.common.item.Util;
+import com.flemmli97.tenshilib.common.network.PacketHandler;
+import com.flemmli97.tenshilib.common.world.StructureBase;
 import com.flemmli97.tenshilib.common.world.StructureGenerator;
 
 import net.minecraft.util.IThreadListener;
@@ -23,11 +25,12 @@ public class CommonProxy {
 	
 	public static boolean isFateLoaded;
 	public static boolean isRunecraftoryLoaded;
-
+	
 	public void preInit(FMLPreInitializationEvent e) {
-		ConfigUtils.init(Init.PRE);
 		if(!ASMLoader.asmLoaded)
 			throw new ASMException.ASMLoadException();
+		PacketHandler.registerPackets();
+		ConfigUtils.init(Init.PRE);
 		isFateLoaded = Loader.isModLoaded("fatemod");
 		isRunecraftoryLoaded = Loader.isModLoaded("runecraftory");
     }
@@ -52,5 +55,10 @@ public class CommonProxy {
     public String translate(String string)
     {
     	return string;
+    }
+    
+    public void setStructureToRender(StructureBase structure)
+    {
+    	
     }
 }

@@ -1,7 +1,5 @@
 package com.flemmli97.tenshilib.common.blocks;
 
-import java.util.Random;
-
 import com.flemmli97.tenshilib.common.blocks.tile.TileStructurePiece;
 
 import net.minecraft.block.Block;
@@ -36,7 +34,7 @@ public class BlockStructurePiece extends BlockIgnore implements ITileEntityProvi
 		{
 			TileEntity tile = world.getTileEntity(pos);
 			if(tile instanceof TileStructurePiece)
-				((TileStructurePiece)tile).runBlock(new Random(), pos, null, null);
+				((TileStructurePiece)tile).runBlock();
 		}
     }
 

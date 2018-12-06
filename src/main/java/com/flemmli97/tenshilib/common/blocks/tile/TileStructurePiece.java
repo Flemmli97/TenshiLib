@@ -1,17 +1,15 @@
 package com.flemmli97.tenshilib.common.blocks.tile;
 
-import java.util.List;
 import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import com.flemmli97.tenshilib.common.world.Position;
 import com.flemmli97.tenshilib.common.world.Schematic;
 import com.flemmli97.tenshilib.common.world.StructureBase;
-import com.flemmli97.tenshilib.common.world.StructureLoader;
-import com.google.common.collect.Lists;
+import com.flemmli97.tenshilib.common.world.StructurePiece;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagIntArray;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.tileentity.TileEntity;
@@ -19,20 +17,18 @@ import net.minecraft.util.Mirror;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraftforge.common.util.Constants;
 
 public class TileStructurePiece extends TileEntity{
 
 	private ResourceLocation[] structureName;
+	
+	private StructurePiece piece;
 	private Mirror mirror=Mirror.NONE;
 	private Rotation rot = Rotation.NONE;
 	private boolean replaceGround;
-	
+	private BlockPos offSet = BlockPos.ORIGIN;
 	//Will be initialized at TileStructurePiece.initStructure
-	private ResourceLocation structureToGen;
-	private List<ChunkPos> structureChunks = Lists.newArrayList();
 	private boolean initialized;
 	
 	public TileStructurePiece() {}
@@ -69,40 +65,35 @@ public class TileStructurePiece extends TileEntity{
 		this.replaceGround=flag;
 	}
 	
-	public ResourceLocation initStructure(Random rand)
-	{
-		if(!this.initialized)
-		{
-			if(this.structureToGen==null)
-				this.structureToGen=this.structureName[rand.nextInt(this.structureName.length)];
-			Schematic schematic = StructureLoader.getSchematic(this.structureToGen);
-			this.structureChunks=StructureBase.calculateChunks(StructureBase.getBox(schematic, this.rot, this.pos));
-			this.initialized=true;
-		}
-		return this.structureToGen;
-	}
-	
-	public boolean hasChunk(ChunkPos pos)
-	{
-		return this.structureChunks.contains(pos);
-	}
-	
-	public boolean finish(ChunkPos pos)
-	{
-		this.structureChunks.remove(pos);
-		return this.structureChunks.isEmpty();
-	}
-	
-	public void runBlock(Random rand, BlockPos pos, @Nullable StructureBoundingBox box,  @Nullable StructureBase base)
+	public StructurePiece initStructure(Random rand, @Nullable StructureBase base)
 	{
 		if(this.structureName!=null)
 		{
-			Schematic schematic = StructureLoader.getSchematic(this.initStructure(rand));
-			if(schematic!=null)
+			if(!this.initialized || this.piece==null)
 			{
-				schematic.generate(this.world, pos, this.rot, this.mirror, this.replaceGround, 
-						box, base);
+				Mirror m = base!=null?base.getMirror():this.mirror;
+				Rotation r=base!=null?this.rot.add(base.getRot()):this.rot;
+				BlockPos offSet = Schematic.transformPos(new Position(0,0,0), m, r, this.offSet);
+				this.piece=new StructurePiece(this.structureName[rand.nextInt(this.structureName.length)], 
+						m, r, base!=null?base.replaceGround():this.replaceGround, this.pos.add(offSet), base, rand);
+				this.initialized=true;
 			}
+		}
+		return this.piece;
+	}
+	
+	public void reset()
+	{
+		this.initialized=false;
+		this.piece=null;
+	}
+	
+	//Manually run the block
+	public void runBlock()
+	{
+		if(this.initStructure(new Random(), null)!=null)
+		{
+			this.piece.generate(world);
 		}
 	}
 
@@ -119,16 +110,11 @@ public class TileStructurePiece extends TileEntity{
 		this.mirror = Mirror.valueOf(compound.getString("Mirror"));
 		this.rot = Rotation.valueOf(compound.getString("Rotation"));
 		this.replaceGround = compound.getBoolean("ReplaceGround");
-		
+		int[] arr = compound.getIntArray("Offset");
+		this.offSet=new BlockPos(arr[0],arr[1],arr[2]);
 		this.initialized=compound.getBoolean("Initialized");
-		if(compound.hasKey("StructureToGenerate"))
-			this.structureToGen=new ResourceLocation(compound.getString("StructureToGenerate"));
-		NBTTagList list2 = compound.getTagList("StructureChunks", Constants.NBT.TAG_INT_ARRAY);
-		for(int i = 0; i < list2.tagCount(); i++)
-		{
-			int[] arr = list2.getIntArrayAt(i);
-			this.structureChunks.add(new ChunkPos(arr[0], arr[1]));
-		}
+		if(compound.hasKey("Piece"))
+			this.piece=new StructurePiece(compound.getCompoundTag("Piece"));
 	}
 
 	@Override
@@ -144,13 +130,10 @@ public class TileStructurePiece extends TileEntity{
 		compound.setString("Mirror", this.mirror.toString());
 		compound.setString("Rotation", this.rot.toString());
 		compound.setBoolean("ReplaceGround", this.replaceGround);
-		
-		if(this.structureToGen!=null)
-			compound.setString("StructureToGenerate", this.structureToGen.toString());
+		compound.setIntArray("Offset", new int[] {this.offSet.getX(),this.offSet.getY(),this.offSet.getZ()});
 		compound.setBoolean("Initialized", this.initialized);
-		NBTTagList list = new NBTTagList();
-		this.structureChunks.forEach(pos->list.appendTag(new NBTTagIntArray(new int[] {pos.x, pos.z})));
-		compound.setTag("StructureChunks", list);
+		if(this.piece!=null)
+			compound.setTag("Piece", this.piece.writeToNBT(new NBTTagCompound()));
 		return compound;	
 	}
 }

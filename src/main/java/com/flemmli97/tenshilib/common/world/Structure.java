@@ -51,6 +51,7 @@ public class Structure implements IConfigSerializable<Structure>{
 			startingStructures = new ResourceLocation[] {id};
 		this.startingStructures=startingStructures;
 		this.frequency=frequency;
+		this.minDist=minDist;
 		this.type=type;
 		this.dimensions=dimID;
 		this.yOffset=yOffset;
@@ -105,7 +106,7 @@ public class Structure implements IConfigSerializable<Structure>{
 			Rotation rot = Rotation.values()[random.nextInt(Rotation.values().length)];
 			Mirror mirror = Mirror.values()[random.nextInt(Mirror.values().length)];
 			ResourceLocation randomStart = this.startingStructures[random.nextInt(this.startingStructures.length)];		
-			structureMap.initStructure(new StructureBase(this.id, randomStart, pos, rot, mirror, this.type==LocationType.GROUND), chunkX, chunkZ);
+			structureMap.initStructure(new StructureBase(this.id, randomStart, random, pos, rot, mirror, this.type==LocationType.GROUND));
 		}
 	}
 	

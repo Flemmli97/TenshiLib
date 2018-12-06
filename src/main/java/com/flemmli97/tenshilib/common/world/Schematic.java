@@ -1,14 +1,14 @@
 package com.flemmli97.tenshilib.common.world;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
 
 import com.flemmli97.tenshilib.api.block.ITileEntityInitialPlaced;
 import com.flemmli97.tenshilib.common.blocks.BlockIgnore;
-import com.flemmli97.tenshilib.common.blocks.tile.TileStructurePiece;
+import com.google.common.collect.ImmutableSet;
 
 import net.minecraft.block.BlockStructure;
 import net.minecraft.block.material.Material;
@@ -25,7 +25,6 @@ import net.minecraft.world.gen.structure.template.Template;
 public class Schematic {
 	
 	public final int x, y, z;
-	private List<TileEntity> tiles;
 	private Map<Position, IBlockState> posBlockMapping = new HashMap<Position, IBlockState>();
 	private Map<Position, NBTTagCompound> posTileMapping = new HashMap<Position, NBTTagCompound>();
 	public Schematic(int width, int height, int length)
@@ -50,9 +49,9 @@ public class Schematic {
 		this.posTileMapping.put(position, nbt);
 	}
 	
-	public List<TileEntity> getTileEntities() 
+	public ImmutableSet<Entry<Position, NBTTagCompound>> getTileEntities() 
 	{
-		return this.tiles;
+		return ImmutableSet.copyOf(this.posTileMapping.entrySet());
 	}
 	
 	public IBlockState getBlockAt(BlockPos pos)
@@ -72,7 +71,7 @@ public class Schematic {
 	 * @param limitation 
 	 */
 	public void generate(World world, BlockPos pos, Rotation rot, Mirror mirror, boolean replaceGroundBelow, 
-			@Nullable StructureBoundingBox chunkLimitation, @Nullable StructureBase base) {
+			@Nullable StructureBoundingBox chunkLimitation) {
 		for(int y = 0; y < this.y; y++)
 			for(int z = 0; z < this.z; z++)
 				for(int x = 0; x < this.x; x++)					
@@ -86,7 +85,7 @@ public class Schematic {
 						continue;
 					}
 					IBlockState state = this.posBlockMapping.get(schemPos);
-					//Also checks for structure pieces since they get removed later.
+
 					if(state!=null && !(state.getBlock() instanceof BlockStructure||state.getBlock() instanceof BlockIgnore))
 					{
 						world.setBlockState(place, state.withMirror(mirror).withRotation(rot), 18);
@@ -110,22 +109,13 @@ public class Schematic {
 							tile.markDirty();	
 							if(tile instanceof ITileEntityInitialPlaced)
 								((ITileEntityInitialPlaced)tile).onPlaced(world, place, rot, mirror);
-							if(tile instanceof TileStructurePiece)
-							{
-								TileStructurePiece piece = (TileStructurePiece) tile;
-								piece.mirror(mirror);
-								piece.setReplaceGround(replaceGroundBelow);
-								piece.rotate(rot);
-								if(base!=null)
-									base.add(piece);
-							}
 						}
 					}
 				}
 	}
 	
 	public void generate(World world, BlockPos pos, Rotation rot, Mirror mirror) {
-		this.generate(world, pos, rot, mirror, false, null, null);
+		this.generate(world, pos, rot, mirror, false, null);
 	}
 		
 	private static void replaceAirAndLiquidDownwards(World worldIn, IBlockState blockstateIn, BlockPos pos)
@@ -180,6 +170,6 @@ public class Schematic {
 	@Override
 	public String toString()
 	{
-		return "Schematic:{[Width:" + this.x + "],[Height:" + this.y + "],[Length:" + this.z+ "],[Tiles:" + this.tiles + "]}";
+		return "Schematic:{[Width:" + this.x + "],[Height:" + this.y + "],[Length:" + this.z+ "],[Tiles:" + this.posTileMapping.values() + "]}";
 	}
 }

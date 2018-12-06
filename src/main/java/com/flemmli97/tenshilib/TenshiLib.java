@@ -10,6 +10,7 @@ import com.flemmli97.tenshilib.common.commands.CommandLocateStructure;
 import com.flemmli97.tenshilib.common.commands.CommandStructure;
 import com.flemmli97.tenshilib.proxy.CommonProxy;
 
+import net.minecraft.world.GameRules.ValueType;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -57,6 +58,8 @@ public class TenshiLib {
     	event.registerServerCommand(new CommandItemData());
     	event.registerServerCommand(new CommandStructure());
     	event.registerServerCommand(new CommandLocateStructure());
+    	if(!event.getServer().getWorld(0).getGameRules().hasRule("showBoundingBox"))
+    		event.getServer().getWorld(0).getGameRules().addGameRule("showBoundingBox", "false", ValueType.BOOLEAN_VALUE);
     }
 }
     

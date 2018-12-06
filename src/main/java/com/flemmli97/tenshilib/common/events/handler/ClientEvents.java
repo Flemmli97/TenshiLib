@@ -1,8 +1,12 @@
 package com.flemmli97.tenshilib.common.events.handler;
 
+import com.flemmli97.tenshilib.TenshiLib;
 import com.flemmli97.tenshilib.api.item.IDualWeaponRender;
 import com.flemmli97.tenshilib.asm.ASMMethods;
+import com.flemmli97.tenshilib.client.render.RenderUtils;
+import com.flemmli97.tenshilib.common.config.ConfigHandler;
 import com.flemmli97.tenshilib.common.events.LayerHeldItemEvent;
+import com.flemmli97.tenshilib.proxy.ClientProxy;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
@@ -11,8 +15,11 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumHandSide;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderSpecificHandEvent;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -90,6 +97,17 @@ public class ClientEvents {
 		if(event.phase==Phase.END && Minecraft.getMinecraft().world!=null && Minecraft.getMinecraft().player!=null)
 		{
 			ClientHandHandler.getInstance().updateEquippedItem();
+		}
+	}
+	
+	@SideOnly(Side.CLIENT)
+	@SubscribeEvent
+	public void clientTick(RenderWorldLastEvent event)
+	{
+		if(((ClientProxy)TenshiLib.proxy).currentStructure!=null && ConfigHandler.showStructure)
+		{
+			for(StructureBoundingBox box : ((ClientProxy)TenshiLib.proxy).currentStructure.getBoxes())
+				RenderUtils.renderBoundingBox(new AxisAlignedBB(box.maxX, box.maxY, box.maxZ, box.minX, box.minY, box.minZ), Minecraft.getMinecraft().player, event.getPartialTicks());
 		}
 	}
 }

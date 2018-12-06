@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.Set;
 
 import com.flemmli97.tenshilib.TenshiLib;
+import com.flemmli97.tenshilib.common.config.ConfigHandler;
 import com.google.common.collect.Maps;
 
 import net.minecraft.util.ResourceLocation;
@@ -27,7 +28,7 @@ public class StructureGenerator implements IWorldGenerator{
 	{
 		return gens.keySet();
 	}
-
+	
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator,
 			IChunkProvider chunkProvider) {
@@ -35,9 +36,14 @@ public class StructureGenerator implements IWorldGenerator{
 		{
 			for(Structure s : gens.values())
 			{
-				s.startStructure(world, chunkX, chunkZ, random);
+				for(int x = chunkX-ConfigHandler.generatorRadius; x <=chunkX+ConfigHandler.generatorRadius; x++)
+					for(int z = chunkZ-ConfigHandler.generatorRadius; z <=chunkZ+ConfigHandler.generatorRadius; z++)
+					{
+						world.setRandomSeed(x, z, ConfigHandler.seed);
+						s.startStructure(world, x, z, random);
+					}
 			}
-			StructureMap.get(world).generate(world, random, chunkX, chunkZ);
+			StructureMap.get(world).generate(world, chunkX, chunkZ);
 		}
 	}
 }

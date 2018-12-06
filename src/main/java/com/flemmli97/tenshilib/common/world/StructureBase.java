@@ -1,10 +1,14 @@
 package com.flemmli97.tenshilib.common.world;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
 
 import com.flemmli97.tenshilib.common.blocks.tile.TileStructurePiece;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagIntArray;
@@ -24,38 +28,27 @@ import net.minecraftforge.common.util.Constants;
  * Contains data about a generated structure.
  */
 public class StructureBase{
-
-	private List<StructureBoundingBox> structureParts=Lists.newArrayList();
-	private List<BlockPos> structurePieceBlocks = Lists.newArrayList();
-	private List<ChunkPos> chunks;
-	private BlockPos structurePos;
-	private ResourceLocation structureID, schematicID;
-	private boolean isGround;
-	private Rotation rot;
-	private Mirror mirror;
 	
-	public StructureBase(ResourceLocation id, ResourceLocation schematicID, BlockPos pos, Rotation rot, Mirror mirror, boolean ground)
+	private static final ResourceLocation structureTile = TileEntity.getKey(TileStructurePiece.class);
+	
+	private ResourceLocation structureID;
+	private BlockPos structurePos;
+	private Mirror mirror=Mirror.NONE;
+	private Rotation rot = Rotation.NONE;
+	private boolean replaceGround;
+	
+	private List<StructureBoundingBox> boundingBoxes =Lists.newArrayList();
+	private Set<StructurePiece> structurePieces = Sets.newHashSet();
+
+	public StructureBase(ResourceLocation id, ResourceLocation schematicID, Random random, BlockPos pos, Rotation rot, Mirror mirror, boolean ground)
 	{
-		Schematic schematic = StructureLoader.getSchematic(schematicID);
 		//Size of the starting structure
-		StructureBoundingBox startingBox = StructureBase.getBox(schematic, rot, pos);
-		this.structureParts.add(startingBox);
 		this.structurePos=pos;
 		this.structureID=id;
-		this.schematicID=schematicID;
-		this.isGround=ground;
 		this.rot=rot;
 		this.mirror=mirror;
-		this.chunks=StructureBase.calculateChunks(startingBox);
-	}
-	
-	public static StructureBoundingBox getBox(Schematic schem, Rotation rot, BlockPos pos)
-	{
-		BlockPos corner = new BlockPos(schem.x,schem.y,schem.z);
-		if(rot==Rotation.CLOCKWISE_90||rot==Rotation.COUNTERCLOCKWISE_90)
-			corner = new BlockPos(schem.z,schem.y,schem.x);
-		return StructureBoundingBox.createProper
-				(corner.getX(), pos.getY(), corner.getZ(), pos.getX(), pos.getY(), pos.getZ());
+		this.replaceGround=ground;
+		this.structurePieces.addAll(getParts(schematicID, random, pos, rot, mirror, ground));
 	}
 	
 	public StructureBase(NBTTagCompound compound)
@@ -63,9 +56,74 @@ public class StructureBase{
 		this.readFromNBT(compound);
 	}
 	
+	private Set<StructurePiece> getParts(ResourceLocation schematicID, Random random, BlockPos pos, Rotation rot, Mirror mirror, boolean ground)
+	{
+		Set<StructurePiece> pieces = Sets.newHashSet();
+		Schematic schematic = StructureLoader.getSchematic(schematicID);
+		//The starting piece
+		pieces.add(new StructurePiece(schematicID, mirror, rot, ground, pos, this, random));
+		//Check schematic for TileStructurePieces
+		schematic.getTileEntities().forEach(entry->{
+			if(entry.getValue().getString("id").equals(structureTile.toString()))
+			{
+				NBTTagCompound compound = entry.getValue();
+				BlockPos place = Schematic.transformPos(entry.getKey(), mirror, rot, new BlockPos(schematic.x, schematic.y
+						, schematic.z)).add(pos);
+				compound.setInteger("x", place.getX());
+				compound.setInteger("y", place.getY());
+				compound.setInteger("z", place.getZ());
+				TileStructurePiece tile = new TileStructurePiece();
+				tile.readFromNBT(compound);
+				tile.initStructure(random, StructureBase.this);
+			}
+		});
+		return pieces;
+	}
+	
+	/**
+	 * Add all StructurePieces read from the given schematic.
+	 */
+	protected void addParts(Schematic schematic, BlockPos pos, Random random)
+	{
+		schematic.getTileEntities().forEach(entry->{
+			if(entry.getValue().getString("id").equals(structureTile.toString()))
+			{
+				NBTTagCompound compound = entry.getValue();
+				BlockPos place = Schematic.transformPos(entry.getKey(), mirror, rot, new BlockPos(schematic.x, schematic.y
+						, schematic.z)).add(pos);
+				compound.setInteger("x", place.getX());
+				compound.setInteger("y", place.getY());
+				compound.setInteger("z", place.getZ());
+				TileStructurePiece tile = new TileStructurePiece();
+				tile.readFromNBT(compound);
+				tile.initStructure(random, StructureBase.this);
+			}
+		});
+	}
+	
+	protected void addStructurePiece(StructurePiece piece)
+	{
+		this.structurePieces.add(piece);
+	}
+	
+	public Rotation getRot()
+	{
+		return this.rot;
+	}
+	
+	public Mirror getMirror()
+	{
+		return this.mirror;
+	}
+	
+	public boolean replaceGround()
+	{
+		return this.replaceGround;
+	}
+	
 	public boolean isInside(Vec3i vec)
 	{
-		for(StructureBoundingBox box : this.structureParts)
+		for(StructureBoundingBox box : this.boundingBoxes)
 		{
 			if(box.isVecInside(vec))
 				return true;
@@ -73,66 +131,26 @@ public class StructureBase{
 		return false;
 	}
 	
-	public void add(TileStructurePiece piece)
+	public boolean intersects(StructureBoundingBox ssbb)
 	{
-		this.structurePieceBlocks.add(piece.getPos());
+		for(StructureBoundingBox box : this.boundingBoxes)
+		{
+			if(ssbb.intersectsWith(box))
+				return true;
+		}
+		return false;
 	}
 	
+	public List<StructureBoundingBox> getBoxes()
+	{
+		return ImmutableList.copyOf(this.boundingBoxes);
+	}
+
 	//Since we use the passed chunk this time the positive chunks should be loaded!
-	public synchronized void process(World world, Random rand, int chunkX, int chunkZ)
+	public boolean process(World world, int chunkX, int chunkZ)
 	{
-		Schematic schem = StructureLoader.getSchematic(this.schematicID);
-		ChunkPos pos = new ChunkPos(chunkX, chunkZ);
-		if(this.chunks.contains(pos))
-		{
-			schem.generate(world, this.structurePos, this.rot, this.mirror, 
-					this.isGround, StructureBase.getChunk(pos.x, pos.z), this);
-			this.chunks.remove(pos);
-		}
-		List<BlockPos> list = Lists.newArrayList();
-		for(BlockPos blockPos : this.structurePieceBlocks)
-		{
-			TileEntity tile = world.getTileEntity(blockPos);
-			if(tile instanceof TileStructurePiece)
-			{
-				TileStructurePiece piece = (TileStructurePiece) tile;
-				piece.initStructure(rand);
-				if(piece.hasChunk(pos))
-				{
-					piece.runBlock(rand, piece.getPos(), getChunk(pos.x, pos.z), this);
-					if(piece.finish(pos))
-						list.add(blockPos);
-				}
-			}
-		}
-		list.forEach(blockPos -> this.structurePieceBlocks.remove(blockPos));
-	}
-	
-	public static List<ChunkPos> calculateChunks(StructureBoundingBox box)
-	{
-		List<ChunkPos> list = Lists.newArrayList();
-		//Test if its at the negative border and if so add the chunk it lies at too
-		int chunkX1 = box.minX>>4+(box.minX%16==0?-1:0);
-		int chunkZ1 = box.minZ>>4+(box.minZ%16==0?-1:0);
-		int chunkX2 = box.maxX>>4;
-		int chunkZ2 = box.maxZ>>4;
-		for(int x = chunkX1; x<=chunkX2;x++)
-			for(int z = chunkZ1; z<=chunkZ2; z++)
-				list.add(new ChunkPos(x, z));
-		return list;
-	}
-	
-	public static StructureBoundingBox getChunk(BlockPos pos)
-	{
-		return getChunk(pos.getX()>>4, pos.getZ()>>4);
-	}
-	
-	public static StructureBoundingBox getChunk(int chunkX, int chunkZ)
-	{
-		int x=chunkX*16;
-		int z=chunkZ*16;
-		//With the negative check add 1 to the box should be fine. i hope
-		return new StructureBoundingBox(x+1,0,z+1,x+17,255,z+17);
+		this.structurePieces.removeIf(piece->piece.generate(world, chunkX, chunkZ));
+		return this.structurePieces.isEmpty();
 	}
 	
 	public ResourceLocation getStructureId()
@@ -147,56 +165,97 @@ public class StructureBase{
 	
 	public void expand(StructureBoundingBox box)
 	{
-		this.structureParts.add(box);
+		this.boundingBoxes.add(box);
 	}
 	
 	public void readFromNBT(NBTTagCompound compound)
 	{
+		this.structureID = new ResourceLocation(compound.getString("ID"));
 		int[] arr = compound.getIntArray("Pos");
 		this.structurePos = new BlockPos(arr[0], arr[1], arr[2]);
-		NBTTagList list = compound.getTagList("Parts", Constants.NBT.TAG_COMPOUND);
-		list.forEach(nbt -> {
-			this.structureParts.add(new StructureBoundingBox(((NBTTagIntArray)nbt).getIntArray()));
+		NBTTagList boundingBoxes = compound.getTagList("BoundingBoxes", Constants.NBT.TAG_INT_ARRAY);
+		boundingBoxes.forEach(nbt -> {
+			this.boundingBoxes.add(new StructureBoundingBox(((NBTTagIntArray)nbt).getIntArray()));
 		});
-		this.structureID=new ResourceLocation(compound.getString("ID"));
-		this.schematicID=new ResourceLocation(compound.getString("Schematic"));
-		NBTTagList list2 = compound.getTagList("StructureChunks", Constants.NBT.TAG_INT_ARRAY);
-		for(int i = 0; i < list2.tagCount(); i++)
-		{
-			int[] arr2 = list2.getIntArrayAt(i);
-			this.chunks.add(new ChunkPos(arr2[0], arr2[1]));
-		}
-		NBTTagList list3 = compound.getTagList("StructurePieceBlocks", Constants.NBT.TAG_INT_ARRAY);
-		for(int i = 0; i < list3.tagCount(); i++)
-		{
-			int[] arr3 = list3.getIntArrayAt(i);
-			this.structurePieceBlocks.add(new BlockPos(arr3[0], arr3[1], arr3[2]));
-		}
-		this.mirror = Mirror.valueOf(compound.getString("Mirror"));
-		this.rot = Rotation.valueOf(compound.getString("Rotation"));
-		this.isGround = compound.getBoolean("ReplaceGround");
+		NBTTagList pieces = compound.getTagList("StructurePieces", Constants.NBT.TAG_COMPOUND);
+		pieces.forEach(nbt -> {
+			this.structurePieces.add(new StructurePiece((NBTTagCompound) nbt));
+		});
 	}
 	
 	public NBTTagCompound writeToNBT(NBTTagCompound compound)
 	{
-		compound.setIntArray("Pos", new int[] {this.structurePos.getX(), this.structurePos.getY(), this.structurePos.getZ()});
-		NBTTagList list = new NBTTagList();
-		for(StructureBoundingBox b : this.structureParts)
-			list.appendTag(b.toNBTTagIntArray());
-		compound.setTag("Parts", list);
 		compound.setString("ID", this.structureID.toString());
-		compound.setString("Schematic", this.schematicID.toString());
-		NBTTagList list2 = new NBTTagList();
-		for(ChunkPos pos : this.chunks)
-			list2.appendTag(new NBTTagIntArray(new int[] {pos.x, pos.z}));
-		compound.setTag("StructureChunks", list2);
-		NBTTagList list3 = new NBTTagList();
-		for(BlockPos pos : this.structurePieceBlocks)
-			list3.appendTag(new NBTTagIntArray(new int[] {pos.getX(), pos.getY(), pos.getZ()}));
-		compound.setTag("StructurePieceBlocks", list3);
-		compound.setString("Mirror", this.mirror.toString());
-		compound.setString("Rotation", this.rot.toString());
-		compound.setBoolean("ReplaceGround", this.isGround);
+		compound.setIntArray("Pos", new int[] {this.structurePos.getX(), this.structurePos.getY(), this.structurePos.getZ()});
+		NBTTagList boundingBoxes = new NBTTagList();
+		this.boundingBoxes.forEach(box->boundingBoxes.appendTag(box.toNBTTagIntArray()));
+		compound.setTag("BoundingBoxes", boundingBoxes);
+		NBTTagList pieces = new NBTTagList();
+		this.structurePieces.forEach(piece->pieces.appendTag(piece.writeToNBT(new NBTTagCompound())));
+		compound.setTag("StructurePieces", pieces);
 		return compound;
 	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(this.structurePos, this.structureID);
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if(this==obj)
+			return true;
+		if(obj instanceof StructureBase)
+		{
+			StructureBase other = (StructureBase) obj;
+			return this.structurePos.equals(other.structurePos)&&this.structureID.equals(other.structureID);
+		}
+		return false;
+		
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "Structure:"+this.structureID+" at BlockPos:["+this.structurePos + "] with BoundingBoxes:["+this.boundingBoxes+"]";
+	}
+	
+	public static StructureBoundingBox getBox(Schematic schem, Rotation rot, BlockPos pos)
+	{
+		BlockPos corner = new BlockPos(schem.x,schem.y,schem.z);
+		if(rot==Rotation.CLOCKWISE_90||rot==Rotation.COUNTERCLOCKWISE_90)
+			corner = new BlockPos(schem.z,schem.y,schem.x);
+		return StructureBoundingBox.createProper
+				(corner.getX()+pos.getX(), corner.getY()+pos.getY(), corner.getZ()+pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
+	}
+	
+	public static Set<ChunkPos> calculateChunks(StructureBoundingBox box)
+	{
+		Set<ChunkPos> set = Sets.newHashSet();
+		//Test if its at the negative border and if so add the chunk it lies at too
+		int chunkX1 = box.minX>>4+(box.minX%16==0?-1:0);
+		int chunkZ1 = box.minZ>>4+(box.minZ%16==0?-1:0);
+		int chunkX2 = box.maxX>>4;
+		int chunkZ2 = box.maxZ>>4;
+		for(int x = chunkX1; x<=chunkX2;x++)
+			for(int z = chunkZ1; z<=chunkZ2; z++)
+				set.add(new ChunkPos(x, z));
+		return set;
+	}
+	
+	public static StructureBoundingBox getChunk(BlockPos pos)
+	{
+		return getChunk(pos.getX()>>4, pos.getZ()>>4);
+	}
+	
+	public static StructureBoundingBox getChunk(int chunkX, int chunkZ)
+	{
+		int x=chunkX*16+1;
+		int z=chunkZ*16+1;
+		//With the negative check add 1 to the box should be fine. i hope
+		return new StructureBoundingBox(x,z,x+15,z+15);
+	}
 }
+
