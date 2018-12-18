@@ -1,4 +1,4 @@
-package com.flemmli97.tenshilib.asm;
+package com.flemmli97.tenshilib.common.config;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

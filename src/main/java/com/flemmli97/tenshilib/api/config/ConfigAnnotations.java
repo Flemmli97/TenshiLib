@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.flemmli97.tenshilib.asm.ConfigUtils.Init;
+import com.flemmli97.tenshilib.common.config.ConfigUtils.Init;
 
 /**
  * To fields with any of this annotations added additional it needs to have the @Config.Ignore annotation too.

@@ -2,8 +2,8 @@ package com.flemmli97.tenshilib.proxy;
 
 import com.flemmli97.tenshilib.asm.ASMException;
 import com.flemmli97.tenshilib.asm.ASMLoader;
-import com.flemmli97.tenshilib.asm.ConfigUtils;
-import com.flemmli97.tenshilib.asm.ConfigUtils.Init;
+import com.flemmli97.tenshilib.common.config.ConfigUtils;
+import com.flemmli97.tenshilib.common.config.ConfigUtils.Init;
 import com.flemmli97.tenshilib.common.events.handler.ClientEvents;
 import com.flemmli97.tenshilib.common.events.handler.CommonEvents;
 import com.flemmli97.tenshilib.common.item.Util;

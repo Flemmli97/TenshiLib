@@ -40,7 +40,7 @@ public class ASMTransformer implements IClassTransformer{
 		classMethod.put("net.minecraft.pathfinding.PathNavigate", new Method("<init>", "<init>", "<init>", "(Lnet/minecraft/entity/EntityLiving;Lnet/minecraft/world/World;)V", "(Lvq;Lamu;)V"));
 		patches.put("net.minecraft.client.renderer.entity.layers.LayerHeldItem", layerHeldItem());
 		classMethod.put("net.minecraft.client.renderer.entity.layers.LayerHeldItem", new Method("doRenderLayer", "func_177141_a", "a", "(Lnet/minecraft/entity/EntityLivingBase;FFFFFFF)V", "(Lvp;FFFFFFF)V"));
-		//SHHH
+		//SHHH. There were various reasons why i did it this way and have not made a pull request for forge
 		patches.put("net.minecraftforge.common.config.ConfigManager", configManager());
 		classMethod.put("net.minecraftforge.common.config.ConfigManager", new Method("sync", "", "", 
 				"(Lnet/minecraftforge/common/config/Configuration;Ljava/lang/Class;Ljava/lang/String;Ljava/lang/String;ZLjava/lang/Object;)V", ""));
@@ -296,7 +296,7 @@ public class ASMTransformer implements IClassTransformer{
 				inject.add(new VarInsnNode(Opcodes.ALOAD, 3));
 				inject.add(new VarInsnNode(Opcodes.ALOAD, 1));
 				inject.add(new VarInsnNode(Opcodes.ALOAD, 5));
-				inject.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/flemmli97/tenshilib/asm/ConfigUtils", "load", 
+				inject.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/flemmli97/tenshilib/asm/ASMMethods", "configLoad", 
                 		"(Lnet/minecraftforge/common/config/Configuration;Ljava/lang/String;Ljava/lang/Class;Ljava/lang/Object;)V", false));
 				method.instructions.insert(inject);
 			}

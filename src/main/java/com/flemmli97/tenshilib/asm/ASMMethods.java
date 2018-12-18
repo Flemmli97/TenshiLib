@@ -1,6 +1,7 @@
 package com.flemmli97.tenshilib.asm;
 
 import com.flemmli97.tenshilib.api.item.IDualWeaponRender;
+import com.flemmli97.tenshilib.common.config.ConfigUtils;
 import com.flemmli97.tenshilib.common.events.LayerHeldItemEvent;
 import com.flemmli97.tenshilib.common.events.ModelRotationEvent;
 import com.flemmli97.tenshilib.common.events.PathFindInitEvent;
@@ -16,6 +17,7 @@ import net.minecraft.pathfinding.PathFinder;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.util.EnumHand;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
 
 public class ASMMethods {
     
@@ -49,5 +51,10 @@ public class ASMMethods {
 		LayerHeldItemEvent event = new LayerHeldItemEvent(entity, stack, hand);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.getStack();
+	}
+	
+	public static void configLoad(Configuration config, String category, Class<?> clss, Object obj)
+	{
+		ConfigUtils.load(config, category, clss, obj);
 	}
 }
