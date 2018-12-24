@@ -5,8 +5,8 @@ import java.util.Collections;
 import java.util.List;
 
 import com.flemmli97.tenshilib.common.blocks.ModBlocks;
-import com.flemmli97.tenshilib.common.world.Schematic;
-import com.flemmli97.tenshilib.common.world.StructureLoader;
+import com.flemmli97.tenshilib.common.world.structure.Schematic;
+import com.flemmli97.tenshilib.common.world.structure.StructureLoader;
 import com.google.common.collect.Lists;
 
 import net.minecraft.command.CommandBase;

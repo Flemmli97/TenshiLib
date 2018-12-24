@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 
-public class Util {
+public class EntityUtil {
 
 	@SuppressWarnings("unchecked")
 	@Nullable

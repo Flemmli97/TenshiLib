@@ -1,10 +1,13 @@
 package com.flemmli97.tenshilib.proxy;
 
-import com.flemmli97.tenshilib.common.world.StructureBase;
+import com.flemmli97.tenshilib.common.events.handler.ClientEvents;
+import com.flemmli97.tenshilib.common.world.structure.StructureBase;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.IThreadListener;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -21,6 +24,7 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void init(FMLInitializationEvent e) {
+    	MinecraftForge.EVENT_BUS.register(new ClientEvents());
         super.init(e);
     }
 
@@ -34,6 +38,11 @@ public class ClientProxy extends CommonProxy {
         return ctx.side.isClient() ? Minecraft.getMinecraft() : super.getListener(ctx);
     }
     
+	@Override
+    public EntityPlayer getPlayerEntity(MessageContext ctx) {
+     return (ctx.side.isClient() ? Minecraft.getMinecraft().player : super.getPlayerEntity(ctx));
+    }
+    
     @Override
     public String translate(String s)
     {
@@ -45,4 +54,5 @@ public class ClientProxy extends CommonProxy {
     {
     	this.currentStructure=base;
     }
+    
 }

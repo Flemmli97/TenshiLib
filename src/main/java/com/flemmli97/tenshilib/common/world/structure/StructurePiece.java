@@ -1,4 +1,4 @@
-package com.flemmli97.tenshilib.common.world;
+package com.flemmli97.tenshilib.common.world.structure;
 
 import java.util.Random;
 import java.util.Set;
@@ -25,17 +25,17 @@ public class StructurePiece {
 	private BlockPos pos;
 	private Mirror mirror=Mirror.NONE;
 	private Rotation rot = Rotation.NONE;
-	private boolean replaceGround;
+	private GenerationType genType;
 	
 	private Set<ChunkPos> structureChunks = Sets.newHashSet();
 	
-	public StructurePiece(ResourceLocation structure, Mirror mirror, Rotation rot, boolean replaceGround, BlockPos pos, @Nullable StructureBase parent, Random rand)
+	public StructurePiece(ResourceLocation structure, Mirror mirror, Rotation rot, GenerationType genType, BlockPos pos, @Nullable StructureBase parent, Random rand)
 	{
 		this.structureToGen=structure;
 		this.pos=pos;
 		this.mirror=mirror;
 		this.rot=rot;
-		this.replaceGround=replaceGround;
+		this.genType=genType;
 		Schematic schematic = StructureLoader.getSchematic(structure);
 		StructureBoundingBox box = StructureBase.getBox(schematic, rot, pos);
 		this.structureChunks=StructureBase.calculateChunks(box);
@@ -61,7 +61,7 @@ public class StructurePiece {
 	 */
 	public void generate(World world)
 	{
-		StructureLoader.getSchematic(this.structureToGen).generate(world, this.pos, this.rot, this.mirror, this.replaceGround, null);
+		StructureLoader.getSchematic(this.structureToGen).generate(world, this.pos, this.rot, this.mirror, this.genType, null);
 	}
 	
 	/**
@@ -72,7 +72,7 @@ public class StructurePiece {
 		ChunkPos pos = new ChunkPos(chunkX, chunkZ);
 		if(this.structureChunks.contains(pos))
 		{
-			StructureLoader.getSchematic(this.structureToGen).generate(world, this.pos, this.rot, this.mirror, this.replaceGround, StructureBase.getChunk(chunkX, chunkZ));
+			StructureLoader.getSchematic(this.structureToGen).generate(world, this.pos, this.rot, this.mirror, this.genType, StructureBase.getChunk(chunkX, chunkZ));
 			this.structureChunks.remove(pos);
 		}
 		return this.structureChunks.isEmpty();
@@ -83,7 +83,7 @@ public class StructurePiece {
 		this.pos=new BlockPos(arrPos[0], arrPos[1], arrPos[2]);
 		this.mirror = Mirror.valueOf(compound.getString("Mirror"));
 		this.rot = Rotation.valueOf(compound.getString("Rotation"));
-		this.replaceGround = compound.getBoolean("ReplaceGround");
+		this.genType = GenerationType.valueOf(compound.getString("GenerationType"));
 		this.structureToGen=new ResourceLocation(compound.getString("StructureToGenerate"));
 		compound.getTagList("StructureChunks", Constants.NBT.TAG_INT_ARRAY).forEach(tag->{
 			int[] arr = ((NBTTagIntArray)tag).getIntArray();
@@ -95,11 +95,17 @@ public class StructurePiece {
 		compound.setIntArray("Position", new int[] {this.pos.getX(),this.pos.getY(),this.pos.getZ()});
 		compound.setString("Mirror", this.mirror.toString());
 		compound.setString("Rotation", this.rot.toString());
-		compound.setBoolean("ReplaceGround", this.replaceGround);
+		compound.setString("GenerationType", this.genType.toString());
 		compound.setString("StructureToGenerate", this.structureToGen.toString());
 		NBTTagList list = new NBTTagList();
 		this.structureChunks.forEach(pos->list.appendTag(new NBTTagIntArray(new int[] {pos.x, pos.z})));
 		compound.setTag("StructureChunks", list);
 		return compound;	
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "Schematic:" + this.structureToGen+",Mirror:"+this.mirror+",Rotation:"+this.rot+",Pos:"+this.pos+",GenerationType:"+this.genType;
 	}
 }

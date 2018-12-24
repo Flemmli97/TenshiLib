@@ -1,5 +1,6 @@
 package com.flemmli97.tenshilib.common.blocks;
 
+import com.flemmli97.tenshilib.TenshiLib;
 import com.flemmli97.tenshilib.common.blocks.tile.TileStructurePiece;
 
 import net.minecraft.block.Block;
@@ -23,8 +24,8 @@ public class BlockStructurePiece extends BlockIgnore implements ITileEntityProvi
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, 
     		EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
-		//GUI
-        return false;
+		player.openGui(TenshiLib.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
+        return true;
     }
 	
 	@Override

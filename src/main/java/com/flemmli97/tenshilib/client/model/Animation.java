@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import com.flemmli97.tenshilib.TenshiLib;
+import com.flemmli97.tenshilib.common.javahelper.ArrayUtils;
+import com.flemmli97.tenshilib.common.javahelper.MathUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
@@ -20,11 +22,16 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.common.Loader;
 
+/**
+ * Reads an extracted tabula animation json from file.
+ * Uses and identifierMap for matching the ModelRenderer with tabulas identifiers. The name needs to match the ModelRendere's field name 
+ */
 public class Animation {
 	
 	private Map<ModelRenderer, ArrayList<AnimationComponent>> map = Maps.newHashMap();
 	private static final Gson gson = new Gson();
 	private int length;
+	private IResetModel model;
 	public Animation(ModelBase model, ResourceLocation res)
 	{
 		InputStream input = Loader.class.getResourceAsStream("/assets/"+res.getResourceDomain()+"/"+res.getResourcePath());
@@ -48,9 +55,10 @@ public class Animation {
 						JsonArray arr = animSets.getAsJsonArray(id);
 						arr.forEach(element->{
 							try {
-								AnimationComponent comp = new AnimationComponent((JsonObject) element);
+								AnimationComponent comp = new AnimationComponent(model, (JsonObject) element);
 								this.map.merge((ModelRenderer) field.get(model), Lists.newArrayList(comp), (old,val)->{old.addAll(val);old.sort(null); return old;});
-							} catch (IllegalArgumentException | IllegalAccessException e) {
+							} catch (Exception e) {
+								TenshiLib.logger.error("Error parsing animation component: {}", element);
 								e.printStackTrace();
 							}						
 						});
@@ -60,11 +68,15 @@ public class Animation {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		if(model instanceof IResetModel)
+			this.model=(IResetModel) model;
 	}
 	
 	//ticker ticks up
 	public void animate(int ticker, float partialTicks)
 	{
+		if(this.model!=null)
+			this.model.resetModel();
 		this.map.entrySet().forEach(entry->{
 			entry.getValue().forEach(comp->{
 				comp.animate(entry.getKey(), ticker, partialTicks);
@@ -88,7 +100,7 @@ public class Animation {
 	
 	public void addComponent(ModelRenderer model, AnimationComponent component)
 	{
-		this.map.merge(model, Lists.newArrayList(component), (old,val)->{old.addAll(val); return old;});
+		this.map.merge(model, Lists.newArrayList(component), (old,val)->{old.addAll(val);old.sort(null); return old;});
 		this.map.values().forEach(list->{
         	list.forEach(comp->{
         		if(comp.startKey + comp.length > this.length)
@@ -124,27 +136,36 @@ public class Animation {
 				
 		public int length;
 		public int startKey;
-		//private boolean start,end;
-		//private String name;
+		private String name;
 		
-		public AnimationComponent(JsonObject obj)
+		public AnimationComponent(ModelBase model, JsonObject obj)
 		{
 			//convert to rad
 			JsonArray posChangeJson = obj.getAsJsonArray("posChange");
 			for(int i = 0; i < 3; i++)
-				this.posChange[i]=posChangeJson.get(i).getAsDouble();
+			{
+				double change = posChangeJson.get(i).getAsDouble();
+				if(change!=0 && !(model instanceof IResetModel))
+					throw new IllegalArgumentException("Model needs to implement IResetModel. Else changes to rotation points will mess up the model during animation");
+				this.posChange[i]=change;
+			}
 			JsonArray rotChangeJson = obj.getAsJsonArray("rotChange");
 			for(int i = 0; i < 3; i++)
-				this.rotChange[i]=ModelUtils.degToRad((float) rotChangeJson.get(i).getAsDouble());
+				this.rotChange[i]=MathUtils.degToRad((float) rotChangeJson.get(i).getAsDouble());
 			JsonArray posOffJson = obj.getAsJsonArray("posOffset");
 			for(int i = 0; i < 3; i++)
-				this.posOffset[i]=posOffJson.get(i).getAsDouble();
+			{
+				double off = posOffJson.get(i).getAsDouble();
+				if(off!=0 && !(model instanceof IResetModel))
+					throw new IllegalArgumentException("Model needs to implement IResetModel. Else changes to rotation points will mess up the model during animation");
+				this.posOffset[i]=off;
+			}
 			JsonArray rotOffJson = obj.getAsJsonArray("rotOffset");
 			for(int i = 0; i < 3; i++)
-				this.rotOffset[i]=ModelUtils.degToRad((float) rotOffJson.get(i).getAsDouble());
+				this.rotOffset[i]=MathUtils.degToRad((float) rotOffJson.get(i).getAsDouble());
 			this.length=obj.get("length").getAsInt();
 			this.startKey=obj.get("startKey").getAsInt();
-			//this.name=obj.get("name").getAsString();
+			this.name=obj.get("name").getAsString();
 		}
 
 		public void animate(ModelRenderer model, int ticker, float partialTicks)
@@ -153,16 +174,16 @@ public class Animation {
 			float prog = MathHelper.clamp((actualTick - startKey) / (float)length, 0F, 1F);
 			if(ticker >= this.startKey)
 		    {
-				model.rotationPointX+=(float)this.posOffset[0];
-				model.rotationPointY+=(float)this.posOffset[1];
-				model.rotationPointZ+=(float)this.posOffset[2];
+				model.rotationPointX+=this.posOffset[0];
+				model.rotationPointY+=this.posOffset[1];
+				model.rotationPointZ+=this.posOffset[2];
 		        model.rotateAngleX+=this.rotOffset[0];
 		        model.rotateAngleY+=this.rotOffset[1];
 		        model.rotateAngleZ+=this.rotOffset[2];
 		    }
-			model.rotationPointX+=(float)this.posChange[0] * prog;
-			model.rotationPointY+=(float)this.posChange[1] * prog;
-			model.rotationPointZ+=(float)this.posChange[2] * prog;
+			model.rotationPointX+=this.posChange[0] * prog;
+			model.rotationPointY+=this.posChange[1] * prog;
+			model.rotationPointZ+=this.posChange[2] * prog;
 	        model.rotateAngleX+=this.rotChange[0] * prog;
 	        model.rotateAngleY+=this.rotChange[1] * prog;
 	        model.rotateAngleZ+=this.rotChange[2] * prog;
@@ -232,6 +253,12 @@ public class Animation {
 		    }
 		    return progressionCurve;
 		}*/
+		
+		@Override
+		public String toString()
+		{
+			return this.name+":{PosOffset:["+ArrayUtils.arrayToString(this.posOffset)+"],RotOffset:["+ArrayUtils.arrayToString(this.rotOffset)+"],PosChange:["+ArrayUtils.arrayToString(this.posChange)+"],RotChange:["+ArrayUtils.arrayToString(this.rotChange)+"]}";
+		}
 
 		@Override
 		public int compareTo(AnimationComponent o) {

@@ -4,9 +4,9 @@ package com.flemmli97.tenshilib.common.commands;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.flemmli97.tenshilib.common.world.StructureBase;
-import com.flemmli97.tenshilib.common.world.StructureGenerator;
-import com.flemmli97.tenshilib.common.world.StructureMap;
+import com.flemmli97.tenshilib.common.world.structure.StructureBase;
+import com.flemmli97.tenshilib.common.world.structure.StructureGenerator;
+import com.flemmli97.tenshilib.common.world.structure.StructureMap;
 import com.google.common.collect.Lists;
 
 import net.minecraft.command.CommandException;

@@ -6,8 +6,12 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import org.apache.commons.lang3.tuple.Pair;
+
+import com.flemmli97.tenshilib.common.javahelper.MathUtils;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.collect.Lists;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -16,12 +20,13 @@ import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class RayTraceUtils {
-	
+
 	/**
 	 * Gets a list of entities in a certain fov around the player
 	 * @param player
@@ -43,37 +48,83 @@ public class RayTraceUtils {
 	private static boolean entityApplicable(EntityPlayer player, EntityLivingBase living, float reach, float fov)
 	{
 		Vec3d posVec = player.getPositionEyes(1);
+		AxisAlignedBB axisalignedbb = living.getEntityBoundingBox().grow(living.getCollisionBorderSize());
 		if(fov==0)
 		{
 			Vec3d look = player.getLook(1);
 			RayTraceResult blocks = player.world.rayTraceBlocks(posVec, posVec.addVector(look.x * reach, look.y * reach, look.z * reach), false, false, true);
 			reach=(float) blocks.hitVec.distanceTo(posVec);
-            AxisAlignedBB axisalignedbb = living.getEntityBoundingBox().grow(living.getCollisionBorderSize());
 			return axisalignedbb.calculateIntercept(posVec, posVec.addVector(look.x * reach, look.y * reach, look.z * reach))!=null;
 		}
-		//Is entity in aoe area
-		double dx = living.posX - player.posX;
-        double dz = living.posZ - player.posZ;
-        if (dx == 0.0 && dz == 0.0)
-            dx = 0.001;
-        while (player.rotationYaw > 360.0f) {
+		if(axisalignedbb.contains(posVec))
+			return true;
+		while (player.rotationYaw > 360.0f) {
             player.rotationYaw -= 360.0f;
         }
         while (player.rotationYaw < -360.0f) {
             player.rotationYaw += 360.0f;
         }
-        float yaw = (float)(Math.atan2(dz, dx) * 180.0 / 3.141592653589793) - player.rotationYaw;
-        yaw -= 90.0f;
+		Vec3d point1 = new Vec3d(axisalignedbb.minX, axisalignedbb.minY, axisalignedbb.minZ);
+		Vec3d point2 = new Vec3d(axisalignedbb.maxX, axisalignedbb.minY, axisalignedbb.minZ);
+		Vec3d point3 = new Vec3d(axisalignedbb.minX, axisalignedbb.minY, axisalignedbb.maxZ);
+		Vec3d point6 = new Vec3d(axisalignedbb.maxX, axisalignedbb.maxY, axisalignedbb.minZ);
+		Vec3d point7 = new Vec3d(axisalignedbb.minX, axisalignedbb.maxY, axisalignedbb.maxZ);
+		Vec3d point8 = new Vec3d(axisalignedbb.maxX, axisalignedbb.maxY, axisalignedbb.maxZ);
 
-        while (yaw < -180.0f) {
-            yaw += 360.0f;
-        }
-        while (yaw >= 180.0f) {
-            yaw -= 360.0f;
-        }
-        double heightDiff = Math.min(Math.abs(posVec.y-living.posY), Math.abs(posVec.y-living.posY+living.height));
-		boolean inAoe = yaw < fov && yaw > -fov && heightDiff<=2.5;
-		return inAoe && canSeeEntity(posVec, living);
+		//Test on X-Z Plane
+		List<Pair<Vec3d,Vec3d>> lines = Lists.newArrayList();
+		lines.add(Pair.of(point1, point6));
+		lines.add(Pair.of(point2, point8));
+		lines.add(Pair.of(point1, point7));
+		lines.add(Pair.of(point3, point8));
+		boolean xz=false;
+		Vec3d closest = null;
+		for(Pair<Vec3d, Vec3d> pair : lines)
+		{
+			closest = MathUtils.closestPointToLine(posVec, pair.getLeft(), pair.getRight());
+			if(posVec.squareDistanceTo(closest)>(reach*reach))
+				continue;
+			double dx = closest.x - posVec.x;
+	        double dz = closest.z - posVec.z;
+	        if (dx == 0.0 && dz == 0.0)
+	            dx = 0.001;
+	        float yaw = (float)(MathHelper.atan2(dz, dx) * 180.0 / 3.141592653589793) - player.rotationYaw-90;
+	        while (yaw < -180.0f) {
+	            yaw += 360.0f;
+	        }
+	        while (yaw >= 180.0f) {
+	            yaw -= 360.0f;
+	        }
+	        xz = yaw < fov && yaw > -fov;
+	        if(xz)
+	        	break;
+		}
+		if(!xz)
+			return false;
+		//Test pitch
+		boolean y=false;
+		for(Pair<Vec3d, Vec3d> pair : lines)
+		{
+			Vec3d vec = MathUtils.closestPointToLine(posVec, pair.getLeft(), pair.getRight());
+			double dis = posVec.distanceTo(vec);
+			double dy = living.posY-posVec.y;
+			if (dy == 0.0)
+				dy = 0.001;
+			float pitchAOE = 20;
+			float pitch = (float)(Math.acos(dy / dis) * 180.0 / 3.141592653589793)-(player.rotationPitch+90);
+			y = pitch<pitchAOE && pitch>-pitchAOE;
+			if(!y)
+			{
+				dy = living.posY+living.height-posVec.y;
+				if (dy == 0.0)
+					dy = 0.001;
+				pitch = (float)(Math.acos(dy / dis) * 180.0 / 3.141592653589793)-(player.rotationPitch+90);
+				y = pitch<pitchAOE && pitch>-pitchAOE;
+			}
+			if(y)
+				break;
+		}
+		return y && canSeeEntity(posVec, living);
 	}
 	
 	public static boolean canSeeEntity(Vec3d pos, EntityLivingBase living)
@@ -140,7 +191,7 @@ public class RayTraceUtils {
 		return null;
 	}
 	
-	public BlockPos randomPosAround(World world, Entity e, BlockPos pos, int range, boolean grounded, Random rand)
+	public static BlockPos randomPosAround(World world, Entity e, BlockPos pos, int range, boolean grounded, Random rand)
 	{
 		int randX = pos.getX()+rand.nextInt(2*range)-range;
 		int randY = pos.getY()+rand.nextInt(2*range)-range;

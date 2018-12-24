@@ -1,4 +1,4 @@
-package com.flemmli97.tenshilib.common.world;
+package com.flemmli97.tenshilib.common.world.structure;
 
 import java.util.Map;
 import java.util.Random;
@@ -34,15 +34,19 @@ public class StructureGenerator implements IWorldGenerator{
 			IChunkProvider chunkProvider) {
 		if(world.getWorldInfo().isMapFeaturesEnabled())
 		{
-			for(Structure s : gens.values())
-			{
-				for(int x = chunkX-ConfigHandler.generatorRadius; x <=chunkX+ConfigHandler.generatorRadius; x++)
-					for(int z = chunkZ-ConfigHandler.generatorRadius; z <=chunkZ+ConfigHandler.generatorRadius; z++)
+			//new Thread() {
+			//	@Override
+			//	public void run() {
+					for(Structure s : gens.values())
 					{
-						world.setRandomSeed(x, z, ConfigHandler.seed);
-						s.startStructure(world, x, z, random);
+						for(int x = chunkX-ConfigHandler.generatorRadius; x <=chunkX+ConfigHandler.generatorRadius; x++)
+							for(int z = chunkZ-ConfigHandler.generatorRadius; z <=chunkZ+ConfigHandler.generatorRadius; z++)
+							{
+								world.setRandomSeed(x, z, ConfigHandler.seed);
+								s.startStructure(world, x, z, random);
+							}
 					}
-			}
+			//	}}.start();
 			StructureMap.get(world).generate(world, chunkX, chunkZ);
 		}
 	}

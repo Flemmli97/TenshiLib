@@ -1,4 +1,4 @@
-package com.flemmli97.tenshilib.common.world;
+package com.flemmli97.tenshilib.common.world.structure;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +8,9 @@ import javax.annotation.Nullable;
 
 import com.flemmli97.tenshilib.api.block.ITileEntityInitialPlaced;
 import com.flemmli97.tenshilib.common.blocks.BlockIgnore;
+import com.flemmli97.tenshilib.common.world.Position;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 
 import net.minecraft.block.BlockStructure;
 import net.minecraft.block.material.Material;
@@ -70,8 +72,9 @@ public class Schematic {
 	 * @param replaceGroundBelow if it should replace potential air spaces below the structure
 	 * @param limitation 
 	 */
-	public void generate(World world, BlockPos pos, Rotation rot, Mirror mirror, boolean replaceGroundBelow, 
+	public void generate(World world, BlockPos pos, Rotation rot, Mirror mirror, GenerationType genType, 
 			@Nullable StructureBoundingBox chunkLimitation) {
+		Map<Position,Integer> map=null;
 		for(int y = 0; y < this.y; y++)
 			for(int z = 0; z < this.z; z++)
 				for(int x = 0; x < this.x; x++)					
@@ -79,7 +82,16 @@ public class Schematic {
 					Position schemPos = new Position(x,y,z);
 					BlockPos place = transformPos(schemPos, mirror, rot, new BlockPos(this.x, this.y
 							, this.z)).add(pos);
-					
+					if(genType==GenerationType.GROUNDALIGNED)
+					{
+						if(y==0)
+						{
+							if(map==null)
+								map=Maps.newHashMap();
+							map.put(new Position(schemPos.getX(),0,schemPos.getZ()), getLowestPosForPlacement(world,place).getY());
+						}
+						place = new BlockPos(place.getX(), map.get(new Position(schemPos.getX(),0,schemPos.getZ()))+y,place.getZ());
+					}
 					if(chunkLimitation!=null && !chunkLimitation.isVecInside(place))
 					{
 						continue;
@@ -89,7 +101,7 @@ public class Schematic {
 					if(state!=null && !(state.getBlock() instanceof BlockStructure||state.getBlock() instanceof BlockIgnore))
 					{
 						world.setBlockState(place, state.withMirror(mirror).withRotation(rot), 18);
-						if(replaceGroundBelow && y == 0)
+						if(genType==GenerationType.REPLACEBELOW && y == 0)
 						{
 							replaceAirAndLiquidDownwards(world, world.getBiome(place).fillerBlock, place.down());
 						}
@@ -115,17 +127,27 @@ public class Schematic {
 	}
 	
 	public void generate(World world, BlockPos pos, Rotation rot, Mirror mirror) {
-		this.generate(world, pos, rot, mirror, false, null);
+		this.generate(world, pos, rot, mirror, GenerationType.FLOATING, null);
 	}
 		
-	private static void replaceAirAndLiquidDownwards(World worldIn, IBlockState blockstateIn, BlockPos pos)
+	private static void replaceAirAndLiquidDownwards(World world, IBlockState blockstate, BlockPos pos)
     {
-        while ((isReplacable(worldIn.getBlockState(pos).getMaterial())||worldIn.isAirBlock(pos)) && pos.getY() > 1)
+        while ((isReplacable(world.getBlockState(pos).getMaterial())||world.isAirBlock(pos)) && pos.getY() > 1)
         {
-            worldIn.setBlockState(pos, blockstateIn, 2);
+            world.setBlockState(pos, blockstate, 2);
             pos=pos.down();
         }
     }
+	
+	private static BlockPos getLowestPosForPlacement(World world, BlockPos pos)
+	{
+		BlockPos orig = pos;
+		while ((isReplacable(world.getBlockState(pos).getMaterial())||world.isAirBlock(pos)) && pos.getY() > 0)
+        {
+            pos=pos.down();
+        }
+		return pos.getY()==1?orig:pos;
+	}
 	
 	private static boolean isReplacable(Material mat)
 	{

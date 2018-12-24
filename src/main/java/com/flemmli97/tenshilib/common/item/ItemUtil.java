@@ -30,7 +30,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import scala.util.Random;
 
-public class Util {
+public class ItemUtil {
 
 	private static List<Item> weapons = Lists.newArrayList();
 	private static List<Item> armor = Lists.newArrayList();

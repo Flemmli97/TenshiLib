@@ -1,7 +1,7 @@
 package com.flemmli97.tenshilib.common.network;
 
 import com.flemmli97.tenshilib.TenshiLib;
-import com.flemmli97.tenshilib.common.world.StructureBase;
+import com.flemmli97.tenshilib.common.world.structure.StructureBase;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;

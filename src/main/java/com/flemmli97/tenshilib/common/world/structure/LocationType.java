@@ -1,4 +1,4 @@
-package com.flemmli97.tenshilib.common.world;
+package com.flemmli97.tenshilib.common.world.structure;
 
 public enum LocationType {
 

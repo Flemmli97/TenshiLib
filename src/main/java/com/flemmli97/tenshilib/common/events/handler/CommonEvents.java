@@ -3,7 +3,7 @@ package com.flemmli97.tenshilib.common.events.handler;
 import com.flemmli97.tenshilib.TenshiLib;
 import com.flemmli97.tenshilib.common.network.PacketHandler;
 import com.flemmli97.tenshilib.common.network.PacketStructure;
-import com.flemmli97.tenshilib.common.world.StructureMap;
+import com.flemmli97.tenshilib.common.world.structure.StructureMap;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.config.Config.Type;

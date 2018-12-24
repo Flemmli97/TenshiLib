@@ -12,7 +12,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class InitUtils {
+public class ItemBlockInitUtils {
 
 	public static void registerAllBlocks(Class<?> clss, RegistryEvent.Register<Block> event)
 	{

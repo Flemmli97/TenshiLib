@@ -1,7 +1,7 @@
 package com.flemmli97.tenshilib.common.blocks;
 
 import com.flemmli97.tenshilib.TenshiLib;
-import com.flemmli97.tenshilib.common.InitUtils;
+import com.flemmli97.tenshilib.common.ItemBlockInitUtils;
 import com.flemmli97.tenshilib.common.blocks.tile.TileStructurePiece;
 
 import net.minecraft.block.Block;
@@ -21,19 +21,22 @@ public class ModBlocks {
 	
 	public static final Block ignore = new BlockIgnore("ignore");
 	public static final Block structure = new BlockStructurePiece();
+	//public static final Block camo = new BlockCamo(new ResourceLocation(TenshiLib.MODID, "camo"), Material.ROCK);
 
 	@SubscribeEvent
 	public static final void registerBlocks(RegistryEvent.Register<Block> event) { 
 	    event.getRegistry().register(ignore);
 	    event.getRegistry().register(structure);
+	    //event.getRegistry().register(camo);
 	    GameRegistry.registerTileEntity(TileStructurePiece.class, new ResourceLocation(TenshiLib.MODID, "tile_structure_piece"));
-
+	    //GameRegistry.registerTileEntity(TileCamo.class, new ResourceLocation(TenshiLib.MODID, "tile_camo"));
 	}
 	
 	@SubscribeEvent
     public static final void registerItemBlocks(RegistryEvent.Register<Item> event) {
-	    event.getRegistry().register(InitUtils.itemFromBlock(ignore));
-	    event.getRegistry().register(InitUtils.itemFromBlock(structure));
+	    event.getRegistry().register(ItemBlockInitUtils.itemFromBlock(ignore));
+	    event.getRegistry().register(ItemBlockInitUtils.itemFromBlock(structure));
+	    //event.getRegistry().register(ItemBlockInitUtils.itemFromBlock(camo));
 
 	}
 	
@@ -41,7 +44,8 @@ public class ModBlocks {
 	@SideOnly(value = Side.CLIENT)
 	public static final void initModel(ModelRegistryEvent event)
 	{
-		InitUtils.registerSpecificModel(ignore, Blocks.END_ROD.getRegistryName());
-		InitUtils.registerSpecificModel(structure, Blocks.END_ROD.getRegistryName());
+		ItemBlockInitUtils.registerSpecificModel(ignore, Blocks.END_ROD.getRegistryName());
+		ItemBlockInitUtils.registerSpecificModel(structure, Blocks.STRUCTURE_BLOCK.getRegistryName());
+		//ItemBlockInitUtils.registerSpecificModel(camo, Blocks.STONE.getRegistryName());
 	}
 }

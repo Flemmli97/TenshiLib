@@ -1,4 +1,4 @@
-package com.flemmli97.tenshilib.common.world;
+package com.flemmli97.tenshilib.common.world.structure;
 
 import java.util.List;
 import java.util.Random;
@@ -16,6 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
@@ -28,23 +29,24 @@ public class Structure implements IConfigSerializable<Structure>{
 	private int frequency, yOffset, minDist;
 	private int[] dimensions;
 	private LocationType type;
+	private GenerationType genType;
 	private List<Biome> biomes = Lists.newLinkedList();
 	private List<Biome> biomesRaw = Lists.newLinkedList();
-
 	private List<Type> biomesTypes = Lists.newLinkedList();
 
 	/**
-	 * Start of a structure. Structures are located under "./assets/MODID/structures/". Currently only .nbt supported
+	 * Start of a structure. Structures are located under "./assets/MODID/structures/". Currently only .nbt supported. 
 	 * @param id The id of the whole structure. Translation key is "structure."+id.
 	 * @param starting Structures structure pieces eligible for the first placement, if null the id will be picked.
 	 * @param frequency Spawnrate of structure
-	 * @param type Ff the structure spawns in air, ground, underground
+	 * @param type If the structure spawns in air, ground, underground.
+	 * @param genType See {@link GenerationType}
 	 * @param dimID Dimensions this structure can spawn in
 	 * @param yOffset Offset of the height during spawn
 	 * @param biomeList Eligible biomes for the structure
 	 * @param biomeTypes Eligible biomes types for the structure
 	 */
-	public Structure(ResourceLocation id, @Nullable ResourceLocation[] startingStructures, int frequency, int minDist, LocationType type, int[] dimID, int yOffset,List<Biome> biomeList, List<Type> biomeTypes)
+	public Structure(ResourceLocation id, @Nullable ResourceLocation[] startingStructures, int frequency, int minDist, LocationType type, GenerationType genType, int[] dimID, int yOffset,List<Biome> biomeList, List<Type> biomeTypes)
 	{
 		this.id=id;
 		if(startingStructures==null)
@@ -58,6 +60,7 @@ public class Structure implements IConfigSerializable<Structure>{
 		this.biomesTypes=biomeTypes;
 		this.biomesRaw=biomeList;
 		this.biomes=biomeList;
+		this.genType=genType;
 		for(Type biomeType : biomeTypes)
 		{
 			for(Biome biome : BiomeDictionary.getBiomes(biomeType))
@@ -68,9 +71,9 @@ public class Structure implements IConfigSerializable<Structure>{
 				throw new NullPointerException("Schematic for structure ["+res.toString()+"] couldn't be loaded");
 	}
 	
-	protected Structure(ResourceLocation id, String[] startingStructures, int frequency, int minDist, LocationType type, int[] dimID, int yOffset,List<Biome> biomeList, List<Type> biomeTypes)
+	protected Structure(ResourceLocation id, String[] startingStructures, int frequency, int minDist, LocationType type, GenerationType genType, int[] dimID, int yOffset,List<Biome> biomeList, List<Type> biomeTypes)
 	{
-		this(id, fromStringArray(startingStructures), frequency, minDist, type, dimID, yOffset, biomeList, biomeTypes);
+		this(id, fromStringArray(startingStructures), frequency, minDist, type, genType, dimID, yOffset, biomeList, biomeTypes);
 	}
 	
 	private static ResourceLocation[] fromStringArray(String[] arr)
@@ -100,13 +103,12 @@ public class Structure implements IConfigSerializable<Structure>{
 			StructureMap structureMap = StructureMap.get(world);
 			BlockPos pos = new BlockPos(x,y,z);
 			StructureBase nearest = structureMap.getNearestStructure(this.id, pos, world);
-			if((nearest!=null && pos.distanceSq(nearest.getPos())<(this.minDist*this.minDist)) || StructureGenerateEvent.structureEvent(this, pos, world))
+			if((nearest!=null && pos.distanceSq(nearest.getPos())<(this.minDist*this.minDist)) || MinecraftForge.EVENT_BUS.post(new StructureGenerateEvent(this, pos, world)))
 				return;
-			
 			Rotation rot = Rotation.values()[random.nextInt(Rotation.values().length)];
 			Mirror mirror = Mirror.values()[random.nextInt(Mirror.values().length)];
 			ResourceLocation randomStart = this.startingStructures[random.nextInt(this.startingStructures.length)];		
-			structureMap.initStructure(new StructureBase(this.id, randomStart, random, pos, rot, mirror, this.type==LocationType.GROUND));
+			structureMap.initStructure(new StructureBase(this.id, randomStart, random, pos, rot, mirror, this.genType));
 		}
 	}
 	

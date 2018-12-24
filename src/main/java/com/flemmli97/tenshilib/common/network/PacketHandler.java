@@ -18,6 +18,8 @@ public class PacketHandler
     public static final void registerPackets() {
         int id = 0;
         PacketHandler.dispatcher.registerMessage(PacketStructure.Handler.class, PacketStructure.class, id++, Side.CLIENT);
+        PacketHandler.dispatcher.registerMessage(PacketHit.Handler.class, PacketHit.class, id++, Side.SERVER);
+        PacketHandler.dispatcher.registerMessage(PacketStructurePiece.Handler.class, PacketStructurePiece.class, id++, Side.SERVER);
     }
     
     public static final void sendTo(final IMessage message, final EntityPlayerMP player) {

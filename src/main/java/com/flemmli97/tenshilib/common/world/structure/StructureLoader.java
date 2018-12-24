@@ -1,11 +1,14 @@
-package com.flemmli97.tenshilib.common.world;
+package com.flemmli97.tenshilib.common.world.structure;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import com.flemmli97.tenshilib.TenshiLib;
+import com.flemmli97.tenshilib.common.world.Position;
 import com.google.common.collect.Maps;
 
 import net.minecraft.block.state.IBlockState;
@@ -21,11 +24,17 @@ public class StructureLoader {
 	
 	private static final Map<ResourceLocation, Schematic> schemMap = Maps.newHashMap();
 	
-	public static Schematic getSchematic(ResourceLocation res)
+	@Nullable
+	public static Schematic getSchematic(ResourceLocation res) 
 	{
-		if(schemMap.get(res)==null)
-			schemMap.put(res, getSchematic(res.getResourceDomain(), res.getResourcePath()));
-		return schemMap.get(res);
+		Schematic schem = schemMap.get(res);
+		if(schemMap.get(res)==null) 
+		{
+			schem = getSchematic(res.getResourceDomain(), res.getResourcePath());
+			if(schem!=null)
+				schemMap.put(res, schem); 
+		}
+		return schem;
 	}
 	public static Schematic getSchematic(String modid, String fileName)
 	{

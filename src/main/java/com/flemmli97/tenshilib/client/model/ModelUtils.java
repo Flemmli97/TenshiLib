@@ -1,18 +1,10 @@
 package com.flemmli97.tenshilib.client.model;
 
+import com.flemmli97.tenshilib.common.javahelper.MathUtils;
+
 import net.minecraft.util.math.MathHelper;
 
 public class ModelUtils {
-
-	public static float degToRad(float degree)
-	{
-		return degree* ((float)Math.PI/180F);
-	}
-	
-	public static float radToDeg(float rad)
-	{
-		return rad* (180/(float)Math.PI);
-	}
 
 	private static float anim(float defaultAngle, int ticker, float startAngle, float endAngle, int startTick, int duration, float partialTicks)
 	{
@@ -39,7 +31,7 @@ public class ModelUtils {
 	public static float animAngle(float defaultAngleInRad, int ticker, float startPoint, float endPoint, int startTick, int duration, float partialTicks, boolean degree)
 	{
 		if(degree)
-			return anim(defaultAngleInRad, ticker, degToRad(startPoint), degToRad(endPoint), startTick, duration, partialTicks);
+			return anim(defaultAngleInRad, ticker, MathUtils.degToRad(startPoint), MathUtils.degToRad(endPoint), startTick, duration, partialTicks);
 		return anim(defaultAngleInRad, ticker, startPoint, endPoint, startTick, duration, partialTicks);
 	}
 	
@@ -47,7 +39,7 @@ public class ModelUtils {
 	{
 		if(ticker<startTick || ticker>duration+startTick)
 			return defaultAngleInRad;
-		return degree?degToRad(angle):angle;
+		return degree?MathUtils.degToRad(angle):angle;
 	}
 	
 	public static float anim(float defaultAngle, int ticker, float[] angles, int startTick, float partialTicks)

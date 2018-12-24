@@ -10,8 +10,6 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
@@ -32,12 +30,16 @@ public class ASMTransformer implements IClassTransformer{
 	
 	static
 	{
+		//Replace #attackEntity and #swingArm in Minecraft#clickMouse
 		patches.put("net.minecraft.client.Minecraft", patchClickMouse());
 		classMethod.put("net.minecraft.client.Minecraft", new Method("clickMouse", "func_147116_af", "aA", "()V", "()V"));
+		//Add ModelRotationEvent
 		patches.put("net.minecraft.client.renderer.entity.RenderLivingBase", patchRenderLivingBase());
 		classMethod.put("net.minecraft.client.renderer.entity.RenderLivingBase", new Method("doRender", "func_76986_a", "a", "(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V", "(Lvp;DDDFF)V"));
+		//Add PathFindInitEvent
 		patches.put("net.minecraft.pathfinding.PathNavigate", patchPathNavigate());
 		classMethod.put("net.minecraft.pathfinding.PathNavigate", new Method("<init>", "<init>", "<init>", "(Lnet/minecraft/entity/EntityLiving;Lnet/minecraft/world/World;)V", "(Lvq;Lamu;)V"));
+		//Add LayerHeldItemEvent
 		patches.put("net.minecraft.client.renderer.entity.layers.LayerHeldItem", layerHeldItem());
 		classMethod.put("net.minecraft.client.renderer.entity.layers.LayerHeldItem", new Method("doRenderLayer", "func_177141_a", "a", "(Lnet/minecraft/entity/EntityLivingBase;FFFFFFF)V", "(Lvp;FFFFFFF)V"));
 		//SHHH. There were various reasons why i did it this way and have not made a pull request for forge
@@ -125,20 +127,28 @@ public class ASMTransformer implements IClassTransformer{
                     		attackEntity=dyn;
                        	//player.swingArm
                     	if(armSwingMethod.matches(dyn))
-                    	{
-	                    	while(!(node.getPrevious() instanceof LineNumberNode))
-	                    		node=node.getPrevious();	
-	                    	armSwing=node.getPrevious();
-                    	}
+	                    	armSwing=dyn;
                     }                                 
                 }
                 testNonNull(attackEntity, attackEntityMethod);
                 testNonNull(armSwing, armSwingMethod);
-                method.instructions.insert(attackEntity,  new MethodInsnNode(Opcodes.INVOKESTATIC, "com/flemmli97/tenshilib/asm/ASMMethods", "setSwing", 
-    					"()V", false));
-                method.instructions.insertBefore(armSwing, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/flemmli97/tenshilib/asm/ASMMethods", "swingArm", 
-    					"()V", false));
-                method.instructions.insertBefore(armSwing, new InsnNode(Opcodes.RETURN));
+                
+                if(ASMLoader.isDeobfEnvironment())
+                {
+                	method.instructions.insert(attackEntity,  new MethodInsnNode(Opcodes.INVOKESTATIC, "com/flemmli97/tenshilib/asm/ASMMethods", "attackEntityClient", 
+    					"(Lnet/minecraft/client/multiplayer/PlayerControllerMP;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/entity/Entity;)V", false));
+                    method.instructions.insertBefore(armSwing, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/flemmli97/tenshilib/asm/ASMMethods", "swingArm", 
+        					"(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumHand;)V", false));
+                }
+                else
+                {
+                	method.instructions.insert(attackEntity,  new MethodInsnNode(Opcodes.INVOKESTATIC, "com/flemmli97/tenshilib/asm/ASMMethods", "attackEntityClient", 
+        				"(Lbda;Laed;Lvg;)V", false));
+                    method.instructions.insertBefore(armSwing, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/flemmli97/tenshilib/asm/ASMMethods", "swingArm", 
+        					"(Laed;Lub;)V", false));
+                }
+                method.instructions.remove(attackEntity);
+                method.instructions.remove(armSwing);
 			}			
 		};
 	}

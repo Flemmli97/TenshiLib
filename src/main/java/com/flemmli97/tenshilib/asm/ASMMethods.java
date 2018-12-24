@@ -1,13 +1,18 @@
 package com.flemmli97.tenshilib.asm;
 
+import com.flemmli97.tenshilib.api.item.IAOEWeapon;
 import com.flemmli97.tenshilib.api.item.IDualWeaponRender;
+import com.flemmli97.tenshilib.api.item.IExtendedWeapon;
 import com.flemmli97.tenshilib.common.config.ConfigUtils;
 import com.flemmli97.tenshilib.common.events.LayerHeldItemEvent;
 import com.flemmli97.tenshilib.common.events.ModelRotationEvent;
 import com.flemmli97.tenshilib.common.events.PathFindInitEvent;
 import com.flemmli97.tenshilib.common.events.handler.ClientHandHandler;
+import com.flemmli97.tenshilib.common.network.PacketHandler;
+import com.flemmli97.tenshilib.common.network.PacketHit;
+import com.flemmli97.tenshilib.common.network.PacketHit.HitType;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -21,17 +26,26 @@ import net.minecraftforge.common.config.Configuration;
 
 public class ASMMethods {
     
-    public static void setSwing()
+    public static void attackEntityClient(PlayerControllerMP controller, EntityPlayer player, Entity entity)
     {
     	ClientHandHandler.getInstance().resetSwing();
+    	if(player.getHeldItemMainhand().getItem() instanceof IExtendedWeapon)
+    	{
+    		PacketHandler.sendToServer(new PacketHit(HitType.EXT));
+    	}
+    	else if(player.getHeldItemMainhand().getItem() instanceof IAOEWeapon)
+    	{
+    		PacketHandler.sendToServer(new PacketHit(HitType.AOE));
+    	}
+    	else
+    		controller.attackEntity(player, entity);
     }
     
-    public static void swingArm() {
-    	EntityPlayer player = Minecraft.getMinecraft().player;
+    public static void swingArm(EntityPlayer player, EnumHand originHand) {
     	if(player.getHeldItemMainhand().getItem() instanceof IDualWeaponRender)
     		player.swingArm(ClientHandHandler.getInstance().currentHand());
     	else
-    		player.swingArm(EnumHand.MAIN_HAND);
+    		player.swingArm(originHand);
     }
     
     public static void modelEvent(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch,

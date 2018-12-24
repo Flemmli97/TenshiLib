@@ -1,10 +1,11 @@
-package com.flemmli97.tenshilib.common.world;
+package com.flemmli97.tenshilib.common.world.structure;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
+import com.flemmli97.tenshilib.TenshiLib;
 import com.flemmli97.tenshilib.common.blocks.tile.TileStructurePiece;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -33,22 +34,24 @@ public class StructureBase{
 	
 	private ResourceLocation structureID;
 	private BlockPos structurePos;
+	
+	//Used for the inital structure piece
 	private Mirror mirror=Mirror.NONE;
 	private Rotation rot = Rotation.NONE;
-	private boolean replaceGround;
+	private GenerationType genType;
 	
 	private List<StructureBoundingBox> boundingBoxes =Lists.newArrayList();
 	private Set<StructurePiece> structurePieces = Sets.newHashSet();
 
-	public StructureBase(ResourceLocation id, ResourceLocation schematicID, Random random, BlockPos pos, Rotation rot, Mirror mirror, boolean ground)
+	public StructureBase(ResourceLocation id, ResourceLocation schematicID, Random random, BlockPos pos, Rotation rot, Mirror mirror, GenerationType genType)
 	{
 		//Size of the starting structure
 		this.structurePos=pos;
 		this.structureID=id;
 		this.rot=rot;
 		this.mirror=mirror;
-		this.replaceGround=ground;
-		this.structurePieces.addAll(getParts(schematicID, random, pos, rot, mirror, ground));
+		this.genType=genType;
+		this.structurePieces.addAll(getParts(schematicID, random, pos, rot, mirror, genType));
 	}
 	
 	public StructureBase(NBTTagCompound compound)
@@ -56,12 +59,17 @@ public class StructureBase{
 		this.readFromNBT(compound);
 	}
 	
-	private Set<StructurePiece> getParts(ResourceLocation schematicID, Random random, BlockPos pos, Rotation rot, Mirror mirror, boolean ground)
+	private Set<StructurePiece> getParts(ResourceLocation schematicID, Random random, BlockPos pos, Rotation rot, Mirror mirror, GenerationType genType)
 	{
 		Set<StructurePiece> pieces = Sets.newHashSet();
 		Schematic schematic = StructureLoader.getSchematic(schematicID);
+		if(schematic==null)
+		{
+			TenshiLib.logger.error("Schematic {} could't be loaded", schematicID);
+			return pieces;
+		}
 		//The starting piece
-		pieces.add(new StructurePiece(schematicID, mirror, rot, ground, pos, this, random));
+		pieces.add(new StructurePiece(schematicID, mirror, rot, genType,  pos, this, random));
 		//Check schematic for TileStructurePieces
 		schematic.getTileEntities().forEach(entry->{
 			if(entry.getValue().getString("id").equals(structureTile.toString()))
@@ -89,7 +97,7 @@ public class StructureBase{
 			if(entry.getValue().getString("id").equals(structureTile.toString()))
 			{
 				NBTTagCompound compound = entry.getValue();
-				BlockPos place = Schematic.transformPos(entry.getKey(), mirror, rot, new BlockPos(schematic.x, schematic.y
+				BlockPos place = Schematic.transformPos(entry.getKey(), this.mirror, this.rot, new BlockPos(schematic.x, schematic.y
 						, schematic.z)).add(pos);
 				compound.setInteger("x", place.getX());
 				compound.setInteger("y", place.getY());
@@ -116,9 +124,9 @@ public class StructureBase{
 		return this.mirror;
 	}
 	
-	public boolean replaceGround()
+	public GenerationType genType()
 	{
-		return this.replaceGround;
+		return this.genType;
 	}
 	
 	public boolean isInside(Vec3i vec)
@@ -173,6 +181,9 @@ public class StructureBase{
 		this.structureID = new ResourceLocation(compound.getString("ID"));
 		int[] arr = compound.getIntArray("Pos");
 		this.structurePos = new BlockPos(arr[0], arr[1], arr[2]);
+		this.mirror = Mirror.valueOf(compound.getString("Mirror"));
+		this.rot = Rotation.valueOf(compound.getString("Rotation"));
+		this.genType = GenerationType.valueOf(compound.getString("GenerationType"));
 		NBTTagList boundingBoxes = compound.getTagList("BoundingBoxes", Constants.NBT.TAG_INT_ARRAY);
 		boundingBoxes.forEach(nbt -> {
 			this.boundingBoxes.add(new StructureBoundingBox(((NBTTagIntArray)nbt).getIntArray()));
@@ -187,6 +198,9 @@ public class StructureBase{
 	{
 		compound.setString("ID", this.structureID.toString());
 		compound.setIntArray("Pos", new int[] {this.structurePos.getX(), this.structurePos.getY(), this.structurePos.getZ()});
+		compound.setString("Mirror", this.mirror.toString());
+		compound.setString("Rotation", this.rot.toString());
+		compound.setString("GenType", this.genType.toString());
 		NBTTagList boundingBoxes = new NBTTagList();
 		this.boundingBoxes.forEach(box->boundingBoxes.appendTag(box.toNBTTagIntArray()));
 		compound.setTag("BoundingBoxes", boundingBoxes);
