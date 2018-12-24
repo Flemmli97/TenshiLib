@@ -42,11 +42,11 @@ public class CommonProxy {
     	MinecraftForge.EVENT_BUS.register(new CommonEvents());
         NetworkRegistry.INSTANCE.registerGuiHandler(TenshiLib.instance, new GuiHandler());
     	ItemUtil.initItemLists();
+    	GameRegistry.registerWorldGenerator(new StructureGenerator(), 1);
 		ConfigUtils.init(Init.INIT);
     }
 
     public void postInit(FMLPostInitializationEvent e) {
-    	GameRegistry.registerWorldGenerator(new StructureGenerator(), 5);
 		ConfigUtils.init(Init.POST);
     }
     
