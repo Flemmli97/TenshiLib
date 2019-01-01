@@ -39,11 +39,11 @@ public class StructureBase{
 	private Mirror mirror=Mirror.NONE;
 	private Rotation rot = Rotation.NONE;
 	private GenerationType genType;
-	
+	private int maxSize;
 	private List<StructureBoundingBox> boundingBoxes =Lists.newArrayList();
 	private Set<StructurePiece> structurePieces = Sets.newHashSet();
 
-	public StructureBase(ResourceLocation id, ResourceLocation schematicID, Random random, BlockPos pos, Rotation rot, Mirror mirror, GenerationType genType)
+	public StructureBase(ResourceLocation id, ResourceLocation schematicID, Random random, BlockPos pos, Rotation rot, Mirror mirror, GenerationType genType, int maxSize)
 	{
 		//Size of the starting structure
 		this.structurePos=pos;
@@ -51,7 +51,9 @@ public class StructureBase{
 		this.rot=rot;
 		this.mirror=mirror;
 		this.genType=genType;
-		this.structurePieces.addAll(getParts(schematicID, random, pos, rot, mirror, genType));
+		StructurePiece start = start(schematicID, random, pos, rot, mirror, genType);
+		if(start!=null)
+			this.structurePieces.add(start);
 	}
 	
 	public StructureBase(NBTTagCompound compound)
@@ -59,33 +61,17 @@ public class StructureBase{
 		this.readFromNBT(compound);
 	}
 	
-	private Set<StructurePiece> getParts(ResourceLocation schematicID, Random random, BlockPos pos, Rotation rot, Mirror mirror, GenerationType genType)
+	private StructurePiece start(ResourceLocation schematicID, Random random, BlockPos pos, Rotation rot, Mirror mirror, GenerationType genType)
 	{
-		Set<StructurePiece> pieces = Sets.newHashSet();
 		Schematic schematic = StructureLoader.getSchematic(schematicID);
 		if(schematic==null)
 		{
 			TenshiLib.logger.error("Schematic {} could't be loaded", schematicID);
-			return pieces;
+			return null;
 		}
-		//The starting piece
-		pieces.add(new StructurePiece(schematicID, mirror, rot, genType,  pos, this, random));
 		//Check schematic for TileStructurePieces
-		schematic.getTileEntities().forEach(entry->{
-			if(entry.getValue().getString("id").equals(structureTile.toString()))
-			{
-				NBTTagCompound compound = entry.getValue();
-				BlockPos place = Schematic.transformPos(entry.getKey(), mirror, rot, new BlockPos(schematic.x, schematic.y
-						, schematic.z)).add(pos);
-				compound.setInteger("x", place.getX());
-				compound.setInteger("y", place.getY());
-				compound.setInteger("z", place.getZ());
-				TileStructurePiece tile = new TileStructurePiece();
-				tile.readFromNBT(compound);
-				tile.initStructure(random, StructureBase.this);
-			}
-		});
-		return pieces;
+		this.addParts(schematic, pos, random);
+		return new StructurePiece(schematicID, mirror, rot, genType,  pos, this, random);
 	}
 	
 	/**
@@ -109,9 +95,11 @@ public class StructureBase{
 		});
 	}
 	
-	protected void addStructurePiece(StructurePiece piece)
+	protected boolean addStructurePiece(StructurePiece piece)
 	{
-		this.structurePieces.add(piece);
+		if(this.structurePieces.size()<this.maxSize || this.maxSize==-1)
+			return this.structurePieces.add(piece);
+		return false;
 	}
 	
 	public Rotation getRot()

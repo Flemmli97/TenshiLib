@@ -36,16 +36,15 @@ public class ASMTransformer implements IClassTransformer{
 		//Add ModelRotationEvent
 		patches.put("net.minecraft.client.renderer.entity.RenderLivingBase", patchRenderLivingBase());
 		classMethod.put("net.minecraft.client.renderer.entity.RenderLivingBase", new Method("doRender", "func_76986_a", "a", "(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V", "(Lvp;DDDFF)V"));
+		//Add ModelPlayerRenderEvent
+		patches.put("net.minecraft.client.model.ModelBiped", patchModelPlayer());
+		classMethod.put("net.minecraft.client.model.ModelBiped", new Method("render", "func_78088_a", "a", "(Lnet/minecraft/entity/Entity;FFFFFF)V", "(Lvg;FFFFFF)V"));
 		//Add PathFindInitEvent
 		patches.put("net.minecraft.pathfinding.PathNavigate", patchPathNavigate());
 		classMethod.put("net.minecraft.pathfinding.PathNavigate", new Method("<init>", "<init>", "<init>", "(Lnet/minecraft/entity/EntityLiving;Lnet/minecraft/world/World;)V", "(Lvq;Lamu;)V"));
 		//Add LayerHeldItemEvent
 		patches.put("net.minecraft.client.renderer.entity.layers.LayerHeldItem", layerHeldItem());
 		classMethod.put("net.minecraft.client.renderer.entity.layers.LayerHeldItem", new Method("doRenderLayer", "func_177141_a", "a", "(Lnet/minecraft/entity/EntityLivingBase;FFFFFFF)V", "(Lvp;FFFFFFF)V"));
-		//SHHH. There were various reasons why i did it this way and have not made a pull request for forge
-		patches.put("net.minecraftforge.common.config.ConfigManager", configManager());
-		classMethod.put("net.minecraftforge.common.config.ConfigManager", new Method("sync", "", "", 
-				"(Lnet/minecraftforge/common/config/Configuration;Ljava/lang/Class;Ljava/lang/String;Ljava/lang/String;ZLjava/lang/Object;)V", ""));
 	}
 	
 	protected static void asmDebug(String debug)
@@ -194,6 +193,47 @@ public class ASMTransformer implements IClassTransformer{
 		};
 	}
 	
+	private static Transform patchModelPlayer()
+	{
+		return new Transform() {
+			@Override
+			public void apply(ClassNode clss, MethodNode method) {
+				asmDebug("Patching ModelPlayer.doRender (Actually ModelBiped.doRender)");
+				Iterator<AbstractInsnNode> it = (Iterator<AbstractInsnNode>)method.instructions.iterator();
+                AbstractInsnNode node = null;
+                AbstractInsnNode setRotationAngles = null;
+                Method setRotationAnglesMethod = new Method("setRotationAngles", "func_78087_a", "a", "(FFFFFFLnet/minecraft/entity/Entity;)V", "(FFFFFFLvg;)V");
+                while (it.hasNext()) {
+                	node = it.next();
+                    if(node.getOpcode()==Opcodes.INVOKEVIRTUAL && node instanceof MethodInsnNode)
+                    {                                 	
+                    	MethodInsnNode dyn = (MethodInsnNode) node;
+                    	//ModelBase.setRotationAngles
+                    	if(setRotationAnglesMethod.matches(dyn))
+                    		setRotationAngles=dyn;
+                    }                                 
+                }
+                testNonNull(setRotationAngles, setRotationAnglesMethod);
+                InsnList inject = new InsnList();
+                inject.add(new VarInsnNode(Opcodes.FLOAD, 2));
+                inject.add(new VarInsnNode(Opcodes.FLOAD, 3));
+                inject.add(new VarInsnNode(Opcodes.FLOAD, 4));
+                inject.add(new VarInsnNode(Opcodes.FLOAD, 5));
+                inject.add(new VarInsnNode(Opcodes.FLOAD, 6));
+                inject.add(new VarInsnNode(Opcodes.FLOAD, 7));
+                inject.add(new VarInsnNode(Opcodes.ALOAD, 1));
+                inject.add(new VarInsnNode(Opcodes.ALOAD, 0));
+                if(ASMLoader.isDeobfEnvironment())
+	                inject.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/flemmli97/tenshilib/asm/ASMMethods", "modelPlayerEvent", 
+	                		"(FFFFFFLnet/minecraft/entity/Entity;Lnet/minecraft/client/model/ModelBiped;)V", false));
+                else
+                	inject.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/flemmli97/tenshilib/asm/ASMMethods", "modelEvent", 
+                			"(FFFFFFLvg;Lbpx;)V", false));
+                method.instructions.insert(setRotationAngles, inject);
+			}			
+		};
+	}
+	
 	private static Transform patchPathNavigate()
 	{
 		return new Transform() {
@@ -293,23 +333,6 @@ public class ASMTransformer implements IClassTransformer{
                 }
                 method.instructions.insertBefore(node, inject);
             }
-        };
-    }
-    
-    private static Transform configManager() {
-    	return new Transform() {
-			@Override
-			public void apply(ClassNode clss, MethodNode method) {
-				asmDebug("Patching ConfigManager.sync");
-                InsnList inject = new InsnList();
-                inject.add(new VarInsnNode(Opcodes.ALOAD, 0));
-				inject.add(new VarInsnNode(Opcodes.ALOAD, 3));
-				inject.add(new VarInsnNode(Opcodes.ALOAD, 1));
-				inject.add(new VarInsnNode(Opcodes.ALOAD, 5));
-				inject.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/flemmli97/tenshilib/asm/ASMMethods", "configLoad", 
-                		"(Lnet/minecraftforge/common/config/Configuration;Ljava/lang/String;Ljava/lang/Class;Ljava/lang/Object;)V", false));
-				method.instructions.insert(inject);
-			}
         };
     }
 }

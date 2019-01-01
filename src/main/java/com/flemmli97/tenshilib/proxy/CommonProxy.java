@@ -4,8 +4,7 @@ import com.flemmli97.tenshilib.TenshiLib;
 import com.flemmli97.tenshilib.asm.ASMException;
 import com.flemmli97.tenshilib.asm.ASMLoader;
 import com.flemmli97.tenshilib.client.gui.GuiHandler;
-import com.flemmli97.tenshilib.common.config.ConfigUtils;
-import com.flemmli97.tenshilib.common.config.ConfigUtils.Init;
+import com.flemmli97.tenshilib.common.config.ConfigHandler;
 import com.flemmli97.tenshilib.common.events.handler.CommonEvents;
 import com.flemmli97.tenshilib.common.item.ItemUtil;
 import com.flemmli97.tenshilib.common.network.PacketHandler;
@@ -32,10 +31,10 @@ public class CommonProxy {
 	public void preInit(FMLPreInitializationEvent e) {
 		if(!ASMLoader.asmLoaded)
 			throw new ASMException.ASMLoadException();
+		ConfigHandler.load();
 		PacketHandler.registerPackets();
 		isFateLoaded = Loader.isModLoaded("fatemod");
 		isRunecraftoryLoaded = Loader.isModLoaded("runecraftory");
-		ConfigUtils.init(Init.PRE);
     }
 
     public void init(FMLInitializationEvent e) {
@@ -43,11 +42,9 @@ public class CommonProxy {
         NetworkRegistry.INSTANCE.registerGuiHandler(TenshiLib.instance, new GuiHandler());
     	ItemUtil.initItemLists();
     	GameRegistry.registerWorldGenerator(new StructureGenerator(), 1);
-		ConfigUtils.init(Init.INIT);
     }
 
     public void postInit(FMLPostInitializationEvent e) {
-		ConfigUtils.init(Init.POST);
     }
     
     public IThreadListener getListener(MessageContext ctx) {

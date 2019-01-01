@@ -40,13 +40,15 @@ public class StructurePiece {
 		StructureBoundingBox box = StructureBase.getBox(schematic, rot, pos);
 		this.structureChunks=StructureBase.calculateChunks(box);
 		if(parent!=null && !parent.intersects(box))
-		{
-			//Add the bounding box of this piece to main structure
-			parent.expand(box);
+		{			
 			//Add structure piece to main structure
-			parent.addStructurePiece(this);
-			//Keep adding possible pieces to main structure
-			parent.addParts(schematic, pos, rand);
+			if(parent.addStructurePiece(this))
+			{
+				//Keep adding possible pieces to main structure
+				parent.addParts(schematic, pos, rand);
+				//Add the bounding box of this piece to main structure
+				parent.expand(box);
+			}
 			
 		}
 	}

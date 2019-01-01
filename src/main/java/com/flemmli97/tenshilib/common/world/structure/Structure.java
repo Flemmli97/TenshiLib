@@ -26,7 +26,7 @@ public class Structure implements IConfigSerializable<Structure>{
 	
 	private ResourceLocation id;
 	private ResourceLocation[] startingStructures;
-	private int frequency, yOffset, minDist;
+	private int frequency, yOffset, minDist, maxParts;
 	private int[] dimensions;
 	private LocationType type;
 	private GenerationType genType;
@@ -37,8 +37,10 @@ public class Structure implements IConfigSerializable<Structure>{
 	/**
 	 * Start of a structure. Structures are located under "./assets/MODID/structures/". Currently only .nbt supported. 
 	 * @param id The id of the whole structure. Translation key is "structure."+id.
-	 * @param starting Structures structure pieces eligible for the first placement, if null the id will be picked.
+	 * @param startingStructures Structures structure pieces eligible for the first placement, if null the id will be picked.
 	 * @param frequency Spawnrate of structure
+	 * @param minDist
+	 * @param maxParts
 	 * @param type If the structure spawns in air, ground, underground.
 	 * @param genType See {@link GenerationType}
 	 * @param dimID Dimensions this structure can spawn in
@@ -46,7 +48,7 @@ public class Structure implements IConfigSerializable<Structure>{
 	 * @param biomeList Eligible biomes for the structure
 	 * @param biomeTypes Eligible biomes types for the structure
 	 */
-	public Structure(ResourceLocation id, @Nullable ResourceLocation[] startingStructures, int frequency, int minDist, LocationType type, GenerationType genType, int[] dimID, int yOffset,List<Biome> biomeList, List<Type> biomeTypes)
+	public Structure(ResourceLocation id, @Nullable ResourceLocation[] startingStructures, int frequency, int minDist, int maxParts, LocationType type, GenerationType genType, int[] dimID, int yOffset,List<Biome> biomeList, List<Type> biomeTypes)
 	{
 		this.id=id;
 		if(startingStructures==null)
@@ -54,6 +56,7 @@ public class Structure implements IConfigSerializable<Structure>{
 		this.startingStructures=startingStructures;
 		this.frequency=frequency;
 		this.minDist=minDist;
+		this.maxParts=maxParts;
 		this.type=type;
 		this.dimensions=dimID;
 		this.yOffset=yOffset;
@@ -71,9 +74,9 @@ public class Structure implements IConfigSerializable<Structure>{
 				throw new NullPointerException("Schematic for structure ["+res.toString()+"] couldn't be loaded");
 	}
 	
-	protected Structure(ResourceLocation id, String[] startingStructures, int frequency, int minDist, LocationType type, GenerationType genType, int[] dimID, int yOffset,List<Biome> biomeList, List<Type> biomeTypes)
+	protected Structure(ResourceLocation id, String[] startingStructures, int frequency, int minDist, int maxParts, LocationType type, GenerationType genType, int[] dimID, int yOffset,List<Biome> biomeList, List<Type> biomeTypes)
 	{
-		this(id, fromStringArray(startingStructures), frequency, minDist, type, genType, dimID, yOffset, biomeList, biomeTypes);
+		this(id, fromStringArray(startingStructures), frequency, minDist, maxParts, type, genType, dimID, yOffset, biomeList, biomeTypes);
 	}
 	
 	private static ResourceLocation[] fromStringArray(String[] arr)
@@ -108,7 +111,7 @@ public class Structure implements IConfigSerializable<Structure>{
 			Rotation rot = Rotation.values()[random.nextInt(Rotation.values().length)];
 			Mirror mirror = Mirror.values()[random.nextInt(Mirror.values().length)];
 			ResourceLocation randomStart = this.startingStructures[random.nextInt(this.startingStructures.length)];		
-			structureMap.initStructure(new StructureBase(this.id, randomStart, random, pos, rot, mirror, this.genType));
+			structureMap.initStructure(new StructureBase(this.id, randomStart, random, pos, rot, mirror, this.genType, this.maxParts));
 		}
 	}
 	

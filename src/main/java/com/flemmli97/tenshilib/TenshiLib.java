@@ -1,7 +1,5 @@
 package com.flemmli97.tenshilib;
 
-import java.io.File;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,7 +18,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
-@Mod(modid = TenshiLib.MODID, name = TenshiLib.MODNAME, version = TenshiLib.VERSION)
+@Mod(modid = TenshiLib.MODID, name = TenshiLib.MODNAME, version = TenshiLib.VERSION, guiFactory = "com.flemmli97.tenshilib.client.gui.GuiFactory")
 public class TenshiLib {
 
     public static final String MODID = "tenshilib";
@@ -33,14 +31,10 @@ public class TenshiLib {
         
     @SidedProxy(clientSide="com.flemmli97.tenshilib.proxy.ClientProxy", serverSide="com.flemmli97.tenshilib.proxy.CommonProxy")
     public static CommonProxy proxy;
-
-    //The modpack/minecraft folder
-    public static File instanceFolder;
     
     @EventHandler
     public void preInit(FMLPreInitializationEvent e) {
         proxy.preInit(e);
-        instanceFolder=e.getModConfigurationDirectory().getParentFile();
     }
 
     @EventHandler
