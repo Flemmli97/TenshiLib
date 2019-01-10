@@ -57,7 +57,7 @@ public class PacketHit  implements IMessage{
 			{
 				IAOEWeapon item = (IAOEWeapon) stack.getItem();
 				List<EntityLivingBase> list = RayTraceUtils.getEntities(player, item.getRange(), item.getFOV());
-				if(MinecraftForge.EVENT_BUS.post(new AOEAttackEvent(player, list)))
+				if(MinecraftForge.EVENT_BUS.post(new AOEAttackEvent(player, list)) || list.isEmpty())
 					return null;
 				for(int i = 0; i < list.size(); i++)
 					AOEAttackEvent.attackTargetEntityWithCurrentItem(player, list.get(i), i==list.size()-1);

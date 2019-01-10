@@ -107,8 +107,14 @@ public class CommandStructure implements ICommand{
     				WorldServer worldserver = (WorldServer)world;
     	            TemplateManager templatemanager = worldserver.getStructureTemplateManager();
     	            Template template = templatemanager.getTemplate(world.getMinecraftServer(), new ResourceLocation(name));
-    	            Rotation rot = args[5]!=null?Rotation.valueOf(args[5]):Rotation.NONE;
-    	            Mirror mirr = args[6]!=null?Mirror.valueOf(args[6]):Mirror.NONE;
+    	            Rotation rot = Rotation.NONE;
+    	            Mirror mirr = Mirror.NONE;
+            		try
+    	            {
+            			rot = Rotation.valueOf(args[5]);
+            			mirr = Mirror.valueOf(args[6]);
+    	            }
+    	            catch (Exception e){}
     	            if(!template.getSize().equals(BlockPos.ORIGIN))
     	            {
     	            	Schematic.fromTemplate(template).generate(world, blockpos, rot, mirr);
@@ -174,11 +180,11 @@ public class CommandStructure implements ICommand{
         }
         else if (args[0].equals("load") && args.length > 4 && args.length <= 7)
         {
-        	if(args.length>5)
+        	if(args.length>6)
+        		return Lists.newArrayList(Mirror.NONE.toString(), Mirror.LEFT_RIGHT.toString(), Mirror.FRONT_BACK.toString());
+        	else if(args.length>5)
 	            return Lists.newArrayList(Rotation.NONE.toString(), Rotation.CLOCKWISE_90.toString(), Rotation.CLOCKWISE_180.toString(), 
 	            		Rotation.COUNTERCLOCKWISE_90.toString());
-        	else if(args.length>6)
-        		return Lists.newArrayList(Mirror.NONE.toString(), Mirror.LEFT_RIGHT.toString(), Mirror.FRONT_BACK.toString());
         }
 		return Collections.<String>emptyList();
 	}

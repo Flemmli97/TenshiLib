@@ -96,7 +96,6 @@ public class ClientEvents {
     	}
 	}
 
-	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void clientTick(RenderWorldLastEvent event)
 	{

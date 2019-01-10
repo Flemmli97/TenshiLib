@@ -8,6 +8,9 @@ import com.flemmli97.tenshilib.common.commands.CommandLocateStructure;
 import com.flemmli97.tenshilib.common.commands.CommandStructure;
 import com.flemmli97.tenshilib.proxy.CommonProxy;
 
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.world.GameRules.ValueType;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -34,6 +37,16 @@ public class TenshiLib {
     
     @EventHandler
     public void preInit(FMLPreInitializationEvent e) {
+	    Blocks.COMMAND_BLOCK.setCreativeTab(CreativeTabs.REDSTONE);
+	    Blocks.STRUCTURE_BLOCK.setCreativeTab(CreativeTabs.MISC);
+	    Blocks.STRUCTURE_VOID.setCreativeTab(CreativeTabs.MISC);
+	    Blocks.BARRIER.setCreativeTab(CreativeTabs.MISC);
+	    Blocks.MOB_SPAWNER.setCreativeTab(CreativeTabs.MISC);
+	    Blocks.DRAGON_EGG.setCreativeTab(CreativeTabs.MISC);
+	    Items.COMMAND_BLOCK_MINECART.setCreativeTab(CreativeTabs.TRANSPORTATION);
+	    Items.FIREWORKS.setCreativeTab(CreativeTabs.MISC);
+	    //For the lols
+	    Items.KNOWLEDGE_BOOK.setCreativeTab(CreativeTabs.MISC);
         proxy.preInit(e);
     }
 

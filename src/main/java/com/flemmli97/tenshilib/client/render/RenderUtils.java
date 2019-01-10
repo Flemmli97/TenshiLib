@@ -1,8 +1,16 @@
 package com.flemmli97.tenshilib.client.render;
 
+import org.lwjgl.opengl.GL11;
+
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
@@ -10,6 +18,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class RenderUtils {
+	
+	public static final int defaultColor = 0xFFFFFFFF;
 
 	public static void renderBlockOutline(EntityPlayer player, BlockPos pos, float partialTicks)
     {
@@ -61,5 +71,38 @@ public class RenderUtils {
 		GlStateManager.enableTexture2D();
 		GlStateManager.disableBlend();
 		GlStateManager.popMatrix();
+    }
+    
+    public static void renderTexture(RenderManager renderManager, ResourceLocation texture, double x, double y, double z, float xSize, float ySize, int hexColor, float yawRot, float pitchRot)
+    {
+    	renderManager.renderEngine.bindTexture(texture);
+    	GlStateManager.pushMatrix();
+        GlStateManager.disableCull();
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        GlStateManager.alphaFunc(GL11.GL_GEQUAL, 1/255f);
+        RenderHelper.disableStandardItemLighting();
+        GlStateManager.translate(x, y+0.2, z);
+        GlStateManager.rotate(yawRot, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(-pitchRot, 1.0F, 0.0F, 0.0F);
+        xSize = xSize/2f;
+        ySize = ySize/2f;
+        int red = hexColor >> 16 & 255;
+        int blue = hexColor >> 8 & 255;
+        int green = hexColor >> 0 & 255;
+        int alpha = hexColor >> 24 & 255;
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder vertexbuffer = tessellator.getBuffer();	
+        vertexbuffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+        vertexbuffer.pos(-xSize, -ySize, 0).tex(0, 0).color(red, green, blue, alpha).endVertex();
+        vertexbuffer.pos(-xSize, ySize, 0).tex(0, 1).color(red, green, blue, alpha).endVertex();
+        vertexbuffer.pos(xSize, ySize, 0).tex(1, 1).color(red, green, blue, alpha).endVertex();
+        vertexbuffer.pos(xSize, -ySize, 0).tex(1, 0).color(red, green, blue, alpha).endVertex();
+        tessellator.draw();	
+        RenderHelper.enableStandardItemLighting();
+        GlStateManager.disableBlend();
+        GlStateManager.alphaFunc(GL11.GL_GEQUAL, 0.1F);
+        GlStateManager.enableCull();
+        GlStateManager.popMatrix();
     }
 }

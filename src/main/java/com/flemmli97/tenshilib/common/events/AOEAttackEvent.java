@@ -14,7 +14,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.MobEffects;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.server.SPacketEntityVelocity;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.DamageSource;
@@ -23,7 +22,9 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.fml.common.eventhandler.Cancelable;
 
+@Cancelable
 public class AOEAttackEvent extends PlayerEvent{
 
 	private List<EntityLivingBase> list;
@@ -40,7 +41,7 @@ public class AOEAttackEvent extends PlayerEvent{
 	}
 	
 	/**
-	 * Exact same like in {@link EntityPlayer#attackTargetEntityWithCurrentItem(Entity)} but with the option of disabling the cooldown
+	 * Exact same like in {@link EntityPlayer#attackTargetEntityWithCurrentItem(Entity)} but with the option of disabling the cooldown and no sweep attack
 	 * @param player
 	 * @param targetEntity
 	 * @param resetCooldown
@@ -73,7 +74,6 @@ public class AOEAttackEvent extends PlayerEvent{
                 if (f > 0.0F || f1 > 0.0F)
                 {
                     boolean flag = f2 > 0.9F;
-                    boolean flag1 = false;
                     int i = 0;
                     i = i + EnchantmentHelper.getKnockbackModifier(player);
 
@@ -81,7 +81,6 @@ public class AOEAttackEvent extends PlayerEvent{
                     {
                         player.world.playSound((EntityPlayer)null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK, player.getSoundCategory(), 1.0F, 1.0F);
                         ++i;
-                        flag1 = true;
                     }
 
                     boolean flag2 = flag && player.fallDistance > 0.0F && !player.onGround && !player.isOnLadder() && !player.isInWater() && !player.isPotionActive(MobEffects.BLINDNESS) && !player.isRiding() && targetEntity instanceof EntityLivingBase;
@@ -95,18 +94,6 @@ public class AOEAttackEvent extends PlayerEvent{
                     }
 
                     f = f + f1;
-                    boolean flag3 = false;
-                    double d0 = (double)(player.distanceWalkedModified - player.prevDistanceWalkedModified);
-
-                    if (flag && !flag2 && !flag1 && player.onGround && d0 < (double)player.getAIMoveSpeed())
-                    {
-                        ItemStack itemstack = player.getHeldItem(EnumHand.MAIN_HAND);
-
-                        if (itemstack.getItem() instanceof ItemSword)
-                        {
-                            flag3 = true;
-                        }
-                    }
 
                     float f4 = 0.0F;
                     boolean flag4 = false;
@@ -146,23 +133,6 @@ public class AOEAttackEvent extends PlayerEvent{
                             player.setSprinting(false);
                         }
 
-                        if (flag3)
-                        {
-                            float f3 = 1.0F + EnchantmentHelper.getSweepingDamageRatio(player) * f;
-
-                            for (EntityLivingBase entitylivingbase : player.world.getEntitiesWithinAABB(EntityLivingBase.class, targetEntity.getEntityBoundingBox().grow(1.0D, 0.25D, 1.0D)))
-                            {
-                                if (entitylivingbase != player && entitylivingbase != targetEntity && !player.isOnSameTeam(entitylivingbase) && player.getDistanceSq(entitylivingbase) < 9.0D)
-                                {
-                                    entitylivingbase.knockBack(player, 0.4F, (double)MathHelper.sin(player.rotationYaw * 0.017453292F), (double)(-MathHelper.cos(player.rotationYaw * 0.017453292F)));
-                                    entitylivingbase.attackEntityFrom(DamageSource.causePlayerDamage(player), f3);
-                                }
-                            }
-
-                            player.world.playSound((EntityPlayer)null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, player.getSoundCategory(), 1.0F, 1.0F);
-                            player.spawnSweepParticles();
-                        }
-
                         if (targetEntity instanceof EntityPlayerMP && targetEntity.velocityChanged)
                         {
                             ((EntityPlayerMP)targetEntity).connection.sendPacket(new SPacketEntityVelocity(targetEntity));
@@ -178,7 +148,7 @@ public class AOEAttackEvent extends PlayerEvent{
                             player.onCriticalHit(targetEntity);
                         }
 
-                        if (!flag2 && !flag3)
+                        if (!flag2)
                         {
                             if (flag)
                             {

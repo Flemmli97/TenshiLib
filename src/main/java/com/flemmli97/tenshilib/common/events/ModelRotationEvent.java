@@ -4,6 +4,9 @@ import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.fml.common.eventhandler.Event;
 
+/**
+ * Unused
+ */
 public class ModelRotationEvent extends Event{
 
 	private final RenderLivingBase<?> render;

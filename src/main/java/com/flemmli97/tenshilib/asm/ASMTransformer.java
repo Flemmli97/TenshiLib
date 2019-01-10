@@ -30,19 +30,14 @@ public class ASMTransformer implements IClassTransformer{
 	
 	static
 	{
-		//Replace #attackEntity and #swingArm in Minecraft#clickMouse
 		patches.put("net.minecraft.client.Minecraft", patchClickMouse());
 		classMethod.put("net.minecraft.client.Minecraft", new Method("clickMouse", "func_147116_af", "aA", "()V", "()V"));
-		//Add ModelRotationEvent
-		patches.put("net.minecraft.client.renderer.entity.RenderLivingBase", patchRenderLivingBase());
-		classMethod.put("net.minecraft.client.renderer.entity.RenderLivingBase", new Method("doRender", "func_76986_a", "a", "(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V", "(Lvp;DDDFF)V"));
-		//Add ModelPlayerRenderEvent
+		//patches.put("net.minecraft.client.renderer.entity.RenderLivingBase", patchRenderLivingBase());
+		//classMethod.put("net.minecraft.client.renderer.entity.RenderLivingBase", new Method("doRender", "func_76986_a", "a", "(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V", "(Lvp;DDDFF)V"));
 		patches.put("net.minecraft.client.model.ModelBiped", patchModelPlayer());
 		classMethod.put("net.minecraft.client.model.ModelBiped", new Method("render", "func_78088_a", "a", "(Lnet/minecraft/entity/Entity;FFFFFF)V", "(Lvg;FFFFFF)V"));
-		//Add PathFindInitEvent
 		patches.put("net.minecraft.pathfinding.PathNavigate", patchPathNavigate());
 		classMethod.put("net.minecraft.pathfinding.PathNavigate", new Method("<init>", "<init>", "<init>", "(Lnet/minecraft/entity/EntityLiving;Lnet/minecraft/world/World;)V", "(Lvq;Lamu;)V"));
-		//Add LayerHeldItemEvent
 		patches.put("net.minecraft.client.renderer.entity.layers.LayerHeldItem", layerHeldItem());
 		classMethod.put("net.minecraft.client.renderer.entity.layers.LayerHeldItem", new Method("doRenderLayer", "func_177141_a", "a", "(Lnet/minecraft/entity/EntityLivingBase;FFFFFFF)V", "(Lvp;FFFFFFF)V"));
 	}
@@ -104,6 +99,7 @@ public class ASMTransformer implements IClassTransformer{
 		}
 	}
 	
+	/**Replace #attackEntity and #swingArm in {@link net.minecraft.client.Minecraft#clickMouse} */
 	private static Transform patchClickMouse()
 	{
 		return new Transform() {
@@ -142,7 +138,7 @@ public class ASMTransformer implements IClassTransformer{
                 else
                 {
                 	method.instructions.insert(attackEntity,  new MethodInsnNode(Opcodes.INVOKESTATIC, "com/flemmli97/tenshilib/asm/ASMMethods", "attackEntityClient", 
-        				"(Lbda;Laed;Lvg;)V", false));
+        				"(Lbsa;Laed;Lvg;)V", false));
                     method.instructions.insertBefore(armSwing, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/flemmli97/tenshilib/asm/ASMMethods", "swingArm", 
         					"(Laed;Lub;)V", false));
                 }
@@ -152,12 +148,16 @@ public class ASMTransformer implements IClassTransformer{
 		};
 	}
 	
+	/** Add ModelRotationEvent in {@link net.minecraft.client.renderer.entity.RenderLivingBase#doRender} */
+	@SuppressWarnings("unused")
 	private static Transform patchRenderLivingBase()
 	{
 		return new Transform() {
 			@Override
 			public void apply(ClassNode clss, MethodNode method) {
 				asmDebug("Patching RenderLivingBase.doRender");
+				boolean optifine=false;
+				try {optifine = Class.forName("optifine.OptiFineClassTransformer")!=null;} catch (ClassNotFoundException e) {}
 				Iterator<AbstractInsnNode> it = (Iterator<AbstractInsnNode>)method.instructions.iterator();
                 AbstractInsnNode node = null;
                 AbstractInsnNode setRotationAngles = null;
@@ -172,14 +172,16 @@ public class ASMTransformer implements IClassTransformer{
                     		setRotationAngles=dyn;
                     }                                 
                 }
+                //shouldSit local variable missing with optifine. this seems so easily breakable...
+                int i = optifine?1:0;
                 testNonNull(setRotationAngles, setRotationAnglesMethod);
                 InsnList inject = new InsnList();
-                inject.add(new VarInsnNode(Opcodes.FLOAD, 18));
-                inject.add(new VarInsnNode(Opcodes.FLOAD, 17));
-                inject.add(new VarInsnNode(Opcodes.FLOAD, 15));
-                inject.add(new VarInsnNode(Opcodes.FLOAD, 13));
-                inject.add(new VarInsnNode(Opcodes.FLOAD, 14));
-                inject.add(new VarInsnNode(Opcodes.FLOAD, 16));
+                inject.add(new VarInsnNode(Opcodes.FLOAD, 18-i));
+                inject.add(new VarInsnNode(Opcodes.FLOAD, 17-i));
+                inject.add(new VarInsnNode(Opcodes.FLOAD, 15-i));
+                inject.add(new VarInsnNode(Opcodes.FLOAD, 13-i));
+                inject.add(new VarInsnNode(Opcodes.FLOAD, 14-i));
+                inject.add(new VarInsnNode(Opcodes.FLOAD, 16-i));
                 inject.add(new VarInsnNode(Opcodes.ALOAD, 1));
                 inject.add(new VarInsnNode(Opcodes.ALOAD, 0));
                 if(ASMLoader.isDeobfEnvironment())
@@ -193,6 +195,8 @@ public class ASMTransformer implements IClassTransformer{
 		};
 	}
 	
+	/** Add ModelPlayerRenderEvent in {@link net.minecraft.client.model.ModelPlayer#render} 
+	 * (Actually {@link net.minecraft.client.model.ModelBiped#render} ) */
 	private static Transform patchModelPlayer()
 	{
 		return new Transform() {
@@ -227,13 +231,14 @@ public class ASMTransformer implements IClassTransformer{
 	                inject.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/flemmli97/tenshilib/asm/ASMMethods", "modelPlayerEvent", 
 	                		"(FFFFFFLnet/minecraft/entity/Entity;Lnet/minecraft/client/model/ModelBiped;)V", false));
                 else
-                	inject.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/flemmli97/tenshilib/asm/ASMMethods", "modelEvent", 
+                	inject.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/flemmli97/tenshilib/asm/ASMMethods", "modelPlayerEvent", 
                 			"(FFFFFFLvg;Lbpx;)V", false));
                 method.instructions.insert(setRotationAngles, inject);
 			}			
 		};
 	}
 	
+	/** Add PathFindInitEvent in {@link net.minecraft.pathfinding.PathNavigate#PathNavigate} */
 	private static Transform patchPathNavigate()
 	{
 		return new Transform() {
@@ -272,12 +277,12 @@ public class ASMTransformer implements IClassTransformer{
 			}};
 	}
 	
-    
+    /** Add LayerHeldItemEvent in {@link net.minecraft.client.renderer.entity.layers.LayerHeldItem#doRenderLayer} */
     private static Transform layerHeldItem() {
     	return new Transform() {
             @Override
             public void apply(ClassNode clss, MethodNode method) {
-                asmDebug("Patching LayerHeldItem.doRenderLayer");
+            	asmDebug("Patching LayerHeldItem.doRenderLayer");
                 Iterator<AbstractInsnNode> it = (Iterator<AbstractInsnNode>)method.instructions.iterator();
                 AbstractInsnNode node = null;
                 Method isEmpty = new Method("isEmpty", "func_78087_a", "a", "()Z", "()Z");

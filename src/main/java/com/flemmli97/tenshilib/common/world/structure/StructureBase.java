@@ -143,7 +143,7 @@ public class StructureBase{
 	}
 
 	//Since we use the passed chunk this time the positive chunks should be loaded!
-	public boolean process(World world, int chunkX, int chunkZ)
+	public synchronized boolean process(World world, int chunkX, int chunkZ)
 	{
 		this.structurePieces.removeIf(piece->piece.generate(world, chunkX, chunkZ));
 		return this.structurePieces.isEmpty();

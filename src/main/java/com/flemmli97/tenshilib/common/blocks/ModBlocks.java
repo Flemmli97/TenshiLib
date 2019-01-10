@@ -21,12 +21,14 @@ public class ModBlocks {
 	
 	public static final Block ignore = new BlockIgnore("ignore");
 	public static final Block structure = new BlockStructurePiece();
+	public static final Block breakableBarrier = new BlockBreakableBarrier();
 	//public static final Block camo = new BlockCamo(new ResourceLocation(TenshiLib.MODID, "camo"), Material.ROCK);
 
 	@SubscribeEvent
 	public static final void registerBlocks(RegistryEvent.Register<Block> event) { 
 	    event.getRegistry().register(ignore);
 	    event.getRegistry().register(structure);
+	    event.getRegistry().register(breakableBarrier);
 	    //event.getRegistry().register(camo);
 	    GameRegistry.registerTileEntity(TileStructurePiece.class, new ResourceLocation(TenshiLib.MODID, "tile_structure_piece"));
 	    //GameRegistry.registerTileEntity(TileCamo.class, new ResourceLocation(TenshiLib.MODID, "tile_camo"));
@@ -36,6 +38,7 @@ public class ModBlocks {
     public static final void registerItemBlocks(RegistryEvent.Register<Item> event) {
 	    event.getRegistry().register(ItemBlockInitUtils.itemFromBlock(ignore));
 	    event.getRegistry().register(ItemBlockInitUtils.itemFromBlock(structure));
+	    event.getRegistry().register(ItemBlockInitUtils.itemFromBlock(breakableBarrier));
 	    //event.getRegistry().register(ItemBlockInitUtils.itemFromBlock(camo));
 
 	}
@@ -46,6 +49,7 @@ public class ModBlocks {
 	{
 		ItemBlockInitUtils.registerSpecificModel(ignore, Blocks.END_ROD.getRegistryName());
 		ItemBlockInitUtils.registerSpecificModel(structure, Blocks.STRUCTURE_BLOCK.getRegistryName());
+		ItemBlockInitUtils.registerSpecificModel(breakableBarrier, Blocks.BARRIER.getRegistryName());
 		//ItemBlockInitUtils.registerSpecificModel(camo, Blocks.STONE.getRegistryName());
 	}
 }

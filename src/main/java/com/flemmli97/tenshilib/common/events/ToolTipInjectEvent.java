@@ -8,7 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 
 /**
- * Like Forge's ItemTooltipEvent but gets called right after getting the items name instead of at the end.
+ * Like Forge's ItemTooltipEvent but gets called right after getting the items name instead of at the end. Unused atm
  */
 public class ToolTipInjectEvent extends ItemTooltipEvent{
 
