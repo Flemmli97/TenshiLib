@@ -60,6 +60,22 @@ public class ArrayUtils {
 		return s;
 	}
 	
+	public static <T> String[] arrayToStringArr(T[] ts)
+	{
+		String[] arr = new String[ts.length];
+		for(int i = 0; i < ts.length; i++)
+			arr[i] = ts[i].toString();
+		return arr;
+	}
+	
+	public static String[] arrayToStringArr(int[] ts)
+	{
+		String[] arr = new String[ts.length];
+		for(int i = 0; i < ts.length; i++)
+			arr[i] = ""+ts[i];
+		return arr;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public static <T,M> M[] arrayConverter(T[] ts, ObjectConverter<T,M> parser, Class<M> clss)
 	{
@@ -67,5 +83,13 @@ public class ArrayUtils {
 		for(T t : ts)
 			list.add(parser.convertFrom(t));
 		return (M[]) Array.newInstance(clss, list.size());
+	}
+	
+	public static int[] intArrFromStringArr(String[] ts)
+	{
+		int[] arr = new int[ts.length];
+		for(int i = 0; i < ts.length; i++)
+			arr[i] = Integer.parseInt(ts[i]);
+		return arr;
 	}
 }

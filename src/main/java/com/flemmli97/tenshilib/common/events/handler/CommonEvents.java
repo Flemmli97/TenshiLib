@@ -4,11 +4,15 @@ import com.flemmli97.tenshilib.TenshiLib;
 import com.flemmli97.tenshilib.common.config.ConfigHandler;
 import com.flemmli97.tenshilib.common.network.PacketHandler;
 import com.flemmli97.tenshilib.common.network.PacketStructure;
+import com.flemmli97.tenshilib.common.world.structure.StructureBase;
+import com.flemmli97.tenshilib.common.world.structure.StructureGenerator;
 import com.flemmli97.tenshilib.common.world.structure.StructureMap;
 
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.event.world.WorldEvent.PotentialSpawns;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 
 public class CommonEvents {
@@ -33,5 +37,23 @@ public class CommonEvents {
 	{
 		if(event.getModID().equals(TenshiLib.MODID))
 			ConfigHandler.load();
+	}
+	
+	@SubscribeEvent
+	public void loggOut(PlayerLoggedOutEvent event)
+	{
+		PacketHandler.sendTo(new PacketStructure(null), (EntityPlayerMP) event.player);
+	}
+	//Isnt this operation suupperr heavy? idk
+	@SubscribeEvent
+	public void mobSpawnStructure(PotentialSpawns event)
+	{
+		StructureBase base = StructureMap.get(event.getWorld()).current(event.getPos());
+		if(base!=null)
+		{
+			if(StructureGenerator.doesStructurePreventSpawn(base.getStructureId()))
+				event.getList().clear();
+			event.getList().addAll(StructureGenerator.getSpawnList(base.getStructureId(), event.getType()));
+		}
 	}
 }

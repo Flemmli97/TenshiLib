@@ -88,6 +88,11 @@ public class ConfigUtils {
         }
 	}
 	
+	public static <T extends Enum<?>> T getEnumVal(Configuration config, String category, String name, String comment, T defaultVal)
+	{
+		return getEnumVal(config, category, name, comment, defaultVal, null);
+	}
+	
 	public static int getIntConfig(Configuration config, String name, String category, int defaultValue, int minValue, String comment)
 	{
 		Property prop = config.get(category, name, Float.toString(defaultValue), name);

@@ -12,7 +12,7 @@ public class ConfigHandler {
 	public static int seed = 454345783;
 	public static int generatorRadius = 8;
 	public static boolean showStructure;
-	
+
 	public static void load()
 	{
 		if(config==null)

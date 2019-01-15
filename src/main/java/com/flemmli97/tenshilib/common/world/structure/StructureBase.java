@@ -39,7 +39,7 @@ public class StructureBase{
 	private Mirror mirror=Mirror.NONE;
 	private Rotation rot = Rotation.NONE;
 	private GenerationType genType;
-	private int maxSize;
+	//private int maxSize;
 	private List<StructureBoundingBox> boundingBoxes =Lists.newArrayList();
 	private Set<StructurePiece> structurePieces = Sets.newHashSet();
 
@@ -97,7 +97,8 @@ public class StructureBase{
 	
 	protected boolean addStructurePiece(StructurePiece piece)
 	{
-		if(this.structurePieces.size()<this.maxSize || this.maxSize==-1)
+		int i = StructureGenerator.maxParts(this.structureID);
+		if(this.structurePieces.size()<i || i==-1)
 			return this.structurePieces.add(piece);
 		return false;
 	}

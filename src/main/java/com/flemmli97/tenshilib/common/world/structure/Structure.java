@@ -1,14 +1,24 @@
 package com.flemmli97.tenshilib.common.world.structure;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
 import com.flemmli97.tenshilib.api.config.IConfigSerializable;
+import com.flemmli97.tenshilib.common.config.ConfigUtils;
 import com.flemmli97.tenshilib.common.events.StructureGenerateEvent;
+import com.flemmli97.tenshilib.common.javahelper.ArrayUtils;
+import com.flemmli97.tenshilib.common.javahelper.ObjectConverter;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
@@ -16,8 +26,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
@@ -30,12 +40,14 @@ public class Structure implements IConfigSerializable<Structure>{
 	private int[] dimensions;
 	private LocationType type;
 	private GenerationType genType;
-	private List<Biome> biomes = Lists.newLinkedList();
-	private List<Biome> biomesRaw = Lists.newLinkedList();
-	private List<Type> biomesTypes = Lists.newLinkedList();
-
+	private List<Biome> biomes = Lists.newArrayList();
+	/**Used for the config*/
+	private List<Biome> biomesRaw = Lists.newArrayList();
+	private List<Type> biomesTypes = Lists.newArrayList();
+	private boolean preventOtherSpawn;
+	private Map<EnumCreatureType,Set<Biome.SpawnListEntry>> spawns = Maps.newHashMap();
 	/**
-	 * Start of a structure. Structures are located under "./assets/MODID/structures/". Currently only .nbt supported. 
+	 * Start of a structure. Structures are located under "./assets/MODID/structures/". Currently only .nbt supported. Should be used for structures which are trackable and/or bigger than a chunk.
 	 * @param id The id of the whole structure. Translation key is "structure."+id.
 	 * @param startingStructures Structures structure pieces eligible for the first placement, if null the id will be picked.
 	 * @param frequency Spawnrate of structure
@@ -48,7 +60,7 @@ public class Structure implements IConfigSerializable<Structure>{
 	 * @param biomeList Eligible biomes for the structure
 	 * @param biomeTypes Eligible biomes types for the structure
 	 */
-	public Structure(ResourceLocation id, @Nullable ResourceLocation[] startingStructures, int frequency, int minDist, int maxParts, LocationType type, GenerationType genType, int[] dimID, int yOffset,List<Biome> biomeList, List<Type> biomeTypes)
+	public Structure(ResourceLocation id, @Nullable ResourceLocation[] startingStructures, int frequency, int minDist, int maxParts, LocationType type, GenerationType genType, int[] dimID, int yOffset, boolean preventOtherMobSpawn)
 	{
 		this.id=id;
 		if(startingStructures==null)
@@ -58,33 +70,43 @@ public class Structure implements IConfigSerializable<Structure>{
 		this.minDist=minDist;
 		this.maxParts=maxParts;
 		this.type=type;
+		this.genType=genType;
 		this.dimensions=dimID;
 		this.yOffset=yOffset;
-		this.biomesTypes=biomeTypes;
-		this.biomesRaw=biomeList;
-		this.biomes=biomeList;
-		this.genType=genType;
-		for(Type biomeType : biomeTypes)
-		{
-			for(Biome biome : BiomeDictionary.getBiomes(biomeType))
-				this.biomes.add(biome);
-		}
+		this.preventOtherSpawn=preventOtherMobSpawn;
 		for(ResourceLocation res : startingStructures)
 			if(StructureLoader.getSchematic(res)==null)
 				throw new NullPointerException("Schematic for structure ["+res.toString()+"] couldn't be loaded");
 	}
 	
-	protected Structure(ResourceLocation id, String[] startingStructures, int frequency, int minDist, int maxParts, LocationType type, GenerationType genType, int[] dimID, int yOffset,List<Biome> biomeList, List<Type> biomeTypes)
+	public Structure addBiome(Set<Biome> biomes)
 	{
-		this(id, fromStringArray(startingStructures), frequency, minDist, maxParts, type, genType, dimID, yOffset, biomeList, biomeTypes);
+		biomes.forEach(biome->{
+			if(!this.biomesRaw.contains(biome))
+			{
+				this.biomesRaw.add(biome);
+				this.biomes.add(biome);
+			}
+		});
+		return this;
 	}
 	
-	private static ResourceLocation[] fromStringArray(String[] arr)
+	public Structure addBiomeType(Set<Type> biomeTypes)
 	{
-		ResourceLocation[] res = new ResourceLocation[arr.length];
-		for(int i = 0; i < res.length; i++)
-			res[i]=new ResourceLocation(arr[i]);
-		return res;
+		for(Type type : biomeTypes)
+		{
+			for(Biome biome : BiomeDictionary.getBiomes(type))
+				if(!this.biomes.contains(biome))
+					this.biomes.add(biome);
+			if(!this.biomesTypes.contains(type))
+				this.biomesTypes.add(type);
+		}
+		return this;
+	}
+	
+	public void addMobSpawn(EnumCreatureType type, Set<Biome.SpawnListEntry> biome)
+	{
+		spawns.merge(type, biome, (old, newSet)->{old.addAll(newSet);return old;});
 	}
 	
 	public void startStructure(World world, int chunkX, int chunkZ, Random random)
@@ -119,18 +141,43 @@ public class Structure implements IConfigSerializable<Structure>{
 	{
 		return this.id;
 	}
+	
+	public int maxParts() 
+	{
+		return this.maxParts;
+	}
+	
+	public Set<Biome.SpawnListEntry> getSpawnList(EnumCreatureType type)
+	{
+		Set<Biome.SpawnListEntry> set = spawns.get(type);
+		return set!=null?set:Sets.newHashSet();
+	}
+	
+	public boolean preventOtherMobSpawn()
+	{
+		return this.preventOtherSpawn;
+	}
 
 	@Override
 	public Structure config(Configuration config, Structure old, String configCategory) {
+		configCategory+="."+this.id;
 		ConfigCategory cat = config.getCategory(configCategory);
 		cat.setLanguageKey("structures."+this.id);
-		this.startingStructures=fromStringArray(config.getStringList("Starting Structures", configCategory, this.toStringList(this.startingStructures), "Schematic names of potential starting structures. If empty will use the structure id"));
+		this.startingStructures=ArrayUtils.arrayConverter(
+				config.getStringList("Starting Structures", configCategory, ArrayUtils.arrayToStringArr(this.startingStructures), "Schematic names of potential starting structures. If empty will use the structure id"), 
+				new ObjectConverter<String, ResourceLocation>() {
+					@Override
+					public ResourceLocation convertFrom(String t) {
+						return new ResourceLocation(t);
+					}}, 
+				ResourceLocation.class);
 		this.frequency=config.get(configCategory, "Frequency", this.frequency, "Structure will spawn with 1/x probability in a chunk").getInt();
-		this.minDist=config.get(configCategory, "Min Distance", this.minDist, "Minimum distance to other structures with the same id").getInt();
-		this.type=LocationType.valueOf(config.get("Location Type", configCategory, this.type.toString(), "Spawn height")
-				.setValidValues(toStringList(LocationType.values())).getString());
-		this.dimensions=this.fromString(config.getStringList("Dimensions", configCategory, this.toStringList(this.dimensions), "List of whitelisted dimension ids"));
 		this.yOffset=config.get(configCategory, "Y-Offset", this.yOffset, "An y offset during generation").getInt();
+		this.minDist=config.get(configCategory, "Min Distance", this.minDist, "Minimum distance to other structures with the same id").getInt();
+		this.maxParts=config.get(configCategory, "Max Parts", this.maxParts, "Maximum of subpieces this structure can have").getInt();
+		this.dimensions=ArrayUtils.intArrFromStringArr(config.getStringList("Dimensions", configCategory, ArrayUtils.arrayToStringArr(this.dimensions), "List of whitelisted dimension ids"));
+		this.type=ConfigUtils.getEnumVal(config, configCategory, "Location Type", "Spawn height", this.type);
+		this.genType=ConfigUtils.getEnumVal(config, configCategory, "Generation Type", "How the the structure should be generated", this.genType);
 		//Biomes
 		String[] arr2 = new String[this.biomesRaw.size()];
 		for(int i = 0; i < this.biomesRaw.size(); i++)
@@ -159,32 +206,54 @@ public class Structure implements IConfigSerializable<Structure>{
 			for(Biome biome : BiomeDictionary.getBiomes(biomeType))
 				this.biomes.add(biome);
 		}
+		this.preventOtherSpawn=config.getBoolean("Prevent MobSpawn", configCategory, this.preventOtherSpawn, "Prevent other mobspawn in this structure");
+		ConfigCategory spawnCat = config.getCategory(configCategory+".spawns");
+		spawnCat.setLanguageKey("config.structures.spawns");
+		spawnCat.setComment("Configure Mobspawning for the structure. Syntax is: <Full Classname>;<minGroup>;<maxGroup>;<weight>");
+		for(EnumCreatureType type : EnumCreatureType.values())
+		{
+			Set<Biome.SpawnListEntry> set = this.spawns.getOrDefault(type, Sets.newHashSet());		
+			String[] def = new String[set.size()];
+			int i = 0;
+			for(Biome.SpawnListEntry entry : set)
+			{
+				def[i] = spawnEntryString(entry);
+				i++;
+			}
+			set.clear();
+			for(String s : config.getStringList(type.toString(), configCategory+".spawns", def, ""))
+			{
+				set.add(fromString(s));
+			}
+			if(!set.isEmpty())
+				this.spawns.put(type, set);
+		}
 		return this;
 	}
 	
-	private String[] toStringList(int[] ts)
+	@SuppressWarnings("unchecked")
+	public static Biome.SpawnListEntry fromString(String s)
 	{
-		String[] arr = new String[ts.length];
-		for(int i = 0; i < ts.length; i++)
-			arr[i]=""+ts[i];
-		return arr;
+		String[] subs = s.split(";");
+		if(subs.length<4)
+			return null;
+		Class<?> clss=null;
+		try {
+			clss = Class.forName(subs[0]);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		if(clss==null || !EntityLivingBase.class.isAssignableFrom(clss))
+			return null;
+		return new Biome.SpawnListEntry((Class<? extends EntityLiving>) clss, Integer.parseInt(subs[1]),Integer.parseInt(subs[2]),Integer.parseInt(subs[3]));
 	}
 	
-	private <T> String[] toStringList(T[] ts)
+	public static String spawnEntryString(Biome.SpawnListEntry s)
 	{
-		String[] arr = new String[ts.length];
-		for(int i = 0; i < ts.length; i++)
-			arr[i]=ts[i].toString();
-		return arr;
+		return s.entityClass.getName()+";"+s.minGroupCount+";"+s.maxGroupCount+";"+s.itemWeight;
 	}
 	
-	private int[] fromString(String[] s) {
-		int[] arr = new int[s.length];
-		for(int i = 0; i < s.length; i++)
-			arr[i]=Integer.parseInt(s[i]);
-		return arr;
-	}
-	
+	@Override
 	public String toString()
 	{
 		return "Structure:[Id:"+this.id+",Freq:"+this.frequency+",MinDist:"+this.minDist+",LocationType:"+this.type+"]";

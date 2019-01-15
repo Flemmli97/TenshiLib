@@ -17,3 +17,5 @@ structure_piece.edit=Edit Structures
 structure_piece.back=Back
 tile.tenshilib:ignore.name=Structure Ignore
 tile.tenshilib:structure_piece.name=Structure Piece
+
+config.structures.spawns=Mob Spawns

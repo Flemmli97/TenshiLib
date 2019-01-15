@@ -7,9 +7,12 @@ import java.util.Set;
 import com.flemmli97.tenshilib.TenshiLib;
 import com.flemmli97.tenshilib.common.config.ConfigHandler;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
+import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.fml.common.IWorldGenerator;
@@ -27,6 +30,24 @@ public class StructureGenerator implements IWorldGenerator{
 	public static Set<ResourceLocation> allRegisteredStructures()
 	{
 		return gens.keySet();
+	}
+	
+	public static int maxParts(ResourceLocation res)
+	{
+		Structure s = gens.get(res);
+		return s!=null?s.maxParts():0;
+	}
+	
+	public static boolean doesStructurePreventSpawn(ResourceLocation res)
+	{
+		Structure s = gens.get(res);
+		return s!=null?s.preventOtherMobSpawn():false;
+	}
+	
+	public static Set<Biome.SpawnListEntry> getSpawnList(ResourceLocation res, EnumCreatureType type)
+	{
+		Structure s = gens.get(res);
+		return s!=null?s.getSpawnList(type):Sets.newHashSet();
 	}
 	
 	@Override
