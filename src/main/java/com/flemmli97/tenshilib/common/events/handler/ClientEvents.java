@@ -2,7 +2,7 @@ package com.flemmli97.tenshilib.common.events.handler;
 
 import com.flemmli97.tenshilib.TenshiLib;
 import com.flemmli97.tenshilib.api.item.IAOEWeapon;
-import com.flemmli97.tenshilib.api.item.IDualWeaponRender;
+import com.flemmli97.tenshilib.api.item.IDualWeapon;
 import com.flemmli97.tenshilib.api.item.IExtendedWeapon;
 import com.flemmli97.tenshilib.client.render.RenderUtils;
 import com.flemmli97.tenshilib.common.config.ConfigHandler;
@@ -36,7 +36,7 @@ public class ClientEvents {
 	{
 		Minecraft client = Minecraft.getMinecraft();
 		ItemStack main = client.player.getHeldItemMainhand();
-		if(main.getItem() instanceof IDualWeaponRender)
+		if(main.getItem() instanceof IDualWeapon)
 		{
 			if(event.getHand()==EnumHand.MAIN_HAND)
 			{
@@ -46,7 +46,7 @@ public class ClientEvents {
 			else if(event.getHand()==EnumHand.OFF_HAND)
 			{
 				event.setCanceled(true);
-				client.getItemRenderer().renderItemInFirstPerson(client.player, event.getPartialTicks(), event.getInterpolatedPitch(), event.getHand(), event.getSwingProgress(), ((IDualWeaponRender)main.getItem()).offHandStack(client.player), ClientHandHandler.getInstance().equipProgress(EnumHand.OFF_HAND, event.getPartialTicks()));
+				client.getItemRenderer().renderItemInFirstPerson(client.player, event.getPartialTicks(), event.getInterpolatedPitch(), event.getHand(), event.getSwingProgress(), ((IDualWeapon)main.getItem()).offHandStack(client.player), ClientHandHandler.getInstance().equipProgress(EnumHand.OFF_HAND, event.getPartialTicks()));
 			}
 		}
 	}
@@ -57,9 +57,9 @@ public class ClientEvents {
 		if(event.getHand()==EnumHand.OFF_HAND)
 		{
 			ItemStack main = event.getEntity().getHeldItemMainhand();
-			if(main.getItem() instanceof IDualWeaponRender)
+			if(main.getItem() instanceof IDualWeapon)
 			{
-				event.setStack(((IDualWeaponRender)main.getItem()).offHandStack(event.getEntity()));
+				event.setStack(((IDualWeapon)main.getItem()).offHandStack(event.getEntity()));
 			}
 		}
 	}
@@ -72,7 +72,7 @@ public class ClientEvents {
 			AbstractClientPlayer player = (AbstractClientPlayer) event.getEntity();
 			ItemStack heldMain = player.getHeldItemMainhand();
 			boolean rightHand = player.getPrimaryHand() == EnumHandSide.RIGHT;
-	        if (heldMain.getItem() instanceof IDualWeaponRender) 
+	        if (heldMain.getItem() instanceof IDualWeapon) 
 	        {
 	        	ModelPlayer model = (ModelPlayer) event.getRenderer().getMainModel();
                 model.rightArmPose = rightHand?model.rightArmPose:model.leftArmPose;

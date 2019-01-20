@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 
 public class EntityUtil {
 
@@ -13,10 +14,19 @@ public class EntityUtil {
 	@Nullable
 	public static <T extends Entity> T findFromUUID(Class<T> clss, World world, UUID uuid)
 	{
-		for(Entity e : world.loadedEntityList)
+		if(world instanceof WorldServer)
 		{
-			if(e.getUniqueID().equals(uuid) && e.getClass().isAssignableFrom(clss))
-				return (T) e;
+            Entity e = ((WorldServer)world).getEntityFromUuid(uuid);
+            if(e.getClass().isAssignableFrom(clss))
+            	return (T) e;
+		}
+		else
+		{
+			for(Entity e : world.loadedEntityList)
+			{
+				if(e.getUniqueID().equals(uuid) && e.getClass().isAssignableFrom(clss))
+					return (T) e;
+			}
 		}
 		return null;
 	}

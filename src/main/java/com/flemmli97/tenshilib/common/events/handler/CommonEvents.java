@@ -1,6 +1,7 @@
 package com.flemmli97.tenshilib.common.events.handler;
 
 import com.flemmli97.tenshilib.TenshiLib;
+import com.flemmli97.tenshilib.api.item.IDualWeapon;
 import com.flemmli97.tenshilib.common.config.ConfigHandler;
 import com.flemmli97.tenshilib.common.network.PacketHandler;
 import com.flemmli97.tenshilib.common.network.PacketStructure;
@@ -9,6 +10,8 @@ import com.flemmli97.tenshilib.common.world.structure.StructureGenerator;
 import com.flemmli97.tenshilib.common.world.structure.StructureMap;
 
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.EnumHand;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.WorldEvent.PotentialSpawns;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -55,5 +58,19 @@ public class CommonEvents {
 				event.getList().clear();
 			event.getList().addAll(StructureGenerator.getSpawnList(base.getStructureId(), event.getType()));
 		}
+	}
+	
+	@SubscribeEvent
+	public void stopOffhand(PlayerInteractEvent.RightClickItem event)
+	{
+		if(event.getHand()==EnumHand.OFF_HAND && event.getItemStack().getItem() instanceof IDualWeapon)
+			event.setCanceled(true);
+	}
+	
+	@SubscribeEvent
+	public void stopOffhand(PlayerInteractEvent.RightClickBlock event)
+	{
+		if(event.getHand()==EnumHand.OFF_HAND && event.getItemStack().getItem() instanceof IDualWeapon)
+			event.setCanceled(true);
 	}
 }

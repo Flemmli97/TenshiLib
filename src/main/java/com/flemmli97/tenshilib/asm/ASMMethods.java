@@ -1,7 +1,7 @@
 package com.flemmli97.tenshilib.asm;
 
 import com.flemmli97.tenshilib.api.item.IAOEWeapon;
-import com.flemmli97.tenshilib.api.item.IDualWeaponRender;
+import com.flemmli97.tenshilib.api.item.IDualWeapon;
 import com.flemmli97.tenshilib.api.item.IExtendedWeapon;
 import com.flemmli97.tenshilib.common.events.LayerHeldItemEvent;
 import com.flemmli97.tenshilib.common.events.ModelPlayerRenderEvent;
@@ -43,7 +43,7 @@ public class ASMMethods {
     }
     
     public static void swingArm(EntityPlayer player, EnumHand originHand) {
-    	if(player.getHeldItemMainhand().getItem() instanceof IDualWeaponRender)
+    	if(player.getHeldItemMainhand().getItem() instanceof IDualWeapon)
     		player.swingArm(ClientHandHandler.getInstance().currentHand());
     	else
     		player.swingArm(originHand);

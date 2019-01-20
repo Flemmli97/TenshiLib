@@ -58,7 +58,7 @@ public class StructureGenerator implements IWorldGenerator{
 			//new Thread() {
 			//	@Override
 			//	public void run() {
-					for(Structure s : gens.values())
+					gens.values().forEach(s->
 					{
 						for(int x = chunkX-ConfigHandler.generatorRadius; x <=chunkX+ConfigHandler.generatorRadius; x++)
 							for(int z = chunkZ-ConfigHandler.generatorRadius; z <=chunkZ+ConfigHandler.generatorRadius; z++)
@@ -66,7 +66,7 @@ public class StructureGenerator implements IWorldGenerator{
 								world.setRandomSeed(x, z, ConfigHandler.seed);
 								s.startStructure(world, x, z, random);
 							}
-					}
+					});
 			//	}}.start();
 			StructureMap.get(world).generate(world, chunkX, chunkZ);
 		}

@@ -31,7 +31,7 @@ public abstract class RenderProjectileModel<T extends Entity> extends Render<T>{
             GlStateManager.enableColorMaterial();
             GlStateManager.enableOutlineMode(this.getTeamColor(entity));
         }
-        model.render(entity, 0, 0, 0, 0, 0, 0.0625F);
+        this.model.render(entity, 0, 0, 0, 0, 0, 0.0625F);
         if (this.renderOutlines)
         {
             GlStateManager.disableOutlineMode();

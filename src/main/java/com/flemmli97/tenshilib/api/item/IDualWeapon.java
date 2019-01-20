@@ -4,9 +4,9 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 
 /**
- * Implementing this will make items be RENDERED as dual weapons. Actual dual weapon handling will not be done
+ * Implementing this will make items dual weapons. Dual weapons prevent offhand use and are also rendered in both hands
  */
-public interface IDualWeaponRender {
+public interface IDualWeapon {
 
 	/**
 	 * Change the item being rendered in the offhand
