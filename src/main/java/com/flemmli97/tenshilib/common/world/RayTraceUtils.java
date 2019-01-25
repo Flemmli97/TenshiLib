@@ -212,4 +212,13 @@ public class RayTraceUtils {
 		}
 		return pos1;
 	}
+	
+    public static RayTraceResult entityRayTrace(Entity e, float range, boolean stopOnLiquid, boolean ignoreBlockWithoutBoundingBox, boolean returnLastUncollidableBlock)
+    {
+		Vec3d posEye = e.getPositionEyes(1);
+		Vec3d look = posEye.add(e.getLookVec().scale(range));
+		RayTraceResult blockpos = e.world.rayTraceBlocks(posEye, look, stopOnLiquid, ignoreBlockWithoutBoundingBox, returnLastUncollidableBlock);
+		return blockpos!=null?blockpos:new RayTraceResult(RayTraceResult.Type.MISS, look, EnumFacing.getFacingFromVector((float)look.x, (float)look.y, (float)look.z),null);
+    }
 }
+

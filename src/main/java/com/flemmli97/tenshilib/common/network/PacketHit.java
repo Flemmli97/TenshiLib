@@ -60,7 +60,7 @@ public class PacketHit  implements IMessage{
 				if(MinecraftForge.EVENT_BUS.post(new AOEAttackEvent(player, list)) || list.isEmpty())
 					return null;
 				for(int i = 0; i < list.size(); i++)
-					AOEAttackEvent.attackTargetEntityWithCurrentItem(player, list.get(i), i==list.size()-1);
+					AOEAttackEvent.attackTargetEntityWithCurrentItem(player, list.get(i), i==(list.size()-1));
 			}
             return null;
         }

@@ -11,8 +11,11 @@ import com.flemmli97.tenshilib.common.network.PacketHandler;
 import com.flemmli97.tenshilib.common.world.structure.StructureBase;
 import com.flemmli97.tenshilib.common.world.structure.StructureGenerator;
 
+import net.minecraft.client.particle.Particle;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.IThreadListener;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
@@ -64,6 +67,16 @@ public class CommonProxy {
     }
     
     public void setStructureToRender(StructureBase structure)
+    {
+    	
+    }
+    
+    public void spawnParticle(ResourceLocation res, World world, double xCoord, double yCoord, double zCoord, double xSpeed, double ySpeed, double zSpeed, Object... parameters) 
+    {
+    	
+    }
+    
+    public void spawnParticle(Particle particle) 
     {
     	
     }

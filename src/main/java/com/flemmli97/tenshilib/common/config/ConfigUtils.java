@@ -95,7 +95,7 @@ public class ConfigUtils {
 	
 	public static int getIntConfig(Configuration config, String name, String category, int defaultValue, int minValue, String comment)
 	{
-		Property prop = config.get(category, name, Float.toString(defaultValue), name);
+		Property prop = config.get(category, name, Integer.toString(defaultValue), name);
         prop.setLanguageKey(name);
         prop.setComment(comment + "[default: " + defaultValue + "]");
         prop.setMinValue(minValue);

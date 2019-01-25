@@ -17,7 +17,7 @@ public class EntityUtil {
 		if(world instanceof WorldServer)
 		{
             Entity e = ((WorldServer)world).getEntityFromUuid(uuid);
-            if(e.getClass().isAssignableFrom(clss))
+            if(e!=null && e.getClass().isAssignableFrom(clss))
             	return (T) e;
 		}
 		else

@@ -1,12 +1,16 @@
 package com.flemmli97.tenshilib.proxy;
 
+import com.flemmli97.tenshilib.client.particles.ParticleHandler;
 import com.flemmli97.tenshilib.common.events.handler.ClientEvents;
 import com.flemmli97.tenshilib.common.world.structure.StructureBase;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.Particle;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.IThreadListener;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -55,4 +59,15 @@ public class ClientProxy extends CommonProxy {
     	this.currentStructure=base;
     }
     
+    @Override
+    public void spawnParticle(ResourceLocation res, World world, double xCoord, double yCoord, double zCoord, double xSpeed, double ySpeed, double zSpeed, Object... parameters) 
+    {
+    	ParticleHandler.ParticleRegistries.spawnParticle(res, world, xCoord, yCoord, zCoord, xSpeed, ySpeed, zSpeed, parameters);
+    }
+    
+    @Override
+    public void spawnParticle(Particle particle) 
+    {
+    	ParticleHandler.ParticleRegistries.spawnParticle(particle);
+    }
 }

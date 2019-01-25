@@ -8,9 +8,6 @@ import com.flemmli97.tenshilib.common.commands.CommandLocateStructure;
 import com.flemmli97.tenshilib.common.commands.CommandStructure;
 import com.flemmli97.tenshilib.proxy.CommonProxy;
 
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.world.GameRules.ValueType;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -26,7 +23,7 @@ public class TenshiLib {
 
     public static final String MODID = "tenshilib";
     public static final String MODNAME = "TenshiLib";
-    public static final String VERSION = "1.0.0";
+    public static final String VERSION = "${@VERSION}";
     public static final Logger logger = LogManager.getLogger(TenshiLib.MODNAME);
         
     @Instance
@@ -37,7 +34,7 @@ public class TenshiLib {
     
     @EventHandler
     public void preInit(FMLPreInitializationEvent e) {
-	    Blocks.COMMAND_BLOCK.setCreativeTab(CreativeTabs.REDSTONE);
+	    /*Blocks.COMMAND_BLOCK.setCreativeTab(CreativeTabs.REDSTONE);
 	    Blocks.STRUCTURE_BLOCK.setCreativeTab(CreativeTabs.MISC);
 	    Blocks.STRUCTURE_VOID.setCreativeTab(CreativeTabs.MISC);
 	    Blocks.BARRIER.setCreativeTab(CreativeTabs.MISC);
@@ -46,7 +43,7 @@ public class TenshiLib {
 	    Items.COMMAND_BLOCK_MINECART.setCreativeTab(CreativeTabs.TRANSPORTATION);
 	    Items.FIREWORKS.setCreativeTab(CreativeTabs.MISC);
 	    //For the lols
-	    Items.KNOWLEDGE_BOOK.setCreativeTab(CreativeTabs.MISC);
+	    Items.KNOWLEDGE_BOOK.setCreativeTab(CreativeTabs.MISC);*/
         proxy.preInit(e);
     }
 

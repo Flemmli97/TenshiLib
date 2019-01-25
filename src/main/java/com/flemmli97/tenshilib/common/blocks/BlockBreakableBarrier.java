@@ -21,7 +21,7 @@ public class BlockBreakableBarrier extends Block{
 	public BlockBreakableBarrier()
 	{
 		super(Material.CIRCUITS);
-		this.setHardness(3);
+		this.setHardness(0.1f);
         this.setResistance(100);
         this.setRegistryName(new ResourceLocation(TenshiLib.MODID, "breakable_barrier"));
         this.setUnlocalizedName(this.getRegistryName().toString());
