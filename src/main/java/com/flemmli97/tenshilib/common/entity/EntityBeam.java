@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 
 import com.flemmli97.tenshilib.api.entity.IBeamEntity;
 import com.flemmli97.tenshilib.common.world.RayTraceUtils;
+import com.google.common.base.Predicate;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -14,6 +15,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -25,11 +27,17 @@ public abstract class EntityBeam extends Entity implements IBeamEntity{
 
 	private EntityLivingBase shooter;
 	protected int livingTicks;
-	
+	private int coolDown;
     private RayTraceResult hit;
-    
-    protected static final DataParameter<String> shooterUUID = EntityDataManager.<String>createKey(EntityBeam.class, DataSerializers.STRING);
+   
+    protected static final DataParameter<String> shooterUUID = EntityDataManager.createKey(EntityBeam.class, DataSerializers.STRING);
 
+    private final Predicate<Entity> notShooter = new Predicate<Entity>() {
+		@Override
+		public boolean apply(Entity t) {
+			return (EntityBeam.this.getShooter()==null || t!=EntityBeam.this.getShooter()) && EntitySelectors.NOT_SPECTATING.apply(t);
+		}};
+    
 	public EntityBeam(World world) {
 		super(world);
 		this.setSize(0.25F, 0.25F);
@@ -98,13 +106,13 @@ public abstract class EntityBeam extends Entity implements IBeamEntity{
 	@Override
     public void onUpdate()
     {
-		if(this.hit==null && !this.dataManager.get(shooterUUID).isEmpty())
-	        this.hit=RayTraceUtils.entityRayTrace(this, this.getRange(), false, true, false);
+		if(this.hit==null && this.getShooter()!=null)
+	        this.hit=RayTraceUtils.entityRayTrace(this, this.getRange(), false, true, false, this.piercing(), notShooter);
 		super.onUpdate();
 		this.livingTicks++;
-        if(this.livingTicks>this.livingTickMax())
+        if(this.livingTicks>=this.livingTickMax())
         	this.setDead();
-        if(this.hit!=null)
+        if(this.hit!=null && --this.coolDown<=0)
 		{
 			List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(this, new AxisAlignedBB(this.posX,this.posY,this.posZ,this.hit.hitVec.x,this.hit.hitVec.y,this.hit.hitVec.z).grow(1));
 			for(int i = 0; i < list.size(); i++)
@@ -121,6 +129,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity{
                     	if (!net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, raytraceresult))
                         {
                             this.onImpact(raytraceresult);
+                            this.coolDown=this.attackCooldown();
                             if(!this.piercing())
                             	return;
                         }
@@ -136,6 +145,11 @@ public abstract class EntityBeam extends Entity implements IBeamEntity{
 	public int livingTicks()
 	{
 		return this.livingTicks;
+	}
+	
+	public int attackCooldown()
+	{
+		return 20;
 	}
 	
 	@Override

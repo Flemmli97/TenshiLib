@@ -16,6 +16,9 @@ import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -30,14 +33,16 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public abstract class EntityProjectile extends Entity implements IProjectile{
 
 	private EntityLivingBase shooter;
-	private UUID shooterUUID;
+
 	protected boolean inGround;
 	protected int ticksInGround, livingTicks;
     public List<UUID> attackedEntities = Lists.newArrayList();
     
     private Block ground;
     private BlockPos groundPos;
-    
+
+    protected static final DataParameter<String> shooterUUID = EntityDataManager.createKey(EntityProjectile.class, DataSerializers.STRING);
+
 	public EntityProjectile(World world) {
 		super(world);
 		this.setSize(0.25F, 0.25F);
@@ -53,8 +58,8 @@ public abstract class EntityProjectile extends Entity implements IProjectile{
     {
         this(world, shooter.posX, shooter.posY + shooter.getEyeHeight() - 0.10000000149011612D, shooter.posZ);
         this.shooter = shooter;
-        this.shooterUUID = shooter.getUniqueID();
-        this.setRotation(shooter.rotationYaw, shooter.rotationPitch);        
+        this.dataManager.set(shooterUUID, shooter.getUniqueID().toString());
+        this.setRotation(shooter.rotationYaw, shooter.rotationPitch);
     }
     
     public boolean isPiercing()
@@ -74,9 +79,26 @@ public abstract class EntityProjectile extends Entity implements IProjectile{
     {
     	return 0;
     }
+    
+	public int livingTicks()
+	{
+		return this.livingTicks;
+	}
+	
+	public int livingTickMax()
+	{
+		return 6000;
+	}
+	
+	public boolean canHitShooter()
+	{
+		return false;
+	}
 	
 	@Override
-	protected void entityInit() {}
+	protected void entityInit() {
+		this.dataManager.register(shooterUUID, "");
+	}
 
 	@Override
     @SideOnly(Side.CLIENT)
@@ -93,12 +115,12 @@ public abstract class EntityProjectile extends Entity implements IProjectile{
         return distance < d0 * d0;
     }
     
-    public void shoot(Entity entityThrower, float rotationPitchIn, float rotationYawIn, float pitchOffset, float velocity, float inaccuracy)
+	public void shoot(Entity entityThrower, float rotationPitchIn, float rotationYawIn, float pitchOffset, float velocity, float inaccuracy)
     {
         float f = -MathHelper.sin(rotationYawIn * 0.017453292F) * MathHelper.cos(rotationPitchIn * 0.017453292F);
         float f1 = -MathHelper.sin((rotationPitchIn + pitchOffset) * 0.017453292F);
         float f2 = MathHelper.cos(rotationYawIn * 0.017453292F) * MathHelper.cos(rotationPitchIn * 0.017453292F);
-        this.shoot((double)f, (double)f1, (double)f2, velocity, inaccuracy);
+        this.shoot(f, f1, f2, velocity, inaccuracy);
         this.motionX += entityThrower.motionX;
         this.motionZ += entityThrower.motionZ;
 
@@ -110,29 +132,29 @@ public abstract class EntityProjectile extends Entity implements IProjectile{
 
     public void shootAtPosition(double x, double y, double z, float velocity, float inaccuracy)
     {
-		Vec3d dir = new Vec3d (x-posX, y - posY, z-posZ).scale(1/velocity);
+		Vec3d dir = new Vec3d (x-this.posX, y - this.posY, z-this.posZ).scale(1/velocity);
 		this.shoot(dir.x, dir.y, dir.z, velocity, inaccuracy);
     }
     
 	@Override
-    public void shoot(double x, double y, double z, float velocity, float inaccuracy)
+	public void shoot(double x, double y, double z, float velocity, float inaccuracy)
     {
         float f = MathHelper.sqrt(x * x + y * y + z * z);
-        x = x / (double)f;
-        y = y / (double)f;
-        z = z / (double)f;
-        x = x + this.rand.nextGaussian() * 0.007499999832361937D * (double)inaccuracy;
-        y = y + this.rand.nextGaussian() * 0.007499999832361937D * (double)inaccuracy;
-        z = z + this.rand.nextGaussian() * 0.007499999832361937D * (double)inaccuracy;
-        x = x * (double)velocity;
-        y = y * (double)velocity;
-        z = z * (double)velocity;
+        x = x / f;
+        y = y / f;
+        z = z / f;
+        x = x + this.rand.nextGaussian() * 0.007499999832361937D * inaccuracy;
+        y = y + this.rand.nextGaussian() * 0.007499999832361937D * inaccuracy;
+        z = z + this.rand.nextGaussian() * 0.007499999832361937D * inaccuracy;
+        x = x * velocity;
+        y = y * velocity;
+        z = z * velocity;
         this.motionX = x;
         this.motionY = y;
         this.motionZ = z;
         float f1 = MathHelper.sqrt(x * x + z * z);
         this.rotationYaw = (float)(MathHelper.atan2(x, z) * (180D / Math.PI));
-        this.rotationPitch = (float)(MathHelper.atan2(y, (double)f1) * (180D / Math.PI));
+        this.rotationPitch = (float)(MathHelper.atan2(y, f1) * (180D / Math.PI));
         this.prevRotationYaw = this.rotationYaw;
         this.prevRotationPitch = this.rotationPitch;
         this.ticksInGround = 0;
@@ -150,7 +172,7 @@ public abstract class EntityProjectile extends Entity implements IProjectile{
         {
             float f = MathHelper.sqrt(x * x + z * z);
             this.rotationYaw = (float)(MathHelper.atan2(x, z) * (180D / Math.PI));
-            this.rotationPitch = (float)(MathHelper.atan2(y, (double)f) * (180D / Math.PI));
+            this.rotationPitch = (float)(MathHelper.atan2(y, f) * (180D / Math.PI));
             this.prevRotationYaw = this.rotationYaw;
             this.prevRotationPitch = this.rotationPitch;
         }
@@ -191,9 +213,9 @@ public abstract class EntityProjectile extends Entity implements IProjectile{
 	            return;
 	        }
 	        this.inGround = false;
-	        this.motionX *= (double)(this.rand.nextFloat() * 0.2F);
-	        this.motionY *= (double)(this.rand.nextFloat() * 0.2F);
-	        this.motionZ *= (double)(this.rand.nextFloat() * 0.2F);
+	        this.motionX *= (this.rand.nextFloat() * 0.2F);
+	        this.motionY *= (this.rand.nextFloat() * 0.2F);
+	        this.motionZ *= (this.rand.nextFloat() * 0.2F);
 	        this.ticksInGround = 0;
 	    }
         
@@ -204,7 +226,7 @@ public abstract class EntityProjectile extends Entity implements IProjectile{
         this.posZ += this.motionZ;
         float f = MathHelper.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
         this.rotationYaw = (float)(MathHelper.atan2(this.motionX, this.motionZ) * (180D / Math.PI));
-        for (this.rotationPitch = (float)(MathHelper.atan2(this.motionY, (double)f) * (180D / Math.PI)); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F)
+        for (this.rotationPitch = (float)(MathHelper.atan2(this.motionY, f) * (180D / Math.PI)); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F)
         {
             ;
         }
@@ -226,7 +248,7 @@ public abstract class EntityProjectile extends Entity implements IProjectile{
 
         this.rotationPitch = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * 0.2F;
         this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.2F;
-        float motionReduction = 0.99F;
+        float motionReduction = this.motionReduction();
         if (this.isInWater())
         {
             for (int j = 0; j < 4; ++j)
@@ -264,7 +286,7 @@ public abstract class EntityProjectile extends Entity implements IProjectile{
         for (int i = 0; i < list.size(); ++i)
         {
             Entity entity1 = list.get(i);
-            if (entity1.canBeCollidedWith() && (this.getShooter()==null||entity1!=this.getShooter()))
+            if (entity1.canBeCollidedWith() && (this.getShooter()==null||this.canHitShooter() && (entity1!=this.getShooter() || this.ticksExisted>2) || entity1!=this.getShooter()))
             {
                 AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().grow(/*this.radius()+*/0.30000001192092896D);
                 RayTraceResult raytraceresult1 = axisalignedbb.calculateIntercept(vec3d, vec3d1);
@@ -315,14 +337,9 @@ public abstract class EntityProjectile extends Entity implements IProjectile{
         return 0.03F;
     }
 	
-	public int livingTicks()
+	protected float motionReduction()
 	{
-		return this.livingTicks;
-	}
-	
-	public int livingTickMax()
-	{
-		return 6000;
+		return 0.99f;
 	}
 	
     protected abstract void onImpact(RayTraceResult result);
@@ -336,10 +353,8 @@ public abstract class EntityProjectile extends Entity implements IProjectile{
 			this.setInGround(new BlockPos(arr[0], arr[1], arr[2]));
 		}
 		if(compound.hasKey("Shooter"))
-		{
-			this.shooterUUID=UUID.fromString(compound.getString("Shooter"));
-			this.shooter=this.getShooter();
-		}
+			this.dataManager.set(shooterUUID, compound.getString("Shooter"));
+		this.shooter=this.getShooter();
 		this.livingTicks=compound.getInteger("LivingTicks");
 		NBTTagList list = compound.getTagList("AttackedEntities", Constants.NBT.TAG_STRING);
 		list.forEach(tag->this.attackedEntities.add(UUID.fromString(((NBTTagString)tag).getString())));
@@ -352,8 +367,7 @@ public abstract class EntityProjectile extends Entity implements IProjectile{
 			compound.setIntArray("GroundPos", new int[] {this.groundPos.getX(), this.groundPos.getY(), this.groundPos.getZ()});
 		}
         compound.setBoolean("InGround", this.inGround);
-        if(this.shooterUUID!=null)
-        	compound.setString("Shooter", this.shooterUUID.toString());
+    	compound.setString("Shooter", this.dataManager.get(shooterUUID));
         compound.setInteger("LivingTicks", this.livingTicks);
         NBTTagList list = new NBTTagList();
         this.attackedEntities.forEach(uuid->list.appendTag(new NBTTagString(uuid.toString())));
@@ -363,9 +377,9 @@ public abstract class EntityProjectile extends Entity implements IProjectile{
     @Nullable
     public EntityLivingBase getShooter()
     {
-        if(this.shooter==null && this.shooterUUID!=null)
+    	if(this.shooter==null && !this.dataManager.get(shooterUUID).isEmpty())
         {
-        	this.shooter=EntityUtil.findFromUUID(EntityLivingBase.class, this.world, this.shooterUUID);
+        	this.shooter=EntityUtil.findFromUUID(EntityLivingBase.class, this.world, UUID.fromString(this.dataManager.get(shooterUUID)));
         }
         return this.shooter;
     }

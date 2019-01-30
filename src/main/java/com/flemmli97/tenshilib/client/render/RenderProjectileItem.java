@@ -25,14 +25,14 @@ public abstract class RenderProjectileItem<T extends Entity> extends Render<T>{
         switch(this.getRenderType(entity))
         {
 			case NORMAL:
-				GlStateManager.rotate(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-	            GlStateManager.rotate((this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-	            GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+				GlStateManager.rotate(-this.renderManager.playerViewY, 0, 1, 0);
+	            GlStateManager.rotate((this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * this.renderManager.playerViewX, 1, 0, 0);
+	            GlStateManager.rotate(180, 0, 1, 0);
 				break;
 			case WEAPON:
-				GlStateManager.rotate((entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTick)+180, 0.0F, 1.0F, 0.0F);
-	        	GlStateManager.rotate((entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTick)+95, 1.0F, 0.0F, 0.0F);
-	        	GlStateManager.rotate(180, 1.0F, 0.0F, 0.0F);
+				GlStateManager.rotate((entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTick)+180, 0, 1, 0);
+	        	GlStateManager.rotate((entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTick)+95, 1, 0, 0);
+	        	GlStateManager.rotate(180, 1, 0, 0);
 				break; 
         }
         this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);

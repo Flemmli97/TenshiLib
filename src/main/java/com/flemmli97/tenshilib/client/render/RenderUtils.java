@@ -73,14 +73,13 @@ public class RenderUtils {
 		GlStateManager.popMatrix();
     }
     
-    public static void renderTexture(RenderManager renderManager, ResourceLocation texture, double x, double y, double z, float xSize, float ySize, float red, float blue, float green, float alpha, float yawRot, float pitchRot)
+    public static void renderTexture(RenderManager renderManager, ResourceLocation texture, double x, double y, double z, float xSize, float ySize, float red, float green, float blue, float alpha, float yawRot, float pitchRot)
     {
-    	renderTexture(renderManager, texture, x, y, z, xSize, ySize, (int)(red*255), (int)(blue*255), (int)(green*255), (int)(alpha*255), yawRot, pitchRot);
+    	renderTexture(renderManager, texture, x, y, z, xSize, ySize, (int)(red*255), (int)(green*255), (int)(blue*255), (int)(alpha*255), yawRot, pitchRot);
     }
     
-    public static void renderTexture(RenderManager renderManager, ResourceLocation texture, double x, double y, double z, float xSize, float ySize, int red, int blue, int green, int alpha, float yawRot, float pitchRot)
+    public static void renderTexture(RenderManager renderManager, ResourceLocation texture, double x, double y, double z, float xSize, float ySize, int red, int green, int blue, int alpha, float yawRot, float pitchRot)
     {
-    	renderManager.renderEngine.bindTexture(texture);
     	GlStateManager.pushMatrix();
         GlStateManager.disableCull();
         GlStateManager.enableBlend();
@@ -89,16 +88,17 @@ public class RenderUtils {
         RenderHelper.disableStandardItemLighting();
         GlStateManager.translate(x, y+0.2, z);
         GlStateManager.rotate(yawRot, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(pitchRot, -1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(pitchRot, 1.0F, 0.0F, 0.0F);
         xSize = xSize/2f;
         ySize = ySize/2f;
+    	renderManager.renderEngine.bindTexture(texture);
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder vertexbuffer = tessellator.getBuffer();	
         vertexbuffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-        vertexbuffer.pos(-xSize, -ySize, 0).tex(0, 0).color(red, green, blue, alpha).endVertex();
-        vertexbuffer.pos(-xSize, ySize, 0).tex(0, 1).color(red, green, blue, alpha).endVertex();
-        vertexbuffer.pos(xSize, ySize, 0).tex(1, 1).color(red, green, blue, alpha).endVertex();
-        vertexbuffer.pos(xSize, -ySize, 0).tex(1, 0).color(red, green, blue, alpha).endVertex();
+        vertexbuffer.pos(-xSize, ySize, 0).tex(0, 0).color(red, green, blue, alpha).endVertex();
+        vertexbuffer.pos(xSize, ySize, 0).tex(1, 0).color(red, green, blue, alpha).endVertex();
+        vertexbuffer.pos(xSize, -ySize, 0).tex(1, 1).color(red, green, blue, alpha).endVertex();
+        vertexbuffer.pos(-xSize, -ySize, 0).tex(0, 1).color(red, green, blue, alpha).endVertex();
         tessellator.draw();	
         RenderHelper.enableStandardItemLighting();
         GlStateManager.disableBlend();
@@ -110,9 +110,9 @@ public class RenderUtils {
     public static void renderTexture(RenderManager renderManager, ResourceLocation texture, double x, double y, double z, float xSize, float ySize, int hexColor, float yawRot, float pitchRot)
     {
     	int red = hexColor >> 16 & 255;
-        int blue = hexColor >> 8 & 255;
-        int green = hexColor >> 0 & 255;
+        int green = hexColor >> 8 & 255;
+        int blue = hexColor >> 0 & 255;
         int alpha = hexColor >> 24 & 255;
-    	renderTexture(renderManager, texture, x, y, z, xSize, ySize, red, blue, green, alpha, yawRot, pitchRot);
+    	renderTexture(renderManager, texture, x, y, z, xSize, ySize, red, green, blue, alpha, yawRot, pitchRot);
     }
 }

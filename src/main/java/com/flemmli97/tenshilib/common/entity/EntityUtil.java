@@ -17,14 +17,14 @@ public class EntityUtil {
 		if(world instanceof WorldServer)
 		{
             Entity e = ((WorldServer)world).getEntityFromUuid(uuid);
-            if(e!=null && e.getClass().isAssignableFrom(clss))
+            if(e!=null && clss.isAssignableFrom(e.getClass()))
             	return (T) e;
 		}
 		else
 		{
 			for(Entity e : world.loadedEntityList)
 			{
-				if(e.getUniqueID().equals(uuid) && e.getClass().isAssignableFrom(clss))
+				if(e.getUniqueID().equals(uuid) && clss.isAssignableFrom(e.getClass()))
 					return (T) e;
 			}
 		}

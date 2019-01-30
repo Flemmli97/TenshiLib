@@ -213,12 +213,42 @@ public class RayTraceUtils {
 		return pos1;
 	}
 	
-    public static RayTraceResult entityRayTrace(Entity e, float range, boolean stopOnLiquid, boolean ignoreBlockWithoutBoundingBox, boolean returnLastUncollidableBlock)
+	public static RayTraceResult entityRayTrace(Entity e, float range, boolean stopOnLiquid, boolean ignoreBlockWithoutBoundingBox, boolean returnLastUncollidableBlock, boolean includeEntities, @Nullable Predicate<? super Entity> pred)
     {
 		Vec3d posEye = e.getPositionEyes(1);
 		Vec3d look = posEye.add(e.getLookVec().scale(range));
+		if(includeEntities)
+		{
+			Entity entity = null;
+			double d0 = 0;
+			List<Entity> list = e.world.getEntitiesInAABBexcluding(e, new AxisAlignedBB(e.posX,e.posY,e.posZ,e.posX+look.x,e.posY+look.y,e.posZ+look.z).grow(1), pred!=null?pred:EntitySelectors.NOT_SPECTATING);
+			for (Entity entity1 : list)
+	        {
+	            if (entity1.canBeCollidedWith())
+	            {
+	                AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().grow(0.30000001192092896D);
+	                RayTraceResult raytraceresult1 = axisalignedbb.calculateIntercept(posEye, look);
+	                if (raytraceresult1 != null || axisalignedbb.contains(look))
+	                {
+	                    double d1 = raytraceresult1!=null?posEye.squareDistanceTo(raytraceresult1.hitVec):0;
+	                    if (d1 < d0 || d0 == 0.0D)
+	                    {
+	                        entity = entity1;
+	                        d0 = d1;
+	                    }
+	                }
+	            }
+	        }
+			if(entity!=null)
+				return new RayTraceResult(entity);
+		}
 		RayTraceResult blockpos = e.world.rayTraceBlocks(posEye, look, stopOnLiquid, ignoreBlockWithoutBoundingBox, returnLastUncollidableBlock);
 		return blockpos!=null?blockpos:new RayTraceResult(RayTraceResult.Type.MISS, look, EnumFacing.getFacingFromVector((float)look.x, (float)look.y, (float)look.z),null);
+    }
+	
+    public static RayTraceResult entityRayTrace(Entity e, float range, boolean stopOnLiquid, boolean ignoreBlockWithoutBoundingBox, boolean returnLastUncollidableBlock)
+    {
+		return entityRayTrace(e, range, returnLastUncollidableBlock, returnLastUncollidableBlock, returnLastUncollidableBlock, false, null);
     }
 }
 
