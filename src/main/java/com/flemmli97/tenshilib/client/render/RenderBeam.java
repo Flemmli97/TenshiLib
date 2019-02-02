@@ -42,9 +42,13 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends Render<
 	@Override
 	public void doRender(T entity, double x, double y, double z, float entityYaw, float partialTicks) {
 		double dist = entity.hitVec().distanceTo(entity.startVec());
-		GlStateManager.pushMatrix();
-		GlStateManager.disableCull();
+		GlStateManager.pushMatrix();        
+        GlStateManager.disableCull();
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        GlStateManager.alphaFunc(GL11.GL_GEQUAL, 1/255f);
         RenderHelper.disableStandardItemLighting();
+        
         GlStateManager.translate(x, y, z);
         GlStateManager.rotate(entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks+90, 0.0F, -1.0F, 0.0F);
         GlStateManager.rotate(-(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks), 0.0F, 0.0F, 1.0F);
@@ -53,9 +57,12 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends Render<
 
         this.renderManager.renderEngine.bindTexture(this.getEntityTexture(entity));
         this.renderBeam(this.width, dist);
+        
         RenderHelper.enableStandardItemLighting();
+        GlStateManager.disableBlend();
+        GlStateManager.alphaFunc(GL11.GL_GEQUAL, 0.1F);
         GlStateManager.enableCull();
-		GlStateManager.popMatrix();
+        GlStateManager.popMatrix();
 		super.doRender(entity, x, y, z, entityYaw, partialTicks);
 	}
 	

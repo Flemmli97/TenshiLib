@@ -12,11 +12,13 @@ import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 
@@ -53,11 +55,12 @@ public class CommandItemData implements ICommand{
 		if(sender.getCommandSenderEntity() instanceof EntityPlayer)
 		{
 			EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
-			if(player.getHeldItemMainhand().isEmpty())
+			ItemStack stack = args.length>1?player.inventory.getStackInSlot(MathHelper.clamp(Integer.parseInt(args[1])-1, 0, 9)):player.getHeldItemMainhand();
+			if(stack.isEmpty())
 			{
 				return;
 			}
-			NBTTagCompound stackCompound = player.getHeldItemMainhand().hasTagCompound()?player.getHeldItemMainhand().getTagCompound():new NBTTagCompound();
+			NBTTagCompound stackCompound = stack.hasTagCompound()?stack.getTagCompound():new NBTTagCompound();
 
 			if(args[0].equals("view"))
 			{
@@ -75,7 +78,7 @@ public class CommandItemData implements ICommand{
                     throw new CommandException("commands.itemdata.tagError", new Object[] {nbtexception.getMessage()});
                 }
 				stackCompound.merge(fromCommand);
-				player.getHeldItemMainhand().setTagCompound(stackCompound);
+				stack.setTagCompound(stackCompound);
                 CommandBase.notifyCommandListener(sender, this, "commands.itemdata.success", new Object[] {stackCompound.toString()});
 			}
 		}

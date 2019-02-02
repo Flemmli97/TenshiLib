@@ -189,7 +189,7 @@ public class StructureBase{
 		compound.setIntArray("Pos", new int[] {this.structurePos.getX(), this.structurePos.getY(), this.structurePos.getZ()});
 		compound.setString("Mirror", this.mirror.toString());
 		compound.setString("Rotation", this.rot.toString());
-		compound.setString("GenType", this.genType.toString());
+		compound.setString("GenerationType", this.genType.toString());
 		NBTTagList boundingBoxes = new NBTTagList();
 		this.boundingBoxes.forEach(box->boundingBoxes.appendTag(box.toNBTTagIntArray()));
 		compound.setTag("BoundingBoxes", boundingBoxes);

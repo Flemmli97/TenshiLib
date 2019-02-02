@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
@@ -25,6 +24,7 @@ public class ConfigUtils {
 		for(Configuration config : configs)
 		{
 			//String conf = configs.length==1?"":config.getConfigFile().getName();
+			//ConfigCategory superCat = new ConfigCategory();
 			for(String cat : config.getCategoryNames())
 			{
                 ConfigCategory category = config.getCategory(cat);
@@ -46,16 +46,6 @@ public class ConfigUtils {
 		return list;
 	}
 	
-	public static IConfigElement element(ConfigCategory category, boolean empty)
-	{
-		if(empty)
-			return new ConfigElement(category);
-		DummyCategoryElement element = new DummyCategoryElement(category.getName(), category.getLanguagekey(), new ConfigElement(category).getChildElements());
-        element.setRequiresMcRestart(category.requiresMcRestart());
-        element.setRequiresWorldRestart(category.requiresWorldRestart());
-		return element;
-	}
-	
 	private static final Joiner PIPE = Joiner.on('|');
     private static final Joiner NEW_LINE = Joiner.on('\n');
 
@@ -67,9 +57,10 @@ public class ConfigUtils {
 		if(pattern==null)
 		{
 			lst = Lists.newArrayList();
-	        for(TextFormatting form : TextFormatting.values())
-	        	if(form.isColor())
-	        		lst.add(form.toString());
+			for (Enum<?> e : defaultVal.getClass().getEnumConstants())
+            {
+                lst.add(e.name());
+            }
 		}
 		prop.setValidationPattern(Pattern.compile(PIPE.join(lst)));
 		prop.setValidValues(lst.toArray(new String[0]));
@@ -95,24 +86,17 @@ public class ConfigUtils {
 	
 	public static int getIntConfig(Configuration config, String name, String category, int defaultValue, int minValue, String comment)
 	{
-		Property prop = config.get(category, name, Integer.toString(defaultValue), name);
+		Property prop = config.get(category, name, defaultValue, name);
         prop.setLanguageKey(name);
         prop.setComment(comment + "[default: " + defaultValue + "]");
         prop.setMinValue(minValue);
-        try
-        {
-            return Math.max(minValue, prop.getInt());
-        }
-        catch (Exception e)
-        {
-            FMLLog.log.error("Failed to get int for {}/{}", name, category, e);
-        }
-        return defaultValue;
+        return Math.max(minValue, prop.getInt());
 	}
 	
 	public static float getFloatConfig(Configuration config, String name, String category, float defaultValue, String comment)
 	{
-		Property prop = config.get(category, name, Float.toString(defaultValue), name);
+		Property prop = config.get(category, name, Float.toString(defaultValue), comment, Property.Type.DOUBLE);
+		prop.setDefaultValue(Float.toString(defaultValue));
         prop.setLanguageKey(name);
         prop.setComment(comment + "[default: " + defaultValue + "]");
         try
@@ -122,6 +106,7 @@ public class ConfigUtils {
         }
         catch (Exception e)
         {
+        	prop.setValue(defaultValue);
             FMLLog.log.error("Failed to get float for {}/{}", name, category, e);
         }
         return defaultValue;

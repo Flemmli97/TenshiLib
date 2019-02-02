@@ -104,9 +104,10 @@ public class Structure implements IConfigSerializable<Structure>{
 		return this;
 	}
 	
-	public void addMobSpawn(EnumCreatureType type, Set<Biome.SpawnListEntry> biome)
+	public Structure addMobSpawn(EnumCreatureType type, Set<Biome.SpawnListEntry> biome)
 	{
 		spawns.merge(type, biome, (old, newSet)->{old.addAll(newSet);return old;});
+		return this;
 	}
 	
 	public void startStructure(World world, int chunkX, int chunkZ, Random random)
@@ -122,13 +123,14 @@ public class Structure implements IConfigSerializable<Structure>{
 		{
 			int x = chunkX * 16 + random.nextInt(16)+8;
 			int z = chunkZ * 16 + random.nextInt(16)+8;
-			int y = Math.max(world.getSeaLevel(), world.getHeight(x, z)+this.yOffset);
+			int y = Math.max(world.getSeaLevel(), world.getHeight(x, z));
 			if(this.type!=LocationType.GROUND)
 				y=random.nextInt(this.type.randomization())+this.type.minHeight();
+			y+=this.yOffset;
 			StructureMap structureMap = StructureMap.get(world);
 			BlockPos pos = new BlockPos(x,y,z);
 			StructureBase nearest = structureMap.getNearestStructure(this.id, pos, world);
-			if((nearest!=null && pos.distanceSq(nearest.getPos())<(this.minDist*this.minDist)) || MinecraftForge.EVENT_BUS.post(new StructureGenerateEvent(this, pos, world)))
+			if((nearest!=null && pos.distanceSq(nearest.getPos())<(this.minDist*this.minDist)) || MinecraftForge.TERRAIN_GEN_BUS.post(new StructureGenerateEvent(this, pos, world)))
 				return;
 			Rotation rot = Rotation.values()[random.nextInt(Rotation.values().length)];
 			Mirror mirror = Mirror.values()[random.nextInt(Mirror.values().length)];
@@ -149,7 +151,7 @@ public class Structure implements IConfigSerializable<Structure>{
 	
 	public Set<Biome.SpawnListEntry> getSpawnList(EnumCreatureType type)
 	{
-		Set<Biome.SpawnListEntry> set = spawns.get(type);
+		Set<Biome.SpawnListEntry> set = this.spawns.get(type);
 		return set!=null?set:Sets.newHashSet();
 	}
 	
@@ -159,7 +161,7 @@ public class Structure implements IConfigSerializable<Structure>{
 	}
 
 	@Override
-	public Structure config(Configuration config, Structure old, String configCategory) {
+	public Structure config(Configuration config, String configCategory) {
 		configCategory+="."+this.id;
 		ConfigCategory cat = config.getCategory(configCategory);
 		cat.setLanguageKey("structures."+this.id);
@@ -167,15 +169,14 @@ public class Structure implements IConfigSerializable<Structure>{
 				config.getStringList("Starting Structures", configCategory, ArrayUtils.arrayToStringArr(this.startingStructures), "Schematic names of potential starting structures. If empty will use the structure id"), 
 				new ObjectConverter<String, ResourceLocation>() {
 					@Override
-					public ResourceLocation convertFrom(String t) {
-						return new ResourceLocation(t);
-					}}, 
-				ResourceLocation.class);
+					public ResourceLocation convertFrom(String t) {return new ResourceLocation(t);}}, ResourceLocation.class, true);
+		if(this.startingStructures==null)
+			this.startingStructures=new ResourceLocation[] {this.id};
 		this.frequency=config.get(configCategory, "Frequency", this.frequency, "Structure will spawn with 1/x probability in a chunk").getInt();
 		this.yOffset=config.get(configCategory, "Y-Offset", this.yOffset, "An y offset during generation").getInt();
 		this.minDist=config.get(configCategory, "Min Distance", this.minDist, "Minimum distance to other structures with the same id").getInt();
 		this.maxParts=config.get(configCategory, "Max Parts", this.maxParts, "Maximum of subpieces this structure can have").getInt();
-		this.dimensions=ArrayUtils.intArrFromStringArr(config.getStringList("Dimensions", configCategory, ArrayUtils.arrayToStringArr(this.dimensions), "List of whitelisted dimension ids"));
+		this.dimensions=config.get(configCategory, "Dimensions", this.dimensions, "List of whitelisted dimension ids").getIntList();
 		this.type=ConfigUtils.getEnumVal(config, configCategory, "Location Type", "Spawn height", this.type);
 		this.genType=ConfigUtils.getEnumVal(config, configCategory, "Generation Type", "How the the structure should be generated", this.genType);
 		//Biomes
@@ -207,9 +208,6 @@ public class Structure implements IConfigSerializable<Structure>{
 				this.biomes.add(biome);
 		}
 		this.preventOtherSpawn=config.getBoolean("Prevent MobSpawn", configCategory, this.preventOtherSpawn, "Prevent other mobspawn in this structure");
-		ConfigCategory spawnCat = config.getCategory(configCategory+".spawns");
-		spawnCat.setLanguageKey("config.structures.spawns");
-		spawnCat.setComment("Configure Mobspawning for the structure. Syntax is: <Full Classname>;<minGroup>;<maxGroup>;<weight>");
 		for(EnumCreatureType type : EnumCreatureType.values())
 		{
 			Set<Biome.SpawnListEntry> set = this.spawns.getOrDefault(type, Sets.newHashSet());		
@@ -221,7 +219,7 @@ public class Structure implements IConfigSerializable<Structure>{
 				i++;
 			}
 			set.clear();
-			for(String s : config.getStringList(type.toString(), configCategory+".spawns", def, ""))
+			for(String s : config.getStringList(type.toString(), configCategory+".spawns", def, "Syntax is: <Full Classname>;<minGroup>;<maxGroup>;<weight>"))
 			{
 				set.add(fromString(s));
 			}

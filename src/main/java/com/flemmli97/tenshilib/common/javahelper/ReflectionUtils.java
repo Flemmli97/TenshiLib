@@ -22,6 +22,17 @@ public class ReflectionUtils {
 			throw new ReflectionException(e);
 		}
 	}
+	
+	public static Field getField(Class<?> clss, String name)
+	{
+		try {
+			Field f = clss.getDeclaredField(name);
+			f.setAccessible(true);
+			return f;
+		} catch (NoSuchFieldException | SecurityException e) {
+			throw new ReflectionException(e);
+		}
+	}
 
 	private static class ReflectionException extends RuntimeException
 	{

@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import com.flemmli97.tenshilib.TenshiLib;
+import com.flemmli97.tenshilib.common.javahelper.ResourceStream;
 import com.flemmli97.tenshilib.common.world.Position;
 import com.google.common.collect.Maps;
 
@@ -18,7 +19,6 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fml.common.Loader;
 
 public class StructureLoader {
 	
@@ -42,10 +42,7 @@ public class StructureLoader {
 			/*InputStream input = Loader.class.getResourceAsStream("/assets/"+modid+"/structures/" + fileName + ".schematic");
 			if(input!=null)
 				return loadSchematic(input, world);*/
-			InputStream input = Loader.class.getResourceAsStream("/assets/"+modid+"/structures/" + fileName + ".nbt");
-			if(input!=null)
-				return loadStructureBlockFile(input);
-			throw new FileNotFoundException();
+			return loadStructureBlockFile(ResourceStream.getStream(modid, "structures", fileName+".nbt"));
 		}
 		catch(FileNotFoundException e)
 		{

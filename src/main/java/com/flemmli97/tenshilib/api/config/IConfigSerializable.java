@@ -7,5 +7,5 @@ public interface IConfigSerializable<T extends IConfigSerializable<T>> {
 	/**
 	 * Read and set value from config
 	 */
-	public T config(Configuration config, T old, String configCategory);
+	public T config(Configuration config, String configCategory);
 }

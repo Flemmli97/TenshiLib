@@ -1,0 +1,14 @@
+TenshiLib 1.1.0
+================
+
+- Updated Forge version to 14.23.5.2808
+- Added ParticleSimpleTexture
+- Made particle spawning easier
+- Added basic EntityBeam and EntityProjectile
+- Made the breakable barrier easier to break
+- Fixed textures being flipped in certain rendering code
+- Fixed some issues with projectiles
+- Removed adding creative items to the creative tabs. (Yell at me if you think that was bad)
+- Fixed some ArrayUtils issues
+- Added JsonConfig for helping with json files
+- Other small stuff
