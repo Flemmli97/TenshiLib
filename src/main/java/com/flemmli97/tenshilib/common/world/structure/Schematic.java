@@ -15,6 +15,7 @@ import com.google.common.collect.Maps;
 import net.minecraft.block.BlockStructure;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Mirror;
@@ -73,7 +74,7 @@ public class Schematic {
 	 * @param limitation 
 	 */
 	public void generate(World world, BlockPos pos, Rotation rot, Mirror mirror, GenerationType genType, 
-			@Nullable StructureBoundingBox chunkLimitation) {
+			@Nullable StructureBoundingBox chunkLimitation, boolean replaceBlocks) {
 		Map<Position,Integer> map=null;
 		for(int y = 0; y < this.y; y++)
 			for(int z = 0; z < this.z; z++)
@@ -100,7 +101,8 @@ public class Schematic {
 
 					if(state!=null && !(state.getBlock() instanceof BlockStructure||state.getBlock() instanceof BlockIgnore))
 					{
-						world.setBlockState(place, state.withMirror(mirror).withRotation(rot), 18);
+						if(replaceBlocks || world.getBlockState(place).getBlock()==Blocks.AIR)
+							world.setBlockState(place, state.withMirror(mirror).withRotation(rot), 18);
 						if(genType==GenerationType.REPLACEBELOW && y == 0)
 						{
 							replaceAirAndLiquidDownwards(world, world.getBiome(place).fillerBlock, place.down());
@@ -127,7 +129,7 @@ public class Schematic {
 	}
 	
 	public void generate(World world, BlockPos pos, Rotation rot, Mirror mirror) {
-		this.generate(world, pos, rot, mirror, GenerationType.FLOATING, null);
+		this.generate(world, pos, rot, mirror, GenerationType.FLOATING, null, true);
 	}
 		
 	private static void replaceAirAndLiquidDownwards(World world, IBlockState blockstate, BlockPos pos)

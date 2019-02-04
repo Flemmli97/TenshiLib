@@ -107,7 +107,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity{
     public void onUpdate()
     {
 		if(this.hit==null && this.getShooter()!=null)
-	        this.hit=RayTraceUtils.entityRayTrace(this, this.getRange(), false, true, false, this.piercing(), notShooter);
+	        this.hit=RayTraceUtils.entityRayTrace(this, this.getRange(), false, true, false, !this.piercing(), notShooter);
 		super.onUpdate();
 		this.livingTicks++;
         if(this.livingTicks>=this.livingTickMax())

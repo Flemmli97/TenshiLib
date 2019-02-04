@@ -12,3 +12,7 @@ TenshiLib 1.1.0
 - Fixed some ArrayUtils issues
 - Added JsonConfig for helping with json files
 - Other small stuff
+- Improved beam rendering code
+- Fixed biome bug in structure code
+- Fixed Itemwrapper code with swapped meta and item amount
+- More ReflectionUtils

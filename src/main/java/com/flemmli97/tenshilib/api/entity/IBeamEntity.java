@@ -8,4 +8,5 @@ public interface IBeamEntity {
 	
 	public Vec3d hitVec();
 	
+	public int livingTickMax();
 }

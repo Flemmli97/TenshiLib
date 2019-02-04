@@ -1,9 +1,16 @@
 package com.flemmli97.tenshilib.api.config;
 
+import java.lang.reflect.Type;
+
 import com.flemmli97.tenshilib.TenshiLib;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Items;
@@ -69,7 +76,7 @@ public class SimpleItemStackWrapper extends ItemWrapper{
 	@Override
 	public ItemStack getStack()
 	{
-		return new ItemStack(this.item, this.meta==-1?0:this.meta, this.count);
+		return new ItemStack(this.item, this.count, this.meta==-1?0:this.meta);
 	}
 
 	@Override
@@ -98,25 +105,26 @@ public class SimpleItemStackWrapper extends ItemWrapper{
 	}
 	
 	@Override
-	public void fromJson(JsonElement json) {
-		if(json instanceof JsonObject)
-		{
-			JsonObject obj = (JsonObject) json;
-			if(obj.get("item") instanceof JsonPrimitive)
-				this.item=ForgeRegistries.ITEMS.getValue(new ResourceLocation(obj.get("item").getAsString()));
-			if(obj.get("meta") instanceof JsonPrimitive && ((JsonPrimitive)obj.get("meta")).isNumber())
-				this.meta=obj.get("meta").getAsInt();
-			if(obj.get("count") instanceof JsonPrimitive && ((JsonPrimitive)obj.get("count")).isNumber())
-				this.count=obj.get("count").getAsInt();
-		}
+	public IItemConfig deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+	{
+		JsonObject obj = (JsonObject) json.getAsJsonObject();
+		int meta = -1;
+		int count = 1;
+		if(obj.get("meta") instanceof JsonPrimitive && obj.get("meta").getAsJsonPrimitive().isNumber())
+			meta=obj.get("meta").getAsInt();
+		if(obj.get("count") instanceof JsonPrimitive && obj.get("count").getAsJsonPrimitive().isNumber())
+			count=obj.get("count").getAsInt();
+		return new SimpleItemStackWrapper(ForgeRegistries.ITEMS.getValue(new ResourceLocation(obj.get("item").getAsString())), meta, count);
 	}
 
 	@Override
-	public JsonElement getSerializableElement() {
+	public JsonElement serialize(IItemConfig src, Type typeOfSrc, JsonSerializationContext context) {
 		JsonObject obj = new JsonObject();
 		obj.add("item", new JsonPrimitive(this.item.getRegistryName().toString()));
-		obj.add("meta", new JsonPrimitive(this.meta));
-		obj.add("count", new JsonPrimitive(this.count));
+		if(this.meta!=-1)
+			obj.add("meta", new JsonPrimitive(this.meta));
+		if(this.count!=1)
+			obj.add("count", new JsonPrimitive(this.count));
 		return obj;
 	}
 	
@@ -133,4 +141,26 @@ public class SimpleItemStackWrapper extends ItemWrapper{
         }
         return false;
     }
+	
+	public static class Serializer implements JsonDeserializer<SimpleItemStackWrapper>, JsonSerializer<SimpleItemStackWrapper>
+	{
+
+		@Override
+		public JsonElement serialize(SimpleItemStackWrapper src, Type typeOfSrc, JsonSerializationContext context) {
+			return src.serialize(src, typeOfSrc, context);
+		}
+
+		@Override
+		public SimpleItemStackWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+				throws JsonParseException {
+			JsonObject obj = (JsonObject) json.getAsJsonObject();
+			int meta = -1;
+			int count = 1;
+			if(obj.get("meta") instanceof JsonPrimitive && obj.get("meta").getAsJsonPrimitive().isNumber())
+				meta=obj.get("meta").getAsInt();
+			if(obj.get("count") instanceof JsonPrimitive && obj.get("count").getAsJsonPrimitive().isNumber())
+				count=obj.get("count").getAsInt();
+			return new SimpleItemStackWrapper(ForgeRegistries.ITEMS.getValue(new ResourceLocation(obj.get("item").getAsString())), meta, count);
+		}	
+	}
 }

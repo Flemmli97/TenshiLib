@@ -1,6 +1,8 @@
 package com.flemmli97.tenshilib.common.javahelper;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class ReflectionUtils {
 	
@@ -30,6 +32,26 @@ public class ReflectionUtils {
 			f.setAccessible(true);
 			return f;
 		} catch (NoSuchFieldException | SecurityException e) {
+			throw new ReflectionException(e);
+		}
+	}
+	
+	public static Method getMethod(Class<?> clss, String name, Class<?>...args)
+	{
+		try {
+			Method m = clss.getDeclaredMethod(name, args);
+			m.setAccessible(true);
+			return m;
+		} catch (SecurityException | NoSuchMethodException e) {
+			throw new ReflectionException(e);
+		}
+	}
+	
+	public static Object invokeMethod(Method method, Object inst, Object...args)
+	{
+		try {
+			return method.invoke(inst, args);
+		} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw new ReflectionException(e);
 		}
 	}

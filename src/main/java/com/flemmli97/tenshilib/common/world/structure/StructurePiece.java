@@ -63,7 +63,7 @@ public class StructurePiece {
 	 */
 	public void generate(World world)
 	{
-		StructureLoader.getSchematic(this.structureToGen).generate(world, this.pos, this.rot, this.mirror, this.genType, null);
+		StructureLoader.getSchematic(this.structureToGen).generate(world, this.pos, this.rot, this.mirror, this.genType, null, true);
 	}
 	
 	/**
@@ -74,7 +74,7 @@ public class StructurePiece {
 		ChunkPos pos = new ChunkPos(chunkX, chunkZ);
 		if(this.structureChunks.contains(pos))
 		{
-			StructureLoader.getSchematic(this.structureToGen).generate(world, this.pos, this.rot, this.mirror, this.genType, StructureBase.getChunk(chunkX, chunkZ));
+			StructureLoader.getSchematic(this.structureToGen).generate(world, this.pos, this.rot, this.mirror, this.genType, StructureBase.getChunk(chunkX, chunkZ), true);
 			this.structureChunks.remove(pos);
 		}
 		return this.structureChunks.isEmpty();

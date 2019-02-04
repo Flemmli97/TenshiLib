@@ -1,13 +1,21 @@
 package com.flemmli97.tenshilib.api.config;
 
+import java.lang.reflect.Type;
+
 import com.flemmli97.tenshilib.TenshiLib;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.JsonUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
@@ -68,19 +76,16 @@ public class ItemWrapper implements IItemConfig{
 	public String usage() {
 		return "Valid values are all item registry names";
 	}
+	
 
 	@Override
-	public void fromJson(JsonElement json) {
-		if(json instanceof JsonObject)
-		{
-			JsonObject obj = (JsonObject) json;
-			if(obj.get("item") instanceof JsonPrimitive)
-				this.item=ForgeRegistries.ITEMS.getValue(new ResourceLocation(obj.get("item").getAsString()));
-		}
+	public IItemConfig deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+			throws JsonParseException {
+		return new ItemWrapper(ForgeRegistries.ITEMS.getValue(new ResourceLocation(JsonUtils.getJsonObject(json, "item").get("item").getAsString())));
 	}
 
 	@Override
-	public JsonElement getSerializableElement() {
+	public JsonElement serialize(IItemConfig src, Type typeOfSrc, JsonSerializationContext context) {
 		JsonObject obj = new JsonObject();
 		obj.add("item", new JsonPrimitive(this.item.getRegistryName().toString()));
 		return obj;
@@ -109,4 +114,19 @@ public class ItemWrapper implements IItemConfig{
     public String toString() {
         return this.writeToString();
     }
+    	
+	public static class Serializer implements JsonDeserializer<ItemWrapper>, JsonSerializer<ItemWrapper>
+	{
+
+		@Override
+		public JsonElement serialize(ItemWrapper src, Type typeOfSrc, JsonSerializationContext context) {
+			return src.serialize(src, typeOfSrc, context);
+		}
+
+		@Override
+		public ItemWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+				throws JsonParseException {
+			return new ItemWrapper(ForgeRegistries.ITEMS.getValue(new ResourceLocation(JsonUtils.getJsonObject(json, "item").get("item").getAsString())));
+		}	
+	}
 }

@@ -119,7 +119,7 @@ public class Structure implements IConfigSerializable<Structure>{
 				rightDimension=true;
 				break;
 			}
-		if(this.frequency>0 && rightDimension && random.nextInt(this.frequency)==0 && world.getBiomeProvider().areBiomesViable(chunkX, chunkZ, 8, this.biomes))
+		if(this.frequency>0 && rightDimension && random.nextInt(this.frequency)==0 && world.getBiomeProvider().areBiomesViable(chunkX, chunkZ, 0, this.biomes))
 		{
 			int x = chunkX * 16 + random.nextInt(16)+8;
 			int z = chunkZ * 16 + random.nextInt(16)+8;
