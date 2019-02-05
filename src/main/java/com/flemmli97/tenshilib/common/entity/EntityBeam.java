@@ -91,6 +91,22 @@ public abstract class EntityBeam extends Entity implements IBeamEntity{
 		return 20;
 	}
 	
+	public void updateYawPitch() {
+		if(this.getHitVecFromShooter() && this.getShooter()!=null)
+		{
+			EntityLivingBase e = this.getShooter();
+			this.rotationPitch=e.rotationPitch;
+			this.rotationYaw=e.rotationYaw;
+			this.prevRotationPitch=e.prevRotationPitch;
+			this.prevRotationYaw=e.prevRotationYaw;
+			this.setPosition(e.posX, e.posY+e.getEyeHeight()- 0.10000000149011612D, e.posZ);
+		}
+	}
+	
+    public boolean getHitVecFromShooter() {
+		return false;
+	}
+	
 	@Override
     @SideOnly(Side.CLIENT)
     public boolean isInRangeToRenderDist(double distance)
@@ -106,8 +122,12 @@ public abstract class EntityBeam extends Entity implements IBeamEntity{
 	@Override
     public void onUpdate()
     {
-		if(this.hit==null && this.getShooter()!=null)
-	        this.hit=RayTraceUtils.entityRayTrace(this, this.getRange(), false, true, false, !this.piercing(), notShooter);
+		if(this.getShooter()!=null)
+		{
+			if(this.hit==null || this.getHitVecFromShooter())
+		        this.hit=RayTraceUtils.entityRayTrace(this.getHitVecFromShooter()?this.getShooter():this, this.getRange(), false, true, false, !this.piercing(), notShooter);
+		}
+		this.updateYawPitch();
 		super.onUpdate();
 		this.livingTicks++;
         if(this.livingTicks>=this.livingTickMax())
@@ -139,8 +159,8 @@ public abstract class EntityBeam extends Entity implements IBeamEntity{
 		}
 
     }
-	
-    protected abstract void onImpact(RayTraceResult result);
+
+	protected abstract void onImpact(RayTraceResult result);
 
 	public int livingTicks()
 	{

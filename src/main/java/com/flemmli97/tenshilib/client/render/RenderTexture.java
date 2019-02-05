@@ -46,7 +46,7 @@ public abstract class RenderTexture<T extends Entity> extends Render<T>{
             
             RenderUtils.renderTexture(this.renderManager, this.getEntityTexture(entity), x, y, z, 
             		this.xSize, this.ySize, this.red, this.blue, this.green, this.alpha, yaw+this.yawOffset(),
-            pitch+this.pitchOffset());
+            pitch+this.pitchOffset(), this.currentAnimation(entity), this.animationFrames());
             super.doRender(entity, x, y, z, entityYaw, partialTicks);
         }
     }
@@ -64,5 +64,15 @@ public abstract class RenderTexture<T extends Entity> extends Render<T>{
 	public float pitchOffset()
 	{
 		return 0;
+	}
+	
+	public int animationFrames()
+	{
+		return 1;
+	}
+	
+	public int currentAnimation(T entity)
+	{
+		return entity.ticksExisted%this.animationFrames()+1;
 	}
 }
