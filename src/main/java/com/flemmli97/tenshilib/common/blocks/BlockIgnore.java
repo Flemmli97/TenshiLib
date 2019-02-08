@@ -63,7 +63,8 @@ public class BlockIgnore extends Block
         return false;
     }
 
-    @SideOnly(Side.CLIENT)
+    @Override
+	@SideOnly(Side.CLIENT)
     public float getAmbientOcclusionLightValue(IBlockState state)
     {
         return 1.0F;

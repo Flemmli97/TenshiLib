@@ -56,6 +56,11 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends Render<
 		GlStateManager.pushMatrix();        
         GlStateManager.disableCull();
         GlStateManager.enableBlend();
+        
+        //GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+        //GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
+        //GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         GlStateManager.alphaFunc(GL11.GL_GEQUAL, 1/255f);
         RenderHelper.disableStandardItemLighting();
@@ -63,7 +68,6 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends Render<
         GlStateManager.translate(x, y, z);
         GlStateManager.rotate(entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks+90, 0.0F, -1.0F, 0.0F);
         GlStateManager.rotate(-(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks), 0.0F, 0.0F, 1.0F);
-        int animationFrame = this.currentAnimation(entity);
         double startLength = 0;
         int layer = entity.getShooter()==Minecraft.getMinecraft().player?1:2;
     	if(this.startTexture(entity)!=null)
@@ -73,7 +77,8 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends Render<
 
     		for(int i = 0; i < layer; i++)
             {
-                this.renderBeam(width, startLength, 0, animationFrame);
+                GlStateManager.rotate(90, 1.0F, 0.0F, 0.0F);
+                this.renderBeam(width, startLength, 0, this.currentAnimation(entity,BeamPart.START),this.animationFrames(BeamPart.START));
             }
     	}
     	double length = dist-startLength;
@@ -85,7 +90,7 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends Render<
             for(int i = 0; i < layer; i++)
             {
                 GlStateManager.rotate(90, 1.0F, 0.0F, 0.0F);
-                this.renderBeam(width, endLength, startLength+length, animationFrame);
+                this.renderBeam(width, endLength, startLength+length, this.currentAnimation(entity,BeamPart.END),this.animationFrames(BeamPart.END));
             }
         }
         this.renderManager.renderEngine.bindTexture(this.getEntityTexture(entity));
@@ -94,7 +99,7 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends Render<
         {
             GlStateManager.rotate(90, 1.0F, 0.0F, 0.0F);
             for(int d = 0; d < segments.length; d++)
-            this.renderBeam(width, segments[d], startLength+d*this.segmentLength(), animationFrame);
+            this.renderBeam(width, segments[d], startLength+d*this.segmentLength(), this.currentAnimation(entity,BeamPart.MIDDLE),this.animationFrames(BeamPart.MIDDLE));
         }
         RenderHelper.enableStandardItemLighting();
         GlStateManager.disableBlend();
@@ -105,31 +110,36 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends Render<
 		super.doRender(entity, x, y, z, entityYaw, partialTicks);
 	}
 	
-	private void renderBeam(double width, double length, double offset, int animationFrame)
+	private void renderBeam(double width, double length, double offset, int animationFrame, float maxFrames)
+	{
+		this.renderBeam(width, length, offset, (animationFrame-1)*1/maxFrames, animationFrame*1/maxFrames);
+	}
+	
+	private void renderBeam(double width, double length, double offset, float vMin, float vMax)
 	{
 		Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder vertexbuffer = tessellator.getBuffer();	
         vertexbuffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-        vertexbuffer.pos(offset, width, 0).tex(0, Math.max(0, (animationFrame-1)*1/(float)this.animationFrames())).color(this.red, this.green, this.blue, this.alpha).endVertex();
-        vertexbuffer.pos(offset+length, width, 0).tex(1, Math.max(0, (animationFrame-1)*1/(float)this.animationFrames())).color(this.red, this.green, this.blue, this.alpha).endVertex();
-        vertexbuffer.pos(offset+length, -width, 0).tex(1, animationFrame*1/(float)this.animationFrames()).color(this.red, this.green, this.blue, this.alpha).endVertex();
-        vertexbuffer.pos(offset, -width, 0).tex(0, animationFrame*1/(float)this.animationFrames()).color(this.red, this.green, this.blue, this.alpha).endVertex();
+        vertexbuffer.pos(offset, width, 0).tex(0, Math.max(0, vMin)).color(this.red, this.green, this.blue, this.alpha).endVertex();
+        vertexbuffer.pos(offset+length, width, 0).tex(1, Math.max(0, vMin)).color(this.red, this.green, this.blue, this.alpha).endVertex();
+        vertexbuffer.pos(offset+length, -width, 0).tex(1, Math.min(1, vMax)).color(this.red, this.green, this.blue, this.alpha).endVertex();
+        vertexbuffer.pos(offset, -width, 0).tex(0,  Math.min(1, vMax)).color(this.red, this.green, this.blue, this.alpha).endVertex();
         tessellator.draw();
 	}
 	
 	/**
 	 * Start texture of the beam. With size
 	 */
-	public abstract Pair<ResourceLocation,Integer> startTexture(T entity);
+	public abstract Pair<ResourceLocation,Float> startTexture(T entity);
 	
 	/**
 	 * End texture of the beam. With size
 	 */
-	public abstract Pair<ResourceLocation,Integer> endTexture(T entity);
+	public abstract Pair<ResourceLocation,Float> endTexture(T entity);
 	
 	public double widthFunc(T entity)
 	{
-		return this.radius * (Math.sin(Math.sqrt(entity.ticksExisted/(float)entity.livingTickMax())*Math.PI))*2;
+		return this.radius * (Math.sin(Math.sqrt(entity.ticksExisted/(float)entity.livingTickMax())*Math.PI));
 	}
 	
 	public double segmentLength()
@@ -137,14 +147,14 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends Render<
 		return 0;
 	}
 
-	public int animationFrames()
+	public int animationFrames(BeamPart part)
 	{
 		return 1;
 	}
 	
-	public int currentAnimation(T entity)
+	public int currentAnimation(T entity, BeamPart part)
 	{
-		return entity.ticksExisted%this.animationFrames()+1;
+		return entity.ticksExisted%this.animationFrames(part)+1;
 	}
 	
 	private double[] split(double length)
@@ -156,5 +166,12 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends Render<
 			arr[i] = Math.max(0, length-i*this.segmentLength());
 		}
 		return arr;
+	}
+	
+	public static enum BeamPart
+	{
+		START,
+		END,
+		MIDDLE;
 	}
 }

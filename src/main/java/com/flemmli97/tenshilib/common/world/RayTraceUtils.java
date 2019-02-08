@@ -167,7 +167,8 @@ public class RayTraceUtils {
         Vec3d hitVec = null;
         List<Entity> list = player.world.getEntitiesInAABBexcluding(player, player.getEntityBoundingBox().expand(look.x * reach, look.y * reach, look.z * reach).expand(1.0D, 1.0D, 1.0D), Predicates.and(EntitySelectors.NOT_SPECTATING, new Predicate<Entity>()
         {
-            public boolean apply(@Nullable Entity entity)
+            @Override
+			public boolean apply(@Nullable Entity entity)
             {
                 return entity != null && entity.canBeCollidedWith();
             }

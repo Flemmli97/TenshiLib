@@ -86,11 +86,13 @@ public abstract class EntityBeam extends Entity implements IBeamEntity{
 		return false;
 	}
 	
+	@Override
 	public int livingTickMax()
 	{
 		return 20;
 	}
 	
+	@Override
 	public void updateYawPitch() {
 		if(this.getHitVecFromShooter() && this.getShooter()!=null)
 		{
@@ -132,7 +134,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity{
 		this.livingTicks++;
         if(this.livingTicks>=this.livingTickMax())
         	this.setDead();
-        if(this.hit!=null && --this.coolDown<=0)
+        if(!this.world.isRemote && this.hit!=null && --this.coolDown<=0)
 		{
 			List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(this, new AxisAlignedBB(this.posX,this.posY,this.posZ,this.hit.hitVec.x,this.hit.hitVec.y,this.hit.hitVec.z).grow(1));
 			for(int i = 0; i < list.size(); i++)
@@ -185,6 +187,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity{
         compound.setInteger("LivingTicks", this.livingTicks);
 	}
 	
+	@Override
     @Nullable
     public EntityLivingBase getShooter()
     {

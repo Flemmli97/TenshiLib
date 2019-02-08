@@ -20,7 +20,8 @@ public class LayerModelRender<T extends EntityLivingBase> implements LayerRender
         this.model=model;
         this.parentPart=parentPart;
     }
-    
+
+    @Override
     public void doRenderLayer(T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale)
     {
     	if (entity instanceof EntityPlayer && (((EntityPlayer)entity).isUser() && this.livingEntityRenderer.getRenderManager().renderViewEntity != entity))
@@ -44,7 +45,8 @@ public class LayerModelRender<T extends EntityLivingBase> implements LayerRender
         this.parentPart.postRender(scale);
         GlStateManager.popMatrix();
     }
-    
+
+    @Override
     public boolean shouldCombineTextures()
     {
         return false;

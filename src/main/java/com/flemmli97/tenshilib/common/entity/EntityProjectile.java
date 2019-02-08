@@ -219,7 +219,8 @@ public abstract class EntityProjectile extends Entity implements IProjectile{
 	        this.ticksInGround = 0;
 	    }
         
-        this.doCollision();
+        if(!this.world.isRemote)
+        	this.doCollision();
 
         this.posX += this.motionX;
         this.posY += this.motionY;

@@ -26,6 +26,7 @@ public class Method {
 		return (method.name.equals(this.name)||method.name.equals(this.srgName)||method.name.equals(this.obfName)) && (method.desc.equals(this.desc)||method.desc.equals(this.obfDesc));
 	}
 	
+	@Override
 	public String toString()
 	{
 		return "Method: " + this.name;
