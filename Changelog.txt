@@ -17,3 +17,4 @@ TenshiLib 1.1.0
 - Fixed Itemwrapper code with swapped meta and item amount
 - More ReflectionUtils
 - Improved projectiles (again)
+- Made dual wield items look smoother

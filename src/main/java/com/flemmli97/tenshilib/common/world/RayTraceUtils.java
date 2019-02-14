@@ -1,6 +1,5 @@
 package com.flemmli97.tenshilib.common.world;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -36,19 +35,19 @@ public class RayTraceUtils {
 	 */
 	public static List<EntityLivingBase> getEntities(EntityPlayer player, float reach, float aoe)
 	{
-		List<EntityLivingBase> list = new ArrayList<EntityLivingBase>();
-		player.world.getEntitiesWithinAABB(EntityLivingBase.class, player.getEntityBoundingBox().grow(reach), new Predicate<EntityLivingBase>(){
+        return player.world.getEntitiesWithinAABB(EntityLivingBase.class, player.getEntityBoundingBox().grow(reach), new Predicate<EntityLivingBase>(){
 			@Override
 			public boolean apply(EntityLivingBase living) {
-				return living!=player && !list.contains(living) && !living.isOnSameTeam(player) && living.canBeCollidedWith() && living.getDistanceSq(player.posX,living.posY,player.posZ) <= (reach*reach) && entityApplicable(player, living, reach, aoe);
-			}}).forEach(entity->list.add(entity));
-        return list;
+				return living!=player && !living.isOnSameTeam(player) && living.canBeCollidedWith() && entityApplicable(player, living, reach, aoe);
+			}});
 	}
 	
 	private static boolean entityApplicable(EntityPlayer player, EntityLivingBase living, float reach, float fov)
 	{
 		Vec3d posVec = player.getPositionEyes(1);
 		AxisAlignedBB axisalignedbb = living.getEntityBoundingBox().grow(living.getCollisionBorderSize());
+		if(axisalignedbb.contains(posVec))
+			return true;
 		if(fov==0)
 		{
 			Vec3d look = player.getLook(1);
@@ -56,14 +55,37 @@ public class RayTraceUtils {
 			reach=(float) blocks.hitVec.distanceTo(posVec);
 			return axisalignedbb.calculateIntercept(posVec, posVec.addVector(look.x * reach, look.y * reach, look.z * reach))!=null;
 		}
-		if(axisalignedbb.contains(posVec))
-			return true;
 		while (player.rotationYaw > 360.0f) {
             player.rotationYaw -= 360.0f;
         }
         while (player.rotationYaw < -360.0f) {
             player.rotationYaw += 360.0f;
         }
+        /*Vec3d left=Vec3d.fromPitchYaw(player.rotationPitch, player.rotationYaw-fov);
+        Vec3d right=Vec3d.fromPitchYaw(player.rotationPitch, player.rotationYaw+fov);
+        boolean xz =axisalignedbb.calculateIntercept(posVec, left)!=null || axisalignedbb.calculateIntercept(posVec, right)!=null;
+        
+        if(!xz)
+        {
+        	Vec3d closest = MathUtils.closestPointToAABB(posVec, axisalignedbb);
+        	double dx = closest.x - posVec.x;
+	        double dz = closest.z - posVec.z;
+	        if (dx == 0.0 && dz == 0.0)
+	            dx = 0.001;
+	        float yaw = (float)(MathHelper.atan2(dz, dx) * 180.0 / 3.141592653589793) - player.rotationYaw-90;
+	        while (yaw < -180.0f) {
+	            yaw += 360.0f;
+	        }
+	        while (yaw >= 180.0f) {
+	            yaw -= 360.0f;
+	        }
+	        xz = yaw < fov && yaw > -fov;
+        }
+        if(!xz)
+        	return false;
+        
+        boolean y ;
+        return true;*/
 		Vec3d point1 = new Vec3d(axisalignedbb.minX, axisalignedbb.minY, axisalignedbb.minZ);
 		Vec3d point2 = new Vec3d(axisalignedbb.maxX, axisalignedbb.minY, axisalignedbb.minZ);
 		Vec3d point3 = new Vec3d(axisalignedbb.minX, axisalignedbb.minY, axisalignedbb.maxZ);

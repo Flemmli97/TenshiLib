@@ -1,5 +1,6 @@
 package com.flemmli97.tenshilib.common.javahelper;
 
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
@@ -28,4 +29,10 @@ public class MathUtils {
 				 Math.abs(l1.y-point.y)>Math.abs(dir.y-point.y)?l1.y:dir.y, 
 				 Math.abs(l1.z-point.z)>Math.abs(dir.z-point.z)?l1.z:dir.z);
 	}
+	
+	public static Vec3d closestPointToAABB(Vec3d point, AxisAlignedBB aabb)	
+	{
+		return new Vec3d(MathHelper.clamp(point.x, aabb.minX, aabb.maxX), MathHelper.clamp(point.y, aabb.minY, aabb.maxY), MathHelper.clamp(point.z, aabb.minZ, aabb.maxZ));
+	}
+	
 }

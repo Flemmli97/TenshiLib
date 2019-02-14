@@ -44,7 +44,10 @@ public class ASMMethods {
     
     public static void swingArm(EntityPlayer player, EnumHand originHand) {
     	if(player.getHeldItemMainhand().getItem() instanceof IDualWeapon)
+    	{
+    		player.isSwingInProgress=false;
     		player.swingArm(ClientHandHandler.getInstance().currentHand());
+    	}
     	else
     		player.swingArm(originHand);
     }
