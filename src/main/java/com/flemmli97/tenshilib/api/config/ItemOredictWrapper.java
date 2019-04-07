@@ -37,13 +37,15 @@ public class ItemOredictWrapper extends SimpleItemStackWrapper{
 		this.list = OreDictionary.getOres(this.oreDict);
 		if(!list.isEmpty())
 			this.firstOreDict=list.get(0);
+		else
+			this.firstOreDict=ItemStack.EMPTY;
 		this.firstOreDict.setCount(this.count);
 	}
 
 	@Override
 	public ItemStack getStack()
 	{
-		return firstOreDict;
+		return this.firstOreDict.copy();
 	}
 	
 	@Override
@@ -80,26 +82,6 @@ public class ItemOredictWrapper extends SimpleItemStackWrapper{
 		return "Usage: oreDict<,amount>";
 	}
 	
-	
-	@Override
-	public IItemConfig deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-	{
-		JsonObject obj = json.getAsJsonObject();
-		int count = 1;
-		if(obj.get("count") instanceof JsonPrimitive && obj.get("count").getAsJsonPrimitive().isNumber())
-			count=obj.get("count").getAsInt();
-		return new ItemOredictWrapper(obj.get("oredict").getAsString(), count);
-	}
-
-	@Override
-	public JsonElement serialize(IItemConfig src, Type typeOfSrc, JsonSerializationContext context) {
-		JsonObject obj = new JsonObject();
-		obj.add("oredict", new JsonPrimitive(this.oreDict));
-		if(this.count!=1)
-			obj.add("count", new JsonPrimitive(this.count));
-		return obj;
-	}
-	
 	@Override
     public boolean equals(Object obj) {
         if (this == obj) 
@@ -124,7 +106,11 @@ public class ItemOredictWrapper extends SimpleItemStackWrapper{
 
 		@Override
 		public JsonElement serialize(ItemOredictWrapper src, Type typeOfSrc, JsonSerializationContext context) {
-			return src.serialize(src, typeOfSrc, context);
+			JsonObject obj = new JsonObject();
+			obj.add("oredict", new JsonPrimitive(src.oreDict));
+			if(src.count!=1)
+				obj.add("count", new JsonPrimitive(src.count));
+			return obj;
 		}
 
 		@Override

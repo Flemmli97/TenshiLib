@@ -20,6 +20,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
+/**
+ * Itemstack supporting nbt. Not exactly made as a single line string config value. More as a json one.
+ */
 public class ExtendedItemStackWrapper extends SimpleItemStackWrapper{
 
 	private NBTTagCompound nbtTagCompound;
@@ -77,40 +80,9 @@ public class ExtendedItemStackWrapper extends SimpleItemStackWrapper{
 	}
 
 	@Override
-	public IItemConfig deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-	{
-		JsonObject obj = (JsonObject) json.getAsJsonObject();
-		int meta = -1;
-		int count = 1;
-		if(obj.get("meta") instanceof JsonPrimitive && obj.get("meta").getAsJsonPrimitive().isNumber())
-			meta=obj.get("meta").getAsInt();
-		if(obj.get("count") instanceof JsonPrimitive && obj.get("count").getAsJsonPrimitive().isNumber())
-			count=obj.get("count").getAsInt();
-		JsonObject nbt = obj.has("nbt")?obj.get("nbt").getAsJsonObject():null;
-		NBTTagCompound compound = null;
-		if(nbt!=null)
-		{
-			try {
-				compound=JsonToNBT.getTagFromJson(nbt.toString());
-			} catch (NBTException e) {
-				e.printStackTrace();
-			}
-		}
-		ItemStack stack = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(obj.get("item").getAsString())), meta, count);
-		stack.setTagCompound(compound);
-		return new ExtendedItemStackWrapper(stack);
-	}
-
-	@Override
-	public JsonElement serialize(IItemConfig src, Type typeOfSrc, JsonSerializationContext context) {
-		JsonObject obj = (JsonObject) super.serialize(src, typeOfSrc, context);
-		if(this.nbtTagCompound!=null)
-			obj.add("nbt", new JsonPrimitive(this.nbtTagCompound.toString()));
-		return obj;
-	}
-
-	@Override
 	public ItemStack getStack() {
+		if(this.item==null)
+			return ItemStack.EMPTY;
 		ItemStack stack = new ItemStack(this.item, this.count, this.meta==-1?0:this.meta);
 		stack.setTagCompound(this.nbtTagCompound);
 		return stack;
@@ -121,7 +93,15 @@ public class ExtendedItemStackWrapper extends SimpleItemStackWrapper{
 
 		@Override
 		public JsonElement serialize(ExtendedItemStackWrapper src, Type typeOfSrc, JsonSerializationContext context) {
-			return src.serialize(src, typeOfSrc, context);
+			JsonObject obj = new JsonObject();
+			obj.add("item", new JsonPrimitive(src.item.getRegistryName().toString()));
+			if(src.meta!=-1)
+				obj.add("meta", new JsonPrimitive(src.meta));
+			if(src.count!=1)
+				obj.add("count", new JsonPrimitive(src.count));
+			if(src.nbtTagCompound!=null)
+				obj.add("nbt", new JsonPrimitive(src.nbtTagCompound.toString()));
+			return obj;
 		}
 
 		@Override

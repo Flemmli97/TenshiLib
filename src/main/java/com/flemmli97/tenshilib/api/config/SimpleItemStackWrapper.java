@@ -76,11 +76,16 @@ public class SimpleItemStackWrapper extends ItemWrapper{
 	@Override
 	public ItemStack getStack()
 	{
-		return new ItemStack(this.item, this.count, this.meta==-1?0:this.meta);
+		return this.item==null ? ItemStack.EMPTY : new ItemStack(this.item, this.count, this.meta==-1?0:this.meta);
 	}
 
 	@Override
 	public IConfigValue readFromString(String s) {
+		if(s.isEmpty())
+		{
+			this.item=null;
+			return this;
+		}
 		String[] parts = s.split(",");
 		Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(parts[0]));
 		if(item==null || item == Items.AIR)
@@ -101,31 +106,7 @@ public class SimpleItemStackWrapper extends ItemWrapper{
 
 	@Override
 	public String usage() {
-		return "Usage: registryname<,meta><,amount>";
-	}
-	
-	@Override
-	public IItemConfig deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-	{
-		JsonObject obj = (JsonObject) json.getAsJsonObject();
-		int meta = -1;
-		int count = 1;
-		if(obj.get("meta") instanceof JsonPrimitive && obj.get("meta").getAsJsonPrimitive().isNumber())
-			meta=obj.get("meta").getAsInt();
-		if(obj.get("count") instanceof JsonPrimitive && obj.get("count").getAsJsonPrimitive().isNumber())
-			count=obj.get("count").getAsInt();
-		return new SimpleItemStackWrapper(ForgeRegistries.ITEMS.getValue(new ResourceLocation(obj.get("item").getAsString())), meta, count);
-	}
-
-	@Override
-	public JsonElement serialize(IItemConfig src, Type typeOfSrc, JsonSerializationContext context) {
-		JsonObject obj = new JsonObject();
-		obj.add("item", new JsonPrimitive(this.item.getRegistryName().toString()));
-		if(this.meta!=-1)
-			obj.add("meta", new JsonPrimitive(this.meta));
-		if(this.count!=1)
-			obj.add("count", new JsonPrimitive(this.count));
-		return obj;
+		return "Usage: registryname<,meta><,amount>. Leave empty for no item";
 	}
 	
 	@Override
@@ -147,7 +128,13 @@ public class SimpleItemStackWrapper extends ItemWrapper{
 
 		@Override
 		public JsonElement serialize(SimpleItemStackWrapper src, Type typeOfSrc, JsonSerializationContext context) {
-			return src.serialize(src, typeOfSrc, context);
+			JsonObject obj = new JsonObject();
+			obj.add("item", new JsonPrimitive(src.item.getRegistryName().toString()));
+			if(src.meta!=-1)
+				obj.add("meta", new JsonPrimitive(src.meta));
+			if(src.count!=1)
+				obj.add("count", new JsonPrimitive(src.count));
+			return obj;
 		}
 
 		@Override

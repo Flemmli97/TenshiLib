@@ -12,7 +12,6 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.JsonUtils;
@@ -22,7 +21,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 public class ItemWrapper implements IItemConfig{
 	
-	protected Item item = Items.AIR;
+	protected Item item;
 	
 	public ItemWrapper(Item defaultItem)
 	{
@@ -43,7 +42,7 @@ public class ItemWrapper implements IItemConfig{
 	@Override
 	public ItemStack getStack()
 	{
-		return new ItemStack(this.item);
+		return this.item==null ? ItemStack.EMPTY : new ItemStack(this.item);
 	}
 	
 
@@ -59,6 +58,11 @@ public class ItemWrapper implements IItemConfig{
 
 	@Override
 	public IConfigValue readFromString(String s) {
+		if(s.isEmpty())
+		{
+			this.item=null;
+			return this;
+		}
 		Item item=ForgeRegistries.ITEMS.getValue(new ResourceLocation(s));
 		if(item==null)
 			TenshiLib.logger.error("Faulty item registry name {}", s);
@@ -74,21 +78,7 @@ public class ItemWrapper implements IItemConfig{
 
 	@Override
 	public String usage() {
-		return "Valid values are all item registry names";
-	}
-	
-
-	@Override
-	public IItemConfig deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-			throws JsonParseException {
-		return new ItemWrapper(ForgeRegistries.ITEMS.getValue(new ResourceLocation(JsonUtils.getJsonObject(json, "item").get("item").getAsString())));
-	}
-
-	@Override
-	public JsonElement serialize(IItemConfig src, Type typeOfSrc, JsonSerializationContext context) {
-		JsonObject obj = new JsonObject();
-		obj.add("item", new JsonPrimitive(this.item.getRegistryName().toString()));
-		return obj;
+		return "Valid values are all item registry names. Empty for nothing";
 	}
 	
 	@Override
@@ -120,7 +110,9 @@ public class ItemWrapper implements IItemConfig{
 
 		@Override
 		public JsonElement serialize(ItemWrapper src, Type typeOfSrc, JsonSerializationContext context) {
-			return src.serialize(src, typeOfSrc, context);
+			JsonObject obj = new JsonObject();
+			obj.add("item", new JsonPrimitive(src.item.getRegistryName().toString()));
+			return obj;		
 		}
 
 		@Override
