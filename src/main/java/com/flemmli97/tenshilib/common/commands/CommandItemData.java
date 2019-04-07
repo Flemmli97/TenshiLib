@@ -71,7 +71,7 @@ public class CommandItemData implements ICommand{
 				NBTTagCompound fromCommand;
 				try
                 {
-					fromCommand = JsonToNBT.getTagFromJson(CommandBase.buildString(args, 3));
+					fromCommand = JsonToNBT.getTagFromJson(CommandBase.buildString(args, args.length>1?2:1));
                 }
                 catch (NBTException nbtexception)
                 {
