@@ -1,3 +1,9 @@
+TenshiLib 1.1.1
+================
+
+- Fixed bug with the itemData command
+- Made the item configs respect empty strings
+
 TenshiLib 1.1.0
 ================
 

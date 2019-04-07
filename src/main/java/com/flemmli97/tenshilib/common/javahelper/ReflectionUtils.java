@@ -10,6 +10,7 @@ public class ReflectionUtils {
 	public static <T> T getFieldValue(Field field, Object inst)
 	{
 		try {
+			field.setAccessible(true);
 			return (T) field.get(inst);
 		} catch (IllegalArgumentException | IllegalAccessException e) {			
 			throw new ReflectionException(e);
@@ -19,7 +20,8 @@ public class ReflectionUtils {
 	public static <T> void setFieldValue(Field field, Object inst, Object value)
 	{
 		try {
-			 field.set(inst, value);
+			field.setAccessible(true);
+			field.set(inst, value);
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			throw new ReflectionException(e);
 		}
@@ -50,6 +52,7 @@ public class ReflectionUtils {
 	public static Object invokeMethod(Method method, Object inst, Object...args)
 	{
 		try {
+			method.setAccessible(true);
 			return method.invoke(inst, args);
 		} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw new ReflectionException(e);
