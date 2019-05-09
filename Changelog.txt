@@ -4,6 +4,7 @@ TenshiLib 1.1.1
 - Fixed bug with the itemData command
 - Made the item configs respect empty strings
 - Removed LayerHeldItemEvent and made that stuff hard coded since there wont be other uses for it (prob)
+- Added option for disabling offhand items with dual items
 
 TenshiLib 1.1.0
 ================
