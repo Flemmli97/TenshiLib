@@ -42,6 +42,8 @@ public class ASMTransformer implements IClassTransformer{
 				new Method("doRenderLayer", "func_177141_a", "a", "(Lnet/minecraft/entity/EntityLivingBase;FFFFFFF)V", "(Lvp;FFFFFFF)V")));
 	}
 	
+	public static boolean test = false;
+	
 	protected static void asmDebug(String debug)
 	{
 		System.out.println("[TenshiCore]: " + debug);
@@ -50,6 +52,7 @@ public class ASMTransformer implements IClassTransformer{
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		ASMLoader.asmLoaded=true;
+		System.out.println(test);
 		if(patches.containsKey(transformedName))
 		{
 			Pair<Transform, Method> pair = patches.get(transformedName);
@@ -144,7 +147,7 @@ public class ASMTransformer implements IClassTransformer{
 	}			
 	
 	/** Add ModelRotationEvent in {@link net.minecraft.client.renderer.entity.RenderLivingBase#doRender} */
-	@SuppressWarnings("unused")
+	/*@SuppressWarnings("unused")
 	private static void patchRenderLivingBase(ClassNode clss, MethodNode method) {
 		asmDebug("Patching RenderLivingBase.doRender");
 		boolean optifine=false;
@@ -182,7 +185,7 @@ public class ASMTransformer implements IClassTransformer{
         	inject.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/flemmli97/tenshilib/asm/ASMMethods", "modelEvent", 
         			"(FFFFFFLvg;Lcaa;)V", false));
         method.instructions.insert(setRotationAngles, inject);
-	}			
+	}*/			
 	
 	/** Add ModelPlayerRenderEvent in {@link net.minecraft.client.model.ModelPlayer#render} 
 	 * (Actually {@link net.minecraft.client.model.ModelBiped#render} ) */
@@ -278,7 +281,7 @@ public class ASMTransformer implements IClassTransformer{
         }
         InsnList inject = new InsnList();
         //Right hand side
-        inject.add(new VarInsnNode(Opcodes.ALOAD, 1));
+        /*inject.add(new VarInsnNode(Opcodes.ALOAD, 1));
         inject.add(new VarInsnNode(Opcodes.ALOAD, 11));
         if(ASMLoader.isDeobfEnvironment())
         {
@@ -293,7 +296,7 @@ public class ASMTransformer implements IClassTransformer{
             inject.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/flemmli97/tenshilib/asm/ASMMethods", "layerHeldItemEvent", 
             		"(Lvp;Laip;Lub;)Laip;", false));
 			inject.add(new VarInsnNode(Opcodes.ASTORE, 11));
-        }
+        }*/
         //Left hand side
         inject.add(new VarInsnNode(Opcodes.ALOAD, 1));
         inject.add(new VarInsnNode(Opcodes.ALOAD, 10));

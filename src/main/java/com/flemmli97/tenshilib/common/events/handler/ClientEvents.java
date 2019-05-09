@@ -6,7 +6,6 @@ import com.flemmli97.tenshilib.api.item.IDualWeapon;
 import com.flemmli97.tenshilib.api.item.IExtendedWeapon;
 import com.flemmli97.tenshilib.client.render.RenderUtils;
 import com.flemmli97.tenshilib.common.config.ConfigHandler;
-import com.flemmli97.tenshilib.common.events.LayerHeldItemEvent;
 import com.flemmli97.tenshilib.common.network.PacketHandler;
 import com.flemmli97.tenshilib.common.network.PacketHit;
 import com.flemmli97.tenshilib.common.network.PacketHit.HitType;
@@ -51,7 +50,7 @@ public class ClientEvents {
 		}
 	}
 	
-	@SubscribeEvent
+	/*@SubscribeEvent
 	public void renderDualWeaponPlayer(LayerHeldItemEvent event)
 	{
 		if(event.getHand()==EnumHand.OFF_HAND)
@@ -62,7 +61,7 @@ public class ClientEvents {
 				event.setStack(((IDualWeapon)main.getItem()).offHandStack(event.getEntity()));
 			}
 		}
-	}
+	}*/
 	
 	@SubscribeEvent
 	public void renderDualWeaponPose(RenderLivingEvent.Pre<?> event)

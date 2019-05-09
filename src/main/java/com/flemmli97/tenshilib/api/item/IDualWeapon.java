@@ -17,4 +17,9 @@ public interface IDualWeapon {
 	{
 		return entity.getHeldItemMainhand();
 	}
+	
+	public default boolean disableOffhand()
+	{
+		return true;
+	}
 }

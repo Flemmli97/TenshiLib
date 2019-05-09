@@ -63,14 +63,14 @@ public class CommonEvents {
 	@SubscribeEvent
 	public void stopOffhand(PlayerInteractEvent.RightClickItem event)
 	{
-		if(event.getHand()==EnumHand.OFF_HAND && event.getItemStack().getItem() instanceof IDualWeapon)
+		if(event.getHand()==EnumHand.OFF_HAND && event.getItemStack().getItem() instanceof IDualWeapon && ((IDualWeapon)event.getItemStack().getItem()).disableOffhand())
 			event.setCanceled(true);
 	}
 	
 	@SubscribeEvent
 	public void stopOffhand(PlayerInteractEvent.RightClickBlock event)
 	{
-		if(event.getHand()==EnumHand.OFF_HAND && event.getItemStack().getItem() instanceof IDualWeapon)
+		if(event.getHand()==EnumHand.OFF_HAND && event.getItemStack().getItem() instanceof IDualWeapon && ((IDualWeapon)event.getItemStack().getItem()).disableOffhand())
 			event.setCanceled(true);
 	}
 }
