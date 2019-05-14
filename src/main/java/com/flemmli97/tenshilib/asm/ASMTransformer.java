@@ -41,9 +41,7 @@ public class ASMTransformer implements IClassTransformer{
 		patches.put("net.minecraft.client.renderer.entity.layers.LayerHeldItem", Pair.of(ASMTransformer::layerHeldItem,
 				new Method("doRenderLayer", "func_177141_a", "a", "(Lnet/minecraft/entity/EntityLivingBase;FFFFFFF)V", "(Lvp;FFFFFFF)V")));
 	}
-	
-	public static boolean test = false;
-	
+		
 	protected static void asmDebug(String debug)
 	{
 		System.out.println("[TenshiCore]: " + debug);
@@ -52,7 +50,6 @@ public class ASMTransformer implements IClassTransformer{
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		ASMLoader.asmLoaded=true;
-		System.out.println(test);
 		if(patches.containsKey(transformedName))
 		{
 			Pair<Transform, Method> pair = patches.get(transformedName);
