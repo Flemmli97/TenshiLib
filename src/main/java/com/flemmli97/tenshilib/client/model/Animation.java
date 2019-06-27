@@ -32,6 +32,7 @@ public class Animation {
 	private static final Gson gson = new Gson();
 	private int length;
 	private IResetModel model;
+	
 	public Animation(ModelBase model, ResourceLocation res)
 	{
 		InputStream input = Loader.class.getResourceAsStream("/assets/"+res.getResourceDomain()+"/"+res.getResourcePath());
@@ -44,7 +45,6 @@ public class Animation {
 			JsonObject obj = gson.getAdapter(JsonObject.class).read(gson.newJsonReader(new InputStreamReader(input)));
 			JsonObject idMap = (JsonObject) obj.get("identifierMap");
 			JsonObject animSets = (JsonObject) obj.get("sets");
-
 			for(Field field : model.getClass().getFields())
 			{
 				if(ModelRenderer.class.isAssignableFrom(field.getType()) && idMap.has(field.getName()))
@@ -79,7 +79,7 @@ public class Animation {
 			this.model.resetModel();
 		this.map.entrySet().forEach(entry->{
 			entry.getValue().forEach(comp->{
-				comp.animate(entry.getKey(), ticker, partialTicks);
+				comp.animate(entry.getKey(), ticker%this.getLength(), partialTicks);
 			});
 		});
 	}

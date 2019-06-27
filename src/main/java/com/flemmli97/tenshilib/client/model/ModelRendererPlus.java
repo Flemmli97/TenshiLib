@@ -54,7 +54,7 @@ public class ModelRendererPlus extends ModelRenderer{
     	this.defaultRotPointX = rotPointX;
     	this.defaultRotPointY = rotPointY;
     	this.defaultRotPointZ = rotPointZ;
-    	this.defaultRotAngleZ = rotAngleX;
+    	this.defaultRotAngleX = rotAngleX;
     	this.defaultRotAngleY = rotAngleY;
     	this.defaultRotAngleZ = rotAngleZ;
     }

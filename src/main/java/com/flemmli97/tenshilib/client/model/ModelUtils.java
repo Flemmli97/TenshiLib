@@ -57,4 +57,8 @@ public class ModelUtils {
 			return defaultAngle;
 		return MathHelper.sin(ticker*speed)*amountInRad+offSet;
 	}
+
+	public static float degToRad(float x) {
+		return (float) Math.toRadians(x);
+	}
 }
