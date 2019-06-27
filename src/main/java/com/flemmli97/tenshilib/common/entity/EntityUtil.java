@@ -13,6 +13,7 @@ import net.minecraft.world.WorldServer;
 
 public class EntityUtil {
 
+	@Nullable
 	public static <T extends Entity> T findFromUUID(Class<T> clss, World world, UUID uuid)
 	{
 		return findFromUUID(clss, world, uuid, Predicates.alwaysTrue());

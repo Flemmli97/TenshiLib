@@ -88,7 +88,7 @@ public class ConfigUtils {
 	{
 		Property prop = config.get(category, name, defaultValue, name);
         prop.setLanguageKey(name);
-        prop.setComment(comment + "[default: " + defaultValue + "]");
+        prop.setComment(comment + "[min: " + minValue + ", default: " + defaultValue + "]");
         prop.setMinValue(minValue);
         return Math.max(minValue, prop.getInt());
 	}

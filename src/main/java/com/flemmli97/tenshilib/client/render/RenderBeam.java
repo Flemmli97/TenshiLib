@@ -69,7 +69,11 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends Render<
         GlStateManager.rotate(entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks+90, 0.0F, -1.0F, 0.0F);
         GlStateManager.rotate(-(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks), 0.0F, 0.0F, 1.0F);
         double startLength = 0;
-        int layer = entity.getShooter()==Minecraft.getMinecraft().player?1:2;
+        boolean isPlayer = entity.getShooter()==Minecraft.getMinecraft().player;
+        int layer = isPlayer?1:3;
+        GlStateManager.rotate(30, 1.0F, 0.0F, 0.0F);
+        if(isPlayer)
+        	GlStateManager.translate(0, -0.1, 0);
     	if(this.startTexture(entity)!=null)
     	{
     		startLength = Math.min(this.startTexture(entity).getRight(), dist);
@@ -77,9 +81,10 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends Render<
 
     		for(int i = 0; i < layer; i++)
             {
-                GlStateManager.rotate(90, 1.0F, 0.0F, 0.0F);
+                GlStateManager.rotate(60, 1.0F, 0.0F, 0.0F);
                 this.renderBeam(width, startLength, 0, this.currentAnimation(entity,BeamPart.START),this.animationFrames(BeamPart.START));
             }
+    		GlStateManager.rotate(60*layer, -1.0F, 0.0F, 0.0F);
     	}
     	double length = dist-startLength;
     	if(this.endTexture(entity)!=null)
@@ -89,15 +94,16 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends Render<
         	length-=endLength;
             for(int i = 0; i < layer; i++)
             {
-                GlStateManager.rotate(90, 1.0F, 0.0F, 0.0F);
+                GlStateManager.rotate(60, 1.0F, 0.0F, 0.0F);
                 this.renderBeam(width, endLength, startLength+length, this.currentAnimation(entity,BeamPart.END),this.animationFrames(BeamPart.END));
             }
+            GlStateManager.rotate(60*layer, -1.0F, 0.0F, 0.0F);
         }
         this.renderManager.renderEngine.bindTexture(this.getEntityTexture(entity));
         double[] segments = this.segmentLength()==0?new double[] {length}:this.split(length);
         for(int i = 0; i < layer; i++)
         {
-            GlStateManager.rotate(90, 1.0F, 0.0F, 0.0F);
+            GlStateManager.rotate(60, 1.0F, 0.0F, 0.0F);
             for(int d = 0; d < segments.length; d++)
             this.renderBeam(width, segments[d], startLength+d*this.segmentLength(), this.currentAnimation(entity,BeamPart.MIDDLE),this.animationFrames(BeamPart.MIDDLE));
         }
