@@ -5,12 +5,9 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.flemmli97.tenshilib.common.javahelper.MathUtils;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.collect.Lists;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -35,11 +32,8 @@ public class RayTraceUtils {
 	 */
 	public static List<EntityLivingBase> getEntities(EntityPlayer player, float reach, float aoe)
 	{
-        return player.world.getEntitiesWithinAABB(EntityLivingBase.class, player.getEntityBoundingBox().grow(reach), new Predicate<EntityLivingBase>(){
-			@Override
-			public boolean apply(EntityLivingBase living) {
-				return living!=player && !living.isOnSameTeam(player) && living.canBeCollidedWith() && entityApplicable(player, living, reach, aoe);
-			}});
+        return player.world.getEntitiesWithinAABB(EntityLivingBase.class, player.getEntityBoundingBox().grow(reach), 
+        		(living)->living!=player && !living.isOnSameTeam(player) && living.canBeCollidedWith() && entityApplicable(player, living, reach, aoe));
 	}
 	
 	private static boolean entityApplicable(EntityPlayer player, EntityLivingBase living, float reach, float fov)
@@ -48,45 +42,42 @@ public class RayTraceUtils {
 		AxisAlignedBB axisalignedbb = living.getEntityBoundingBox().grow(living.getCollisionBorderSize());
 		if(axisalignedbb.contains(posVec))
 			return true;
+		Vec3d look = player.getLook(1);
+		RayTraceResult blocks = player.world.rayTraceBlocks(posVec, posVec.addVector(look.x * reach, look.y * reach, look.z * reach), false, false, true);
+		reach=(float) blocks.hitVec.distanceTo(posVec);
+        look = posVec.addVector(look.x * reach, look.y * reach, look.z * reach);
 		if(fov==0)
-		{
-			Vec3d look = player.getLook(1);
-			RayTraceResult blocks = player.world.rayTraceBlocks(posVec, posVec.addVector(look.x * reach, look.y * reach, look.z * reach), false, false, true);
-			reach=(float) blocks.hitVec.distanceTo(posVec);
-			return axisalignedbb.calculateIntercept(posVec, posVec.addVector(look.x * reach, look.y * reach, look.z * reach))!=null;
-		}
+			return axisalignedbb.calculateIntercept(posVec, look)!=null;
+		if(axisalignedbb.calculateIntercept(posVec, look)!=null)
+			return true;
 		while (player.rotationYaw > 360.0f) {
             player.rotationYaw -= 360.0f;
         }
         while (player.rotationYaw < -360.0f) {
             player.rotationYaw += 360.0f;
         }
-        /*Vec3d left=Vec3d.fromPitchYaw(player.rotationPitch, player.rotationYaw-fov);
-        Vec3d right=Vec3d.fromPitchYaw(player.rotationPitch, player.rotationYaw+fov);
-        boolean xz =axisalignedbb.calculateIntercept(posVec, left)!=null || axisalignedbb.calculateIntercept(posVec, right)!=null;
-        
-        if(!xz)
-        {
-        	Vec3d closest = MathUtils.closestPointToAABB(posVec, axisalignedbb);
-        	double dx = closest.x - posVec.x;
-	        double dz = closest.z - posVec.z;
-	        if (dx == 0.0 && dz == 0.0)
-	            dx = 0.001;
-	        float yaw = (float)(MathHelper.atan2(dz, dx) * 180.0 / 3.141592653589793) - player.rotationYaw-90;
-	        while (yaw < -180.0f) {
-	            yaw += 360.0f;
-	        }
-	        while (yaw >= 180.0f) {
-	            yaw -= 360.0f;
-	        }
-	        xz = yaw < fov && yaw > -fov;
+        Vec3d closest = MathUtils.closestPointOnAABBToLine(axisalignedbb, posVec, look);
+		double dx = closest.x - posVec.x;
+        double dz = closest.z - posVec.z;
+        if (dx == 0.0 && dz == 0.0)
+            dx = 0.001;
+        float yaw = (float)(MathHelper.atan2(dz, dx) * 180.0 / 3.141592653589793) - player.rotationYaw-90;
+        while (yaw < -180.0f) {
+            yaw += 360.0f;
         }
-        if(!xz)
+        while (yaw >= 180.0f) {
+            yaw -= 360.0f;
+        }
+        if(!(yaw < fov && yaw > -fov))
         	return false;
-        
-        boolean y ;
-        return true;*/
-		Vec3d point1 = new Vec3d(axisalignedbb.minX, axisalignedbb.minY, axisalignedbb.minZ);
+		double dis = posVec.distanceTo(closest);
+		double dy = closest.y-posVec.y;
+		if (dy == 0.0)
+			dy = 0.001;
+		float pitchAOE = 20;
+		float pitch = (float)(Math.acos(dy / dis) * 180.0 / 3.141592653589793)-(player.rotationPitch+90);
+		boolean y = pitch<pitchAOE && pitch>-pitchAOE;
+		/*Vec3d point1 = new Vec3d(axisalignedbb.minX, axisalignedbb.minY, axisalignedbb.minZ);
 		Vec3d point2 = new Vec3d(axisalignedbb.maxX, axisalignedbb.minY, axisalignedbb.minZ);
 		Vec3d point3 = new Vec3d(axisalignedbb.minX, axisalignedbb.minY, axisalignedbb.maxZ);
 		Vec3d point6 = new Vec3d(axisalignedbb.maxX, axisalignedbb.maxY, axisalignedbb.minZ);
@@ -145,7 +136,7 @@ public class RayTraceUtils {
 			}
 			if(y)
 				break;
-		}
+		}*/
 		return y && canSeeEntity(posVec, living);
 	}
 	
@@ -179,26 +170,23 @@ public class RayTraceUtils {
 		return false;
 	}
 	
-	public static RayTraceResult calculateEntityFromLook(EntityPlayer player, float reach)
+	public static RayTraceResult calculateEntityFromLook(EntityLivingBase entity, float reach)
 	{
-        Vec3d posVec = player.getPositionEyes(1);
-		Vec3d look = player.getLook(1);
-		RayTraceResult blocks = player.world.rayTraceBlocks(posVec, posVec.addVector(look.x * reach, look.y * reach, look.z * reach), false, false, true);
+		return calculateEntityFromLook(entity, reach, Entity.class);
+	}
+	
+	public static RayTraceResult calculateEntityFromLook(EntityLivingBase entity, float reach, Class<? extends Entity>clss)
+	{
+        Vec3d posVec = entity.getPositionEyes(1);
+		Vec3d look = entity.getLook(1);
+		RayTraceResult blocks = entity.world.rayTraceBlocks(posVec, posVec.addVector(look.x * reach, look.y * reach, look.z * reach), false, false, true);
 		reach=(float) blocks.hitVec.distanceTo(posVec);
         Vec3d rangeVec = posVec.addVector(look.x * reach, look.y * reach, look.z * reach);
         Vec3d hitVec = null;
-        List<Entity> list = player.world.getEntitiesInAABBexcluding(player, player.getEntityBoundingBox().expand(look.x * reach, look.y * reach, look.z * reach).expand(1.0D, 1.0D, 1.0D), Predicates.and(EntitySelectors.NOT_SPECTATING, new Predicate<Entity>()
+        List<Entity> list = entity.world.getEntitiesWithinAABB(clss, entity.getEntityBoundingBox().expand(look.x * reach, look.y * reach, look.z * reach).expand(1.0D, 1.0D, 1.0D), Predicates.and(EntitySelectors.NOT_SPECTATING, (t)->t != null && t!=entity && t.canBeCollidedWith()));
+        for(Entity e : list)
         {
-            @Override
-			public boolean apply(@Nullable Entity entity)
-            {
-                return entity != null && entity.canBeCollidedWith();
-            }
-        }));
-        for(int i = 0; i < list.size(); ++i)
-        {
-        	Entity entity = list.get(i);
-            AxisAlignedBB axisalignedbb = entity.getEntityBoundingBox().grow(entity.getCollisionBorderSize());
+            AxisAlignedBB axisalignedbb = e.getEntityBoundingBox().grow(e.getCollisionBorderSize());
             RayTraceResult raytraceresult = axisalignedbb.calculateIntercept(posVec, rangeVec);
             if (raytraceresult != null)
             {
@@ -207,7 +195,7 @@ public class RayTraceUtils {
                 if (d3 < reach)
                 {
                     hitVec = raytraceresult.hitVec;
-                    return new RayTraceResult(entity, hitVec);
+                    return new RayTraceResult(e, hitVec);
                 }
             }
         }
