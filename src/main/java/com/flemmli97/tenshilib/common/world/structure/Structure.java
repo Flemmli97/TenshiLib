@@ -11,7 +11,6 @@ import com.flemmli97.tenshilib.api.config.IConfigSerializable;
 import com.flemmli97.tenshilib.common.config.ConfigUtils;
 import com.flemmli97.tenshilib.common.events.StructureGenerateEvent;
 import com.flemmli97.tenshilib.common.javahelper.ArrayUtils;
-import com.flemmli97.tenshilib.common.javahelper.ObjectConverter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -167,9 +166,7 @@ public class Structure implements IConfigSerializable<Structure>{
 		cat.setLanguageKey("structures."+this.id);
 		this.startingStructures=ArrayUtils.arrayConverter(
 				config.getStringList("Starting Structures", configCategory, ArrayUtils.arrayToStringArr(this.startingStructures), "Schematic names of potential starting structures. If empty will use the structure id"), 
-				new ObjectConverter<String, ResourceLocation>() {
-					@Override
-					public ResourceLocation convertFrom(String t) {return new ResourceLocation(t);}}, ResourceLocation.class, true);
+				(t)->new ResourceLocation(t), ResourceLocation.class, true);
 		if(this.startingStructures==null)
 			this.startingStructures=new ResourceLocation[] {this.id};
 		this.frequency=config.get(configCategory, "Frequency", this.frequency, "Structure will spawn with 1/x probability in a chunk").getInt();

@@ -3,7 +3,8 @@ package com.flemmli97.tenshilib.common.entity;
 public class AnimatedAction {
 
 	public static final AnimatedAction vanillaAttack = new AnimatedAction(20,0, "vanilla");
-	
+	public static final AnimatedAction[] vanillaAttackOnly = new AnimatedAction[] {vanillaAttack};
+
 	private final int length, attackTime;
 	private final String id;
 	private float ticker;

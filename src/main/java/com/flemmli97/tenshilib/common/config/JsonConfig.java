@@ -45,6 +45,7 @@ public class JsonConfig<T extends JsonElement> {
 	public JsonConfig<T> setGson(Gson gson)
 	{
 		this.gson=gson;
+		this.load();
 		return this;
 	}
 	

@@ -32,11 +32,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity{
    
     protected static final DataParameter<String> shooterUUID = EntityDataManager.createKey(EntityBeam.class, DataSerializers.STRING);
 
-    private final Predicate<Entity> notShooter = new Predicate<Entity>() {
-		@Override
-		public boolean apply(Entity t) {
-			return (EntityBeam.this.getShooter()==null || t!=EntityBeam.this.getShooter()) && EntitySelectors.NOT_SPECTATING.apply(t);
-		}};
+    private final Predicate<Entity> notShooter = (entity)->(EntityBeam.this.getShooter()==null || entity!=EntityBeam.this.getShooter()) && EntitySelectors.NOT_SPECTATING.apply(entity);
     
 	public EntityBeam(World world) {
 		super(world);
@@ -55,7 +51,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity{
         this(world, shooter.posX, shooter.posY + shooter.getEyeHeight() - 0.10000000149011612D, shooter.posZ);
         this.shooter = shooter;
 		this.dataManager.set(shooterUUID, shooter.getUniqueID().toString());
-        this.setRotation(shooter.rotationYaw, shooter.rotationPitch);   
+        this.setRotation(shooter.rotationYawHead, shooter.rotationPitch);   
     }
 
 	@Override
@@ -105,6 +101,9 @@ public abstract class EntityBeam extends Entity implements IBeamEntity{
 		}
 	}
 	
+	/**
+	 * post update the projectiles heading and stuff after beeing shot
+	 */
     public boolean getHitVecFromShooter() {
 		return false;
 	}
