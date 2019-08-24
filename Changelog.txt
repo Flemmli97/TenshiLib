@@ -1,3 +1,9 @@
+TenshiLib 1.2.0
+================
+- Removed a debug spamm
+- Added a lightweight animation system
+- Some more helper methods
+
 TenshiLib 1.1.1
 ================
 
