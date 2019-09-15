@@ -65,7 +65,7 @@ public class ExtendedItemStackWrapper extends SimpleItemStackWrapper{
 	}
 	
 	@Override
-	public IConfigValue readFromString(String s) {
+	public ExtendedItemStackWrapper readFromString(String s) {
 		return this;
 	}
 

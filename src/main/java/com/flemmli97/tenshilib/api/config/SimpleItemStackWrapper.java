@@ -80,7 +80,7 @@ public class SimpleItemStackWrapper extends ItemWrapper{
 	}
 
 	@Override
-	public IConfigValue readFromString(String s) {
+	public SimpleItemStackWrapper readFromString(String s) {
 		if(s.isEmpty())
 		{
 			this.item=null;

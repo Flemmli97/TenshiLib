@@ -1,8 +1,8 @@
 package com.flemmli97.tenshilib.api.config;
 
-public interface IConfigArrayValue {
+public interface IConfigArrayValue<T extends IConfigArrayValue<T>> {
 	
-	public IConfigArrayValue readFromString(String[] s);
+	public T readFromString(String[] s);
 	
 	public String[] writeToString();
 

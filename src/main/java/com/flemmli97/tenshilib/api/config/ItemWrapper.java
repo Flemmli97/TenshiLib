@@ -19,7 +19,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
-public class ItemWrapper implements IItemConfig{
+public class ItemWrapper implements IItemConfig<ItemWrapper>{
 	
 	protected Item item;
 	
@@ -57,7 +57,7 @@ public class ItemWrapper implements IItemConfig{
 	}
 
 	@Override
-	public IConfigValue readFromString(String s) {
+	public ItemWrapper readFromString(String s) {
 		if(s.isEmpty())
 		{
 			this.item=null;

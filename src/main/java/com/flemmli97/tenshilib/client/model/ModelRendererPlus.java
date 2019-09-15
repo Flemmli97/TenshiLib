@@ -48,6 +48,13 @@ public class ModelRendererPlus extends ModelRenderer{
     	this.defaultRotPointY = rotPointY;
     	this.defaultRotPointZ = rotPointZ;
     }
+    
+    public void setDefaultRotAngle(float rotAngleX, float rotAngleY, float rotAngleZ)
+    {
+    	this.defaultRotAngleX = rotAngleX;
+    	this.defaultRotAngleY = rotAngleY;
+    	this.defaultRotAngleZ = rotAngleZ;
+    }
 
     public void setDefaultValues(float rotPointX, float rotPointY, float rotPointZ, float rotAngleX, float rotAngleY, float rotAngleZ)
     {

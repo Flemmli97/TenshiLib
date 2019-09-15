@@ -65,7 +65,7 @@ public class ItemOredictWrapper extends SimpleItemStackWrapper{
 	}
 
 	@Override
-	public IConfigValue readFromString(String s) {
+	public ItemOredictWrapper readFromString(String s) {
 		String[] parts = s.split(",");
 		this.oreDict=parts[0];
 		this.reloadItem();
