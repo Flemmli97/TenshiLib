@@ -8,6 +8,8 @@ import javax.annotation.Nullable;
 import com.google.common.base.Predicates;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
@@ -38,5 +40,21 @@ public class EntityUtil {
 			}
 		}
 		return null;
+	}
+	
+	public static ItemStack findItem(EntityPlayer player, Predicate<ItemStack> pred, boolean searchArmor, boolean offHand)
+	{
+		for(ItemStack stack : player.inventory.mainInventory)
+			if(pred.test(stack))
+				return stack;
+		if(searchArmor)
+			for(ItemStack stack : player.inventory.armorInventory)
+				if(pred.test(stack))
+					return stack;
+		if(offHand)
+			for(ItemStack stack : player.inventory.offHandInventory)
+				if(pred.test(stack))
+					return stack;
+		return ItemStack.EMPTY;
 	}
 }
