@@ -88,6 +88,20 @@ public class ExtendedItemStackWrapper extends SimpleItemStackWrapper{
 		return stack;
 	}
 	
+	@Override
+    public boolean equals(Object obj) {
+        if (this == obj) 
+        {
+            return true;
+        }
+        if (obj instanceof ExtendedItemStackWrapper) 
+        {
+        	ExtendedItemStackWrapper prop = (ExtendedItemStackWrapper)obj;
+            return prop.toString().equals(this.toString());
+        }
+        return false;
+    }
+	
 	public static class Serializer implements JsonDeserializer<ExtendedItemStackWrapper>, JsonSerializer<ExtendedItemStackWrapper>
 	{
 

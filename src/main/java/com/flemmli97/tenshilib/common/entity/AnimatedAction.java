@@ -43,6 +43,17 @@ public class AnimatedAction {
 		return (int) this.ticker;
 	}
 	
+	
+	public int getLength()
+	{
+		return this.length;
+	}
+	
+	public int getAttackTime()
+	{
+		return this.attackTime;
+	}
+	
 	public void reset()
 	{
 		this.ticker=0;

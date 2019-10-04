@@ -12,6 +12,7 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.JsonUtils;
@@ -21,7 +22,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 public class ItemWrapper implements IItemConfig<ItemWrapper>{
 	
-	protected Item item;
+	protected Item item = Items.AIR;
 	
 	public ItemWrapper(Item defaultItem)
 	{
