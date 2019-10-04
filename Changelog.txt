@@ -1,3 +1,11 @@
+TenshiLib 1.2.1
+================
+- Added a helper method to ModelRendererPlus
+- Added generics to config api
+- Add player inventory search method
+- Fix for some item configs
+- Some getter for AnimatedAction
+
 TenshiLib 1.2.0
 ================
 - Removed a debug spamm
