@@ -17,6 +17,7 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -53,6 +54,15 @@ public abstract class EntityBeam extends Entity implements IBeamEntity{
 		this.dataManager.set(shooterUUID, shooter.getUniqueID().toString());
         this.setRotation(shooter.rotationYawHead, shooter.rotationPitch);   
     }
+	
+	public void setRotationTo(double x, double y, double z, float accuracyMod) {
+	    double dx = x+(this.rand.nextGaussian()*accuracyMod)-this.posX;
+	    double dy = y+(this.rand.nextGaussian()*accuracyMod)-this.posY;
+	    double dz = z+(this.rand.nextGaussian()*accuracyMod)-this.posZ;
+	    double dis = MathHelper.sqrt(dx * dx + dy * dy + dz * dz);
+        this.rotationYaw=(float) (MathHelper.atan2(dz, dx) * 180.0 / 3.141592653589793) -90;
+        this.rotationPitch = (float) (Math.acos(dy / dis) * 180.0 / 3.141592653589793) -90;
+	}
 
 	@Override
 	public Vec3d startVec() {

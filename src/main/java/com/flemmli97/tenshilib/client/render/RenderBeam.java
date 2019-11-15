@@ -32,10 +32,17 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends Render<
 
 	public void setColor(int hexColor)
 	{
-		this.setColor(hexColor >> 16 & 255, hexColor >> 8 & 255, hexColor >> 0 & 255, hexColor >> 24 & 255);
+		this.setColorAndAlpha(hexColor >> 16 & 255, hexColor >> 8 & 255, hexColor >> 0 & 255, hexColor >> 24 & 255);
 	}
 	
-	public void setColor(int red, int green, int blue, int alpha)
+	public void setColor(int red, int green, int blue)
+    {
+	    this.red = red;
+        this.blue = blue;
+        this.green = green;
+    }
+	
+	public void setColorAndAlpha(int red, int green, int blue, int alpha)
 	{
 		this.red = red;
 		this.blue = blue;

@@ -2,11 +2,8 @@ package com.flemmli97.tenshilib.common.javahelper;
 
 import java.util.List;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.google.common.collect.Lists;
 
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
@@ -22,6 +19,19 @@ public class MathUtils {
 		return rad* (180/(float)Math.PI);
 	}
 	
+	/**
+	 * Gets closest point on circle circumfence from point
+	 */
+	public static double[] closestOnCircle(double centerX, double centerY, double pointX, double pointY, double radius){
+	    double x = pointX-centerX;
+	    double y = pointY-centerY;
+        float d0 = MathHelper.sqrt(x * x + y * y);
+	    return new double[] {x/d0*radius+centerX,y/d0*radius+centerY};
+	}
+	
+	public static double phiFromPoint(double centerX, double centerY, double pointX, double pointY) {
+	    return Math.atan2(pointY-centerY, pointX-centerX);
+	}
 	/**
 	 * 
 	 * @param radius
@@ -41,6 +51,28 @@ public class MathUtils {
 		return list;
 	}
 	
+	/**
+	 * Rotates a vector around a rotation axis with the given angle
+	 * @param rotAxis Rotation axis vector. needs to be normalized.
+	 * @param vec The vector to rotate
+	 * @param angle Angle in radians
+	 * @return The rotated vector
+	 */
+	public static Vec3d rotate(Vec3d rotAxis, Vec3d vec, float angle) {
+        double x = rotAxis.x*(rotAxis.x*vec.x+rotAxis.y*vec.y+rotAxis.z*vec.z)*(1-MathHelper.cos(angle))
+            +vec.x*MathHelper.cos(angle)
+            +(-rotAxis.z*vec.y+rotAxis.y*vec.z)*MathHelper.sin(angle);
+        
+        double y = rotAxis.y*(rotAxis.x*vec.x+rotAxis.y*vec.y+rotAxis.z*vec.z)*(1-MathHelper.cos(angle))
+            +vec.y*MathHelper.cos(angle)
+            +(rotAxis.z*vec.x-rotAxis.x*vec.z)*MathHelper.sin(angle);
+        
+        double z = rotAxis.z*(rotAxis.x*vec.x+rotAxis.y*vec.y+rotAxis.z*vec.z)*(1-MathHelper.cos(angle))
+            +vec.z*MathHelper.cos(angle)
+            +(-rotAxis.y*vec.x+rotAxis.x*vec.y)*MathHelper.sin(angle);
+        return new Vec3d(x,y,z);
+    }
+	
 	public static Vec3d closestPointToLine(Vec3d point, Vec3d l1, Vec3d dir)
 	{
 		return new Vec3d(MathHelper.clamp(point.x, l1.x, dir.x), 
@@ -53,67 +85,5 @@ public class MathUtils {
 		 return new Vec3d(Math.abs(l1.x-point.x)>Math.abs(dir.x-point.x)? l1.x : dir.x,
 				 Math.abs(l1.y-point.y)>Math.abs(dir.y-point.y)?l1.y:dir.y, 
 				 Math.abs(l1.z-point.z)>Math.abs(dir.z-point.z)?l1.z:dir.z);
-	}
-	
-	public static Vec3d closestPointToAABB(Vec3d point, AxisAlignedBB aabb)	
-	{
-		return new Vec3d(MathHelper.clamp(point.x, aabb.minX, aabb.maxX), MathHelper.clamp(point.y, aabb.minY, aabb.maxY), MathHelper.clamp(point.z, aabb.minZ, aabb.maxZ));
-	}
-	
-	public static Vec3d closestPointOnAABBToLine(AxisAlignedBB aabb, Vec3d line, Vec3d dir)
-	{
-		/*List<Pair<Vec3d,Vec3d>> list = Lists.newArrayList();
-		list.add(Pair.of(new Vec3d(aabb.minX, aabb.minY, aabb.minZ), new Vec3d(aabb.maxX, aabb.minY, aabb.minZ)));
-		list.add(Pair.of(new Vec3d(aabb.maxX, aabb.minY, aabb.minZ), new Vec3d(aabb.maxX, aabb.minY, aabb.maxZ)));
-		list.add(Pair.of(new Vec3d(aabb.maxX, aabb.minY, aabb.maxZ), new Vec3d(aabb.minX, aabb.minY, aabb.minZ)));
-		list.add(Pair.of(new Vec3d(aabb.minX, aabb.minY, aabb.maxZ), new Vec3d(aabb.minX, aabb.minY, aabb.minZ)));
-		
-		list.add(Pair.of(new Vec3d(aabb.minX, aabb.minY, aabb.minZ), new Vec3d(aabb.minX, aabb.maxY, aabb.minZ)));
-		list.add(Pair.of(new Vec3d(aabb.maxX, aabb.minY, aabb.minZ), new Vec3d(aabb.maxX, aabb.maxY, aabb.minZ)));
-		list.add(Pair.of(new Vec3d(aabb.maxX, aabb.minY, aabb.maxZ), new Vec3d(aabb.maxX, aabb.maxY, aabb.maxZ)));
-		list.add(Pair.of(new Vec3d(aabb.minX, aabb.minY, aabb.maxZ), new Vec3d(aabb.minX, aabb.maxY, aabb.maxZ)));
-
-		list.add(Pair.of(new Vec3d(aabb.minX, aabb.maxY, aabb.minZ), new Vec3d(aabb.maxX, aabb.maxY, aabb.minZ)));
-		list.add(Pair.of(new Vec3d(aabb.maxX, aabb.maxY, aabb.minZ), new Vec3d(aabb.maxX, aabb.maxY, aabb.maxZ)));
-		list.add(Pair.of(new Vec3d(aabb.maxX, aabb.maxY, aabb.maxZ), new Vec3d(aabb.minX, aabb.maxY, aabb.minZ)));
-		list.add(Pair.of(new Vec3d(aabb.minX, aabb.maxY, aabb.maxZ), new Vec3d(aabb.minX, aabb.maxY, aabb.minZ)));*/
-		
-		List<Pair<Vec3d,Vec3d>> planes = Lists.newArrayList();
-		Vec3d v1 = new Vec3d(aabb.minX, aabb.minY, aabb.minZ);
-		planes.add(Pair.of(v1,v1.crossProduct(new Vec3d(aabb.maxX, aabb.minY, aabb.minZ))));
-		Vec3d v2 = new Vec3d(aabb.minX, aabb.minY, aabb.minZ);
-		planes.add(Pair.of(v2,v2.crossProduct(new Vec3d(aabb.minX, aabb.maxY, aabb.minZ))));
-		Vec3d v3 = new Vec3d(aabb.maxX, aabb.minY, aabb.minZ);
-		planes.add(Pair.of(v3,v3.crossProduct(new Vec3d(aabb.maxX, aabb.maxY, aabb.minZ))));
-		Vec3d v4 = new Vec3d(aabb.maxX, aabb.minY, aabb.maxZ);
-		planes.add(Pair.of(v4,v4.crossProduct(new Vec3d(aabb.maxX, aabb.maxY, aabb.maxZ))));
-		Vec3d v5 = new Vec3d(aabb.minX, aabb.minY, aabb.maxZ);
-		planes.add(Pair.of(v5,v5.crossProduct(new Vec3d(aabb.minX, aabb.maxY, aabb.maxZ))));
-		Vec3d v6 = new Vec3d(aabb.minX, aabb.maxY, aabb.minZ);
-		planes.add(Pair.of(v6,v6.crossProduct(new Vec3d(aabb.maxX, aabb.maxY, aabb.minZ))));
-
-		Vec3d point = line;
-		
-		for(Pair<Vec3d, Vec3d> pair : planes)
-		{
-			double dot = dir.dotProduct(pair.getRight());
-			double val=pair.getLeft().subtract(line).dotProduct(pair.getRight());
-			double dis;
-			if(dot!=0)
-			{
-				
-			}
-			else
-			{
-				
-			}
-		}
-		/*for(Pair<Vec3d, Vec3d> pair : list)
-		{
-			Vec3d point1 = closestPointOnTwoLines(pair.getLeft(), pair.getRight(), line, dir);
-			if(point==null || closestPointToLine(point, line, dir).distanceTo(point)>closestPointToLine(point1, line, dir).distanceTo(point1))
-				point=point1;
-		}*/
-		return point;
 	}
 }

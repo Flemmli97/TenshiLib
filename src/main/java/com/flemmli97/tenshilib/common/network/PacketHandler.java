@@ -21,7 +21,6 @@ public class PacketHandler
         PacketHandler.dispatcher.registerMessage(PacketHit.Handler.class, PacketHit.class, id++, Side.SERVER);
         PacketHandler.dispatcher.registerMessage(PacketStructurePiece.Handler.class, PacketStructurePiece.class, id++, Side.SERVER);
         PacketHandler.dispatcher.registerMessage(PacketAnimatedEntity.Handler.class, PacketAnimatedEntity.class, id++, Side.CLIENT);
-
     }
     
     public static final void sendTo(final IMessage message, final EntityPlayerMP player) {

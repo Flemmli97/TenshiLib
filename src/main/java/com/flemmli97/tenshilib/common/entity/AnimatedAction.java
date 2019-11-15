@@ -69,4 +69,16 @@ public class AnimatedAction {
 	{
 		return "ID: " + this.id + "; length: " + this.length + "; attackTime: " + this.attackTime + "; speed: " + this.speed;
 	}
+	
+	@Override
+    public boolean equals(Object o) {
+	    if(o instanceof AnimatedAction)
+	        return this.toString().equals(o.toString());
+	    return false;
+	}
+	
+	@Override
+    public int hashCode() {
+	    return this.toString().hashCode();
+	}
 }
