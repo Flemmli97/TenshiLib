@@ -1,3 +1,8 @@
+TenshiLib 1.2.2
+================
+- Some more helper methods
+- Aoe attack system done (Not satisfied with previous one)
+
 TenshiLib 1.2.1
 ================
 - Added a helper method to ModelRendererPlus
