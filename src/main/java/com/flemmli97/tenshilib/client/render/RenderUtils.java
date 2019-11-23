@@ -80,10 +80,10 @@ public class RenderUtils {
     
     public static void renderTexture(RenderManager renderManager, ResourceLocation texture, double x, double y, double z, float xSize, float ySize, int red, int green, int blue, int alpha, float yawRot, float pitchRot)
     {
-    	renderTexture(renderManager, texture, x, y, z, xSize, ySize, red, green, blue, alpha, yawRot, pitchRot, 1, 1);
+    	renderTexture(renderManager, texture, x, y, z, xSize, ySize, red, green, blue, alpha, yawRot, pitchRot, 0,0,1,1);
     }
     
-    public static void renderTexture(RenderManager renderManager, ResourceLocation texture, double x, double y, double z, float xSize, float ySize, int red, int green, int blue, int alpha, float yawRot, float pitchRot, int animationFrame, int maxAnimationFrames)
+    public static void renderTexture(RenderManager renderManager, ResourceLocation texture, double x, double y, double z, float xSize, float ySize, int red, int green, int blue, int alpha, float yawRot, float pitchRot, double u, double v, double uLength, double vLength)
     {
     	GlStateManager.pushMatrix();
         GlStateManager.disableCull();
@@ -100,10 +100,10 @@ public class RenderUtils {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder vertexbuffer = tessellator.getBuffer();	
         vertexbuffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-        vertexbuffer.pos(-xSize, ySize, 0).tex(0, Math.max(0, (animationFrame-1)*1/(float)maxAnimationFrames)).color(red, green, blue, alpha).endVertex();
-        vertexbuffer.pos(xSize, ySize, 0).tex(1, Math.max(0, (animationFrame-1)*1/(float)maxAnimationFrames)).color(red, green, blue, alpha).endVertex();
-        vertexbuffer.pos(xSize, -ySize, 0).tex(1, animationFrame*1/(float)maxAnimationFrames).color(red, green, blue, alpha).endVertex();
-        vertexbuffer.pos(-xSize, -ySize, 0).tex(0, animationFrame*1/(float)maxAnimationFrames).color(red, green, blue, alpha).endVertex();
+        vertexbuffer.pos(-xSize, ySize, 0).tex(u, v).color(red, green, blue, alpha).endVertex();
+        vertexbuffer.pos(xSize, ySize, 0).tex(u+uLength, v).color(red, green, blue, alpha).endVertex();
+        vertexbuffer.pos(xSize, -ySize, 0).tex(u+uLength, v+vLength).color(red, green, blue, alpha).endVertex();
+        vertexbuffer.pos(-xSize, -ySize, 0).tex(u, v+vLength).color(red, green, blue, alpha).endVertex();
         tessellator.draw();	
         RenderHelper.enableStandardItemLighting();
         GlStateManager.disableBlend();

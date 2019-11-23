@@ -6,16 +6,22 @@ import net.minecraft.entity.Entity;
 
 public abstract class RenderTexture<T extends Entity> extends Render<T>{
 
-	private float xSize, ySize;
+	public final float xSize, ySize;
 	private int red=255;
 	private int green=255;
 	private int blue=255;
 	private int alpha=255;
-	
-	public RenderTexture(RenderManager renderManager, float xSize, float ySize) {
+	public final int rows, columns,length;
+	public final double uLength, vLength;
+	public RenderTexture(RenderManager renderManager, float xSize, float ySize, int rows, int columns) {
 		super(renderManager);
 		this.xSize=xSize;
 		this.ySize=ySize;
+		this.rows=rows;
+		this.columns=columns;
+		this.length=rows*columns;
+		this.uLength=1D/columns;
+		this.vLength=1D/rows;
 	}
 	
 	public void setColor(int hexColor)
@@ -43,10 +49,10 @@ public abstract class RenderTexture<T extends Entity> extends Render<T>{
             	yaw=-this.renderManager.playerViewY+180;
                 pitch=(this.renderManager.options.thirdPersonView == 2 ? 1 : -1) * this.renderManager.playerViewX;
             }
-            
+            double[] uvOffset = this.uvOffset(entity.ticksExisted);
             RenderUtils.renderTexture(this.renderManager, this.getEntityTexture(entity), x, y, z, 
             		this.xSize, this.ySize, this.red, this.blue, this.green, this.alpha, yaw+this.yawOffset(),
-            pitch+this.pitchOffset(), this.currentAnimation(entity), this.animationFrames());
+            pitch+this.pitchOffset(), uvOffset[0], uvOffset[1], this.uLength, this.vLength);
             super.doRender(entity, x, y, z, entityYaw, partialTicks);
         }
     }
@@ -66,13 +72,8 @@ public abstract class RenderTexture<T extends Entity> extends Render<T>{
 		return 0;
 	}
 	
-	public int animationFrames()
-	{
-		return 1;
-	}
-	
-	public int currentAnimation(T entity)
-	{
-		return entity.ticksExisted%this.animationFrames()+1;
+	public double[] uvOffset(int timer) {
+	    int frame = timer % this.length;
+        return new double[] {(frame % columns) * this.uLength, (frame / columns) * this.vLength};
 	}
 }
