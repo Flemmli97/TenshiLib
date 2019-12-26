@@ -2,6 +2,8 @@ package com.flemmli97.tenshilib.api.config;
 
 import java.lang.reflect.Type;
 
+import javax.annotation.Nullable;
+
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -50,12 +52,17 @@ public class ExtendedItemStackWrapper extends SimpleItemStackWrapper{
 	public ExtendedItemStackWrapper(ItemStack stack)
 	{
 		super(stack.getItem(), stack.getMetadata(), stack.getCount());
-		this.nbtTagCompound = stack.hasTagCompound()?stack.getTagCompound():null;
+		this.nbtTagCompound = stack.hasTagCompound()?stack.getTagCompound().copy():null;
 	}
 	
 	public ExtendedItemStackWrapper(ItemStack stack, boolean ignoreMeta)
 	{
 		super(stack.getItem(), ignoreMeta?-1:stack.getMetadata(), stack.getCount());
+	}
+	
+	public ExtendedItemStackWrapper setNBT(NBTTagCompound nbt) {
+	    this.nbtTagCompound=nbt;
+	    return this;
 	}
 	
 	public ExtendedItemStackWrapper ignoreNBT()
@@ -78,13 +85,19 @@ public class ExtendedItemStackWrapper extends SimpleItemStackWrapper{
 	public String usage() {
 		return "";
 	}
+	
+	@Nullable
+	public NBTTagCompound getTag() {
+	    return this.nbtTagCompound==null?null:this.nbtTagCompound.copy();
+	}
 
 	@Override
 	public ItemStack getStack() {
 		if(this.item==null)
 			return ItemStack.EMPTY;
 		ItemStack stack = new ItemStack(this.item, this.count, this.meta==-1?0:this.meta);
-		stack.setTagCompound(this.nbtTagCompound);
+		if(this.nbtTagCompound!=null)
+		    stack.setTagCompound(this.nbtTagCompound.copy());
 		return stack;
 	}
 	
