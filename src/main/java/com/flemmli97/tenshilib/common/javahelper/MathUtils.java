@@ -86,4 +86,8 @@ public class MathUtils {
 				 Math.abs(l1.y-point.y)>Math.abs(dir.y-point.y)?l1.y:dir.y, 
 				 Math.abs(l1.z-point.z)>Math.abs(dir.z-point.z)?l1.z:dir.z);
 	}
+	
+    public static double roundTo(double val, double step) {
+        return Math.round(val / (float)step) * step;
+    }
 }
