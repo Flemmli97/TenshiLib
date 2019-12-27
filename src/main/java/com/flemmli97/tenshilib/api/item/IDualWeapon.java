@@ -8,17 +8,18 @@ import net.minecraft.item.ItemStack;
  */
 public interface IDualWeapon {
 
-    /**
-     * Change the item being rendered in the offhand
-     * 
-     * @param entity
-     * @return
-     */
-    public default ItemStack offHandStack(EntityLivingBase entity) {
-        return entity.getHeldItemMainhand();
-    }
-
-    public default boolean disableOffhand() {
-        return true;
-    }
+	/**
+	 * Change the item being rendered in the offhand
+	 * @param entity
+	 * @return
+	 */
+	public default ItemStack offHandStack(EntityLivingBase entity)
+	{
+		return entity.getHeldItemMainhand();
+	}
+	
+	public default boolean disableOffhand()
+	{
+		return true;
+	}
 }

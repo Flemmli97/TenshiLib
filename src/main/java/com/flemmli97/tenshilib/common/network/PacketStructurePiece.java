@@ -14,45 +14,46 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class PacketStructurePiece implements IMessage {
+public class PacketStructurePiece implements IMessage{
+	
+	public NBTTagCompound compound;
+	
+	public PacketStructurePiece() {}
 
-    public NBTTagCompound compound;
+	/**
+	 * @param resync wether it should just sent an update to the client again without changing the tile serverside
+	 */
+	public PacketStructurePiece(NBTTagCompound compound, boolean resync) 
+	{
+		compound.setBoolean("Resync", resync);
+		this.compound=compound;
+	}
 
-    public PacketStructurePiece() {
-    }
+	@Override
+	public void fromBytes(ByteBuf buf) {
+		this.compound=ByteBufUtils.readTag(buf);
+	}
 
-    /**
-     * @param resync wether it should just sent an update to the client again without changing the tile serverside
-     */
-    public PacketStructurePiece(NBTTagCompound compound, boolean resync) {
-        compound.setBoolean("Resync", resync);
-        this.compound = compound;
-    }
-
-    @Override
-    public void fromBytes(ByteBuf buf) {
-        this.compound = ByteBufUtils.readTag(buf);
-    }
-
-    @Override
-    public void toBytes(ByteBuf buf) {
-        ByteBufUtils.writeTag(buf, this.compound);
-    }
-
-    public static class Handler implements IMessageHandler<PacketStructurePiece, IMessage> {
+	@Override
+	public void toBytes(ByteBuf buf) {
+		ByteBufUtils.writeTag(buf, this.compound);
+	}
+	
+	public static class Handler implements IMessageHandler<PacketStructurePiece, IMessage> {
 
         @Override
         public IMessage onMessage(PacketStructurePiece msg, MessageContext ctx) {
-            World world = TenshiLib.proxy.getPlayerEntity(ctx).world;
-            NBTTagCompound compound = msg.compound;
-            BlockPos pos = new BlockPos(compound.getInteger("x"), compound.getInteger("y"), compound.getInteger("z"));
-            TileEntity tile = world.getTileEntity(pos);
-            if(tile instanceof TileStructurePiece){
-                if(!compound.getBoolean("Resync"))
-                    tile.readFromNBT(compound);
-                IBlockState state = world.getBlockState(pos);
-                world.notifyBlockUpdate(pos, state, state, 2);
-            }
+        	World world = TenshiLib.proxy.getPlayerEntity(ctx).world;	
+        	NBTTagCompound compound = msg.compound;
+        	BlockPos pos = new BlockPos(compound.getInteger("x"),compound.getInteger("y"),compound.getInteger("z"));
+        	TileEntity tile = world.getTileEntity(pos);
+        	if(tile instanceof TileStructurePiece)
+        	{
+        		if(!compound.getBoolean("Resync"))
+        			tile.readFromNBT(compound);
+        		IBlockState state = world.getBlockState(pos);
+        		world.notifyBlockUpdate(pos, state, state, 2);
+        	}
             return null;
         }
     }

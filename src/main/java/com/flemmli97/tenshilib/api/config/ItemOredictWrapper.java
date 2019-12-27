@@ -17,104 +17,110 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.oredict.OreDictionary;
 
-public class ItemOredictWrapper extends SimpleItemStackWrapper {
+public class ItemOredictWrapper extends SimpleItemStackWrapper{
 
-    private String oreDict;
-    private ItemStack firstOreDict = ItemStack.EMPTY;
-    private NonNullList<ItemStack> list;
+	private String oreDict;
+	private ItemStack firstOreDict = ItemStack.EMPTY;
+	private NonNullList<ItemStack> list;
+	
+	public ItemOredictWrapper(String oredictName) {
+		this(oredictName, 1);
+	}
+	public ItemOredictWrapper(String oredictName, int amount) {
+		super(Items.AIR, amount);
+		this.oreDict=oredictName;
+		this.reloadItem();
+	}
+	
+	private void reloadItem()
+	{
+		this.list = OreDictionary.getOres(this.oreDict);
+		if(!list.isEmpty())
+			this.firstOreDict=list.get(0);
+		else
+			this.firstOreDict=ItemStack.EMPTY;
+		this.firstOreDict.setCount(this.count);
+	}
 
-    public ItemOredictWrapper(String oredictName) {
-        this(oredictName, 1);
-    }
+	@Override
+	public ItemStack getStack()
+	{
+		return this.firstOreDict.copy();
+	}
+	
+	@Override
+	public Item getItem()
+	{
+		return this.firstOreDict.getItem();
+	}
 
-    public ItemOredictWrapper(String oredictName, int amount) {
-        super(Items.AIR, amount);
-        this.oreDict = oredictName;
-        this.reloadItem();
-    }
+	@Override
+	public NonNullList<ItemStack> getStackList() {
+		return this.list;
+	}
 
-    private void reloadItem() {
-        this.list = OreDictionary.getOres(this.oreDict);
-        if(!list.isEmpty())
-            this.firstOreDict = list.get(0);
-        else
-            this.firstOreDict = ItemStack.EMPTY;
-        this.firstOreDict.setCount(this.count);
-    }
+	@Override
+	public boolean hasList() {
+		return true;
+	}
 
-    @Override
-    public ItemStack getStack() {
-        return this.firstOreDict.copy();
-    }
+	@Override
+	public ItemOredictWrapper readFromString(String s) {
+		String[] parts = s.split(",");
+		this.oreDict=parts[0];
+		this.reloadItem();
+		return this;
+	}
 
-    @Override
-    public Item getItem() {
-        return this.firstOreDict.getItem();
-    }
+	@Override
+	public String writeToString() {
+		return this.oreDict + (this.count!=1?","+this.count:"");
+	}
 
-    @Override
-    public NonNullList<ItemStack> getStackList() {
-        return this.list;
-    }
-
-    @Override
-    public boolean hasList() {
-        return true;
-    }
-
-    @Override
-    public ItemOredictWrapper readFromString(String s) {
-        String[] parts = s.split(",");
-        this.oreDict = parts[0];
-        this.reloadItem();
-        return this;
-    }
-
-    @Override
-    public String writeToString() {
-        return this.oreDict + (this.count != 1 ? "," + this.count : "");
-    }
-
-    @Override
-    public String usage() {
-        return "Usage: oreDict<,amount>";
-    }
-
-    @Override
+	@Override
+	public String usage() {
+		return "Usage: oreDict<,amount>";
+	}
+	
+	@Override
     public boolean equals(Object obj) {
-        if(this == obj){
+        if (this == obj) 
+        {
             return true;
         }
-        if(obj instanceof ItemOredictWrapper){
-            ItemOredictWrapper prop = (ItemOredictWrapper) obj;
+        if (obj instanceof ItemOredictWrapper) 
+        {
+        	ItemOredictWrapper prop = (ItemOredictWrapper)obj;
             return prop.writeToString().equals(this.toString());
         }
         return false;
     }
-
+    
     @Override
     public int hashCode() {
         return this.writeToString().hashCode();
     }
+	
+	public static class Serializer implements JsonDeserializer<ItemOredictWrapper>, JsonSerializer<ItemOredictWrapper>
+	{
 
-    public static class Serializer implements JsonDeserializer<ItemOredictWrapper>, JsonSerializer<ItemOredictWrapper> {
+		@Override
+		public JsonElement serialize(ItemOredictWrapper src, Type typeOfSrc, JsonSerializationContext context) {
+			JsonObject obj = new JsonObject();
+			obj.add("oredict", new JsonPrimitive(src.oreDict));
+			if(src.count!=1)
+				obj.add("count", new JsonPrimitive(src.count));
+			return obj;
+		}
 
-        @Override
-        public JsonElement serialize(ItemOredictWrapper src, Type typeOfSrc, JsonSerializationContext context) {
-            JsonObject obj = new JsonObject();
-            obj.add("oredict", new JsonPrimitive(src.oreDict));
-            if(src.count != 1)
-                obj.add("count", new JsonPrimitive(src.count));
-            return obj;
-        }
-
-        @Override
-        public ItemOredictWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            JsonObject obj = json.getAsJsonObject();
-            int count = 1;
-            if(obj.get("count") instanceof JsonPrimitive && obj.get("count").getAsJsonPrimitive().isNumber())
-                count = obj.get("count").getAsInt();
-            return new ItemOredictWrapper(obj.get("oredict").getAsString(), count);
-        }
-    }
+		@Override
+		public ItemOredictWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+				throws JsonParseException {
+			JsonObject obj = json.getAsJsonObject();
+			int count = 1;
+			if(obj.get("count") instanceof JsonPrimitive && obj.get("count").getAsJsonPrimitive().isNumber())
+				count=obj.get("count").getAsInt();
+			return new ItemOredictWrapper(obj.get("oredict").getAsString(), count);
+		}	
+	}
 }

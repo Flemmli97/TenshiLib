@@ -12,23 +12,26 @@ import net.minecraft.world.WorldServer;
 
 public interface IAnimated {
 
-    @Nullable
-    public AnimatedAction getAnimation();
-
-    public void setAnimation(AnimatedAction anim);
-
-    public AnimatedAction[] getAnimations();
-
-    public default void tickAnimation() {
-        if(this.getAnimation() != null && this.getAnimation().tick())
-            this.setAnimation(null);
-    }
-
-    public static <T extends Entity & IAnimated> void sentToClient(T entity) {
-        if(!entity.world.isRemote){
-            WorldServer world = (WorldServer) entity.world;
-            for(EntityPlayer player : world.getEntityTracker().getTrackingPlayers(entity))
-                PacketHandler.sendTo(new PacketAnimatedEntity(entity, entity.getAnimation()), (EntityPlayerMP) player);
-        }
-    }
+	@Nullable
+	public AnimatedAction getAnimation();
+	
+	public void setAnimation(AnimatedAction anim);
+	
+	public AnimatedAction[] getAnimations();
+	
+	public default void tickAnimation()
+	{
+		if(this.getAnimation()!=null && this.getAnimation().tick())
+			this.setAnimation(null);
+	}
+	
+	public static <T extends Entity & IAnimated> void sentToClient(T entity)
+	{
+		if(!entity.world.isRemote)
+		{
+			WorldServer world = (WorldServer) entity.world;
+			for(EntityPlayer player : world.getEntityTracker().getTrackingPlayers(entity))
+				PacketHandler.sendTo(new PacketAnimatedEntity(entity, entity.getAnimation()), (EntityPlayerMP) player);
+		}
+	}
 }

@@ -27,54 +27,57 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class CommonProxy {
-
-    public static boolean isFateLoaded;
-    public static boolean isRunecraftoryLoaded;
-
-    public void preInit(FMLPreInitializationEvent e) {
-        if(!ASMLoader.asmLoaded)
-            throw new ASMException.ASMLoadException();
-        ConfigHandler.load();
-        PacketHandler.registerPackets();
-        isFateLoaded = Loader.isModLoaded("fatemod");
-        isRunecraftoryLoaded = Loader.isModLoaded("runecraftory");
+	
+	public static boolean isFateLoaded;
+	public static boolean isRunecraftoryLoaded;
+	
+	public void preInit(FMLPreInitializationEvent e) {
+		if(!ASMLoader.asmLoaded)
+			throw new ASMException.ASMLoadException();
+		ConfigHandler.load();
+		PacketHandler.registerPackets();
+		isFateLoaded = Loader.isModLoaded("fatemod");
+		isRunecraftoryLoaded = Loader.isModLoaded("runecraftory");
     }
 
     public void init(FMLInitializationEvent e) {
-        MinecraftForge.EVENT_BUS.register(new CommonEvents());
+    	MinecraftForge.EVENT_BUS.register(new CommonEvents());
         NetworkRegistry.INSTANCE.registerGuiHandler(TenshiLib.instance, new GuiHandler());
-        ItemUtil.initItemLists();
-        GameRegistry.registerWorldGenerator(new StructureGenerator(), 1);
+    	ItemUtil.initItemLists();
+    	GameRegistry.registerWorldGenerator(new StructureGenerator(), 1);
     }
 
     public void postInit(FMLPostInitializationEvent e) {
     }
-
+    
     public IThreadListener getListener(MessageContext ctx) {
         return (WorldServer) ctx.getServerHandler().player.world;
     }
-
+    
     public EntityPlayer getPlayerEntity(MessageContext ctx) {
-        return ctx.getServerHandler().player;
+      	 return ctx.getServerHandler().player;
     }
-
+    
     /**
      * Client needs translation
      */
-    public String translate(String string) {
-        return string;
+    public String translate(String string)
+    {
+    	return string;
     }
-
-    public void setStructureToRender(StructureBase structure) {
-
+    
+    public void setStructureToRender(StructureBase structure)
+    {
+    	
     }
-
-    public void spawnParticle(ResourceLocation res, World world, double xCoord, double yCoord, double zCoord, double xSpeed, double ySpeed,
-            double zSpeed, Object... parameters) {
-
+    
+    public void spawnParticle(ResourceLocation res, World world, double xCoord, double yCoord, double zCoord, double xSpeed, double ySpeed, double zSpeed, Object... parameters) 
+    {
+    	
     }
-
-    public void spawnParticle(Particle particle) {
-
+    
+    public void spawnParticle(Particle particle) 
+    {
+    	
     }
 }
