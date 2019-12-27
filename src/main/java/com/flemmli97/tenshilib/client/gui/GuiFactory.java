@@ -13,21 +13,22 @@ import net.minecraftforge.fml.client.config.GuiConfig;
 
 public class GuiFactory implements IModGuiFactory {
 
-	@Override
-	public void initialize(Minecraft minecraftInstance) {}
+    @Override
+    public void initialize(Minecraft minecraftInstance) {
+    }
 
-	@Override
-	public boolean hasConfigGui() {
-		return true;
-	}
+    @Override
+    public boolean hasConfigGui() {
+        return true;
+    }
 
-	@Override
-	public GuiScreen createConfigGui(GuiScreen parentScreen) {
-		return new GuiConfig(parentScreen, ConfigUtils.list(ConfigHandler.config), TenshiLib.MODID, false, false, TenshiLib.MODNAME);
-	}
+    @Override
+    public GuiScreen createConfigGui(GuiScreen parentScreen) {
+        return new GuiConfig(parentScreen, ConfigUtils.list(ConfigHandler.config), TenshiLib.MODID, false, false, TenshiLib.MODNAME);
+    }
 
-	@Override
-	public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
-		return null;
-	}
+    @Override
+    public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
+        return null;
+    }
 }

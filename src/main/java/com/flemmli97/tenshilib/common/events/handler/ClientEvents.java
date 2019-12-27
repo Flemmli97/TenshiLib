@@ -29,81 +29,64 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class ClientEvents {
-	
-	@SubscribeEvent
-	public void renderDualWeaponFirstPerson(RenderSpecificHandEvent event)
-	{
-		Minecraft client = Minecraft.getMinecraft();
-		ItemStack main = client.player.getHeldItemMainhand();
-		if(main.getItem() instanceof IDualWeapon)
-		{
-			if(event.getHand()==EnumHand.MAIN_HAND)
-			{
-				event.setCanceled(true);
-				client.getItemRenderer().renderItemInFirstPerson(client.player, event.getPartialTicks(), event.getInterpolatedPitch(), event.getHand(), event.getSwingProgress(), main, ClientHandHandler.getInstance().equipProgress(EnumHand.MAIN_HAND, event.getPartialTicks()));
-			}
-			else if(event.getHand()==EnumHand.OFF_HAND)
-			{
-				event.setCanceled(true);
-				client.getItemRenderer().renderItemInFirstPerson(client.player, event.getPartialTicks(), event.getInterpolatedPitch(), event.getHand(), event.getSwingProgress(), ((IDualWeapon)main.getItem()).offHandStack(client.player), ClientHandHandler.getInstance().equipProgress(EnumHand.OFF_HAND, event.getPartialTicks()));
-			}
-		}
-	}
-	
-	/*@SubscribeEvent
-	public void renderDualWeaponPlayer(LayerHeldItemEvent event)
-	{
-		if(event.getHand()==EnumHand.OFF_HAND)
-		{
-			ItemStack main = event.getEntity().getHeldItemMainhand();
-			if(main.getItem() instanceof IDualWeapon)
-			{
-				event.setStack(((IDualWeapon)main.getItem()).offHandStack(event.getEntity()));
-			}
-		}
-	}*/
-	
-	@SubscribeEvent
-	public void renderDualWeaponPose(RenderLivingEvent.Pre<?> event)
-	{
-		if(event.getEntity() instanceof AbstractClientPlayer)
-		{
-			AbstractClientPlayer player = (AbstractClientPlayer) event.getEntity();
-			ItemStack heldMain = player.getHeldItemMainhand();
-			boolean rightHand = player.getPrimaryHand() == EnumHandSide.RIGHT;
-	        if (heldMain.getItem() instanceof IDualWeapon) 
-	        {
-	        	ModelPlayer model = (ModelPlayer) event.getRenderer().getMainModel();
-                model.rightArmPose = rightHand?model.rightArmPose:model.leftArmPose;
-                model.leftArmPose = rightHand?model.rightArmPose:model.leftArmPose;
-	        }
-		}
-	}
-	
-	@SubscribeEvent
-	public void swingEmpty(PlayerInteractEvent.LeftClickEmpty event)
-	{
-		ClientHandHandler.getInstance().resetSwing();
-    	ItemStack stack = event.getEntityPlayer().getHeldItemMainhand();
-		if(stack.getItem() instanceof IExtendedWeapon)
-    	{
-    		PacketHandler.sendToServer(new PacketHit(HitType.EXT));
-    	}
-		else if(stack.getItem() instanceof IAOEWeapon)
-    	{
-    		PacketHandler.sendToServer(new PacketHit(HitType.AOE));
-    	}
-	}
 
-	@SubscribeEvent
-	public void clientTick(RenderWorldLastEvent event)
-	{
-		ClientHandHandler.getInstance().updateEquippedItem();
-		if(((ClientProxy)TenshiLib.proxy).currentStructure!=null && ConfigHandler.showStructure)
-		{
-			for(StructureBoundingBox box : ((ClientProxy)TenshiLib.proxy).currentStructure.getBoxes())
-				RenderUtils.renderBoundingBox(new AxisAlignedBB(box.maxX, box.maxY, box.maxZ, box.minX, box.minY, box.minZ), Minecraft.getMinecraft().player, event.getPartialTicks());
-		}
-	}
+    @SubscribeEvent
+    public void renderDualWeaponFirstPerson(RenderSpecificHandEvent event) {
+        Minecraft client = Minecraft.getMinecraft();
+        ItemStack main = client.player.getHeldItemMainhand();
+        if(main.getItem() instanceof IDualWeapon){
+            if(event.getHand() == EnumHand.MAIN_HAND){
+                event.setCanceled(true);
+                client.getItemRenderer().renderItemInFirstPerson(client.player, event.getPartialTicks(), event.getInterpolatedPitch(),
+                        event.getHand(), event.getSwingProgress(), main,
+                        ClientHandHandler.getInstance().equipProgress(EnumHand.MAIN_HAND, event.getPartialTicks()));
+            }else if(event.getHand() == EnumHand.OFF_HAND){
+                event.setCanceled(true);
+                client.getItemRenderer().renderItemInFirstPerson(client.player, event.getPartialTicks(), event.getInterpolatedPitch(),
+                        event.getHand(), event.getSwingProgress(), ((IDualWeapon) main.getItem()).offHandStack(client.player),
+                        ClientHandHandler.getInstance().equipProgress(EnumHand.OFF_HAND, event.getPartialTicks()));
+            }
+        }
+    }
+
+    /*
+     * @SubscribeEvent public void renderDualWeaponPlayer(LayerHeldItemEvent event) { if(event.getHand()==EnumHand.OFF_HAND)
+     * { ItemStack main = event.getEntity().getHeldItemMainhand(); if(main.getItem() instanceof IDualWeapon) {
+     * event.setStack(((IDualWeapon)main.getItem()).offHandStack(event.getEntity())); } } }
+     */
+
+    @SubscribeEvent
+    public void renderDualWeaponPose(RenderLivingEvent.Pre<?> event) {
+        if(event.getEntity() instanceof AbstractClientPlayer){
+            AbstractClientPlayer player = (AbstractClientPlayer) event.getEntity();
+            ItemStack heldMain = player.getHeldItemMainhand();
+            boolean rightHand = player.getPrimaryHand() == EnumHandSide.RIGHT;
+            if(heldMain.getItem() instanceof IDualWeapon){
+                ModelPlayer model = (ModelPlayer) event.getRenderer().getMainModel();
+                model.rightArmPose = rightHand ? model.rightArmPose : model.leftArmPose;
+                model.leftArmPose = rightHand ? model.rightArmPose : model.leftArmPose;
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void swingEmpty(PlayerInteractEvent.LeftClickEmpty event) {
+        ClientHandHandler.getInstance().resetSwing();
+        ItemStack stack = event.getEntityPlayer().getHeldItemMainhand();
+        if(stack.getItem() instanceof IExtendedWeapon){
+            PacketHandler.sendToServer(new PacketHit(HitType.EXT));
+        }else if(stack.getItem() instanceof IAOEWeapon){
+            PacketHandler.sendToServer(new PacketHit(HitType.AOE));
+        }
+    }
+
+    @SubscribeEvent
+    public void clientTick(RenderWorldLastEvent event) {
+        ClientHandHandler.getInstance().updateEquippedItem();
+        if(((ClientProxy) TenshiLib.proxy).currentStructure != null && ConfigHandler.showStructure){
+            for(StructureBoundingBox box : ((ClientProxy) TenshiLib.proxy).currentStructure.getBoxes())
+                RenderUtils.renderBoundingBox(new AxisAlignedBB(box.maxX, box.maxY, box.maxZ, box.minX, box.minY, box.minZ),
+                        Minecraft.getMinecraft().player, event.getPartialTicks());
+        }
+    }
 }
-

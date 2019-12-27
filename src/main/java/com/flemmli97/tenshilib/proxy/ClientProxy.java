@@ -18,8 +18,8 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class ClientProxy extends CommonProxy {
-	
-	public StructureBase currentStructure;
+
+    public StructureBase currentStructure;
 
     @Override
     public void preInit(FMLPreInitializationEvent e) {
@@ -28,7 +28,7 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void init(FMLInitializationEvent e) {
-    	MinecraftForge.EVENT_BUS.register(new ClientEvents());
+        MinecraftForge.EVENT_BUS.register(new ClientEvents());
         super.init(e);
     }
 
@@ -36,38 +36,35 @@ public class ClientProxy extends CommonProxy {
     public void postInit(FMLPostInitializationEvent e) {
         super.postInit(e);
     }
-    
+
     @Override
     public IThreadListener getListener(MessageContext ctx) {
         return ctx.side.isClient() ? Minecraft.getMinecraft() : super.getListener(ctx);
     }
-    
-	@Override
+
+    @Override
     public EntityPlayer getPlayerEntity(MessageContext ctx) {
-     return (ctx.side.isClient() ? Minecraft.getMinecraft().player : super.getPlayerEntity(ctx));
+        return (ctx.side.isClient() ? Minecraft.getMinecraft().player : super.getPlayerEntity(ctx));
     }
-    
+
     @Override
-    public String translate(String s)
-    {
-    	return I18n.format(s);
+    public String translate(String s) {
+        return I18n.format(s);
     }
-    
+
     @Override
-    public void setStructureToRender(StructureBase base)
-    {
-    	this.currentStructure=base;
+    public void setStructureToRender(StructureBase base) {
+        this.currentStructure = base;
     }
-    
+
     @Override
-    public void spawnParticle(ResourceLocation res, World world, double xCoord, double yCoord, double zCoord, double xSpeed, double ySpeed, double zSpeed, Object... parameters) 
-    {
-    	ParticleHandler.ParticleRegistries.spawnParticle(res, world, xCoord, yCoord, zCoord, xSpeed, ySpeed, zSpeed, parameters);
+    public void spawnParticle(ResourceLocation res, World world, double xCoord, double yCoord, double zCoord, double xSpeed, double ySpeed,
+            double zSpeed, Object... parameters) {
+        ParticleHandler.ParticleRegistries.spawnParticle(res, world, xCoord, yCoord, zCoord, xSpeed, ySpeed, zSpeed, parameters);
     }
-    
+
     @Override
-    public void spawnParticle(Particle particle) 
-    {
-    	ParticleHandler.ParticleRegistries.spawnParticle(particle);
+    public void spawnParticle(Particle particle) {
+        ParticleHandler.ParticleRegistries.spawnParticle(particle);
     }
 }

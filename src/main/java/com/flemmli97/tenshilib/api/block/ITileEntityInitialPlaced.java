@@ -10,5 +10,5 @@ import net.minecraft.world.World;
  */
 public interface ITileEntityInitialPlaced {
 
-	public void onPlaced(World world, BlockPos pos, Rotation rot, Mirror mirror);
+    public void onPlaced(World world, BlockPos pos, Rotation rot, Mirror mirror);
 }

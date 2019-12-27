@@ -23,11 +23,12 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.common.Loader;
 
 /**
- * Reads an extracted tabula animation json from file. Uses and identifierMap for matching the ModelRenderer with tabulas identifiers. The name needs to match the ModelRendere's field name
+ * Reads an extracted tabula animation json from file. Uses and identifierMap for matching the ModelRenderer with
+ * tabulas identifiers. The name needs to match the ModelRendere's field name
  */
 public class Animation {
 
-    private Map<ModelRenderer,ArrayList<AnimationComponent>> map = Maps.newHashMap();
+    private Map<ModelRenderer, ArrayList<AnimationComponent>> map = Maps.newHashMap();
     private static final Gson gson = new Gson();
     private int length;
     private IResetModel model;
@@ -39,28 +40,28 @@ public class Animation {
 
     public Animation(ModelBase model, ResourceLocation res, boolean reset) {
         InputStream input = Loader.class.getResourceAsStream("/assets/" + res.getResourceDomain() + "/" + res.getResourcePath());
-        if (input == null) {
+        if(input == null){
             TenshiLib.logger.error("Couldn't find animation: " + res);
             return;
         }
-        try {
+        try{
             JsonObject obj = gson.getAdapter(JsonObject.class).read(gson.newJsonReader(new InputStreamReader(input)));
             JsonObject idMap = (JsonObject) obj.get("identifierMap");
             JsonObject animSets = (JsonObject) obj.get("sets");
-            for (Field field : model.getClass().getFields()) {
-                if (ModelRenderer.class.isAssignableFrom(field.getType()) && idMap.has(field.getName())) {
+            for(Field field : model.getClass().getFields()){
+                if(ModelRenderer.class.isAssignableFrom(field.getType()) && idMap.has(field.getName())){
                     String id = idMap.get(field.getName()).getAsString();
-                    if (animSets.has(id)) {
+                    if(animSets.has(id)){
                         JsonArray arr = animSets.getAsJsonArray(id);
                         arr.forEach(element -> {
-                            try {
+                            try{
                                 AnimationComponent comp = new AnimationComponent(model, (JsonObject) element);
                                 this.map.merge((ModelRenderer) field.get(model), Lists.newArrayList(comp), (old, val) -> {
                                     old.addAll(val);
                                     old.sort(null);
                                     return old;
                                 });
-                            } catch (Exception e) {
+                            }catch(Exception e){
                                 TenshiLib.logger.error("Error parsing animation component: {}", element);
                                 e.printStackTrace();
                             }
@@ -68,18 +69,18 @@ public class Animation {
                     }
                 }
             }
-        } catch (IOException e) {
+        }catch(IOException e){
             e.printStackTrace();
         }
         this.doReset = reset;
-        if (model instanceof IResetModel)
+        if(model instanceof IResetModel)
             this.model = (IResetModel) model;
     }
 
     //ticker ticks up
     public void animate(int ticker, float partialTicks) {
         int tick = ticker % this.getLength();
-        if (this.model != null && this.doReset)
+        if(this.model != null && this.doReset)
             this.model.resetModel();
         this.map.entrySet().forEach(entry -> {
             entry.getValue().forEach(comp -> {
@@ -89,10 +90,10 @@ public class Animation {
     }
 
     public int getLength() {
-        if (this.length == 0)
+        if(this.length == 0)
             this.map.values().forEach(list -> {
                 list.forEach(comp -> {
-                    if (comp.startKey + comp.length > this.length) {
+                    if(comp.startKey + comp.length > this.length){
                         this.length = comp.startKey + comp.length;
                     }
                 });
@@ -108,7 +109,7 @@ public class Animation {
         });
         this.map.values().forEach(list -> {
             list.forEach(comp -> {
-                if (comp.startKey + comp.length > this.length) {
+                if(comp.startKey + comp.length > this.length){
                     this.length = comp.startKey + comp.length;
                 }
             });
@@ -145,24 +146,26 @@ public class Animation {
         public AnimationComponent(ModelBase model, JsonObject obj) {
             //convert to rad
             JsonArray posChangeJson = obj.getAsJsonArray("posChange");
-            for (int i = 0; i < 3; i++) {
+            for(int i = 0; i < 3; i++){
                 double change = posChangeJson.get(i).getAsDouble();
-                if (change != 0 && !(model instanceof IResetModel))
-                    throw new IllegalArgumentException("Model needs to implement IResetModel. Else changes to rotation points will mess up the model during animation");
+                if(change != 0 && !(model instanceof IResetModel))
+                    throw new IllegalArgumentException(
+                            "Model needs to implement IResetModel. Else changes to rotation points will mess up the model during animation");
                 this.posChange[i] = change;
             }
             JsonArray rotChangeJson = obj.getAsJsonArray("rotChange");
-            for (int i = 0; i < 3; i++)
+            for(int i = 0; i < 3; i++)
                 this.rotChange[i] = MathUtils.degToRad((float) rotChangeJson.get(i).getAsDouble());
             JsonArray posOffJson = obj.getAsJsonArray("posOffset");
-            for (int i = 0; i < 3; i++) {
+            for(int i = 0; i < 3; i++){
                 double off = posOffJson.get(i).getAsDouble();
-                if (off != 0 && !(model instanceof IResetModel))
-                    throw new IllegalArgumentException("Model needs to implement IResetModel. Else changes to rotation points will mess up the model during animation");
+                if(off != 0 && !(model instanceof IResetModel))
+                    throw new IllegalArgumentException(
+                            "Model needs to implement IResetModel. Else changes to rotation points will mess up the model during animation");
                 this.posOffset[i] = off;
             }
             JsonArray rotOffJson = obj.getAsJsonArray("rotOffset");
-            for (int i = 0; i < 3; i++)
+            for(int i = 0; i < 3; i++)
                 this.rotOffset[i] = MathUtils.degToRad((float) rotOffJson.get(i).getAsDouble());
             this.length = obj.get("length").getAsInt();
             this.startKey = obj.get("startKey").getAsInt();
@@ -172,7 +175,7 @@ public class Animation {
         public void animate(ModelRenderer model, int ticker, float partialTicks) {
             float actualTick = Math.max(ticker - 1 + partialTicks, 0);
             float prog = MathHelper.clamp((actualTick - startKey) / (float) length, 0F, 1F);
-            if (ticker >= this.startKey) {
+            if(ticker >= this.startKey){
                 model.rotationPointX += this.posOffset[0];
                 model.rotationPointY += this.posOffset[1];
                 model.rotationPointZ += this.posOffset[2];
@@ -188,75 +191,35 @@ public class Animation {
             model.rotateAngleZ += this.rotChange[2] * prog;
         }
         /*
-        public void animate(ModelRenderer info, float time)
-        {
-            float prog = MathHelper.clamp((time - startKey) / (float)length, 0F, 1F);
-            float mag = prog;
-            if(getProgressionCurve() != null)
-            {
-                mag = MathHelper.clamp((float)getProgressionCurve().value(prog), 0.0F, 1.0F);
-            }
-            if(time >= startKey)
-            {
-                for(int i = 0; i < 3; i++)
-                {
-                    info.position[i] += posOffset[i];
-                    info.rotation[i] += rotOffset[i];
-                    info.scale[i] += scaleOffset[i];
-                }
-                info.opacity += opacityOffset;
-            }
-            for(int i = 0; i < 3; i++)
-            {
-                info.position[i] += posChange[i] * mag;
-                info.rotation[i] += rotChange[i] * mag;
-                info.scale[i] += scaleChange[i] * mag;
-            }
-            info.opacity += opacityChange * mag;
-        }
-        
-        public double getProgressionFactor(double progression)
-        {
-            if(progressionCurve == null)
-            {
-                return progression;
-            }
-            return progressionCurve.value(progression);
-        }
-        
-        public void createProgressionCurve()
-        {
-            if(progressionCoords != null)
-            {
-                double[] xes = new double[progressionCoords.size() + 2];
-                double[] yes = new double[progressionCoords.size() + 2];
-        
-                xes[0] = yes[0] = 0;
-                xes[1] = yes[1] = 1;
-        
-                for(int i = 0; i < progressionCoords.size(); i++)
-                {
-                    xes[2 + i] = progressionCoords.get(i)[0];
-                    yes[2 + i] = progressionCoords.get(i)[1];
-                }
-        
-                progressionCurve = new PolynomialFunctionLagrangeForm(xes, yes);
-            }
-        }
-        
-        public PolynomialFunctionLagrangeForm getProgressionCurve()
-        {
-            if(progressionCoords != null && progressionCurve == null)
-            {
-                createProgressionCurve();
-            }
-            return progressionCurve;
-        }*/
+         * public void animate(ModelRenderer info, float time) { float prog = MathHelper.clamp((time - startKey) /
+         * (float)length, 0F, 1F); float mag = prog; if(getProgressionCurve() != null) { mag =
+         * MathHelper.clamp((float)getProgressionCurve().value(prog), 0.0F, 1.0F); } if(time >= startKey) { for(int i = 0; i <
+         * 3; i++) { info.position[i] += posOffset[i]; info.rotation[i] += rotOffset[i]; info.scale[i] += scaleOffset[i]; }
+         * info.opacity += opacityOffset; } for(int i = 0; i < 3; i++) { info.position[i] += posChange[i] * mag;
+         * info.rotation[i] += rotChange[i] * mag; info.scale[i] += scaleChange[i] * mag; } info.opacity += opacityChange * mag;
+         * }
+         * 
+         * public double getProgressionFactor(double progression) { if(progressionCurve == null) { return progression; } return
+         * progressionCurve.value(progression); }
+         * 
+         * public void createProgressionCurve() { if(progressionCoords != null) { double[] xes = new
+         * double[progressionCoords.size() + 2]; double[] yes = new double[progressionCoords.size() + 2];
+         * 
+         * xes[0] = yes[0] = 0; xes[1] = yes[1] = 1;
+         * 
+         * for(int i = 0; i < progressionCoords.size(); i++) { xes[2 + i] = progressionCoords.get(i)[0]; yes[2 + i] =
+         * progressionCoords.get(i)[1]; }
+         * 
+         * progressionCurve = new PolynomialFunctionLagrangeForm(xes, yes); } }
+         * 
+         * public PolynomialFunctionLagrangeForm getProgressionCurve() { if(progressionCoords != null && progressionCurve ==
+         * null) { createProgressionCurve(); } return progressionCurve; }
+         */
 
         @Override
         public String toString() {
-            return this.name + ":{PosOffset:[" + ArrayUtils.arrayToString(this.posOffset) + "],RotOffset:[" + ArrayUtils.arrayToString(this.rotOffset) + "],PosChange:[" + ArrayUtils.arrayToString(this.posChange) + "],RotChange:["
-                + ArrayUtils.arrayToString(this.rotChange) + "]}";
+            return this.name + ":{PosOffset:[" + ArrayUtils.arrayToString(this.posOffset) + "],RotOffset:[" + ArrayUtils.arrayToString(this.rotOffset)
+                    + "],PosChange:[" + ArrayUtils.arrayToString(this.posChange) + "],RotChange:[" + ArrayUtils.arrayToString(this.rotChange) + "]}";
         }
 
         @Override
