@@ -22,68 +22,59 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 /**
  * Basically just a copy of the structure void block but more VISIBLE
  */
-public class BlockIgnore extends Block
-{
+public class BlockIgnore extends Block {
+
     private static final AxisAlignedBB STRUCTURE_VOID_AABB = new AxisAlignedBB(0.2D, 0.2D, 0.2D, 0.8D, 0.8D, 0.8D);
 
-    public BlockIgnore(String name)
-    {
+    public BlockIgnore(String name) {
         super(Material.BARRIER);
         this.setRegistryName(new ResourceLocation(TenshiLib.MODID, name));
-		this.setUnlocalizedName(this.getRegistryName().toString());
+        this.setUnlocalizedName(this.getRegistryName().toString());
     }
 
     @Override
-    public EnumBlockRenderType getRenderType(IBlockState state)
-    {
+    public EnumBlockRenderType getRenderType(IBlockState state) {
         return EnumBlockRenderType.MODEL;
     }
 
     @Nullable
     @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos)
-    {
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
         return NULL_AABB;
     }
+
     @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
-    {
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
         return STRUCTURE_VOID_AABB;
     }
 
     @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    public boolean isOpaqueCube(IBlockState state) {
         return false;
     }
 
     @Override
-    public boolean isFullCube(IBlockState state)
-    {
+    public boolean isFullCube(IBlockState state) {
         return false;
     }
 
     @Override
-	@SideOnly(Side.CLIENT)
-    public float getAmbientOcclusionLightValue(IBlockState state)
-    {
+    @SideOnly(Side.CLIENT)
+    public float getAmbientOcclusionLightValue(IBlockState state) {
         return 1.0F;
     }
 
     @Override
-    public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
-    {
+    public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune) {
     }
 
     @Override
-    public EnumPushReaction getMobilityFlag(IBlockState state)
-    {
+    public EnumPushReaction getMobilityFlag(IBlockState state) {
         return EnumPushReaction.DESTROY;
     }
-    
+
     @Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
-    {
+    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
         return BlockFaceShape.UNDEFINED;
     }
 }

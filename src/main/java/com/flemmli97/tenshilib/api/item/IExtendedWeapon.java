@@ -5,6 +5,6 @@ package com.flemmli97.tenshilib.api.item;
  */
 public interface IExtendedWeapon {
 
-	public float getRange();
-	
+    public float getRange();
+
 }

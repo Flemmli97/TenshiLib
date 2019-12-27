@@ -25,25 +25,25 @@ public class TenshiLib {
     public static final String MODNAME = "TenshiLib";
     public static final String VERSION = "${@VERSION}";
     public static final Logger logger = LogManager.getLogger(TenshiLib.MODNAME);
-        
+
     @Instance
     public static TenshiLib instance = new TenshiLib();
-        
-    @SidedProxy(clientSide="com.flemmli97.tenshilib.proxy.ClientProxy", serverSide="com.flemmli97.tenshilib.proxy.CommonProxy")
+
+    @SidedProxy(clientSide = "com.flemmli97.tenshilib.proxy.ClientProxy", serverSide = "com.flemmli97.tenshilib.proxy.CommonProxy")
     public static CommonProxy proxy;
-    
+
     @EventHandler
     public void preInit(FMLPreInitializationEvent e) {
-	    /*Blocks.COMMAND_BLOCK.setCreativeTab(CreativeTabs.REDSTONE);
-	    Blocks.STRUCTURE_BLOCK.setCreativeTab(CreativeTabs.MISC);
-	    Blocks.STRUCTURE_VOID.setCreativeTab(CreativeTabs.MISC);
-	    Blocks.BARRIER.setCreativeTab(CreativeTabs.MISC);
-	    Blocks.MOB_SPAWNER.setCreativeTab(CreativeTabs.MISC);
-	    Blocks.DRAGON_EGG.setCreativeTab(CreativeTabs.MISC);
-	    Items.COMMAND_BLOCK_MINECART.setCreativeTab(CreativeTabs.TRANSPORTATION);
-	    Items.FIREWORKS.setCreativeTab(CreativeTabs.MISC);
-	    //For the lols
-	    Items.KNOWLEDGE_BOOK.setCreativeTab(CreativeTabs.MISC);*/
+        /*Blocks.COMMAND_BLOCK.setCreativeTab(CreativeTabs.REDSTONE);
+        Blocks.STRUCTURE_BLOCK.setCreativeTab(CreativeTabs.MISC);
+        Blocks.STRUCTURE_VOID.setCreativeTab(CreativeTabs.MISC);
+        Blocks.BARRIER.setCreativeTab(CreativeTabs.MISC);
+        Blocks.MOB_SPAWNER.setCreativeTab(CreativeTabs.MISC);
+        Blocks.DRAGON_EGG.setCreativeTab(CreativeTabs.MISC);
+        Items.COMMAND_BLOCK_MINECART.setCreativeTab(CreativeTabs.TRANSPORTATION);
+        Items.FIREWORKS.setCreativeTab(CreativeTabs.MISC);
+        //For the lols
+        Items.KNOWLEDGE_BOOK.setCreativeTab(CreativeTabs.MISC);*/
         proxy.preInit(e);
     }
 
@@ -56,14 +56,13 @@ public class TenshiLib {
     public void postInit(FMLPostInitializationEvent e) {
         proxy.postInit(e);
     }
-    
+
     @EventHandler
     public void serverStart(FMLServerStartingEvent event) {
-    	event.registerServerCommand(new CommandItemData());
-    	event.registerServerCommand(new CommandStructure());
-    	event.registerServerCommand(new CommandLocateStructure());
-    	if(!event.getServer().getWorld(0).getGameRules().hasRule("showBoundingBox"))
-    		event.getServer().getWorld(0).getGameRules().addGameRule("showBoundingBox", "false", ValueType.BOOLEAN_VALUE);
+        event.registerServerCommand(new CommandItemData());
+        event.registerServerCommand(new CommandStructure());
+        event.registerServerCommand(new CommandLocateStructure());
+        if(!event.getServer().getWorld(0).getGameRules().hasRule("showBoundingBox"))
+            event.getServer().getWorld(0).getGameRules().addGameRule("showBoundingBox", "false", ValueType.BOOLEAN_VALUE);
     }
 }
-    

@@ -25,43 +25,37 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
 
 @Cancelable
-public class AOEAttackEvent extends PlayerEvent{
+public class AOEAttackEvent extends PlayerEvent {
 
-	private List<EntityLivingBase> list;
+    private List<EntityLivingBase> list;
 
-	public AOEAttackEvent(EntityPlayer player, List<EntityLivingBase> attackList)
-	{
-		super(player);
-		this.list=attackList;
-	}
-	
-	public List<EntityLivingBase> attackList()
-	{
-		return this.list;
-	}
-	
-	/**
-	 * Exact same like in {@link EntityPlayer#attackTargetEntityWithCurrentItem(Entity)} but with the option of disabling the cooldown and no sweep attack
-	 * @param player
-	 * @param targetEntity
-	 * @param resetCooldown
-	 */
-	public static void attackTargetEntityWithCurrentItem(EntityPlayer player, Entity targetEntity, boolean resetCooldown)
-    {
-        if (!net.minecraftforge.common.ForgeHooks.onPlayerAttackTarget(player, targetEntity)) return;
-        if (targetEntity.canBeAttackedWithItem())
-        {
-            if (!targetEntity.hitByEntity(player))
-            {
-                float f = (float)player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
+    public AOEAttackEvent(EntityPlayer player, List<EntityLivingBase> attackList) {
+        super(player);
+        this.list = attackList;
+    }
+
+    public List<EntityLivingBase> attackList() {
+        return this.list;
+    }
+
+    /**
+     * Exact same like in {@link EntityPlayer#attackTargetEntityWithCurrentItem(Entity)} but with the option of disabling the cooldown and no sweep attack
+     * @param player
+     * @param targetEntity
+     * @param resetCooldown
+     */
+    public static void attackTargetEntityWithCurrentItem(EntityPlayer player, Entity targetEntity, boolean resetCooldown) {
+        if(!net.minecraftforge.common.ForgeHooks.onPlayerAttackTarget(player, targetEntity))
+            return;
+        if(targetEntity.canBeAttackedWithItem()){
+            if(!targetEntity.hitByEntity(player)){
+                float f = (float) player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
                 float f1;
 
-                if (targetEntity instanceof EntityLivingBase)
-                {
-                    f1 = EnchantmentHelper.getModifierForCreature(player.getHeldItemMainhand(), ((EntityLivingBase)targetEntity).getCreatureAttribute());
-                }
-                else
-                {
+                if(targetEntity instanceof EntityLivingBase){
+                    f1 = EnchantmentHelper.getModifierForCreature(player.getHeldItemMainhand(),
+                            ((EntityLivingBase) targetEntity).getCreatureAttribute());
+                }else{
                     f1 = EnchantmentHelper.getModifierForCreature(player.getHeldItemMainhand(), EnumCreatureAttribute.UNDEFINED);
                 }
 
@@ -69,27 +63,27 @@ public class AOEAttackEvent extends PlayerEvent{
                 f = f * (0.2F + f2 * f2 * 0.8F);
                 f1 = f1 * f2;
                 if(resetCooldown)
-                	player.resetCooldown();
+                    player.resetCooldown();
 
-                if (f > 0.0F || f1 > 0.0F)
-                {
+                if(f > 0.0F || f1 > 0.0F){
                     boolean flag = f2 > 0.9F;
                     int i = 0;
                     i = i + EnchantmentHelper.getKnockbackModifier(player);
 
-                    if (player.isSprinting() && flag)
-                    {
-                        player.world.playSound((EntityPlayer)null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK, player.getSoundCategory(), 1.0F, 1.0F);
+                    if(player.isSprinting() && flag){
+                        player.world.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK,
+                                player.getSoundCategory(), 1.0F, 1.0F);
                         ++i;
                     }
 
-                    boolean flag2 = flag && player.fallDistance > 0.0F && !player.onGround && !player.isOnLadder() && !player.isInWater() && !player.isPotionActive(MobEffects.BLINDNESS) && !player.isRiding() && targetEntity instanceof EntityLivingBase;
+                    boolean flag2 = flag && player.fallDistance > 0.0F && !player.onGround && !player.isOnLadder() && !player.isInWater()
+                            && !player.isPotionActive(MobEffects.BLINDNESS) && !player.isRiding() && targetEntity instanceof EntityLivingBase;
                     flag2 = flag2 && !player.isSprinting();
 
-                    net.minecraftforge.event.entity.player.CriticalHitEvent hitResult = net.minecraftforge.common.ForgeHooks.getCriticalHit(player, targetEntity, flag2, flag2 ? 1.5F : 1.0F);
+                    net.minecraftforge.event.entity.player.CriticalHitEvent hitResult = net.minecraftforge.common.ForgeHooks.getCriticalHit(player,
+                            targetEntity, flag2, flag2 ? 1.5F : 1.0F);
                     flag2 = hitResult != null;
-                    if (flag2)
-                    {
+                    if(flag2){
                         f *= hitResult.getDamageModifier();
                     }
 
@@ -99,12 +93,10 @@ public class AOEAttackEvent extends PlayerEvent{
                     boolean flag4 = false;
                     int j = EnchantmentHelper.getFireAspectModifier(player);
 
-                    if (targetEntity instanceof EntityLivingBase)
-                    {
-                        f4 = ((EntityLivingBase)targetEntity).getHealth();
+                    if(targetEntity instanceof EntityLivingBase){
+                        f4 = ((EntityLivingBase) targetEntity).getHealth();
 
-                        if (j > 0 && !targetEntity.isBurning())
-                        {
+                        if(j > 0 && !targetEntity.isBurning()){
                             flag4 = true;
                             targetEntity.setFire(1);
                         }
@@ -115,17 +107,15 @@ public class AOEAttackEvent extends PlayerEvent{
                     double d3 = targetEntity.motionZ;
                     boolean flag5 = targetEntity.attackEntityFrom(DamageSource.causePlayerDamage(player), f);
 
-                    if (flag5)
-                    {
-                        if (i > 0)
-                        {
-                            if (targetEntity instanceof EntityLivingBase)
-                            {
-                                ((EntityLivingBase)targetEntity).knockBack(player, (float)i * 0.5F, (double)MathHelper.sin(player.rotationYaw * 0.017453292F), (double)(-MathHelper.cos(player.rotationYaw * 0.017453292F)));
-                            }
-                            else
-                            {
-                                targetEntity.addVelocity((double)(-MathHelper.sin(player.rotationYaw * 0.017453292F) * (float)i * 0.5F), 0.1D, (double)(MathHelper.cos(player.rotationYaw * 0.017453292F) * (float)i * 0.5F));
+                    if(flag5){
+                        if(i > 0){
+                            if(targetEntity instanceof EntityLivingBase){
+                                ((EntityLivingBase) targetEntity).knockBack(player, (float) i * 0.5F,
+                                        (double) MathHelper.sin(player.rotationYaw * 0.017453292F),
+                                        (double) (-MathHelper.cos(player.rotationYaw * 0.017453292F)));
+                            }else{
+                                targetEntity.addVelocity((double) (-MathHelper.sin(player.rotationYaw * 0.017453292F) * (float) i * 0.5F), 0.1D,
+                                        (double) (MathHelper.cos(player.rotationYaw * 0.017453292F) * (float) i * 0.5F));
                             }
 
                             player.motionX *= 0.6D;
@@ -133,96 +123,83 @@ public class AOEAttackEvent extends PlayerEvent{
                             player.setSprinting(false);
                         }
 
-                        if (targetEntity instanceof EntityPlayerMP && targetEntity.velocityChanged)
-                        {
-                            ((EntityPlayerMP)targetEntity).connection.sendPacket(new SPacketEntityVelocity(targetEntity));
+                        if(targetEntity instanceof EntityPlayerMP && targetEntity.velocityChanged){
+                            ((EntityPlayerMP) targetEntity).connection.sendPacket(new SPacketEntityVelocity(targetEntity));
                             targetEntity.velocityChanged = false;
                             targetEntity.motionX = d1;
                             targetEntity.motionY = d2;
                             targetEntity.motionZ = d3;
                         }
 
-                        if (flag2)
-                        {
-                            player.world.playSound((EntityPlayer)null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, player.getSoundCategory(), 1.0F, 1.0F);
+                        if(flag2){
+                            player.world.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_CRIT,
+                                    player.getSoundCategory(), 1.0F, 1.0F);
                             player.onCriticalHit(targetEntity);
                         }
 
-                        if (!flag2)
-                        {
-                            if (flag)
-                            {
-                                player.world.playSound((EntityPlayer)null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, player.getSoundCategory(), 1.0F, 1.0F);
-                            }
-                            else
-                            {
-                                player.world.playSound((EntityPlayer)null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_WEAK, player.getSoundCategory(), 1.0F, 1.0F);
+                        if(!flag2){
+                            if(flag){
+                                player.world.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ,
+                                        SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, player.getSoundCategory(), 1.0F, 1.0F);
+                            }else{
+                                player.world.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ,
+                                        SoundEvents.ENTITY_PLAYER_ATTACK_WEAK, player.getSoundCategory(), 1.0F, 1.0F);
                             }
                         }
 
-                        if (f1 > 0.0F)
-                        {
+                        if(f1 > 0.0F){
                             player.onEnchantmentCritical(targetEntity);
                         }
 
                         player.setLastAttackedEntity(targetEntity);
 
-                        if (targetEntity instanceof EntityLivingBase)
-                        {
-                            EnchantmentHelper.applyThornEnchantments((EntityLivingBase)targetEntity, player);
+                        if(targetEntity instanceof EntityLivingBase){
+                            EnchantmentHelper.applyThornEnchantments((EntityLivingBase) targetEntity, player);
                         }
 
                         EnchantmentHelper.applyArthropodEnchantments(player, targetEntity);
                         ItemStack itemstack1 = player.getHeldItemMainhand();
                         Entity entity = targetEntity;
 
-                        if (targetEntity instanceof MultiPartEntityPart)
-                        {
-                            IEntityMultiPart ientitymultipart = ((MultiPartEntityPart)targetEntity).parent;
+                        if(targetEntity instanceof MultiPartEntityPart){
+                            IEntityMultiPart ientitymultipart = ((MultiPartEntityPart) targetEntity).parent;
 
-                            if (ientitymultipart instanceof EntityLivingBase)
-                            {
-                                entity = (EntityLivingBase)ientitymultipart;
+                            if(ientitymultipart instanceof EntityLivingBase){
+                                entity = (EntityLivingBase) ientitymultipart;
                             }
                         }
 
-                        if (!itemstack1.isEmpty() && entity instanceof EntityLivingBase)
-                        {
+                        if(!itemstack1.isEmpty() && entity instanceof EntityLivingBase){
                             ItemStack beforeHitCopy = itemstack1.copy();
-                            itemstack1.hitEntity((EntityLivingBase)entity, player);
+                            itemstack1.hitEntity((EntityLivingBase) entity, player);
 
-                            if (itemstack1.isEmpty())
-                            {
+                            if(itemstack1.isEmpty()){
                                 net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem(player, beforeHitCopy, EnumHand.MAIN_HAND);
                                 player.setHeldItem(EnumHand.MAIN_HAND, ItemStack.EMPTY);
                             }
                         }
 
-                        if (targetEntity instanceof EntityLivingBase)
-                        {
-                            float f5 = f4 - ((EntityLivingBase)targetEntity).getHealth();
+                        if(targetEntity instanceof EntityLivingBase){
+                            float f5 = f4 - ((EntityLivingBase) targetEntity).getHealth();
                             player.addStat(StatList.DAMAGE_DEALT, Math.round(f5 * 10.0F));
 
-                            if (j > 0)
-                            {
+                            if(j > 0){
                                 targetEntity.setFire(j * 4);
                             }
 
-                            if (player.world instanceof WorldServer && f5 > 2.0F)
-                            {
-                                int k = (int)((double)f5 * 0.5D);
-                                ((WorldServer)player.world).spawnParticle(EnumParticleTypes.DAMAGE_INDICATOR, targetEntity.posX, targetEntity.posY + (double)(targetEntity.height * 0.5F), targetEntity.posZ, k, 0.1D, 0.0D, 0.1D, 0.2D);
+                            if(player.world instanceof WorldServer && f5 > 2.0F){
+                                int k = (int) ((double) f5 * 0.5D);
+                                ((WorldServer) player.world).spawnParticle(EnumParticleTypes.DAMAGE_INDICATOR, targetEntity.posX,
+                                        targetEntity.posY + (double) (targetEntity.height * 0.5F), targetEntity.posZ, k, 0.1D, 0.0D, 0.1D, 0.2D);
                             }
                         }
 
                         player.addExhaustion(0.1F);
-                    }
-                    else
-                    {
-                        player.world.playSound((EntityPlayer)null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_NODAMAGE, player.getSoundCategory(), 1.0F, 1.0F);
+                    }else{
+                        player.world.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_NODAMAGE,
+                                player.getSoundCategory(), 1.0F, 1.0F);
 
-                        if (flag4)
-                        {
+                        if(flag4){
                             targetEntity.extinguish();
                         }
                     }
@@ -230,6 +207,5 @@ public class AOEAttackEvent extends PlayerEvent{
             }
         }
     }
-
 
 }

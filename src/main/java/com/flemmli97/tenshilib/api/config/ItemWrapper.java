@@ -20,106 +20,97 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
-public class ItemWrapper implements IItemConfig<ItemWrapper>{
-	
-	protected Item item = Items.AIR;
-	
-	public ItemWrapper(Item defaultItem)
-	{
-		this.item=defaultItem;
-	}
-	
-	public ItemWrapper(String s)
-	{
-		this.readFromString(s);
-	}
+public class ItemWrapper implements IItemConfig<ItemWrapper> {
 
-	@Override
-	public Item getItem()
-	{
-		return this.item;
-	}
-	
-	@Override
-	public ItemStack getStack()
-	{
-		return this.item==null ? ItemStack.EMPTY : new ItemStack(this.item);
-	}
-	
+    protected Item item = Items.AIR;
 
-	@Override
-	public NonNullList<ItemStack> getStackList() {
-		return null;
-	}
+    public ItemWrapper(Item defaultItem) {
+        this.item = defaultItem;
+    }
 
-	@Override
-	public boolean hasList() {
-		return false;
-	}
+    public ItemWrapper(String s) {
+        this.readFromString(s);
+    }
 
-	@Override
-	public ItemWrapper readFromString(String s) {
-		if(s.isEmpty())
-		{
-			this.item=null;
-			return this;
-		}
-		Item item=ForgeRegistries.ITEMS.getValue(new ResourceLocation(s));
-		if(item==null)
-			TenshiLib.logger.error("Faulty item registry name {}", s);
-		else
-			this.item=item;
-		return this;
-	}
+    @Override
+    public Item getItem() {
+        return this.item;
+    }
 
-	@Override
-	public String writeToString() {
-		return this.item.getRegistryName().toString();
-	}
+    @Override
+    public ItemStack getStack() {
+        return this.item == null ? ItemStack.EMPTY : new ItemStack(this.item);
+    }
 
-	@Override
-	public String usage() {
-		return "Valid values are all item registry names. Empty for nothing";
-	}
-	
-	@Override
+    @Override
+    public NonNullList<ItemStack> getStackList() {
+        return null;
+    }
+
+    @Override
+    public boolean hasList() {
+        return false;
+    }
+
+    @Override
+    public ItemWrapper readFromString(String s) {
+        if(s.isEmpty()){
+            this.item = null;
+            return this;
+        }
+        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(s));
+        if(item == null)
+            TenshiLib.logger.error("Faulty item registry name {}", s);
+        else
+            this.item = item;
+        return this;
+    }
+
+    @Override
+    public String writeToString() {
+        return this.item.getRegistryName().toString();
+    }
+
+    @Override
+    public String usage() {
+        return "Valid values are all item registry names. Empty for nothing";
+    }
+
+    @Override
     public boolean equals(Object obj) {
-        if (this == obj) 
-        {
+        if(this == obj){
             return true;
         }
-        if (obj instanceof ItemWrapper) 
-        {
-        	ItemWrapper prop = (ItemWrapper)obj;
+        if(obj instanceof ItemWrapper){
+            ItemWrapper prop = (ItemWrapper) obj;
             return prop.writeToString().equals(this.writeToString());
         }
         return false;
     }
-    
+
     @Override
     public int hashCode() {
         return this.writeToString().hashCode();
     }
-    
+
     @Override
     public String toString() {
         return this.writeToString();
     }
-    	
-	public static class Serializer implements JsonDeserializer<ItemWrapper>, JsonSerializer<ItemWrapper>
-	{
 
-		@Override
-		public JsonElement serialize(ItemWrapper src, Type typeOfSrc, JsonSerializationContext context) {
-			JsonObject obj = new JsonObject();
-			obj.add("item", new JsonPrimitive(src.item.getRegistryName().toString()));
-			return obj;		
-		}
+    public static class Serializer implements JsonDeserializer<ItemWrapper>, JsonSerializer<ItemWrapper> {
 
-		@Override
-		public ItemWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-				throws JsonParseException {
-			return new ItemWrapper(ForgeRegistries.ITEMS.getValue(new ResourceLocation(JsonUtils.getJsonObject(json, "item").get("item").getAsString())));
-		}	
-	}
+        @Override
+        public JsonElement serialize(ItemWrapper src, Type typeOfSrc, JsonSerializationContext context) {
+            JsonObject obj = new JsonObject();
+            obj.add("item", new JsonPrimitive(src.item.getRegistryName().toString()));
+            return obj;
+        }
+
+        @Override
+        public ItemWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            return new ItemWrapper(
+                    ForgeRegistries.ITEMS.getValue(new ResourceLocation(JsonUtils.getJsonObject(json, "item").get("item").getAsString())));
+        }
+    }
 }

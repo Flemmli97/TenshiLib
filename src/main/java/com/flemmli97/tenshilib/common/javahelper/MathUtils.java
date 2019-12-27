@@ -9,85 +9,75 @@ import net.minecraft.util.math.Vec3d;
 
 public class MathUtils {
 
-	public static float degToRad(float degree)
-	{
-		return degree* ((float)Math.PI/180F);
-	}
-	
-	public static float radToDeg(float rad)
-	{
-		return rad* (180/(float)Math.PI);
-	}
-	
-	/**
-	 * Gets closest point on circle circumfence from point
-	 */
-	public static double[] closestOnCircle(double centerX, double centerY, double pointX, double pointY, double radius){
-	    double x = pointX-centerX;
-	    double y = pointY-centerY;
-        float d0 = MathHelper.sqrt(x * x + y * y);
-	    return new double[] {x/d0*radius+centerX,y/d0*radius+centerY};
-	}
-	
-	public static double phiFromPoint(double centerX, double centerY, double pointX, double pointY) {
-	    return Math.atan2(pointY-centerY, pointX-centerX);
-	}
-	/**
-	 * 
-	 * @param radius
-	 * @param density every x degree there will be a point (if possible)
-	 * @return a list of x y array pair
-	 */
-	public static List<float[]> pointsOfCircle(float radius, int density)
-	{
-		float rad = degToRad(density);
-		float i = -rad;
-		List<float[]> list = Lists.newArrayList();
-		while(i < 2*Math.PI)
-		{
-			i+=rad;
-			list.add(new float[] {radius*MathHelper.cos(i), radius*MathHelper.sin(i)});
-		}
-		return list;
-	}
-	
-	/**
-	 * Rotates a vector around a rotation axis with the given angle
-	 * @param rotAxis Rotation axis vector. needs to be normalized.
-	 * @param vec The vector to rotate
-	 * @param angle Angle in radians
-	 * @return The rotated vector
-	 */
-	public static Vec3d rotate(Vec3d rotAxis, Vec3d vec, float angle) {
-        double x = rotAxis.x*(rotAxis.x*vec.x+rotAxis.y*vec.y+rotAxis.z*vec.z)*(1-MathHelper.cos(angle))
-            +vec.x*MathHelper.cos(angle)
-            +(-rotAxis.z*vec.y+rotAxis.y*vec.z)*MathHelper.sin(angle);
-        
-        double y = rotAxis.y*(rotAxis.x*vec.x+rotAxis.y*vec.y+rotAxis.z*vec.z)*(1-MathHelper.cos(angle))
-            +vec.y*MathHelper.cos(angle)
-            +(rotAxis.z*vec.x-rotAxis.x*vec.z)*MathHelper.sin(angle);
-        
-        double z = rotAxis.z*(rotAxis.x*vec.x+rotAxis.y*vec.y+rotAxis.z*vec.z)*(1-MathHelper.cos(angle))
-            +vec.z*MathHelper.cos(angle)
-            +(-rotAxis.y*vec.x+rotAxis.x*vec.y)*MathHelper.sin(angle);
-        return new Vec3d(x,y,z);
+    public static float degToRad(float degree) {
+        return degree * ((float) Math.PI / 180F);
     }
-	
-	public static Vec3d closestPointToLine(Vec3d point, Vec3d l1, Vec3d dir)
-	{
-		return new Vec3d(MathHelper.clamp(point.x, l1.x, dir.x), 
-				MathHelper.clamp(point.y, l1.y, dir.y),
-				MathHelper.clamp(point.z, l1.z, dir.z));
-	}
-	
-	public static Vec3d farestPointToLine(Vec3d point, Vec3d l1, Vec3d dir)
-	{
-		 return new Vec3d(Math.abs(l1.x-point.x)>Math.abs(dir.x-point.x)? l1.x : dir.x,
-				 Math.abs(l1.y-point.y)>Math.abs(dir.y-point.y)?l1.y:dir.y, 
-				 Math.abs(l1.z-point.z)>Math.abs(dir.z-point.z)?l1.z:dir.z);
-	}
-	
+
+    public static float radToDeg(float rad) {
+        return rad * (180 / (float) Math.PI);
+    }
+
+    /**
+     * Gets closest point on circle circumfence from point
+     */
+    public static double[] closestOnCircle(double centerX, double centerY, double pointX, double pointY, double radius) {
+        double x = pointX - centerX;
+        double y = pointY - centerY;
+        float d0 = MathHelper.sqrt(x * x + y * y);
+        return new double[] {x / d0 * radius + centerX, y / d0 * radius + centerY};
+    }
+
+    public static double phiFromPoint(double centerX, double centerY, double pointX, double pointY) {
+        return Math.atan2(pointY - centerY, pointX - centerX);
+    }
+
+    /**
+     * 
+     * @param radius
+     * @param density every x degree there will be a point (if possible)
+     * @return a list of x y array pair
+     */
+    public static List<float[]> pointsOfCircle(float radius, int density) {
+        float rad = degToRad(density);
+        float i = -rad;
+        List<float[]> list = Lists.newArrayList();
+        while(i < 2 * Math.PI){
+            i += rad;
+            list.add(new float[] {radius * MathHelper.cos(i), radius * MathHelper.sin(i)});
+        }
+        return list;
+    }
+
+    /**
+     * Rotates a vector around a rotation axis with the given angle
+     * @param rotAxis Rotation axis vector. needs to be normalized.
+     * @param vec The vector to rotate
+     * @param angle Angle in radians
+     * @return The rotated vector
+     */
+    public static Vec3d rotate(Vec3d rotAxis, Vec3d vec, float angle) {
+        double x = rotAxis.x * (rotAxis.x * vec.x + rotAxis.y * vec.y + rotAxis.z * vec.z) * (1 - MathHelper.cos(angle))
+                + vec.x * MathHelper.cos(angle) + (-rotAxis.z * vec.y + rotAxis.y * vec.z) * MathHelper.sin(angle);
+
+        double y = rotAxis.y * (rotAxis.x * vec.x + rotAxis.y * vec.y + rotAxis.z * vec.z) * (1 - MathHelper.cos(angle))
+                + vec.y * MathHelper.cos(angle) + (rotAxis.z * vec.x - rotAxis.x * vec.z) * MathHelper.sin(angle);
+
+        double z = rotAxis.z * (rotAxis.x * vec.x + rotAxis.y * vec.y + rotAxis.z * vec.z) * (1 - MathHelper.cos(angle))
+                + vec.z * MathHelper.cos(angle) + (-rotAxis.y * vec.x + rotAxis.x * vec.y) * MathHelper.sin(angle);
+        return new Vec3d(x, y, z);
+    }
+
+    public static Vec3d closestPointToLine(Vec3d point, Vec3d l1, Vec3d dir) {
+        return new Vec3d(MathHelper.clamp(point.x, l1.x, dir.x), MathHelper.clamp(point.y, l1.y, dir.y), MathHelper.clamp(point.z, l1.z, dir.z));
+    }
+
+    public static Vec3d farestPointToLine(Vec3d point, Vec3d l1, Vec3d dir) {
+        return new Vec3d(Math.abs(l1.x - point.x) > Math.abs(dir.x - point.x) ? l1.x : dir.x,
+                Math.abs(l1.y - point.y) > Math.abs(dir.y - point.y) ? l1.y : dir.y,
+                Math.abs(l1.z - point.z) > Math.abs(dir.z - point.z) ? l1.z : dir.z);
+    }
+
     public static double roundTo(double val, double step) {
-        return Math.round(val / (float)step) * step;
+        return Math.round(val / (float) step) * step;
     }
 }
