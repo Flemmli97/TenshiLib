@@ -50,7 +50,7 @@ public class CommandItemData implements ICommand {
 		if(args.length < 1){
 			throw new WrongUsageException(this.getUsage(sender), new Object[0]);
 		}
-		if(args[0].equals("modify")) {
+		if(args[0].equals("modify")){
 			if(!sender.canUseCommand(2, this.getName()))
 				throw new CommandException("commands.generic.permission");
 			if(args.length < 2)
@@ -59,37 +59,33 @@ public class CommandItemData implements ICommand {
 		if(sender.getCommandSenderEntity() instanceof EntityPlayer){
 			EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
 			int slot = -1;
-			if(args.length > 1) {
+			if(args.length > 1){
 				try{
 					slot = Integer.parseInt(args[1]);
-				}
-				catch(NumberFormatException e) {
-					
+				}catch(NumberFormatException e){
 				}
 			}
-			ItemStack stack = slot!=-1 ? player.inventory.getStackInSlot(MathHelper.clamp(slot - 1, 0, 9)) : player.getHeldItemMainhand();
+			ItemStack stack = slot != -1 ? player.inventory.getStackInSlot(MathHelper.clamp(slot - 1, 0, 9)) : player.getHeldItemMainhand();
 			if(stack.isEmpty()){
 				return;
 			}
 			NBTTagCompound stackCompound = stack.hasTagCompound() ? stack.getTagCompound() : new NBTTagCompound();
 			if(args[0].equals("view")){
-				if(slot!=-1 && args.length>2 || slot==-1 && args.length>1) {
-					String s = slot!=-1?args[2]:args[1];
-					System.out.println(s);
+				if(slot != -1 && args.length > 2 || slot == -1 && args.length > 1){
+					String s = slot != -1 ? args[2] : args[1];
 					NBTBase nbt = stackCompound.getTag(s);
-					if(nbt!=null)
+					if(nbt != null)
 						player.sendMessage(new TextComponentString(TextFormatting.GOLD + nbt.toString()));
 					else
 						throw new CommandException("command.itemdata.noSuchTag", new Object[] {s});
-				}
-				else
+				}else
 					player.sendMessage(new TextComponentString(TextFormatting.GOLD + stackCompound.toString()));
 			}
 			if(args[0].equals("modify")){
 				if(sender.canUseCommand(2, this.getName())){
 					NBTTagCompound fromCommand;
 					try{
-						fromCommand = JsonToNBT.getTagFromJson(CommandBase.buildString(args, slot!=-1 ? 2 : 1));
+						fromCommand = JsonToNBT.getTagFromJson(CommandBase.buildString(args, slot != -1 ? 2 : 1));
 					}catch(NBTException nbtexception){
 						throw new CommandException("command.itemdata.tagError", new Object[] {nbtexception.getMessage()});
 					}

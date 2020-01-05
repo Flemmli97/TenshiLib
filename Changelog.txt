@@ -3,6 +3,7 @@ TenshiLib 1.2.3
 - Changed texture rendering animation to use a n*m sheet instead of just one colum
 - Fix for ExtendedItemStackWrapper and ArrayUtils
 - Some more methods
+- Fixed and improved itemdata command and changed it to /tenshilib:itemdata
 
 TenshiLib 1.2.2
 ================
