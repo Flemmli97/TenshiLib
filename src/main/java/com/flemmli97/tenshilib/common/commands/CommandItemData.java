@@ -13,6 +13,7 @@ import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
@@ -23,77 +24,107 @@ import net.minecraft.util.text.TextFormatting;
 
 public class CommandItemData implements ICommand {
 
-    private final List<String> aliases = new ArrayList<String>();
+	private final List<String> aliases = new ArrayList<String>();
 
-    public CommandItemData() {
-        this.aliases.add("itemData");
-    }
+	public CommandItemData() {
+		this.aliases.add("tenshilib:itemdata");
+	}
 
-    @Override
-    public String getName() {
-        return "itemData";
-    }
+	@Override
+	public String getName() {
+		return "tenshilib:itemdata";
+	}
 
-    @Override
-    public String getUsage(ICommandSender sender) {
-        return "commands.itemdata.usage";
-    }
+	@Override
+	public String getUsage(ICommandSender sender) {
+		return "command.itemdata.usage";
+	}
 
-    @Override
-    public List<String> getAliases() {
-        return this.aliases;
-    }
+	@Override
+	public List<String> getAliases() {
+		return this.aliases;
+	}
 
-    @Override
-    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-        if(args.length < 1 || (args[0].equals("modify") && args.length < 2)){
-            throw new WrongUsageException(this.getUsage(sender), new Object[0]);
-        }
-        if(sender.getCommandSenderEntity() instanceof EntityPlayer){
-            EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
-            ItemStack stack = args.length > 1 ? player.inventory.getStackInSlot(MathHelper.clamp(Integer.parseInt(args[1]) - 1, 0, 9))
-                    : player.getHeldItemMainhand();
-            if(stack.isEmpty()){
-                return;
-            }
-            NBTTagCompound stackCompound = stack.hasTagCompound() ? stack.getTagCompound() : new NBTTagCompound();
+	@Override
+	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+		if(args.length < 1){
+			throw new WrongUsageException(this.getUsage(sender), new Object[0]);
+		}
+		if(args[0].equals("modify")) {
+			if(!sender.canUseCommand(2, this.getName()))
+				throw new CommandException("commands.generic.permission");
+			if(args.length < 2)
+				throw new WrongUsageException(this.getUsage(sender), new Object[0]);
+		}
+		if(sender.getCommandSenderEntity() instanceof EntityPlayer){
+			EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
+			int slot = -1;
+			if(args.length > 1) {
+				try{
+					slot = Integer.parseInt(args[1]);
+				}
+				catch(NumberFormatException e) {
+					
+				}
+			}
+			ItemStack stack = slot!=-1 ? player.inventory.getStackInSlot(MathHelper.clamp(slot - 1, 0, 9)) : player.getHeldItemMainhand();
+			if(stack.isEmpty()){
+				return;
+			}
+			NBTTagCompound stackCompound = stack.hasTagCompound() ? stack.getTagCompound() : new NBTTagCompound();
+			if(args[0].equals("view")){
+				if(slot!=-1 && args.length>2 || slot==-1 && args.length>1) {
+					String s = slot!=-1?args[2]:args[1];
+					System.out.println(s);
+					NBTBase nbt = stackCompound.getTag(s);
+					if(nbt!=null)
+						player.sendMessage(new TextComponentString(TextFormatting.GOLD + nbt.toString()));
+					else
+						throw new CommandException("command.itemdata.noSuchTag", new Object[] {s});
+				}
+				else
+					player.sendMessage(new TextComponentString(TextFormatting.GOLD + stackCompound.toString()));
+			}
+			if(args[0].equals("modify")){
+				if(sender.canUseCommand(2, this.getName())){
+					NBTTagCompound fromCommand;
+					try{
+						fromCommand = JsonToNBT.getTagFromJson(CommandBase.buildString(args, slot!=-1 ? 2 : 1));
+					}catch(NBTException nbtexception){
+						throw new CommandException("command.itemdata.tagError", new Object[] {nbtexception.getMessage()});
+					}
+					stackCompound.merge(fromCommand);
+					stack.setTagCompound(stackCompound);
+					CommandBase.notifyCommandListener(sender, this, "command.itemdata.success", new Object[] {stackCompound.toString()});
+				}else{
+					throw new CommandException("commands.generic.permission");
+				}
+			}
+		}
+	}
 
-            if(args[0].equals("view")){
-                player.sendMessage(new TextComponentString(TextFormatting.GOLD + stackCompound.toString()));
-            }
-            if(args[0].equals("modify")){
-                NBTTagCompound fromCommand;
-                try{
-                    fromCommand = JsonToNBT.getTagFromJson(CommandBase.buildString(args, args.length > 1 ? 2 : 1));
-                }catch(NBTException nbtexception){
-                    throw new CommandException("commands.itemdata.tagError", new Object[] {nbtexception.getMessage()});
-                }
-                stackCompound.merge(fromCommand);
-                stack.setTagCompound(stackCompound);
-                CommandBase.notifyCommandListener(sender, this, "commands.itemdata.success", new Object[] {stackCompound.toString()});
-            }
-        }
-    }
+	@Override
+	public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
+		return true;
+	}
 
-    @Override
-    public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-        return sender.canUseCommand(2, this.getName());
-    }
+	@Override
+	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos targetPos) {
+		if(args.length == 1)
+			if(sender.canUseCommand(2, this.getName()))
+				return Lists.newArrayList("view", "modify");
+			else
+				return Lists.newArrayList("view");
+		return Lists.newArrayList();
+	}
 
-    @Override
-    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos targetPos) {
-        if(args.length == 1)
-            return Lists.newArrayList("view", "modify");
-        return Lists.newArrayList();
-    }
+	@Override
+	public boolean isUsernameIndex(String[] args, int index) {
+		return false;
+	}
 
-    @Override
-    public boolean isUsernameIndex(String[] args, int index) {
-        return false;
-    }
-
-    @Override
-    public int compareTo(ICommand o) {
-        return 0;
-    }
+	@Override
+	public int compareTo(ICommand o) {
+		return 0;
+	}
 }

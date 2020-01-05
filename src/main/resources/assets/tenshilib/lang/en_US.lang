@@ -1,6 +1,7 @@
-command.itemdata.error=Error parsing data: %s
+command.itemdata.tagError=Error parsing data: %s
 command.itemdata.success=ItemStack tags updated to: %s
-command.itemdata.usage=/itemData [view;modify] <NBT,Optional:HotBarSlot>
+command.itemdata.usage=/tenshilib:itemdata view <Optional:Slot> <Optional:NBT-Path> | modify <Optional:Slot> <NBT>
+command.itemdata.noSuchTag=No NBT-Tag named %s
 command.structures.usage=/structures <structureID>
 command.schematic.usage=/template <save,load> x y z [x2 y2 z2 name;name rotation mirror]
 command.schematic.confirm=File already exist. Type again to confirm.
