@@ -20,11 +20,11 @@ public class ArrayUtils {
             return "";
         if(parser == null)
             parser = (StringParser<T>) StringParser.objToString;
-        String s = "" + t[0] == null ? "" : parser.getString(t[0]);
+        String s = "" + (t[0] == null ? "" : parser.getString(t[0]));
         if(t.length == 1)
             return s;
         for(int i = 1; i < t.length; i++)
-            s += "," + t[i] == null ? "NULL" : parser.getString(t[i]);
+            s += "," + (t[i] == null ? "NULL" : parser.getString(t[i]));
         return s;
     }
 
