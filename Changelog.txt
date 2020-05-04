@@ -1,6 +1,7 @@
 TenshiLib 1.2.4
 ================
 - Fix crash with particles spawning
+- Support for BlockBench Animations
 
 TenshiLib 1.2.3
 ================

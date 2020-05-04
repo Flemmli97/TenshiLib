@@ -1,12 +1,5 @@
 package com.flemmli97.tenshilib.client.model;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Map;
-
 import com.flemmli97.tenshilib.TenshiLib;
 import com.flemmli97.tenshilib.common.javahelper.ArrayUtils;
 import com.flemmli97.tenshilib.common.javahelper.MathUtils;
@@ -15,17 +8,23 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.common.Loader;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Map;
+
 /**
  * Reads an extracted tabula animation json from file. Uses and identifierMap for matching the ModelRenderer with tabulas identifiers. The name needs to match the ModelRendere's field name
  */
-public class Animation {
+public class TabulaAnimation {
 
     private Map<ModelRenderer, ArrayList<AnimationComponent>> map = Maps.newHashMap();
     private static final Gson gson = new Gson();
@@ -33,34 +32,34 @@ public class Animation {
     private IResetModel model;
     private boolean doReset;
 
-    public Animation(ModelBase model, ResourceLocation res) {
+    public TabulaAnimation(ModelBase model, ResourceLocation res) {
         this(model, res, true);
     }
 
-    public Animation(ModelBase model, ResourceLocation res, boolean reset) {
+    public TabulaAnimation(ModelBase model, ResourceLocation res, boolean reset) {
         InputStream input = Loader.class.getResourceAsStream("/assets/" + res.getResourceDomain() + "/" + res.getResourcePath());
-        if(input == null){
+        if (input == null) {
             TenshiLib.logger.error("Couldn't find animation: " + res);
             return;
         }
-        try{
+        try {
             JsonObject obj = gson.getAdapter(JsonObject.class).read(gson.newJsonReader(new InputStreamReader(input)));
             JsonObject idMap = (JsonObject) obj.get("identifierMap");
             JsonObject animSets = (JsonObject) obj.get("sets");
-            for(Field field : model.getClass().getFields()){
-                if(ModelRenderer.class.isAssignableFrom(field.getType()) && idMap.has(field.getName())){
+            for (Field field : model.getClass().getFields()) {
+                if (ModelRenderer.class.isAssignableFrom(field.getType()) && idMap.has(field.getName())) {
                     String id = idMap.get(field.getName()).getAsString();
-                    if(animSets.has(id)){
+                    if (animSets.has(id)) {
                         JsonArray arr = animSets.getAsJsonArray(id);
                         arr.forEach(element -> {
-                            try{
+                            try {
                                 AnimationComponent comp = new AnimationComponent(model, (JsonObject) element);
                                 this.map.merge((ModelRenderer) field.get(model), Lists.newArrayList(comp), (old, val) -> {
                                     old.addAll(val);
                                     old.sort(null);
                                     return old;
                                 });
-                            }catch(Exception e){
+                            } catch (Exception e) {
                                 TenshiLib.logger.error("Error parsing animation component: {}", element);
                                 e.printStackTrace();
                             }
@@ -68,35 +67,35 @@ public class Animation {
                     }
                 }
             }
-        }catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
         this.doReset = reset;
-        if(model instanceof IResetModel)
+        if (model instanceof IResetModel)
             this.model = (IResetModel) model;
     }
 
     //ticker ticks up
     public void animate(int ticker, float partialTicks) {
         int tick = ticker % this.getLength();
-        if(this.model != null && this.doReset)
+        if (this.model != null && this.doReset)
             this.model.resetModel();
-        this.map.entrySet().forEach(entry -> {
-            entry.getValue().forEach(comp -> {
-                comp.animate(entry.getKey(), tick, partialTicks);
-            });
-        });
+        this.map.forEach((k, v) ->
+                v.forEach(comp ->
+                        comp.animate(k, tick, partialTicks)
+                )
+        );
     }
 
     public int getLength() {
-        if(this.length == 0)
-            this.map.values().forEach(list -> {
-                list.forEach(comp -> {
-                    if(comp.startKey + comp.length > this.length){
-                        this.length = comp.startKey + comp.length;
-                    }
-                });
-            });
+        if (this.length == 0)
+            this.map.values().forEach(list ->
+                    list.forEach(comp -> {
+                        if (comp.startKey + comp.length > this.length) {
+                            this.length = comp.startKey + comp.length;
+                        }
+                    })
+            );
         return this.length;
     }
 
@@ -106,13 +105,13 @@ public class Animation {
             old.sort(null);
             return old;
         });
-        this.map.values().forEach(list -> {
-            list.forEach(comp -> {
-                if(comp.startKey + comp.length > this.length){
-                    this.length = comp.startKey + comp.length;
-                }
-            });
-        });
+        this.map.values().forEach(list ->
+                list.forEach(comp -> {
+                    if (comp.startKey + comp.length > this.length) {
+                        this.length = comp.startKey + comp.length;
+                    }
+                })
+        );
     }
 
     /**
@@ -145,26 +144,26 @@ public class Animation {
         public AnimationComponent(ModelBase model, JsonObject obj) {
             //convert to rad
             JsonArray posChangeJson = obj.getAsJsonArray("posChange");
-            for(int i = 0; i < 3; i++){
+            for (int i = 0; i < 3; i++) {
                 double change = posChangeJson.get(i).getAsDouble();
-                if(change != 0 && !(model instanceof IResetModel))
+                if (change != 0 && !(model instanceof IResetModel))
                     throw new IllegalArgumentException(
                             "Model needs to implement IResetModel. Else changes to rotation points will mess up the model during animation");
                 this.posChange[i] = change;
             }
             JsonArray rotChangeJson = obj.getAsJsonArray("rotChange");
-            for(int i = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++)
                 this.rotChange[i] = MathUtils.degToRad((float) rotChangeJson.get(i).getAsDouble());
             JsonArray posOffJson = obj.getAsJsonArray("posOffset");
-            for(int i = 0; i < 3; i++){
+            for (int i = 0; i < 3; i++) {
                 double off = posOffJson.get(i).getAsDouble();
-                if(off != 0 && !(model instanceof IResetModel))
+                if (off != 0 && !(model instanceof IResetModel))
                     throw new IllegalArgumentException(
                             "Model needs to implement IResetModel. Else changes to rotation points will mess up the model during animation");
                 this.posOffset[i] = off;
             }
             JsonArray rotOffJson = obj.getAsJsonArray("rotOffset");
-            for(int i = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++)
                 this.rotOffset[i] = MathUtils.degToRad((float) rotOffJson.get(i).getAsDouble());
             this.length = obj.get("length").getAsInt();
             this.startKey = obj.get("startKey").getAsInt();
@@ -174,7 +173,7 @@ public class Animation {
         public void animate(ModelRenderer model, int ticker, float partialTicks) {
             float actualTick = Math.max(ticker - 1 + partialTicks, 0);
             float prog = MathHelper.clamp((actualTick - startKey) / (float) length, 0F, 1F);
-            if(ticker >= this.startKey){
+            if (ticker >= this.startKey) {
                 model.rotationPointX += this.posOffset[0];
                 model.rotationPointY += this.posOffset[1];
                 model.rotationPointZ += this.posOffset[2];
