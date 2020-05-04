@@ -45,7 +45,6 @@ public class BlockBenchAnimations {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(this.animations);
     }
 
     public void doAnimation(String name, int ticker, float partialTicks) {
@@ -60,6 +59,11 @@ public class BlockBenchAnimations {
         return animation != null ? animation.length : 0;
     }
 
+    @Override
+    public String toString() {
+        return "Animation: " + this.animations;
+    }
+
     public static class Animation {
 
         public final int length;
@@ -67,7 +71,7 @@ public class BlockBenchAnimations {
         private List<AnimationComponent> components = Lists.newArrayList();
 
         public Animation(ModelBase model, JsonObject json) {
-            this.length = json.get("animation_length").getAsInt() * 20 + 1;
+            this.length = (int) Math.floor((json.get("animation_length").getAsDouble() * 20) + 1);
             this.loop = json.has("loop") ? json.get("loop").getAsBoolean() : false;
             JsonObject components = json.getAsJsonObject("bones");
             for (Field field : model.getClass().getFields()) {
