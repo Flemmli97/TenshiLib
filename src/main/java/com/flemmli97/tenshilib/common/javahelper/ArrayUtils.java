@@ -1,12 +1,11 @@
 package com.flemmli97.tenshilib.common.javahelper;
 
+import com.google.common.collect.Lists;
+
+import javax.annotation.Nullable;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
-
-import javax.annotation.Nullable;
-
-import com.google.common.collect.Lists;
 
 public class ArrayUtils {
 
@@ -20,45 +19,45 @@ public class ArrayUtils {
             return "";
         if(parser == null)
             parser = (StringParser<T>) StringParser.objToString;
-        String s = "" + (t[0] == null ? "" : parser.getString(t[0]));
+        StringBuilder s = new StringBuilder("" + (t[0] == null ? "" : parser.getString(t[0])));
         if(t.length == 1)
-            return s;
+            return s.toString();
         for(int i = 1; i < t.length; i++)
-            s += "," + (t[i] == null ? "NULL" : parser.getString(t[i]));
-        return s;
+            s.append(",").append(t[i] == null ? "NULL" : parser.getString(t[i]));
+        return s.toString();
     }
 
     public static <T> String arrayToString(int[] t) {
         if(t == null || t.length == 0)
             return "";
-        String s = "" + t[0];
+        StringBuilder s = new StringBuilder("" + t[0]);
         if(t.length == 1)
-            return s;
+            return s.toString();
         for(int i = 1; i < t.length; i++)
-            s += "," + t[i];
-        return s;
+            s.append(",").append(t[i]);
+        return s.toString();
     }
 
     public static <T> String arrayToString(float[] t) {
         if(t == null || t.length == 0)
             return "";
-        String s = "" + t[0];
+        StringBuilder s = new StringBuilder("" + t[0]);
         if(t.length == 1)
-            return s;
+            return s.toString();
         for(int i = 1; i < t.length; i++)
-            s += "," + t[i];
-        return s;
+            s.append(",").append(t[i]);
+        return s.toString();
     }
 
     public static <T> String arrayToString(double[] t) {
         if(t == null || t.length == 0)
             return "";
-        String s = "" + t[0];
+        StringBuilder s = new StringBuilder("" + t[0]);
         if(t.length == 1)
-            return s;
+            return s.toString();
         for(int i = 1; i < t.length; i++)
-            s += "," + t[i];
-        return s;
+            s.append(",").append(t[i]);
+        return s.toString();
     }
 
     public static <T> String[] arrayToStringArr(T[] ts) {

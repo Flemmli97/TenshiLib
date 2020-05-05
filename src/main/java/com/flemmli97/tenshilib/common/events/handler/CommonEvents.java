@@ -27,7 +27,7 @@ public class CommonEvents {
         if(!event.player.world.isRemote){
             boolean now = event.player.world.getGameRules().getBoolean("showBoundingBox");
             if(now)
-                StructureMap.get(event.player.world).current(event.player, prev != now);
+                StructureMap.get(event.player.world).current(event.player, this.prev != now);
             else
                 PacketHandler.sendTo(new PacketStructure(null), (EntityPlayerMP) event.player);
             this.prev = event.player.world.getGameRules().getBoolean("showBoundingBox");

@@ -1,12 +1,5 @@
 package com.flemmli97.tenshilib.common.world.structure;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
 import com.flemmli97.tenshilib.api.config.IConfigSerializable;
 import com.flemmli97.tenshilib.common.config.ConfigUtils;
 import com.flemmli97.tenshilib.common.events.StructureGenerateEvent;
@@ -14,7 +7,6 @@ import com.flemmli97.tenshilib.common.javahelper.ArrayUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureType;
@@ -30,6 +22,12 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 public class Structure implements IConfigSerializable<Structure> {
 
@@ -101,7 +99,7 @@ public class Structure implements IConfigSerializable<Structure> {
     }
 
     public Structure addMobSpawn(EnumCreatureType type, Set<Biome.SpawnListEntry> biome) {
-        spawns.merge(type, biome, (old, newSet) -> {
+        this.spawns.merge(type, biome, (old, newSet) -> {
             old.addAll(newSet);
             return old;
         });
@@ -193,8 +191,7 @@ public class Structure implements IConfigSerializable<Structure> {
         }
         this.biomesTypes = biomeTypes;
         for(Type biomeType : biomeTypes){
-            for(Biome biome : BiomeDictionary.getBiomes(biomeType))
-                this.biomes.add(biome);
+            this.biomes.addAll(BiomeDictionary.getBiomes(biomeType));
         }
         this.preventOtherSpawn = config.getBoolean("Prevent MobSpawn", configCategory, this.preventOtherSpawn,
                 "Prevent other mobspawn in this structure");

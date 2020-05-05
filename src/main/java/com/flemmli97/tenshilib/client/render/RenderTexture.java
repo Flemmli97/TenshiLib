@@ -66,6 +66,6 @@ public abstract class RenderTexture<T extends Entity> extends Render<T> {
 
     public double[] uvOffset(int timer) {
         int frame = timer % this.length;
-        return new double[] {(frame % columns) * this.uLength, (frame / columns) * this.vLength};
+        return new double[] {(frame % this.columns) * this.uLength, (frame / this.columns) * this.vLength};
     }
 }

@@ -140,7 +140,7 @@ public class TileStructurePiece extends TileEntity {
     //Manually run the block
     public void runBlock() {
         if(this.initStructure(new Random(), null) != null)
-            this.piece.generate(world);
+            this.piece.generate(this.world);
         this.world.notifyBlockUpdate(this.getPos(), this.world.getBlockState(this.getPos()), this.world.getBlockState(this.getPos()), 2);
     }
 
@@ -189,7 +189,7 @@ public class TileStructurePiece extends TileEntity {
 
     @Override
     public final SPacketUpdateTileEntity getUpdatePacket() {
-        return new SPacketUpdateTileEntity(pos, -1, this.getUpdateTag());
+        return new SPacketUpdateTileEntity(this.pos, -1, this.getUpdateTag());
     }
 
     @Override

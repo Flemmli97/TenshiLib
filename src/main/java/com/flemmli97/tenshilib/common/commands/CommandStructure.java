@@ -78,12 +78,12 @@ public class CommandStructure implements ICommand {
                     WorldServer worldserver = (WorldServer) world;
                     TemplateManager templatemanager = worldserver.getStructureTemplateManager();
                     Template template = templatemanager.getTemplate(world.getMinecraftServer(), new ResourceLocation(name));
-                    if((template.getSize().getX() != 0 || template.getSize().getY() != 0 || template.getSize().getZ() != 0) && !confirm){
-                        confirm = true;
+                    if((template.getSize().getX() != 0 || template.getSize().getY() != 0 || template.getSize().getZ() != 0) && !this.confirm){
+                        this.confirm = true;
                         CommandBase.notifyCommandListener(sender, this, "command.schematic.confirm", new Object[0]);
                         return;
                     }
-                    confirm = false;
+                    this.confirm = false;
                     template.takeBlocksFromWorld(world, blockpos, size, true, ModBlocks.ignore);
                     templatemanager.writeTemplate(world.getMinecraftServer(), new ResourceLocation(name));
                     CommandBase.notifyCommandListener(sender, this, "command.schematic.save", new Object[0]);

@@ -35,8 +35,8 @@ public class ItemOredictWrapper extends SimpleItemStackWrapper {
 
     private void reloadItem() {
         this.list = OreDictionary.getOres(this.oreDict);
-        if(!list.isEmpty())
-            this.firstOreDict = list.get(0);
+        if(!this.list.isEmpty())
+            this.firstOreDict = this.list.get(0);
         else
             this.firstOreDict = ItemStack.EMPTY;
         this.firstOreDict.setCount(this.count);

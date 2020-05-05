@@ -41,7 +41,7 @@ public class BlockBenchAnimations {
             if (obj.has("animations"))
                 for (Map.Entry<String, JsonElement> anims : obj.getAsJsonObject("animations").entrySet())
                     if (anims.getValue() instanceof JsonObject)
-                        animations.put(anims.getKey(), new Animation(model, (JsonObject) anims.getValue()));
+                        this.animations.put(anims.getKey(), new Animation(model, (JsonObject) anims.getValue()));
         } catch (IOException e) {
             e.printStackTrace();
         }

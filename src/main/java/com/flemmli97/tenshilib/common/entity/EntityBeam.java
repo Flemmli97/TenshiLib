@@ -1,14 +1,8 @@
 package com.flemmli97.tenshilib.common.entity;
 
-import java.util.List;
-import java.util.UUID;
-
-import javax.annotation.Nullable;
-
 import com.flemmli97.tenshilib.api.entity.IBeamEntity;
 import com.flemmli97.tenshilib.common.world.RayTraceUtils;
 import com.google.common.base.Predicate;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -23,6 +17,10 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.UUID;
 
 public abstract class EntityBeam extends Entity implements IBeamEntity {
 
@@ -128,7 +126,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         if(this.getShooter() != null){
             if(this.hit == null || this.getHitVecFromShooter())
                 this.hit = RayTraceUtils.entityRayTrace(this.getHitVecFromShooter() ? this.getShooter() : this, this.getRange(), false, true, false,
-                        !this.piercing(), notShooter);
+                        !this.piercing(), this.notShooter);
         }
         this.updateYawPitch();
         super.onUpdate();

@@ -172,7 +172,7 @@ public class TabulaAnimation {
 
         public void animate(ModelRenderer model, int ticker, float partialTicks) {
             float actualTick = Math.max(ticker - 1 + partialTicks, 0);
-            float prog = MathHelper.clamp((actualTick - startKey) / (float) length, 0F, 1F);
+            float prog = MathHelper.clamp((actualTick - this.startKey) / (float) this.length, 0F, 1F);
             if (ticker >= this.startKey) {
                 model.rotationPointX += this.posOffset[0];
                 model.rotationPointY += this.posOffset[1];

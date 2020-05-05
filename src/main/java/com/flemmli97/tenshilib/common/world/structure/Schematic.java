@@ -1,17 +1,10 @@
 package com.flemmli97.tenshilib.common.world.structure;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.annotation.Nullable;
-
 import com.flemmli97.tenshilib.api.block.ITileEntityInitialPlaced;
 import com.flemmli97.tenshilib.common.blocks.BlockIgnore;
 import com.flemmli97.tenshilib.common.world.Position;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-
 import net.minecraft.block.BlockStructure;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -24,6 +17,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraft.world.gen.structure.template.Template;
+
+import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class Schematic {
 
@@ -135,7 +133,7 @@ public class Schematic {
 
     private static boolean isReplacable(Material mat) {
         if(mat == Material.CACTUS || mat == Material.CIRCUITS || mat == Material.CAKE || mat == Material.FIRE || mat == Material.GOURD
-                || mat == Material.LAVA || mat == Material.LEAVES | mat == Material.PLANTS || mat == Material.VINE || mat == Material.VINE
+                || mat == Material.LAVA || mat == Material.LEAVES | mat == Material.PLANTS || mat == Material.VINE
                 || mat == Material.WEB || mat == Material.WATER)
             return true;
         return false;

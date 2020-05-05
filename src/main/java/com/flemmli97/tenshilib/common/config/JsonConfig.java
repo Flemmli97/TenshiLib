@@ -1,17 +1,16 @@
 package com.flemmli97.tenshilib.common.config;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-
-import javax.annotation.Nullable;
-
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
+
+import javax.annotation.Nullable;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class JsonConfig<T extends JsonElement> {
 
@@ -89,7 +88,7 @@ public class JsonConfig<T extends JsonElement> {
     public void load() {
         try{
             FileReader reader = new FileReader(this.file);
-            this.element = gson.fromJson(reader, this.type);
+            this.element = this.gson.fromJson(reader, this.type);
             reader.close();
         }catch(IOException e){
             e.printStackTrace();
@@ -99,7 +98,7 @@ public class JsonConfig<T extends JsonElement> {
     public void save() {
         try{
             FileWriter writer = new FileWriter(this.file);
-            gson.toJson(this.element, writer);
+            this.gson.toJson(this.element, writer);
             writer.close();
         }catch(JsonIOException | IOException e){
             e.printStackTrace();

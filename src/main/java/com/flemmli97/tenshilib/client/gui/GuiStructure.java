@@ -186,20 +186,20 @@ public class GuiStructure extends GuiScreen {
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
         boolean typed = false;
-        if(this.offX.getVisible() && (isNumber(this.offX.getText(), typedChar) || keyCode == 14)){
+        if(this.offX.getVisible() && (this.isNumber(this.offX.getText(), typedChar) || keyCode == 14)){
             typed = this.offX.textboxKeyTyped(typedChar, keyCode);
         }
 
-        if(this.offY.getVisible() && (isNumber(this.offX.getText(), typedChar) || keyCode == 14)){
+        if(this.offY.getVisible() && (this.isNumber(this.offX.getText(), typedChar) || keyCode == 14)){
             typed = this.offY.textboxKeyTyped(typedChar, keyCode);
         }
 
-        if(this.offZ.getVisible() && (isNumber(this.offX.getText(), typedChar) || keyCode == 14)){
+        if(this.offZ.getVisible() && (this.isNumber(this.offX.getText(), typedChar) || keyCode == 14)){
             typed = this.offZ.textboxKeyTyped(typedChar, keyCode);
         }
         for(Triple<GuiTextField, GuiTextField, GuiButton> triple : this.resources){
             typed = triple.getLeft().textboxKeyTyped(typedChar, keyCode);
-            if(floatTest(triple.getMiddle().getText(), typedChar) || keyCode == 14)
+            if(this.floatTest(triple.getMiddle().getText(), typedChar) || keyCode == 14)
                 typed = triple.getMiddle().textboxKeyTyped(typedChar, keyCode);
         }
         if(!typed)

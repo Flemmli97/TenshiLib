@@ -51,7 +51,7 @@ public class StructureBase {
         this.rot = rot;
         this.mirror = mirror;
         this.genType = genType;
-        StructurePiece start = start(schematicID, random, pos, rot, mirror, genType);
+        StructurePiece start = this.start(schematicID, random, pos, rot, mirror, genType);
         if(start != null)
             this.structurePieces.add(start);
     }

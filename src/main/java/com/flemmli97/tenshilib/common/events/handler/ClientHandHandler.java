@@ -1,7 +1,5 @@
 package com.flemmli97.tenshilib.common.events.handler;
 
-import java.util.Objects;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
@@ -10,6 +8,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.Objects;
 
 @SideOnly(Side.CLIENT)
 public class ClientHandHandler {
@@ -68,8 +68,8 @@ public class ClientHandHandler {
             this.equippedProgressMainHand = MathHelper.clamp(this.equippedProgressMainHand - 0.4F, 0.0F, 1.0F);
             this.equippedProgressOffHand = MathHelper.clamp(this.equippedProgressOffHand - 0.4F, 0.0F, 1.0F);
         }else{
-            float main = this.getCooledAttackStrength(entityplayersp, lastSwingMain);
-            float off = this.getCooledAttackStrength(entityplayersp, lastSwingOff);
+            float main = this.getCooledAttackStrength(entityplayersp, this.lastSwingMain);
+            float off = this.getCooledAttackStrength(entityplayersp, this.lastSwingOff);
 
             boolean requipM = net.minecraftforge.client.ForgeHooksClient.shouldCauseReequipAnimation(this.itemStackMainHand, stack,
                     entityplayersp.inventory.currentItem);
