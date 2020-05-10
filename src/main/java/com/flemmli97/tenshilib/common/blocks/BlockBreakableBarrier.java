@@ -1,9 +1,6 @@
 package com.flemmli97.tenshilib.common.blocks;
 
-import java.util.Random;
-
 import com.flemmli97.tenshilib.TenshiLib;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -15,6 +12,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.Random;
 
 public class BlockBreakableBarrier extends Block {
 
@@ -32,7 +31,7 @@ public class BlockBreakableBarrier extends Block {
     @SideOnly(Side.CLIENT)
     public void randomDisplayTick(IBlockState stateIn, World world, BlockPos pos, Random rand) {
         if(Minecraft.getMinecraft().player.isCreative())
-            world.spawnParticle(EnumParticleTypes.BARRIER, pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F, 0.0D, 0.0D, 0.0D, new int[0]);
+            world.spawnParticle(EnumParticleTypes.BARRIER, pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F, 0.0D, 0.0D, 0.0D);
     }
 
     @Override

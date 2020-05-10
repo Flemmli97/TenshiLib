@@ -19,15 +19,14 @@ import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraft.world.gen.structure.template.Template;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 public class Schematic {
 
     public final int x, y, z;
-    private Map<Position, IBlockState> posBlockMapping = new HashMap<Position, IBlockState>();
-    private Map<Position, NBTTagCompound> posTileMapping = new HashMap<Position, NBTTagCompound>();
+    private Map<Position, IBlockState> posBlockMapping = Maps.newHashMap();
+    private Map<Position, NBTTagCompound> posTileMapping = Maps.newHashMap();
 
     public Schematic(int width, int height, int length) {
         this.x = width;
@@ -53,8 +52,7 @@ public class Schematic {
 
     public IBlockState getBlockAt(BlockPos pos) {
         Position pos1 = new Position(pos.getX(), pos.getY(), pos.getZ());
-        IBlockState state = this.posBlockMapping.get(pos1);
-        return state;
+        return this.posBlockMapping.get(pos1);
     }
 
     /**
@@ -132,11 +130,9 @@ public class Schematic {
     }
 
     private static boolean isReplacable(Material mat) {
-        if(mat == Material.CACTUS || mat == Material.CIRCUITS || mat == Material.CAKE || mat == Material.FIRE || mat == Material.GOURD
-                || mat == Material.LAVA || mat == Material.LEAVES | mat == Material.PLANTS || mat == Material.VINE
-                || mat == Material.WEB || mat == Material.WATER)
-            return true;
-        return false;
+        return (mat == Material.CACTUS || mat == Material.CIRCUITS || mat == Material.CAKE || mat == Material.GOURD
+                || mat == Material.LEAVES | mat == Material.PLANTS
+                || mat == Material.WEB || mat.isReplaceable());
     }
 
     public static BlockPos transformPos(Position pos, Mirror mirrorIn, Rotation rotationIn, BlockPos oppositeCornerFlat) {

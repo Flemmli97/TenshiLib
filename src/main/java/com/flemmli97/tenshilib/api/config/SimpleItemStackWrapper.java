@@ -124,7 +124,7 @@ public class SimpleItemStackWrapper extends ItemWrapper {
 
         @Override
         public SimpleItemStackWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            JsonObject obj = (JsonObject) json.getAsJsonObject();
+            JsonObject obj = json.getAsJsonObject();
             int meta = -1;
             int count = 1;
             if(obj.get("meta") instanceof JsonPrimitive && obj.get("meta").getAsJsonPrimitive().isNumber())

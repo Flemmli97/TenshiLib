@@ -1,8 +1,5 @@
 package com.flemmli97.tenshilib.common.item;
 
-import java.util.Collection;
-import java.util.List;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -10,7 +7,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -29,6 +25,9 @@ import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import scala.util.Random;
+
+import java.util.Collection;
+import java.util.List;
 
 public class ItemUtil {
 
@@ -220,7 +219,7 @@ public class ItemUtil {
     public static boolean areItemsStackable(ItemStack stack1, ItemStack stack2) {
         return (stack1.isEmpty() && stack2.isEmpty()) || (!stack1.isEmpty() && !stack2.isEmpty() && stack1.getItem() == stack2.getItem()
                 && stack1.getMetadata() == stack2.getMetadata() && ((!stack1.hasTagCompound() && !stack2.hasTagCompound()) || (stack1.hasTagCompound()
-                        && (stack1.getTagCompound().equals((Object) stack2.getTagCompound()) && stack1.areCapsCompatible(stack2)))));
+                        && (stack1.getTagCompound().equals(stack2.getTagCompound()) && stack1.areCapsCompatible(stack2)))));
     }
 
     private static boolean isCustomWeapon(Item item) {

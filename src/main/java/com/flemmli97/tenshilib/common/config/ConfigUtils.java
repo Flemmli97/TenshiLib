@@ -97,6 +97,6 @@ public class ConfigUtils {
     }
 
     public enum LoadState {
-        PREINIT, INIT, POSTINIT, SYNC;
+        PREINIT, INIT, POSTINIT, SYNC
     }
 }

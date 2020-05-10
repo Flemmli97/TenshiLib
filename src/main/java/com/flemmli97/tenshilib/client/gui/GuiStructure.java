@@ -1,19 +1,10 @@
 package com.flemmli97.tenshilib.client.gui;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.function.Predicate;
-
-import org.apache.commons.lang3.tuple.Triple;
-import org.lwjgl.input.Keyboard;
-
 import com.flemmli97.tenshilib.common.blocks.tile.TileStructurePiece;
 import com.flemmli97.tenshilib.common.network.PacketHandler;
 import com.flemmli97.tenshilib.common.network.PacketStructurePiece;
 import com.flemmli97.tenshilib.common.world.structure.GenerationType;
 import com.google.common.collect.Lists;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -24,6 +15,12 @@ import net.minecraft.util.Mirror;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+import org.apache.commons.lang3.tuple.Triple;
+import org.lwjgl.input.Keyboard;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map.Entry;
 
 public class GuiStructure extends GuiScreen {
 
@@ -136,14 +133,10 @@ public class GuiStructure extends GuiScreen {
         this.offX.mouseClicked(mouseX, mouseY, mouseButton);
         this.offY.mouseClicked(mouseX, mouseY, mouseButton);
         this.offZ.mouseClicked(mouseX, mouseY, mouseButton);
-        this.resources.removeIf(new Predicate<Triple<GuiTextField, GuiTextField, GuiButton>>() {
-
-            @Override
-            public boolean test(Triple<GuiTextField, GuiTextField, GuiButton> triple) {
-                triple.getLeft().mouseClicked(mouseX, mouseY, mouseButton);
-                triple.getMiddle().mouseClicked(mouseX, mouseY, mouseButton);
-                return GuiStructure.this.deleteTriple(triple.getRight(), mouseX, mouseY);
-            }
+        this.resources.removeIf(triple -> {
+            triple.getLeft().mouseClicked(mouseX, mouseY, mouseButton);
+            triple.getMiddle().mouseClicked(mouseX, mouseY, mouseButton);
+            return GuiStructure.this.deleteTriple(triple.getRight(), mouseX, mouseY);
         });
         if(this.removed){
             this.orderResources();

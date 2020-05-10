@@ -58,6 +58,6 @@ public class PacketHandler {
     }
 
     public static final Packet<?> getPacket(final IMessage message) {
-        return (Packet<?>) PacketHandler.dispatcher.getPacketFrom(message);
+        return PacketHandler.dispatcher.getPacketFrom(message);
     }
 }

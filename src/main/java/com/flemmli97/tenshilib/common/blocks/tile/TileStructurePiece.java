@@ -1,15 +1,5 @@
 package com.flemmli97.tenshilib.common.blocks.tile;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.function.Predicate;
-
-import javax.annotation.Nullable;
-
 import com.flemmli97.tenshilib.common.world.Position;
 import com.flemmli97.tenshilib.common.world.structure.GenerationType;
 import com.flemmli97.tenshilib.common.world.structure.Schematic;
@@ -18,7 +8,7 @@ import com.flemmli97.tenshilib.common.world.structure.StructureLoader;
 import com.flemmli97.tenshilib.common.world.structure.StructurePiece;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-
+import com.google.common.collect.Maps;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -28,9 +18,16 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
+import java.util.Set;
+
 public class TileStructurePiece extends TileEntity {
 
-    private Map<Float, List<ResourceLocation>> structureNames = new TreeMap<Float, List<ResourceLocation>>();
+    private Map<Float, List<ResourceLocation>> structureNames = Maps.newTreeMap();
 
     private StructurePiece piece;
     private Mirror mirror = Mirror.NONE;
@@ -54,14 +51,10 @@ public class TileStructurePiece extends TileEntity {
     }
 
     public void removeStructureName(ResourceLocation res, float chance) {
-        this.structureNames.entrySet().removeIf(new Predicate<Entry<Float, List<ResourceLocation>>>() {
-
-            @Override
-            public boolean test(Entry<Float, List<ResourceLocation>> entry) {
-                if(entry.getKey().equals(chance))
-                    entry.getValue().remove(res);
-                return entry.getValue().isEmpty();
-            }
+        this.structureNames.entrySet().removeIf(entry -> {
+            if(entry.getKey().equals(chance))
+                entry.getValue().remove(res);
+            return entry.getValue().isEmpty();
         });
     }
 
@@ -149,9 +142,7 @@ public class TileStructurePiece extends TileEntity {
         super.readFromNBT(compound);
         this.structureNames.clear();
         NBTTagCompound tag = compound.getCompoundTag("Structures");
-        tag.getKeySet().forEach(key -> {
-            this.addStructureName(tag.getFloat(key), key.equals("EMPTY") ? null : new ResourceLocation(key));
-        });
+        tag.getKeySet().forEach(key -> this.addStructureName(tag.getFloat(key), key.equals("EMPTY") ? null : new ResourceLocation(key)));
         this.mirror = Mirror.valueOf(compound.getString("Mirror"));
         this.rot = Rotation.valueOf(compound.getString("Rotation"));
         this.genType = GenerationType.valueOf(compound.getString("GenerationType"));
@@ -166,11 +157,9 @@ public class TileStructurePiece extends TileEntity {
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
         NBTTagCompound tag = new NBTTagCompound();
-        this.structureNames.entrySet().forEach(entry -> {
-            entry.getValue().forEach(res -> {
-                tag.setFloat(res != null ? res.toString() : "EMPTY", entry.getKey());
-            });
-        });
+        this.structureNames.forEach((key, value) -> value.forEach(res -> {
+            tag.setFloat(res != null ? res.toString() : "EMPTY", key);
+        }));
         compound.setTag("Structures", tag);
         compound.setString("Mirror", this.mirror.toString());
         compound.setString("Rotation", this.rot.toString());

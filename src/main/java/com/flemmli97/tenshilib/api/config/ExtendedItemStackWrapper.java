@@ -1,9 +1,5 @@
 package com.flemmli97.tenshilib.api.config;
 
-import java.lang.reflect.Type;
-
-import javax.annotation.Nullable;
-
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -12,7 +8,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -21,6 +16,9 @@ import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+
+import javax.annotation.Nullable;
+import java.lang.reflect.Type;
 
 /**
  * Itemstack supporting nbt. Not exactly made as a single line string config value. More as a json one.
@@ -123,7 +121,7 @@ public class ExtendedItemStackWrapper extends SimpleItemStackWrapper {
 
         @Override
         public ExtendedItemStackWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            JsonObject obj = (JsonObject) json.getAsJsonObject();
+            JsonObject obj = json.getAsJsonObject();
             int meta = -1;
             int count = 1;
             if(obj.get("meta") instanceof JsonPrimitive && obj.get("meta").getAsJsonPrimitive().isNumber())

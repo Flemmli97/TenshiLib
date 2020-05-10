@@ -1,16 +1,10 @@
 package com.flemmli97.tenshilib.common.world.structure;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
-import java.util.Set;
-
 import com.flemmli97.tenshilib.TenshiLib;
 import com.flemmli97.tenshilib.common.blocks.tile.TileStructurePiece;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagIntArray;
 import net.minecraft.nbt.NBTTagList;
@@ -24,6 +18,11 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraftforge.common.util.Constants;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Contains data about a generated structure.
@@ -155,13 +154,9 @@ public class StructureBase {
         this.rot = Rotation.valueOf(compound.getString("Rotation"));
         this.genType = GenerationType.valueOf(compound.getString("GenerationType"));
         NBTTagList boundingBoxes = compound.getTagList("BoundingBoxes", Constants.NBT.TAG_INT_ARRAY);
-        boundingBoxes.forEach(nbt -> {
-            this.boundingBoxes.add(new StructureBoundingBox(((NBTTagIntArray) nbt).getIntArray()));
-        });
+        boundingBoxes.forEach(nbt -> this.boundingBoxes.add(new StructureBoundingBox(((NBTTagIntArray) nbt).getIntArray())));
         NBTTagList pieces = compound.getTagList("StructurePieces", Constants.NBT.TAG_COMPOUND);
-        pieces.forEach(nbt -> {
-            this.structurePieces.add(new StructurePiece((NBTTagCompound) nbt));
-        });
+        pieces.forEach(nbt -> this.structurePieces.add(new StructurePiece((NBTTagCompound) nbt)));
     }
 
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {

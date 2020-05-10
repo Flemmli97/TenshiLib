@@ -14,8 +14,7 @@ public class ModelUtils {
 
         float rotationLastTick = startAngle + m * Math.max(0, ticker - 1);
         float rotationNow = startAngle + m * ticker;
-        float actualRotation = rotationLastTick + (rotationNow - rotationLastTick) * (partialTicks);
-        return actualRotation;
+        return rotationLastTick + (rotationNow - rotationLastTick) * (partialTicks);
     }
 
     /**

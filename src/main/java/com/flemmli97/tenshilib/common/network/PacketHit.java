@@ -1,13 +1,10 @@
 package com.flemmli97.tenshilib.common.network;
 
-import java.util.List;
-
 import com.flemmli97.tenshilib.TenshiLib;
 import com.flemmli97.tenshilib.api.item.IAOEWeapon;
 import com.flemmli97.tenshilib.api.item.IExtendedWeapon;
 import com.flemmli97.tenshilib.common.events.AOEAttackEvent;
 import com.flemmli97.tenshilib.common.world.RayTraceUtils;
-
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,6 +14,8 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+
+import java.util.List;
 
 public class PacketHit implements IMessage {
 
@@ -65,6 +64,6 @@ public class PacketHit implements IMessage {
     }
 
     public static enum HitType {
-        EXT, AOE;
+        EXT, AOE
     }
 }

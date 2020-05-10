@@ -1,15 +1,9 @@
 package com.flemmli97.tenshilib.common.world.structure;
 
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
 import com.flemmli97.tenshilib.common.network.PacketHandler;
 import com.flemmli97.tenshilib.common.network.PacketStructure;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -20,6 +14,10 @@ import net.minecraft.world.World;
 import net.minecraft.world.storage.MapStorage;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
+
+import javax.annotation.Nullable;
+import java.util.Map;
+import java.util.Set;
 
 public class StructureMap extends WorldSavedData {
 
@@ -141,12 +139,10 @@ public class StructureMap extends WorldSavedData {
     public void readFromNBT(NBTTagCompound nbt) {
         nbt.getKeySet().forEach(key -> {
             NBTTagList tagList = nbt.getTagList(key, Constants.NBT.TAG_COMPOUND);
-            tagList.forEach(compound -> {
-                this.map.merge(new ResourceLocation(key), Sets.newHashSet(new StructureBase((NBTTagCompound) compound)), (old, val) -> {
-                    old.addAll(val);
-                    return old;
-                });
-            });
+            tagList.forEach(compound -> this.map.merge(new ResourceLocation(key), Sets.newHashSet(new StructureBase((NBTTagCompound) compound)), (old, val) -> {
+                old.addAll(val);
+                return old;
+            }));
         });
         NBTTagList list = nbt.getTagList("IncompleteStructures", Constants.NBT.TAG_COMPOUND);
         list.forEach(compound -> this.structureToGenerate.add(new StructureBase((NBTTagCompound) compound)));
@@ -154,12 +150,12 @@ public class StructureMap extends WorldSavedData {
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-        this.map.entrySet().forEach(entry -> {
+        this.map.forEach((key, value) -> {
             NBTTagList tagList = new NBTTagList();
-            entry.getValue().forEach(structure -> {
+            value.forEach(structure -> {
                 tagList.appendTag(structure.writeToNBT(new NBTTagCompound()));
             });
-            compound.setTag(entry.getKey().toString(), tagList);
+            compound.setTag(key.toString(), tagList);
         });
         NBTTagList list = new NBTTagList();
         this.structureToGenerate.forEach(base -> list.appendTag(base.writeToNBT(new NBTTagCompound())));

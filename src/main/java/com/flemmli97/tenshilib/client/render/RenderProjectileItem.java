@@ -64,6 +64,6 @@ public abstract class RenderProjectileItem<T extends Entity> extends Render<T> {
     public abstract RenderType getRenderType(T entity);
 
     public enum RenderType {
-        NORMAL, WEAPON;
+        NORMAL, WEAPON
     }
 }

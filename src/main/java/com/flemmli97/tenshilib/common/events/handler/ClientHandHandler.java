@@ -91,9 +91,7 @@ public class ClientHandHandler {
 
     private boolean changed(ItemStack stack) {
         if(!ItemStack.areItemStacksEqual(this.itemStackMainHand, stack)){
-            if(!ItemStack.areItemsEqualIgnoreDurability(this.itemStackMainHand, stack)){
-                return true;
-            }
+            return !ItemStack.areItemsEqualIgnoreDurability(this.itemStackMainHand, stack);
         }
         return false;
     }

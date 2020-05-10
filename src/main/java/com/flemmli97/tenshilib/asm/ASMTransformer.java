@@ -1,8 +1,7 @@
 package com.flemmli97.tenshilib.asm;
 
-import java.util.Iterator;
-import java.util.Map;
-
+import com.google.common.collect.Maps;
+import net.minecraft.launchwrapper.IClassTransformer;
 import org.apache.commons.lang3.tuple.Pair;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -15,9 +14,8 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import com.google.common.collect.Maps;
-
-import net.minecraft.launchwrapper.IClassTransformer;
+import java.util.Iterator;
+import java.util.Map;
 
 public class ASMTransformer implements IClassTransformer {
 
@@ -90,7 +88,7 @@ public class ASMTransformer implements IClassTransformer {
     /**Replace #attackEntity and #swingArm in {@link net.minecraft.client.Minecraft#clickMouse} */
     private static void patchClickMouse(ClassNode clss, MethodNode method) {
         asmDebug("Patching Minecraft.clickMouse");
-        Iterator<AbstractInsnNode> it = (Iterator<AbstractInsnNode>) method.instructions.iterator();
+        Iterator<AbstractInsnNode> it = method.instructions.iterator();
         AbstractInsnNode node = null;
         AbstractInsnNode attackEntity = null;
         AbstractInsnNode armSwing = null;
@@ -174,7 +172,7 @@ public class ASMTransformer implements IClassTransformer {
      * (Actually {@link net.minecraft.client.model.ModelBiped#render} ) */
     private static void patchModelPlayer(ClassNode clss, MethodNode method) {
         asmDebug("Patching ModelPlayer.doRender (Actually ModelBiped.doRender)");
-        Iterator<AbstractInsnNode> it = (Iterator<AbstractInsnNode>) method.instructions.iterator();
+        Iterator<AbstractInsnNode> it = method.instructions.iterator();
         AbstractInsnNode node = null;
         AbstractInsnNode setRotationAngles = null;
         Method setRotationAnglesMethod = new Method("setRotationAngles", "func_78087_a", "a", "(FFFFFFLnet/minecraft/entity/Entity;)V",
@@ -210,7 +208,7 @@ public class ASMTransformer implements IClassTransformer {
     /** Add PathFindInitEvent in {@link net.minecraft.pathfinding.PathNavigate#PathNavigate} */
     private static void patchPathNavigate(ClassNode clss, MethodNode method) {
         asmDebug("Patching PathNavigate");
-        Iterator<AbstractInsnNode> it = (Iterator<AbstractInsnNode>) method.instructions.iterator();
+        Iterator<AbstractInsnNode> it = method.instructions.iterator();
         AbstractInsnNode node = null;
         while(it.hasNext()){
             node = it.next();
@@ -242,7 +240,7 @@ public class ASMTransformer implements IClassTransformer {
     /** Add LayerHeldItemEvent in {@link net.minecraft.client.renderer.entity.layers.LayerHeldItem#doRenderLayer} */
     private static void layerHeldItem(ClassNode clss, MethodNode method) {
         asmDebug("Patching LayerHeldItem.doRenderLayer");
-        Iterator<AbstractInsnNode> it = (Iterator<AbstractInsnNode>) method.instructions.iterator();
+        Iterator<AbstractInsnNode> it = method.instructions.iterator();
         AbstractInsnNode node = null;
         Method isEmpty = new Method("isEmpty", "func_78087_a", "a", "()Z", "()Z");
 

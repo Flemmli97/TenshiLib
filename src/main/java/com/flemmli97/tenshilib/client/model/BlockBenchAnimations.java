@@ -72,7 +72,7 @@ public class BlockBenchAnimations {
 
         public Animation(ModelBase model, JsonObject json) {
             this.length = (int) Math.floor((json.get("animation_length").getAsDouble() * 20) + 1);
-            this.loop = json.has("loop") ? json.get("loop").getAsBoolean() : false;
+            this.loop = json.has("loop") && json.get("loop").getAsBoolean();
             JsonObject components = json.getAsJsonObject("bones");
             for (Field field : model.getClass().getFields()) {
                 if (ModelRenderer.class.isAssignableFrom(field.getType()) && components.has(field.getName())) {

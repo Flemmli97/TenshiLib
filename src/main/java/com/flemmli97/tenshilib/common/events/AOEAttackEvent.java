@@ -1,7 +1,5 @@
 package com.flemmli97.tenshilib.common.events;
 
-import java.util.List;
-
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -23,6 +21,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
+
+import java.util.List;
 
 @Cancelable
 public class AOEAttackEvent extends PlayerEvent {
@@ -71,7 +71,7 @@ public class AOEAttackEvent extends PlayerEvent {
                     i = i + EnchantmentHelper.getKnockbackModifier(player);
 
                     if(player.isSprinting() && flag){
-                        player.world.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK,
+                        player.world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK,
                                 player.getSoundCategory(), 1.0F, 1.0F);
                         ++i;
                     }
@@ -111,11 +111,11 @@ public class AOEAttackEvent extends PlayerEvent {
                         if(i > 0){
                             if(targetEntity instanceof EntityLivingBase){
                                 ((EntityLivingBase) targetEntity).knockBack(player, (float) i * 0.5F,
-                                        (double) MathHelper.sin(player.rotationYaw * 0.017453292F),
-                                        (double) (-MathHelper.cos(player.rotationYaw * 0.017453292F)));
+                                        MathHelper.sin(player.rotationYaw * 0.017453292F),
+                                        -MathHelper.cos(player.rotationYaw * 0.017453292F));
                             }else{
-                                targetEntity.addVelocity((double) (-MathHelper.sin(player.rotationYaw * 0.017453292F) * (float) i * 0.5F), 0.1D,
-                                        (double) (MathHelper.cos(player.rotationYaw * 0.017453292F) * (float) i * 0.5F));
+                                targetEntity.addVelocity(-MathHelper.sin(player.rotationYaw * 0.017453292F) * (float) i * 0.5F, 0.1D,
+                                        MathHelper.cos(player.rotationYaw * 0.017453292F) * (float) i * 0.5F);
                             }
 
                             player.motionX *= 0.6D;
@@ -132,17 +132,17 @@ public class AOEAttackEvent extends PlayerEvent {
                         }
 
                         if(flag2){
-                            player.world.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_CRIT,
+                            player.world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_CRIT,
                                     player.getSoundCategory(), 1.0F, 1.0F);
                             player.onCriticalHit(targetEntity);
                         }
 
                         if(!flag2){
                             if(flag){
-                                player.world.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ,
+                                player.world.playSound(null, player.posX, player.posY, player.posZ,
                                         SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, player.getSoundCategory(), 1.0F, 1.0F);
                             }else{
-                                player.world.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ,
+                                player.world.playSound(null, player.posX, player.posY, player.posZ,
                                         SoundEvents.ENTITY_PLAYER_ATTACK_WEAK, player.getSoundCategory(), 1.0F, 1.0F);
                             }
                         }
@@ -196,7 +196,7 @@ public class AOEAttackEvent extends PlayerEvent {
 
                         player.addExhaustion(0.1F);
                     }else{
-                        player.world.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_NODAMAGE,
+                        player.world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_NODAMAGE,
                                 player.getSoundCategory(), 1.0F, 1.0F);
 
                         if(flag4){

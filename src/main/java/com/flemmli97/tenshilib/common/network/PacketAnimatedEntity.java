@@ -28,7 +28,7 @@ public class PacketAnimatedEntity implements IMessage {
         else{
             int i = 0;
             for(AnimatedAction a : ((IAnimated) entity).getAnimations()){
-                if(a.getID() == anim.getID())
+                if(a.getID().equals(anim.getID()))
                     break;
                 i++;
             }

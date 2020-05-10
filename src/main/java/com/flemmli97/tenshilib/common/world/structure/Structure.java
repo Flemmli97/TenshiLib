@@ -159,7 +159,7 @@ public class Structure implements IConfigSerializable<Structure> {
         this.startingStructures = ArrayUtils.arrayConverter(
                 config.getStringList("Starting Structures", configCategory, ArrayUtils.arrayToStringArr(this.startingStructures),
                         "Schematic names of potential starting structures. If empty will use the structure id"),
-                (t) -> new ResourceLocation(t), ResourceLocation.class, true);
+                ResourceLocation::new, ResourceLocation.class, true);
         if(this.startingStructures == null)
             this.startingStructures = new ResourceLocation[] {this.id};
         this.frequency = config.get(configCategory, "Frequency", this.frequency, "Structure will spawn with 1/x probability in a chunk").getInt();

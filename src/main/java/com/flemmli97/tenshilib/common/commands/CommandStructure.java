@@ -1,14 +1,9 @@
 package com.flemmli97.tenshilib.common.commands;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import com.flemmli97.tenshilib.common.blocks.ModBlocks;
 import com.flemmli97.tenshilib.common.world.structure.Schematic;
 import com.flemmli97.tenshilib.common.world.structure.StructureLoader;
 import com.google.common.collect.Lists;
-
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
@@ -26,9 +21,12 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.structure.template.Template;
 import net.minecraft.world.gen.structure.template.TemplateManager;
 
+import java.util.Collections;
+import java.util.List;
+
 public class CommandStructure implements ICommand {
 
-    private final List<String> aliases = new ArrayList<String>();
+    private final List<String> aliases = Lists.newArrayList();
     private boolean confirm = false;
 
     public CommandStructure() {
@@ -58,14 +56,14 @@ public class CommandStructure implements ICommand {
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         if(args.length < 1){
-            throw new WrongUsageException(this.getUsage(sender), new Object[0]);
+            throw new WrongUsageException(this.getUsage(sender));
         }
         try{
             BlockPos blockpos = CommandBase.parseBlockPos(sender, args, 1, false);
             String s = args[0];
             if(s.equals("save")){
                 if(args.length < 8){
-                    throw new WrongUsageException(this.getUsage(sender), new Object[0]);
+                    throw new WrongUsageException(this.getUsage(sender));
                 }
                 BlockPos blockpos1 = CommandBase.parseBlockPos(sender, args, 4, false);
                 BlockPos size = this.translatePos2(blockpos, blockpos1);
@@ -80,17 +78,17 @@ public class CommandStructure implements ICommand {
                     Template template = templatemanager.getTemplate(world.getMinecraftServer(), new ResourceLocation(name));
                     if((template.getSize().getX() != 0 || template.getSize().getY() != 0 || template.getSize().getZ() != 0) && !this.confirm){
                         this.confirm = true;
-                        CommandBase.notifyCommandListener(sender, this, "command.schematic.confirm", new Object[0]);
+                        CommandBase.notifyCommandListener(sender, this, "command.schematic.confirm");
                         return;
                     }
                     this.confirm = false;
                     template.takeBlocksFromWorld(world, blockpos, size, true, ModBlocks.ignore);
                     templatemanager.writeTemplate(world.getMinecraftServer(), new ResourceLocation(name));
-                    CommandBase.notifyCommandListener(sender, this, "command.schematic.save", new Object[0]);
+                    CommandBase.notifyCommandListener(sender, this, "command.schematic.save");
                 }
             }else if(s.equals("load")){
                 if(args.length < 5){
-                    throw new WrongUsageException(this.getUsage(sender), new Object[0]);
+                    throw new WrongUsageException(this.getUsage(sender));
                 }
                 String name = args[4];
                 World world = server.getEntityWorld();
@@ -107,14 +105,14 @@ public class CommandStructure implements ICommand {
                     }
                     if(!template.getSize().equals(BlockPos.ORIGIN)){
                         Schematic.fromTemplate(template).generate(world, blockpos, rot, mirr);
-                        CommandBase.notifyCommandListener(sender, this, "command.schematic.load", new Object[] {name});
+                        CommandBase.notifyCommandListener(sender, this, "command.schematic.load", name);
                     }else{
                         Schematic schem = StructureLoader.getSchematic(new ResourceLocation(name));
                         if(schem != null){
                             schem.generate(world, blockpos, rot, mirr);
-                            CommandBase.notifyCommandListener(sender, this, "command.schematic.load", new Object[] {name});
+                            CommandBase.notifyCommandListener(sender, this, "command.schematic.load", name);
                         }else
-                            CommandBase.notifyCommandListener(sender, this, "command.schematic.load.fail", new Object[] {name});
+                            CommandBase.notifyCommandListener(sender, this, "command.schematic.load.fail", name);
                     }
                 }
             }
@@ -146,7 +144,7 @@ public class CommandStructure implements ICommand {
     @Override
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos targetPos) {
         if(args.length == 1){
-            return CommandBase.getListOfStringsMatchingLastWord(args, new String[] {"save", "load"});
+            return CommandBase.getListOfStringsMatchingLastWord(args, "save", "load");
         }else if(args.length > 1 && args.length <= 4){
             return CommandBase.getTabCompletionCoordinate(args, 1, targetPos);
         }else if(args[0].equals("save") && args.length > 4 && args.length <= 7){
@@ -158,7 +156,7 @@ public class CommandStructure implements ICommand {
                 return Lists.newArrayList(Rotation.NONE.toString(), Rotation.CLOCKWISE_90.toString(), Rotation.CLOCKWISE_180.toString(),
                         Rotation.COUNTERCLOCKWISE_90.toString());
         }
-        return Collections.<String>emptyList();
+        return Collections.emptyList();
     }
 
     @Override

@@ -1,12 +1,6 @@
 package com.flemmli97.tenshilib.common.entity;
 
-import java.util.List;
-import java.util.UUID;
-
-import javax.annotation.Nullable;
-
 import com.google.common.collect.Lists;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -29,6 +23,10 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.UUID;
 
 public abstract class EntityProjectile extends Entity implements IProjectile {
 
@@ -208,7 +206,6 @@ public abstract class EntityProjectile extends Entity implements IProjectile {
         this.rotationYaw = (float) (MathHelper.atan2(this.motionX, this.motionZ) * (180D / Math.PI));
         for(this.rotationPitch = (float) (MathHelper.atan2(this.motionY, f) * (180D / Math.PI)); this.rotationPitch
                 - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F){
-            ;
         }
 
         while(this.rotationPitch - this.prevRotationPitch >= 180.0F){
@@ -257,24 +254,23 @@ public abstract class EntityProjectile extends Entity implements IProjectile {
                 this.getEntityBoundingBox().expand(this.motionX, this.motionY, this.motionZ).grow(1.0D));
         boolean flag = false;
         double d0 = 0.0D;
-        for(int i = 0; i < list.size(); ++i){
-            Entity entity1 = list.get(i);
-            if(entity1.canBeCollidedWith() && (this.getShooter() == null
-                    || this.canHitShooter() && (entity1 != this.getShooter() || this.ticksExisted > 2) || entity1 != this.getShooter())){
+        for (Entity entity1 : list) {
+            if (entity1.canBeCollidedWith() && (this.getShooter() == null
+                    || this.canHitShooter() && (entity1 != this.getShooter() || this.ticksExisted > 2) || entity1 != this.getShooter())) {
                 AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().grow(/*this.radius()+*/0.30000001192092896D);
                 RayTraceResult raytraceresult1 = axisalignedbb.calculateIntercept(vec3d, vec3d1);
-                if(raytraceresult1 != null || axisalignedbb.contains(vec3d1)){
-                    if(this.isPiercing()){
+                if (raytraceresult1 != null || axisalignedbb.contains(vec3d1)) {
+                    if (this.isPiercing()) {
                         raytraceresult1 = new RayTraceResult(entity1);
-                        if(!this.attackedEntities.contains(entity1.getUniqueID())
-                                && !net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, raytraceresult1)){
+                        if (!this.attackedEntities.contains(entity1.getUniqueID())
+                                && !net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, raytraceresult1)) {
                             flag = true;
                             this.onImpact(raytraceresult1);
                             this.attackedEntities.add(entity1.getUniqueID());
                         }
-                    }else{
+                    } else {
                         double d1 = raytraceresult1 != null ? vec3d.squareDistanceTo(raytraceresult1.hitVec) : 0;
-                        if(d1 < d0 || d0 == 0.0D){
+                        if (d1 < d0 || d0 == 0.0D) {
                             entity = entity1;
                             d0 = d1;
                         }

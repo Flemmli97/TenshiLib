@@ -1,13 +1,9 @@
 package com.flemmli97.tenshilib.common.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.flemmli97.tenshilib.common.world.structure.StructureBase;
 import com.flemmli97.tenshilib.common.world.structure.StructureGenerator;
 import com.flemmli97.tenshilib.common.world.structure.StructureMap;
 import com.google.common.collect.Lists;
-
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -17,9 +13,11 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 
+import java.util.List;
+
 public class CommandLocateStructure implements ICommand {
 
-    private final List<String> aliases = new ArrayList<String>();
+    private final List<String> aliases = Lists.newArrayList();
 
     public CommandLocateStructure() {
         this.aliases.add("structures");
@@ -43,7 +41,7 @@ public class CommandLocateStructure implements ICommand {
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         if(args.length < 1){
-            throw new WrongUsageException(this.getUsage(sender), new Object[0]);
+            throw new WrongUsageException(this.getUsage(sender));
         }
         String id = args[0];
         StructureBase base = StructureMap.get(sender.getEntityWorld()).getNearestStructure(new ResourceLocation(id), sender.getPosition(),
@@ -51,9 +49,9 @@ public class CommandLocateStructure implements ICommand {
         String translation = "structures." + id;
         if(base != null){
             sender.sendMessage(
-                    new TextComponentTranslation("commands.locate.success", new Object[] {translation, base.getPos().getX(), base.getPos().getZ()}));
+                    new TextComponentTranslation("commands.locate.success", translation, base.getPos().getX(), base.getPos().getZ()));
         }else{
-            throw new CommandException("commands.locate.failure", new Object[] {translation});
+            throw new CommandException("commands.locate.failure", translation);
         }
     }
 

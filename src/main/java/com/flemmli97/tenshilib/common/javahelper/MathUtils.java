@@ -1,11 +1,10 @@
 package com.flemmli97.tenshilib.common.javahelper;
 
-import java.util.List;
-
 import com.google.common.collect.Lists;
-
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+
+import java.util.List;
 
 public class MathUtils {
 
@@ -56,13 +55,14 @@ public class MathUtils {
      * @return The rotated vector
      */
     public static Vec3d rotate(Vec3d rotAxis, Vec3d vec, float angle) {
-        double x = rotAxis.x * (rotAxis.x * vec.x + rotAxis.y * vec.y + rotAxis.z * vec.z) * (1 - MathHelper.cos(angle))
+        double rot = rotAxis.x * vec.x + rotAxis.y * vec.y + rotAxis.z * vec.z;
+        double x = rotAxis.x * rot * (1 - MathHelper.cos(angle))
                 + vec.x * MathHelper.cos(angle) + (-rotAxis.z * vec.y + rotAxis.y * vec.z) * MathHelper.sin(angle);
 
-        double y = rotAxis.y * (rotAxis.x * vec.x + rotAxis.y * vec.y + rotAxis.z * vec.z) * (1 - MathHelper.cos(angle))
+        double y = rotAxis.y * rot * (1 - MathHelper.cos(angle))
                 + vec.y * MathHelper.cos(angle) + (rotAxis.z * vec.x - rotAxis.x * vec.z) * MathHelper.sin(angle);
 
-        double z = rotAxis.z * (rotAxis.x * vec.x + rotAxis.y * vec.y + rotAxis.z * vec.z) * (1 - MathHelper.cos(angle))
+        double z = rotAxis.z * rot * (1 - MathHelper.cos(angle))
                 + vec.z * MathHelper.cos(angle) + (-rotAxis.y * vec.x + rotAxis.x * vec.y) * MathHelper.sin(angle);
         return new Vec3d(x, y, z);
     }

@@ -1,10 +1,6 @@
 package com.flemmli97.tenshilib.common.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.common.collect.Lists;
-
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
@@ -22,9 +18,11 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 
+import java.util.List;
+
 public class CommandItemData implements ICommand {
 
-	private final List<String> aliases = new ArrayList<String>();
+	private final List<String> aliases = Lists.newArrayList();
 
 	public CommandItemData() {
 		this.aliases.add("tenshilib:itemdata");
@@ -48,13 +46,13 @@ public class CommandItemData implements ICommand {
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if(args.length < 1){
-			throw new WrongUsageException(this.getUsage(sender), new Object[0]);
+			throw new WrongUsageException(this.getUsage(sender));
 		}
 		if(args[0].equals("modify")){
 			if(!sender.canUseCommand(2, this.getName()))
 				throw new CommandException("commands.generic.permission");
 			if(args.length < 2)
-				throw new WrongUsageException(this.getUsage(sender), new Object[0]);
+				throw new WrongUsageException(this.getUsage(sender));
 		}
 		if(sender.getCommandSenderEntity() instanceof EntityPlayer){
 			EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
@@ -77,7 +75,7 @@ public class CommandItemData implements ICommand {
 					if(nbt != null)
 						player.sendMessage(new TextComponentString(TextFormatting.GOLD + nbt.toString()));
 					else
-						throw new CommandException("command.itemdata.noSuchTag", new Object[] {s});
+						throw new CommandException("command.itemdata.noSuchTag", s);
 				}else
 					player.sendMessage(new TextComponentString(TextFormatting.GOLD + stackCompound.toString()));
 			}
@@ -87,11 +85,11 @@ public class CommandItemData implements ICommand {
 					try{
 						fromCommand = JsonToNBT.getTagFromJson(CommandBase.buildString(args, slot != -1 ? 2 : 1));
 					}catch(NBTException nbtexception){
-						throw new CommandException("command.itemdata.tagError", new Object[] {nbtexception.getMessage()});
+						throw new CommandException("command.itemdata.tagError", nbtexception.getMessage());
 					}
 					stackCompound.merge(fromCommand);
 					stack.setTagCompound(stackCompound);
-					CommandBase.notifyCommandListener(sender, this, "command.itemdata.success", new Object[] {stackCompound.toString()});
+					CommandBase.notifyCommandListener(sender, this, "command.itemdata.success", stackCompound.toString());
 				}else{
 					throw new CommandException("commands.generic.permission");
 				}

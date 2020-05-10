@@ -116,7 +116,7 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends Render<
     }
 
     private void renderBeam(double width, double length, double offset, int animationFrame, float maxFrames) {
-        this.renderBeam(width, length, offset, (animationFrame - 1) * 1 / maxFrames, animationFrame * 1 / maxFrames);
+        this.renderBeam(width, length, offset, (animationFrame - 1) / maxFrames, animationFrame / maxFrames);
     }
 
     private void renderBeam(double width, double length, double offset, float vMin, float vMax) {
@@ -166,6 +166,6 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends Render<
     }
 
     public static enum BeamPart {
-        START, END, MIDDLE;
+        START, END, MIDDLE
     }
 }

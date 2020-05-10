@@ -7,5 +7,5 @@ package com.flemmli97.tenshilib.common.world.structure;
  */
 public enum GenerationType {
 
-    FLOATING, REPLACEBELOW, GROUNDALIGNED;
+    FLOATING, REPLACEBELOW, GROUNDALIGNED
 }

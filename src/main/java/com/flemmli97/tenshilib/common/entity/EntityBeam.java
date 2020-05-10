@@ -136,18 +136,17 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         if(!this.world.isRemote && this.hit != null && --this.coolDown <= 0){
             List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(this,
                     new AxisAlignedBB(this.posX, this.posY, this.posZ, this.hit.hitVec.x, this.hit.hitVec.y, this.hit.hitVec.z).grow(1));
-            for(int i = 0; i < list.size(); i++){
-                Entity entity = list.get(i);
-                if(entity.canBeCollidedWith() && (this.getShooter() == null || entity != this.getShooter())){
+            for (Entity entity : list) {
+                if (entity.canBeCollidedWith() && (this.getShooter() == null || entity != this.getShooter())) {
                     AxisAlignedBB axisalignedbb = entity.getEntityBoundingBox().grow(this.radius() + 0.30000001192092896D);
                     RayTraceResult raytraceresult = axisalignedbb.calculateIntercept(this.getPositionVector(), this.hit.hitVec);
 
-                    if(raytraceresult != null){
+                    if (raytraceresult != null) {
                         raytraceresult = new RayTraceResult(entity);
-                        if(!net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, raytraceresult)){
+                        if (!net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, raytraceresult)) {
                             this.onImpact(raytraceresult);
                             this.coolDown = this.attackCooldown();
-                            if(!this.piercing())
+                            if (!this.piercing())
                                 return;
                         }
                     }
