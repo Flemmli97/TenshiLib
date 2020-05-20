@@ -112,7 +112,7 @@ public class BlockBenchAnimations {
             this.model = part;
             int i = 0;
             if (obj.has("position")) {
-                JsonObject position = obj.getAsJsonObject("position");
+                JsonObject position = this.tryGet(obj, "position");
                 this.positions = new float[position.size()][4];
                 for (Map.Entry<String, JsonElement> e : position.entrySet()) {
                     if (e.getValue() instanceof JsonArray) {
@@ -124,7 +124,7 @@ public class BlockBenchAnimations {
                 Arrays.sort(this.positions, Comparator.comparingDouble(arr -> arr[0]));
             }
             if (obj.has("rotation")) {
-                JsonObject rotation = obj.getAsJsonObject("rotation");
+                JsonObject rotation = this.tryGet(obj, "rotation");
                 this.rotations = new float[rotation.size()][4];
                 i = 0;
                 for (Map.Entry<String, JsonElement> e : rotation.entrySet()) {
@@ -138,7 +138,7 @@ public class BlockBenchAnimations {
                 Arrays.sort(this.rotations, Comparator.comparingDouble(arr -> arr[0]));
             }
             if (obj.has("scale")) {
-                JsonObject scale = obj.getAsJsonObject("scale");
+                JsonObject scale = this.tryGet(obj, "scale");
                 this.scales = new float[scale.size()][4];
                 i = 0;
                 for (Map.Entry<String, JsonElement> e : scale.entrySet()) {
@@ -152,42 +152,72 @@ public class BlockBenchAnimations {
             }
         }
 
+        private JsonObject tryGet(JsonObject obj, String name) {
+            JsonElement el = obj.get(name);
+            if (el.isJsonObject())
+                return (JsonObject) el;
+            else if (el.isJsonArray()) {
+                JsonObject val = new JsonObject();
+                val.add("0", el);
+                return val;
+            }
+            return null;
+        }
+
         //For now till i find a better way (maybe without loops)
         public void animate(int ticker, float partialTicks) {
             float actualTick = Math.max(ticker - 1 + partialTicks, 0);
             if (this.positions != null) {
-                int id = 1;
-                float[] pos = this.positions[id];
-                while (pos[0] < ticker && ++id < this.positions.length)
-                    pos = this.positions[id];
-                float[] posPrev = this.positions[id - 1];
-                float prog = MathHelper.clamp((actualTick - posPrev[0]) / (pos[0] - posPrev[0]), 0F, 1F);
-                this.model.rotationPointX += this.interpolate(posPrev[1], pos[1], prog);
-                this.model.rotationPointY -= this.interpolate(posPrev[2], pos[2], prog);
-                this.model.rotationPointZ += this.interpolate(posPrev[3], pos[3], prog);
+                if (this.positions.length == 1) {
+                    this.model.rotationPointX += this.positions[0][1];
+                    this.model.rotationPointY -= this.positions[0][2];
+                    this.model.rotationPointZ += this.positions[0][3];
+                } else {
+                    int id = 1;
+                    float[] pos = this.positions[id];
+                    while (pos[0] < ticker && ++id < this.positions.length)
+                        pos = this.positions[id];
+                    float[] posPrev = this.positions[id - 1];
+                    float prog = MathHelper.clamp((actualTick - posPrev[0]) / (pos[0] - posPrev[0]), 0F, 1F);
+                    this.model.rotationPointX += this.interpolate(posPrev[1], pos[1], prog);
+                    this.model.rotationPointY -= this.interpolate(posPrev[2], pos[2], prog);
+                    this.model.rotationPointZ += this.interpolate(posPrev[3], pos[3], prog);
+                }
             }
             if (this.rotations != null) {
-                int id = 1;
-                float[] rot = this.rotations[id];
-                while (rot[0] < ticker && ++id < this.rotations.length)
-                    rot = this.rotations[id];
-                float[] rotPrev = this.rotations[id - 1];
-                float prog = MathHelper.clamp((actualTick - rotPrev[0]) / (rot[0] - rotPrev[0]), 0F, 1F);
-                this.model.rotateAngleX += this.interpolate(rotPrev[1], rot[1], prog);
-                this.model.rotateAngleY += this.interpolate(rotPrev[2], rot[2], prog);
-                this.model.rotateAngleZ += this.interpolate(rotPrev[3], rot[3], prog);
+                if (this.rotations.length == 1) {
+                    this.model.rotateAngleX += this.rotations[0][1];
+                    this.model.rotateAngleY += this.rotations[0][2];
+                    this.model.rotateAngleZ += this.rotations[0][3];
+                } else {
+                    int id = 1;
+                    float[] rot = this.rotations[id];
+                    while (rot[0] < ticker && ++id < this.rotations.length)
+                        rot = this.rotations[id];
+                    float[] rotPrev = this.rotations[id - 1];
+                    float prog = MathHelper.clamp((actualTick - rotPrev[0]) / (rot[0] - rotPrev[0]), 0F, 1F);
+                    this.model.rotateAngleX += this.interpolate(rotPrev[1], rot[1], prog);
+                    this.model.rotateAngleY += this.interpolate(rotPrev[2], rot[2], prog);
+                    this.model.rotateAngleZ += this.interpolate(rotPrev[3], rot[3], prog);
+                }
             }
             if (this.scales != null && this.model instanceof ModelRendererPlus) {
                 ModelRendererPlus plus = (ModelRendererPlus) this.model;
-                int id = 1;
-                float[] scale = this.scales[id];
-                while (scale[0] < ticker && ++id < this.scales.length)
-                    scale = this.scales[id];
-                float[] scalePrev = this.scales[id - 1];
-                float prog = MathHelper.clamp((actualTick - scalePrev[0]) / (scale[0] - scalePrev[0]), 0F, 1F);
-                plus.scaleX += this.interpolate(scalePrev[1], scale[1], prog);
-                plus.scaleY += this.interpolate(scalePrev[2], scale[2], prog);
-                plus.scaleZ += this.interpolate(scalePrev[3], scale[3], prog);
+                if (this.scales.length == 1) {
+                    plus.scaleX += this.scales[0][3];
+                    plus.scaleY += this.scales[0][3];
+                    plus.scaleZ += this.scales[0][3];
+                } else {
+                    int id = 1;
+                    float[] scale = this.scales[id];
+                    while (scale[0] < ticker && ++id < this.scales.length)
+                        scale = this.scales[id];
+                    float[] scalePrev = this.scales[id - 1];
+                    float prog = MathHelper.clamp((actualTick - scalePrev[0]) / (scale[0] - scalePrev[0]), 0F, 1F);
+                    plus.scaleX += this.interpolate(scalePrev[1], scale[1], prog);
+                    plus.scaleY += this.interpolate(scalePrev[2], scale[2], prog);
+                    plus.scaleZ += this.interpolate(scalePrev[3], scale[3], prog);
+                }
             }
         }
 
