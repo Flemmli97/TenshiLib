@@ -24,6 +24,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A Blockbench animation using the free model animation from Blockbench.
+ */
 public class BlockBenchAnimations {
 
     private static final Gson gson = new Gson();
