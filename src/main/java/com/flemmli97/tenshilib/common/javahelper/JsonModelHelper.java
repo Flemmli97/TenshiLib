@@ -37,7 +37,7 @@ public class JsonModelHelper {
                     json.name("textures");
                     json.beginObject();
                     json.name("layer0");
-                    json.value("runecraftory:items/" + item.getRegistryName().getResourcePath());
+                    json.value(item.getRegistryName().getResourceDomain()+":items/" + item.getRegistryName().getResourcePath());
                     json.endObject();
                     json.endObject();
                     writer.close();
@@ -82,8 +82,8 @@ public class JsonModelHelper {
                     json.value(parentModel.apply(block));
                     json.name("textures");
                     json.beginObject();
-                    json.name("ore");
-                    json.value("runecraftory:blocks/"+ block.getRegistryName().getResourcePath());
+                    json.name("0");
+                    json.value(block.getRegistryName().getResourceDomain()+":blocks/"+ block.getRegistryName().getResourcePath());
                     json.endObject();
                     json.endObject();
                     writer.close();
@@ -95,7 +95,7 @@ public class JsonModelHelper {
                     JsonWriter json = GSON.newJsonWriter(writer);
                     json.beginObject();
                     json.name("parent");
-                    json.value("runecraftory:block/" + block.getRegistryName().getResourcePath());
+                    json.value(block.getRegistryName().getResourceDomain()+":block/" + block.getRegistryName().getResourcePath());
                     json.endObject();
                     writer.close();
                 }
