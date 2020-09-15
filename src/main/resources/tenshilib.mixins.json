@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.flemmli97.tenshilib.mixin",
+  "refmap": "tenshilib.refmap.json",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "LivingEntityMixin",
+    "PlayerModelMixin",
+    "FirstPersonRenderMixin",
+    "SwordTestMixin"
+  ],
+  "server": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
