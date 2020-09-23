@@ -36,7 +36,7 @@ public class SimpleItemStackWrapper extends ItemWrapper {
     }
 
     public SimpleItemStackWrapper(Block block) {
-        this(Item.getItemFromBlock(block), 1);
+        this(block.asItem(), 1);
     }
 
     public SimpleItemStackWrapper(ItemStack stack) {

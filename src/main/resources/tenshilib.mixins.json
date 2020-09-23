@@ -8,6 +8,8 @@
     "LivingEntityMixin",
     "PlayerModelMixin",
     "FirstPersonRenderMixin",
+    "RenderStateAccessors",
+    "WorldRenderAccessor",
     "SwordTestMixin"
   ],
   "server": [

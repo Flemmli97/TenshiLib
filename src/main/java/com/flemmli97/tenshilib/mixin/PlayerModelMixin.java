@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(PlayerModel.class)
 public abstract class PlayerModelMixin<T extends LivingEntity> {
 
-    @Inject(method = "setRotationAngles", at = @At(value = "RETURN"))
+    @Inject(method = "setAngles", at = @At(value = "RETURN")) //mcp: setRotationAngles
     private void rotationHook(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo info){
         MinecraftForge.EVENT_BUS.post(new PlayerRotationEvent(entity, (PlayerModel<T>) (Object) this, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch));
     }

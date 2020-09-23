@@ -1,24 +1,21 @@
 package com.flemmli97.tenshilib.client.render;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.texture.TextureMap;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 
-public abstract class RenderProjectileItem<T extends Entity> extends Render<T> {
+public abstract class RenderProjectileItem<T extends Entity> extends EntityRenderer<T> {
 
-    public RenderProjectileItem(RenderManager renderManagerIn) {
+    public RenderProjectileItem(EntityRendererManager renderManagerIn) {
         super(renderManagerIn);
     }
 
     @Override
-    public void doRender(T entity, double x, double y, double z, float entityYaw, float partialTick) {
-        GlStateManager.pushMatrix();
+    public void render(T entity, float rotation, float partialTicks, MatrixStack stack, IRenderTypeBuffer buffer, int packedLight) {
+        /*stack.push();
         GlStateManager.translate(x, y + 0.2, z);
         GlStateManager.enableRescaleNormal();
         switch(this.getRenderType(entity)){
@@ -38,23 +35,23 @@ public abstract class RenderProjectileItem<T extends Entity> extends Render<T> {
             GlStateManager.enableColorMaterial();
             GlStateManager.enableOutlineMode(this.getTeamColor(entity));
         }
-        Minecraft.getMinecraft().getRenderItem().renderItem(this.getRenderItemStack(entity), TransformType.THIRD_PERSON_RIGHT_HAND);
+        Minecraft.getInstance().getItemRenderer().renderItem(this.getRenderItemStack(entity), ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND);
         if(this.renderOutlines){
             GlStateManager.disableOutlineMode();
             GlStateManager.disableColorMaterial();
         }
 
         GlStateManager.disableRescaleNormal();
-        GlStateManager.popMatrix();
+        stack.pop();
         if(!this.renderOutlines){
             this.renderName(entity, x, y, z);
-        }
+        }*/
     }
 
-    @Override
-    protected ResourceLocation getEntityTexture(T entity) {
+    /*@Override
+    public ResourceLocation getEntityTexture(T entity) {
         return TextureMap.LOCATION_BLOCKS_TEXTURE;
-    }
+    }*/
 
     public abstract ItemStack getRenderItemStack(T entity);
 

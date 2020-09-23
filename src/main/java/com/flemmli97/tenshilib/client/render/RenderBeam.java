@@ -1,30 +1,15 @@
 package com.flemmli97.tenshilib.client.render;
 
+import com.flemmli97.tenshilib.api.entity.IBeamEntity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.entity.IEntityRenderer;
-import net.minecraft.client.renderer.entity.LivingRenderer;
-import net.minecraft.entity.IRendersAsItem;
-import net.minecraft.util.math.vector.Quaternion;
-import org.apache.commons.lang3.tuple.Pair;
-import org.lwjgl.opengl.GL11;
-
-import com.flemmli97.tenshilib.api.entity.IBeamEntity;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import org.apache.commons.lang3.tuple.Pair;
 
 public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityRenderer<T> {
 
@@ -79,14 +64,13 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
         //matrixStack.rotate(-(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks), 0.0F, 0.0F, 1.0F);
     }
 
-    @Override
+    /*@Override
     public void doRender(T entity, double x, double y, double z, float entityYaw, float partialTicks) {
         entity.updateYawPitch();
         double dist = entity.hitVec().distanceTo(entity.startVec());
         double width = this.widthFunc(entity);
         RenderSystem.disableCull();
         RenderSystem.enableBlend();
-
         //GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
         //GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
         //GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
@@ -156,7 +140,7 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
         vertexbuffer.pos(offset + length, -width, 0).tex(1, Math.min(1, vMax)).color(this.red, this.green, this.blue, this.alpha).endVertex();
         vertexbuffer.pos(offset, -width, 0).tex(0, Math.min(1, vMax)).color(this.red, this.green, this.blue, this.alpha).endVertex();
         tessellator.draw();
-    }
+    }*/
 
     /**
      * Start texture of the beam. With size
@@ -187,7 +171,7 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
     private double[] split(double length) {
         int arrL = (int) Math.ceil(length / this.segmentLength());
         double[] arr = new double[arrL];
-        for(int i = 0; i < arr.length; i++){
+        for (int i = 0; i < arr.length; i++) {
             arr[i] = Math.max(0, length - i * this.segmentLength());
         }
         return arr;

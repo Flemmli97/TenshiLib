@@ -15,11 +15,12 @@ public class LayerModelRender<T extends LivingEntity, M extends EntityModel<T>> 
 
     private final EntityModel<T> model;
     private final LivingRenderer<T, M> renderer;
-
-    public LayerModelRender(LivingRenderer<T, M> renderer, EntityModel<T> model) {
+    private final ResourceLocation texture;
+    public LayerModelRender(LivingRenderer<T, M> renderer, EntityModel<T> model, ResourceLocation texture) {
         super(renderer);
         this.model = model;
         this.renderer = renderer;
+        this.texture = texture;
     }
 
     @Override
@@ -36,26 +37,26 @@ public class LayerModelRender<T extends LivingEntity, M extends EntityModel<T>> 
             matrixStack.translate(0.0F, 0.2F, 0.0F);
         }
         this.model.setLivingAnimations(entity, limbSwing, limbSwingAmount, partialTicks);
-        this.model.setRotationAngles(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+        this.model.setAngles(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
         Minecraft mc = Minecraft.getInstance();
         boolean flag = !entity.isInvisible();
         boolean flag1 = !flag && !entity.isInvisibleToPlayer(mc.player);
-        boolean flag2 = mc.func_238206_b_(entity);
+        boolean flag2 = mc.hasOutline(entity);
         RenderType rendertype = this.getRenderType(entity, flag, flag1, flag2);
         if (rendertype != null) {
             IVertexBuilder ivertexbuilder = buffer.getBuffer(rendertype);
-            int i = this.renderer.getPackedOverlay(entity, 0);
+            int i = LivingRenderer.getOverlay(entity, 0);
             this.model.render(matrixStack, ivertexbuilder, packedLightIn, i, 1.0F, 1.0F, 1.0F, flag1 ? 0.15F : 1.0F);
         }
         matrixStack.pop();
     }
 
     protected RenderType getRenderType(T entity, boolean invis, boolean canSee, boolean glowing) {
-        ResourceLocation resourcelocation = this.getEntityTexture(entity);
+        ResourceLocation resourcelocation = this.texture;
         if (canSee) {
-            return RenderType.func_239268_f_(resourcelocation);
+            return RenderType.getItemEntityTranslucentCull(resourcelocation);
         } else if (invis) {
-            return this.model.getRenderType(resourcelocation);
+            return this.model.getLayer(resourcelocation);
         } else {
             return glowing ? RenderType.getOutline(resourcelocation) : null;
         }

@@ -39,8 +39,8 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
     }
 
     private void reloadItem() {
-        ITag tags = ItemTags.getCollection().func_241834_b(new ResourceLocation(this.tag));
-        this.list = tags.getAllElements();
+        ITag tags = ItemTags.getCollection().getTagOrEmpty(new ResourceLocation(this.tag));
+        this.list = tags.values();
         if(!this.list.isEmpty())
             this.firstTag = new ItemStack(this.list.get(0));
         else

@@ -1,120 +1,110 @@
 package com.flemmli97.tenshilib.client.render;
 
-import org.lwjgl.opengl.GL11;
-
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.player.EntityPlayer;
+import com.flemmli97.tenshilib.mixin.WorldRenderAccessor;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ActiveRenderInfo;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.vector.Matrix4f;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3f;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class RenderUtils {
 
     public static final int defaultColor = 0xFFFFFFFF;
 
-    public static void renderBlockOutline(EntityPlayer player, BlockPos pos, float partialTicks) {
-        AxisAlignedBB aabb = player.world.getBlockState(pos).getSelectedBoundingBox(player.world, pos);
-        if(aabb != null){
-            RenderUtils.renderBoundingBox(aabb, player, partialTicks);
-        }
+    public static void renderBlockOutline(MatrixStack matrixStack, IRenderTypeBuffer buffer, PlayerEntity player, BlockPos pos, float partialTicks) {
+        renderBlockOutline(matrixStack, buffer, player, pos, partialTicks, 0, 0, 0, 1, false);
     }
 
-    public static void renderBlockOutline(EntityPlayer player, BlockPos pos, float partialTicks, float red, float green, float blue, float alpha,
+    public static void renderBlockOutline(MatrixStack matrixStack, IRenderTypeBuffer buffer, PlayerEntity player, BlockPos pos, float partialTicks, float red, float green, float blue, float alpha,
             boolean ignoreDepth) {
-        AxisAlignedBB aabb = player.world.getBlockState(pos).getSelectedBoundingBox(player.world, pos);
-        if(aabb != null){
-            RenderUtils.renderBoundingBox(aabb, player, partialTicks, red, green, blue, alpha, ignoreDepth);
-        }
+        BlockState state = player.world.getBlockState(pos);
+        IVertexBuilder build;
+        if(ignoreDepth)
+            build = buffer.getBuffer(MoreRenderTypes.LINE_NODEPTH);
+        else
+            build = buffer.getBuffer(RenderType.getLines());
+        ActiveRenderInfo renderInfo = Minecraft.getInstance().gameRenderer.getActiveRenderInfo();
+        Vector3d rpos = renderInfo.getProjectedView();
+        WorldRenderAccessor.drawShapeOutline(matrixStack, build, state.getShape(player.world, pos, ISelectionContext.forEntity(player)),
+                rpos.x,rpos.y,rpos.z, red, green, blue, alpha);
     }
 
-    public static void renderAreaAround(EntityPlayer player, BlockPos pos, float partialTicks, float radius) {
-        RenderUtils.renderBoundingBox(new AxisAlignedBB(0, 0, 0, 1, 1, 1).grow(radius).offset(pos.down()), player, partialTicks);
+    public static void renderAreaAround(MatrixStack matrixStack, IRenderTypeBuffer buffer, PlayerEntity player, BlockPos pos, float partialTicks, float radius) {
+        RenderUtils.renderBoundingBox(matrixStack, buffer, new AxisAlignedBB(0, 0, 0, 1, 1, 1).grow(radius).offset(pos.down()), player, partialTicks);
     }
 
-    public static void renderAreaAround(EntityPlayer player, BlockPos pos, float partialTicks, float radius, float red, float green, float blue,
+    public static void renderAreaAround(MatrixStack matrixStack, IRenderTypeBuffer buffer, PlayerEntity player, BlockPos pos, float partialTicks, float radius, float red, float green, float blue,
             float alpha, boolean ignoreDepth) {
-        RenderUtils.renderBoundingBox(new AxisAlignedBB(0, 0, 0, 1, 1, 1).grow(radius).offset(pos.down()), player, partialTicks, red, green, blue,
+        RenderUtils.renderBoundingBox(matrixStack, buffer, new AxisAlignedBB(0, 0, 0, 1, 1, 1).grow(radius).offset(pos.down()), player, partialTicks, red, green, blue,
                 alpha, ignoreDepth);
     }
 
-    public static void renderBoundingBox(AxisAlignedBB aabb, EntityPlayer player, float partialTicks) {
-        RenderUtils.renderBoundingBox(aabb, player, partialTicks, 1, 0.5F, 0.5F, 1, false);
+    public static void renderBoundingBox(MatrixStack matrixStack, IRenderTypeBuffer buffer, AxisAlignedBB aabb, PlayerEntity player, float partialTicks) {
+        RenderUtils.renderBoundingBox(matrixStack, buffer, aabb, player, partialTicks, 1, 0.5F, 0.5F, 1, false);
     }
 
-    public static void renderBoundingBox(AxisAlignedBB aabb, EntityPlayer player, float partialTicks, float red, float green, float blue, float alpha,
+    public static void renderBoundingBox(MatrixStack matrixStack, IRenderTypeBuffer buffer, AxisAlignedBB aabb, PlayerEntity player, float partialTicks, float red, float green, float blue, float alpha,
             boolean ignoreDepth) {
-        double playerX = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
-        double playerY = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks;
-        double playerZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
-        GlStateManager.pushMatrix();
-        GlStateManager.enableBlend();
-        GlStateManager.disableTexture2D();
-        GlStateManager.glLineWidth(2);
+        double playerX = player.lastTickPosX + (player.getX() - player.lastTickPosX) * partialTicks;
+        double playerY = player.lastTickPosY + (player.getY() - player.lastTickPosY) * partialTicks;
+        double playerZ = player.lastTickPosZ + (player.getZ() - player.lastTickPosZ) * partialTicks;
+        IVertexBuilder build;
         if(ignoreDepth)
-            GlStateManager.disableDepth();
-        RenderGlobal.drawSelectionBoundingBox(aabb.grow(0.0020000000949949026D).offset(-playerX, -playerY, -playerZ), 1, 0.5F, 0.5F, 1);
-        if(ignoreDepth)
-            GlStateManager.enableDepth();
-        GlStateManager.enableTexture2D();
-        GlStateManager.disableBlend();
-        GlStateManager.popMatrix();
+            build = buffer.getBuffer(MoreRenderTypes.LINE_NODEPTH);
+        else
+            build = buffer.getBuffer(RenderType.getLines());
+        WorldRenderer.drawBox(matrixStack, build, aabb.grow(0.0020000000949949026D).offset(-playerX, -playerY, -playerZ), red, green, blue, alpha);
     }
 
-    public static void renderTexture(RenderManager renderManager, ResourceLocation texture, double x, double y, double z, float xSize, float ySize,
-            float red, float green, float blue, float alpha, float yawRot, float pitchRot) {
-        renderTexture(renderManager, texture, x, y, z, xSize, ySize, (int) (red * 255), (int) (green * 255), (int) (blue * 255), (int) (alpha * 255),
+    public static void renderTexture(MatrixStack matrixStack, IRenderTypeBuffer buffer, ResourceLocation texture, double x, double y, double z, float xSize, float ySize,
+                                     float red, float green, float blue, float alpha, float yawRot, float pitchRot) {
+        renderTexture(matrixStack, buffer, texture, x, y, z, xSize, ySize, (int) (red * 255), (int) (green * 255), (int) (blue * 255), (int) (alpha * 255),
                 yawRot, pitchRot);
     }
 
-    public static void renderTexture(RenderManager renderManager, ResourceLocation texture, double x, double y, double z, float xSize, float ySize,
+    public static void renderTexture(MatrixStack matrixStack, IRenderTypeBuffer buffer, ResourceLocation texture, double x, double y, double z, float xSize, float ySize,
             int red, int green, int blue, int alpha, float yawRot, float pitchRot) {
-        renderTexture(renderManager, texture, x, y, z, xSize, ySize, red, green, blue, alpha, yawRot, pitchRot, 0, 0, 1, 1);
+        renderTexture(matrixStack, buffer, texture, x, y, z, xSize, ySize, red, green, blue, alpha, yawRot, pitchRot, 0, 0, 1, 1);
     }
 
-    public static void renderTexture(RenderManager renderManager, ResourceLocation texture, double x, double y, double z, float xSize, float ySize,
-            int red, int green, int blue, int alpha, float yawRot, float pitchRot, double u, double v, double uLength, double vLength) {
-        GlStateManager.pushMatrix();
-        GlStateManager.disableCull();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        GlStateManager.alphaFunc(GL11.GL_GEQUAL, 1 / 255f);
-        RenderHelper.disableStandardItemLighting();
-        GlStateManager.translate(x, y + 0.2, z);
-        GlStateManager.rotate(yawRot, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(pitchRot, 1.0F, 0.0F, 0.0F);
+    public static void renderTexture(MatrixStack matrixStack, IRenderTypeBuffer buffer, ResourceLocation texture, double x, double y, double z, float xSize, float ySize,
+            int red, int green, int blue, int alpha, float yawRot, float pitchRot, float u, float v, float uLength, float vLength) {
+        matrixStack.push();
+        matrixStack.translate(x, y + 0.2, z);
+        matrixStack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(yawRot));
+        matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(pitchRot));
         xSize = xSize / 2f;
         ySize = ySize / 2f;
-        renderManager.renderEngine.bindTexture(texture);
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder vertexbuffer = tessellator.getBuffer();
-        vertexbuffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-        vertexbuffer.pos(-xSize, ySize, 0).tex(u, v).color(red, green, blue, alpha).endVertex();
-        vertexbuffer.pos(xSize, ySize, 0).tex(u + uLength, v).color(red, green, blue, alpha).endVertex();
-        vertexbuffer.pos(xSize, -ySize, 0).tex(u + uLength, v + vLength).color(red, green, blue, alpha).endVertex();
-        vertexbuffer.pos(-xSize, -ySize, 0).tex(u, v + vLength).color(red, green, blue, alpha).endVertex();
-        tessellator.draw();
-        RenderHelper.enableStandardItemLighting();
-        GlStateManager.disableBlend();
-        GlStateManager.alphaFunc(GL11.GL_GEQUAL, 0.1F);
-        GlStateManager.enableCull();
-        GlStateManager.popMatrix();
+        Minecraft.getInstance().textureManager.bindTexture(texture);
+        IVertexBuilder build = buffer.getBuffer(MoreRenderTypes.TEXTURED_QUAD);
+        build.vertex(-xSize, ySize, 0).color(red, green, blue, alpha).texture(u, v).endVertex();
+        build.vertex(xSize, ySize, 0).color(red, green, blue, alpha).texture(u + uLength, v).endVertex();
+        build.vertex(xSize, -ySize, 0).color(red, green, blue, alpha).texture(u + uLength, v + vLength).endVertex();
+        build.vertex(-xSize, -ySize, 0).color(red, green, blue, alpha).texture(u, v + vLength).endVertex();
+        matrixStack.pop();
     }
 
-    public static void renderTexture(RenderManager renderManager, ResourceLocation texture, double x, double y, double z, float xSize, float ySize,
+    public static void renderTexture(MatrixStack matrixStack, IRenderTypeBuffer buffer, ResourceLocation texture, double x, double y, double z, float xSize, float ySize,
             int hexColor, float yawRot, float pitchRot) {
         int red = hexColor >> 16 & 255;
         int green = hexColor >> 8 & 255;
         int blue = hexColor >> 0 & 255;
         int alpha = hexColor >> 24 & 255;
-        renderTexture(renderManager, texture, x, y, z, xSize, ySize, red, green, blue, alpha, yawRot, pitchRot);
+        renderTexture(matrixStack, buffer, texture, x, y, z, xSize, ySize, red, green, blue, alpha, yawRot, pitchRot);
     }
 }
