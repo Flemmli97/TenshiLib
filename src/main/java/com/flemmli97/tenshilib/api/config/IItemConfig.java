@@ -4,13 +4,15 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 
+import java.util.List;
+
 public interface IItemConfig<T extends IItemConfig<T>> extends IConfigValue<T> {
 
     Item getItem();
 
     ItemStack getStack();
 
-    NonNullList<ItemStack> getStackList();
+    List<Item> getItemList();
 
     boolean hasList();
 

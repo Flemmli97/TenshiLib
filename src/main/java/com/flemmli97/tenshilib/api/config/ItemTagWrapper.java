@@ -8,21 +8,17 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.Tag;
-import net.minecraft.tags.TagRegistryManager;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 
 import java.lang.reflect.Type;
 import java.util.List;
 
-//TODO: this needs rework
 public class ItemTagWrapper extends SimpleItemStackWrapper {
 
     private String tag;
@@ -33,34 +29,25 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
         this(tagName, 1);
     }
 
-    public ItemTagWrapper(String tagName, int amount) {
-        super(Items.AIR, amount);
+    public ItemTagWrapper(String tagName, int count) {
+        super("", count);
         this.tag = tagName;
-    }
-
-    private void reloadItem() {
-        ITag tags = ItemTags.getCollection().getTagOrEmpty(new ResourceLocation(this.tag));
-        this.list = tags.values();
-        if(!this.list.isEmpty())
-            this.firstTag = new ItemStack(this.list.get(0));
-        else
-            this.firstTag = ItemStack.EMPTY;
-        this.firstTag.setCount(this.count);
-    }
-
-    @Override
-    public ItemStack getStack() {
-        return this.firstTag.copy();
     }
 
     @Override
     public Item getItem() {
-        return this.firstTag.getItem();
+        ITag tags = ItemTags.getCollection().getTagOrEmpty(new ResourceLocation(this.tag));
+        this.list = tags.values();
+        if(!this.list.isEmpty())
+            this.item = this.list.get(0);
+        else
+            this.item = Items.AIR;
+        return this.item;
     }
 
     @Override
-    public NonNullList<ItemStack> getStackList() {
-        return null;
+    public List<Item> getItemList() {
+        return this.list;
     }
 
     @Override
@@ -72,7 +59,7 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
     public ItemTagWrapper readFromString(String s) {
         String[] parts = s.split(",");
         this.tag = parts[0];
-        this.reloadItem();
+        this.count = parts.length < 2 ? 1 : Integer.parseInt(parts[1]);
         return this;
     }
 
@@ -81,9 +68,8 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
         return this.tag + (this.count != 1 ? "," + this.count : "");
     }
 
-    @Override
-    public String usage() {
-        return "Usage: oreDict<,amount>";
+    public static String usage() {
+        return "Usage: item-tag,<amount>";
     }
 
     @Override
@@ -108,7 +94,7 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
         @Override
         public JsonElement serialize(ItemTagWrapper src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject obj = new JsonObject();
-            obj.add("oredict", new JsonPrimitive(src.tag));
+            obj.add("tag", new JsonPrimitive(src.tag));
             if(src.count != 1)
                 obj.add("count", new JsonPrimitive(src.count));
             return obj;
@@ -120,7 +106,7 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
             int count = 1;
             if(obj.get("count") instanceof JsonPrimitive && obj.get("count").getAsJsonPrimitive().isNumber())
                 count = obj.get("count").getAsInt();
-            return new ItemTagWrapper(obj.get("oredict").getAsString(), count);
+            return new ItemTagWrapper(obj.get("tag").getAsString(), count);
         }
     }
 }

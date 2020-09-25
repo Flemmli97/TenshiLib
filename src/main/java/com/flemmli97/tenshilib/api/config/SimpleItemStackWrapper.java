@@ -22,27 +22,10 @@ public class SimpleItemStackWrapper extends ItemWrapper {
 
     protected int count;
 
-    public SimpleItemStackWrapper(String s) {
+    public SimpleItemStackWrapper(String s, int count) {
         super(s);
+        this.count = count;
     }
-
-    public SimpleItemStackWrapper(Item item) {
-        this(item, 1);
-    }
-
-    public SimpleItemStackWrapper(Item item, int amount) {
-        super(item);
-        this.count = amount;
-    }
-
-    public SimpleItemStackWrapper(Block block) {
-        this(block.asItem(), 1);
-    }
-
-    public SimpleItemStackWrapper(ItemStack stack) {
-        this(stack.getItem(), stack.getCount());
-    }
-
 
     public SimpleItemStackWrapper setIgnoreAmount() {
         this.count = 1;
@@ -51,34 +34,27 @@ public class SimpleItemStackWrapper extends ItemWrapper {
 
     @Override
     public ItemStack getStack() {
-        return this.item == null ? ItemStack.EMPTY : new ItemStack(this.item, this.count);
+        ItemStack stack = super.getStack();
+        if(!stack.isEmpty())
+            stack.setCount(this.count);
+        return stack;
     }
 
     @Override
     public SimpleItemStackWrapper readFromString(String s) {
-        if(s.isEmpty()){
-            this.item = null;
-            return this;
-        }
         String[] parts = s.split(",");
-        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(parts[0]));
-        if(item == null || item == Items.AIR)
-            TenshiLib.logger.error("Faulty item registry name {}; Full String {}", parts[0], s);
-        else{
-            this.item = item;
-            this.count = parts.length < 3 ? 1 : Integer.parseInt(parts[1]);
-        }
+        super.readFromString(parts[0]);
+        this.count = parts.length < 2 ? 1 : Integer.parseInt(parts[1]);
         return this;
     }
 
     @Override
     public String writeToString() {
-        return this.item.getRegistryName().toString() + (this.count != 1 ? "," + this.count : "");
+        return super.writeToString() + (this.count != 1 ? "," + this.count : "");
     }
 
-    @Override
-    public String usage() {
-        return "Usage: registryname<,meta><,amount>. Leave empty for no item";
+    public static String usage() {
+        return "Usage: registryname,<amount>. Leave empty for no item";
     }
 
     @Override
@@ -98,7 +74,7 @@ public class SimpleItemStackWrapper extends ItemWrapper {
         @Override
         public JsonElement serialize(SimpleItemStackWrapper src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject obj = new JsonObject();
-            obj.add("item", new JsonPrimitive(src.item.getRegistryName().toString()));
+            obj.add("item", new JsonPrimitive(src.reg));
             if(src.count != 1)
                 obj.add("count", new JsonPrimitive(src.count));
             return obj;
@@ -110,7 +86,7 @@ public class SimpleItemStackWrapper extends ItemWrapper {
             int count = 1;
             if(obj.get("count") instanceof JsonPrimitive && obj.get("count").getAsJsonPrimitive().isNumber())
                 count = obj.get("count").getAsInt();
-            return new SimpleItemStackWrapper(ForgeRegistries.ITEMS.getValue(new ResourceLocation(obj.get("item").getAsString())), count);
+            return new SimpleItemStackWrapper(obj.get("item").getAsString(), count);
         }
     }
 }

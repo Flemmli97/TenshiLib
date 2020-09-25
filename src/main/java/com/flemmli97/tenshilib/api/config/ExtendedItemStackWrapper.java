@@ -25,27 +25,22 @@ import java.lang.reflect.Type;
  */
 public class ExtendedItemStackWrapper extends SimpleItemStackWrapper {
 
-    private CompoundNBT nbtTagCompound;
+    protected CompoundNBT nbtTagCompound;
 
     public ExtendedItemStackWrapper(CompoundNBT compound) {
-        this(ItemStack.read(compound));
+        this(compound.getString("id"), compound.getInt("Count"), compound.getCompound("nbt"));
     }
 
-    public ExtendedItemStackWrapper(Item item) {
-        super(item, 1);
+    public ExtendedItemStackWrapper(String item){
+        this(item, 1);
     }
 
-    public ExtendedItemStackWrapper(Item item, int amount) {
-        super(item, amount);
+    public ExtendedItemStackWrapper(String item, int count){
+        this(item, count, null);
     }
 
-    public ExtendedItemStackWrapper(Block block) {
-        super(block.asItem(), 1);
-    }
-
-    public ExtendedItemStackWrapper(ItemStack stack) {
-        super(stack.getItem(), stack.getCount());
-        this.nbtTagCompound = stack.hasTag() ? stack.getTag().copy() : null;
+    public ExtendedItemStackWrapper(String item, int count, CompoundNBT nbt){
+        super(item, count);
     }
 
     public ExtendedItemStackWrapper setNBT(CompoundNBT nbt) {
@@ -60,17 +55,28 @@ public class ExtendedItemStackWrapper extends SimpleItemStackWrapper {
 
     @Override
     public ExtendedItemStackWrapper readFromString(String s) {
+        try {
+            CompoundNBT nbt = JsonToNBT.getTagFromJson(s);
+            this.nbtTagCompound = nbt.getCompound("nbt");
+            this.count = nbt.getInt("Count");
+            this.reg = nbt.getString("id");
+        } catch (CommandSyntaxException e) {
+            e.printStackTrace();
+        }
         return this;
     }
 
     @Override
     public String writeToString() {
-        return super.writeToString() + (this.nbtTagCompound != null ? ",nbt:" + this.nbtTagCompound.toString() : "");
+        CompoundNBT nbt = new CompoundNBT();
+        nbt.put("nbt", this.nbtTagCompound.copy());
+        nbt.putString("id", this.item.getRegistryName().toString());
+        nbt.putInt("Count", this.count);
+        return nbt.toString();
     }
 
-    @Override
-    public String usage() {
-        return "";
+    public static String usage() {
+        return "Complete ItemStack nbt (meaning with id and count)";
     }
 
     @Nullable
@@ -80,10 +86,8 @@ public class ExtendedItemStackWrapper extends SimpleItemStackWrapper {
 
     @Override
     public ItemStack getStack() {
-        if(this.item == null)
-            return ItemStack.EMPTY;
-        ItemStack stack = new ItemStack(this.item, this.count);
-        if(this.nbtTagCompound != null)
+        ItemStack stack = super.getStack();
+        if(!stack.isEmpty())
             stack.setTag(this.nbtTagCompound.copy());
         return stack;
     }
@@ -105,7 +109,7 @@ public class ExtendedItemStackWrapper extends SimpleItemStackWrapper {
         @Override
         public JsonElement serialize(ExtendedItemStackWrapper src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject obj = new JsonObject();
-            obj.add("item", new JsonPrimitive(src.item.getRegistryName().toString()));
+            obj.add("item", new JsonPrimitive(src.reg));
             if(src.count != 1)
                 obj.add("count", new JsonPrimitive(src.count));
             if(src.nbtTagCompound != null)
@@ -128,10 +132,7 @@ public class ExtendedItemStackWrapper extends SimpleItemStackWrapper {
                     e.printStackTrace();
                 }
             }
-            ItemStack stack = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(obj.get("item").getAsString())), count);
-            stack.setTag(compound);
-            ExtendedItemStackWrapper w = new ExtendedItemStackWrapper(stack);
-            return w;
+            return new ExtendedItemStackWrapper(obj.get("item").getAsString(), count, compound);
         }
     }
 }

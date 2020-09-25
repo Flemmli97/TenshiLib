@@ -23,32 +23,36 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import javax.annotation.CheckForNull;
 import java.lang.reflect.Type;
+import java.util.List;
 
 public class ItemWrapper implements IItemConfig<ItemWrapper> {
 
-    protected Item item = Items.AIR;
-
-    public ItemWrapper(Item defaultItem) {
-        this.item = defaultItem;
-    }
+    protected Item item;
+    protected String reg;
 
     public ItemWrapper(String s) {
-        this.readFromString(s);
+        this.reg = s;
     }
 
     @Override
     public Item getItem() {
+        if(this.item==null) {
+            this.item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(this.reg));
+            if(item == Items.AIR && (this.reg.isEmpty() || this.reg.equals("minecraft:air")))
+                TenshiLib.logger.error("Faulty item registry name {}", this.reg);
+        }
         return this.item;
     }
 
     @Override
     public ItemStack getStack() {
-        return this.item == null ? ItemStack.EMPTY : new ItemStack(this.item);
+        return this.getItem() == Items.AIR ? ItemStack.EMPTY : new ItemStack(this.getItem());
     }
 
     @Override
-    public NonNullList<ItemStack> getStackList() {
+    public List<Item> getItemList() {
         return null;
     }
 
@@ -59,26 +63,18 @@ public class ItemWrapper implements IItemConfig<ItemWrapper> {
 
     @Override
     public ItemWrapper readFromString(String s) {
-        if(s.isEmpty()){
-            this.item = null;
-            return this;
-        }
-        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(s));
-        if(item == null)
-            TenshiLib.logger.error("Faulty item registry name {}", s);
-        else
-            this.item = item;
+        this.reg = s;
+        this.item = null;
         return this;
     }
 
     @Override
     public String writeToString() {
-        return this.item.getRegistryName().toString();
+        return this.reg;
     }
 
-    @Override
-    public String usage() {
-        return "Valid values are all item registry names. Empty for nothing";
+    public static String usage() {
+        return "Valid values are all item registry names. Empty or minecraft:air for nothing";
     }
 
     @Override
@@ -108,14 +104,13 @@ public class ItemWrapper implements IItemConfig<ItemWrapper> {
         @Override
         public JsonElement serialize(ItemWrapper src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject obj = new JsonObject();
-            obj.add("item", new JsonPrimitive(src.item.getRegistryName().toString()));
+            obj.add("item", new JsonPrimitive(src.reg));
             return obj;
         }
 
         @Override
         public ItemWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            return new ItemWrapper(
-                    ForgeRegistries.ITEMS.getValue(new ResourceLocation(json.getAsJsonObject().get("item").getAsString())));
+            return new ItemWrapper(json.getAsJsonObject().get("item").getAsString());
         }
     }
 }
