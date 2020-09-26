@@ -83,7 +83,7 @@ public class ExtendedItemStackWrapper extends SimpleItemStackWrapper {
     @Override
     public ItemStack getStack() {
         ItemStack stack = super.getStack();
-        if(!stack.isEmpty())
+        if(!stack.isEmpty() && this.nbtTagCompound != null)
             stack.setTag(this.nbtTagCompound.copy());
         return stack;
     }
