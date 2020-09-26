@@ -2,7 +2,6 @@ package com.flemmli97.tenshilib.api.config;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
 
 import java.util.List;
 

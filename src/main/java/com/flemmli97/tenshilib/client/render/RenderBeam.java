@@ -25,7 +25,7 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
     }
 
     public void setColor(int hexColor) {
-        this.setColorAndAlpha(hexColor >> 16 & 255, hexColor >> 8 & 255, hexColor >> 0 & 255, hexColor >> 24 & 255);
+        this.setColorAndAlpha(hexColor >> 16 & 255, hexColor >> 8 & 255, hexColor & 255, hexColor >> 24 & 255);
     }
 
     public void setColor(int red, int green, int blue) {
@@ -177,7 +177,7 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
         return arr;
     }
 
-    public static enum BeamPart {
+    public enum BeamPart {
         START, END, MIDDLE
     }
 }

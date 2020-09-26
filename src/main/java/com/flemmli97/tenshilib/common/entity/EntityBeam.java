@@ -2,11 +2,9 @@ package com.flemmli97.tenshilib.common.entity;
 
 import com.flemmli97.tenshilib.api.entity.IBeamEntity;
 import com.flemmli97.tenshilib.common.utils.RayTraceUtils;
-import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -21,11 +19,13 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.event.ForgeEventFactory;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 public abstract class EntityBeam extends Entity implements IBeamEntity {
 
@@ -146,7 +146,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
                     Optional<Vector3d> res = axisalignedbb.rayTrace(offSetPosVec, this.hit.getHitVec());
                     if (res.isPresent()) {
                         EntityRayTraceResult raytraceresult = new EntityRayTraceResult(entity);
-                        if (!net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, raytraceresult)) {
+                        if (!ForgeEventFactory.onProjectileImpact(this, raytraceresult)) {
                             this.onImpact(raytraceresult);
                             this.coolDown = this.attackCooldown();
                             if (!this.piercing())

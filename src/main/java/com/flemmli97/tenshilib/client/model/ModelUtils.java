@@ -2,7 +2,6 @@ package com.flemmli97.tenshilib.client.model;
 
 import com.flemmli97.tenshilib.common.utils.MathUtils;
 
-import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.util.math.MathHelper;
 
 public class ModelUtils {

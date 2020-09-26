@@ -6,11 +6,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.boss.dragon.EnderDragonPartEntity;
-import net.minecraft.entity.item.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.SwordItem;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.server.SEntityVelocityPacket;
 import net.minecraft.particles.ParticleTypes;
@@ -68,9 +66,6 @@ public class C2SPacketHit {
 
     /**
      * Exact same like in {@link PlayerEntity#attackTargetEntityWithCurrentItem(Entity)} but with the option of disabling the cooldown and no sweep attack
-     * @param player
-     * @param target
-     * @param resetCooldown
      */
     public static void attackWithoutSweep(PlayerEntity player, Entity target, boolean resetCooldown) {
         if (!ForgeHooks.onPlayerAttackTarget(player, target)) return;
@@ -200,7 +195,7 @@ public class C2SPacketHit {
             }
         }
     }
-    public static enum HitType {
+    public enum HitType {
         EXT, AOE
     }
 }

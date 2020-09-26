@@ -2,7 +2,6 @@ package com.flemmli97.tenshilib.client.render;
 
 import com.flemmli97.tenshilib.mixin.WorldRenderAccessor;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -15,7 +14,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.api.distmarker.Dist;
@@ -103,7 +101,7 @@ public class RenderUtils {
             int hexColor, float yawRot, float pitchRot) {
         int red = hexColor >> 16 & 255;
         int green = hexColor >> 8 & 255;
-        int blue = hexColor >> 0 & 255;
+        int blue = hexColor & 255;
         int alpha = hexColor >> 24 & 255;
         renderTexture(matrixStack, buffer, texture, x, y, z, xSize, ySize, red, green, blue, alpha, yawRot, pitchRot);
     }

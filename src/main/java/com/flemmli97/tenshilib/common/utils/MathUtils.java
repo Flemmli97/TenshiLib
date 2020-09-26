@@ -30,12 +30,6 @@ public class MathUtils {
         return Math.atan2(pointY - centerY, pointX - centerX);
     }
 
-    /**
-     * 
-     * @param radius
-     * @param density every x degree there will be a point (if possible)
-     * @return a list of x y array pair
-     */
     public static List<float[]> pointsOfCircle(float radius, int density) {
         float rad = degToRad(density);
         float i = -rad;

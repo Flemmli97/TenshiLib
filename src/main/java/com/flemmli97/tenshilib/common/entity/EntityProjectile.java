@@ -7,7 +7,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MoverType;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -196,7 +195,7 @@ public abstract class EntityProjectile extends Entity {
 
         float f = MathHelper.sqrt(horizontalMag(motion));
         this.rotationYaw = this.updateRotation(this.prevRotationYaw, (float) (MathHelper.atan2(motion.x, motion.z) * (180D / Math.PI)));
-        this.rotationPitch = this.updateRotation(this.prevRotationPitch, (float) (MathHelper.atan2(motion.y, (double) f) * (double) (180F / (float) Math.PI)));
+        this.rotationPitch = this.updateRotation(this.prevRotationPitch, (float) (MathHelper.atan2(motion.y, f) * (double) (180F / (float) Math.PI)));
 
         float friction;
         if (this.isInWater()) {
@@ -227,7 +226,7 @@ public abstract class EntityProjectile extends Entity {
         Vector3d pos = this.getPositionVec();
         Vector3d to = pos.add(this.getMotion());
         //Vector3d aabbRadius = new Vector3d(this.motionX, this.motionY, this.motionZ).normalize().scale(this.radius());
-        RayTraceResult raytraceresult = this.world.rayTraceBlocks(new RayTraceContext(pos, to, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, this));
+        BlockRayTraceResult raytraceresult = this.world.rayTraceBlocks(new RayTraceContext(pos, to, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, this));
         if (raytraceresult.getType() != RayTraceResult.Type.MISS) {
             to = raytraceresult.getHitVec();
         }
@@ -243,7 +242,7 @@ public abstract class EntityProjectile extends Entity {
         }
 
         if (raytraceresult.getType() == RayTraceResult.Type.BLOCK) {
-            BlockPos blockpos = ((BlockRayTraceResult) raytraceresult).getPos();
+            BlockPos blockpos = raytraceresult.getPos();
             BlockState blockstate = this.world.getBlockState(blockpos);
             if (blockstate.isIn(Blocks.NETHER_PORTAL)) {
                 this.setPortal(blockpos);
@@ -253,7 +252,7 @@ public abstract class EntityProjectile extends Entity {
                     ((EndGatewayTileEntity) tileentity).teleportEntity(this);
                 }
             } else if (!net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, raytraceresult))
-                this.onBlockHit((BlockRayTraceResult) raytraceresult);
+                this.onBlockHit(raytraceresult);
         }
     }
 
@@ -320,7 +319,7 @@ public abstract class EntityProjectile extends Entity {
         this.shooter = this.getShooter();
         this.livingTicks = compound.getInt("LivingTicks");
         ListNBT list = compound.getList("AttackedEntities", Constants.NBT.TAG_STRING);
-        list.forEach(tag -> this.attackedEntities.add(UUID.fromString(((StringNBT) tag).getString())));
+        list.forEach(tag -> this.attackedEntities.add(UUID.fromString(tag.getString())));
     }
 
     @Override

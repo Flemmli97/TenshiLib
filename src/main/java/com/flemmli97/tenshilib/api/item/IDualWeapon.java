@@ -10,8 +10,6 @@ public interface IDualWeapon {
 
     /**
      * Change the item being rendered in the offhand
-     * @param entity
-     * @return
      */
     default ItemStack offHandStack(LivingEntity entity) {
         return entity.getHeldItemMainhand();

@@ -16,9 +16,9 @@ public class JsonConfig<T extends JsonElement> {
 
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-    private File file;
+    private final File file;
     private T element;
-    private Class<T> type;
+    private final Class<T> type;
     private boolean mcRestart, worldRestart;
     private String name;
     private Gson gson = GSON;

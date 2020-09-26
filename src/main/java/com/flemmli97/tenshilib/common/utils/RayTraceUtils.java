@@ -7,7 +7,6 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.EntityPredicates;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
@@ -27,10 +26,8 @@ public class RayTraceUtils {
 
     /**
      * Gets a list of entities in a certain fov around the player
-     * @param entity
      * @param reach Radius around the entity
      * @param aoe FOV in degrees. 0 means vanilla raytracing. use 1 to have it like vanilla but get multiple entities.
-     * @return
      */
     public static List<LivingEntity> getEntities(LivingEntity entity, float reach, float aoe) {
         return getEntitiesIn(LivingEntity.class, entity, entity.getPositionVec().add(0, entity.getHeight() / 2, 0), entity.getLook(1), reach,
@@ -58,7 +55,7 @@ public class RayTraceUtils {
         RayTraceResult blocks = entity.world.rayTraceBlocks(new RayTraceContext(pos, pos.add(dir.x * reach, dir.y * reach, dir.z * reach), RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, entity));
         reach = (float) blocks.getHitVec().distanceTo(pos);
         Vector3d rangeVec = pos.add(dir.x * reach, dir.y * reach, dir.z * reach);
-        Vector3d hitVec = null;
+        Vector3d hitVec;
         List<Entity> list = entity.world.getEntitiesWithinAABB(clss,
                 entity.getBoundingBox().expand(dir.x * reach, dir.y * reach, dir.z * reach).expand(1.0D, 1.0D, 1.0D),
                 (t) -> EntityPredicates.NOT_SPECTATING.test(t) && t != null && t != entity && t.canBeCollidedWith()

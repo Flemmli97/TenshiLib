@@ -38,7 +38,7 @@ public class CircleSector {
         while(rot <= this.theta){
             BlockRayTraceResult blocks = world.rayTraceBlocks(new RayTraceContext(this.center,
                     this.center.add(ray.x * this.radius, ray.y * this.radius, ray.z * this.radius), RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, this.entity));
-            float reach = blocks != null ? (float) blocks.getHitVec().distanceTo(this.center) : this.radius;
+            float reach = (float) blocks.getHitVec().distanceTo(this.center);
             flag = aabb.intersects(this.center, this.center.add(ray.x * reach, ray.y * reach, ray.z * reach));
             if(flag)
                 break;

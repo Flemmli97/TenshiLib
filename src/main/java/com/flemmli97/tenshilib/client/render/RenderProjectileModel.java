@@ -12,9 +12,9 @@ import net.minecraft.util.math.MathHelper;
 
 public abstract class RenderProjectileModel<T extends Entity> extends EntityRenderer<T> {
 
-    private EntityModel model;
+    private EntityModel<T> model;
 
-    public RenderProjectileModel(EntityRendererManager renderManagerIn, EntityModel model) {
+    public RenderProjectileModel(EntityRendererManager renderManagerIn, EntityModel<T> model) {
         super(renderManagerIn);
         this.model = model;
     }

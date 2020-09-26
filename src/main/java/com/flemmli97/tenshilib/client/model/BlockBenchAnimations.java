@@ -31,7 +31,7 @@ public class BlockBenchAnimations {
 
     private static final Gson gson = new Gson();
 
-    private Map<String, Animation> animations = Maps.newHashMap();
+    private final Map<String, Animation> animations = Maps.newHashMap();
 
     public BlockBenchAnimations(Model model, ResourceLocation res) {
         InputStream input = BlockBenchAnimations.class.getResourceAsStream("/assets/" + res.getNamespace() + "/" + res.getPath());
@@ -71,7 +71,7 @@ public class BlockBenchAnimations {
 
         public final int length;
         public final boolean loop;
-        private List<AnimationComponent> components = Lists.newArrayList();
+        private final List<AnimationComponent> components = Lists.newArrayList();
 
         public Animation(Model model, JsonObject json) {
             this.length = (int) Math.floor((json.get("animation_length").getAsDouble() * 20) + 1);

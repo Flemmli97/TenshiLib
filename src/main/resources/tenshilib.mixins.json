@@ -7,10 +7,8 @@
   "mixins": [
     "LivingEntityMixin",
     "PlayerModelMixin",
-    "FirstPersonRenderMixin",
     "RenderStateAccessors",
-    "WorldRenderAccessor",
-    "SwordTestMixin"
+    "WorldRenderAccessor"
   ],
   "server": [
   ],

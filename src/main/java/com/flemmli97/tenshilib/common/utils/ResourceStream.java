@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import com.flemmli97.tenshilib.TenshiLib;
-import net.minecraftforge.fml.ModLoader;
 
 
 public class ResourceStream {

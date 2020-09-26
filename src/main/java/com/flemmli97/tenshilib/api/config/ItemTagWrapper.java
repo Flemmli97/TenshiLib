@@ -13,7 +13,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 
 import java.lang.reflect.Type;
@@ -22,7 +21,6 @@ import java.util.List;
 public class ItemTagWrapper extends SimpleItemStackWrapper {
 
     private String tag;
-    private ItemStack firstTag = ItemStack.EMPTY;
     private List<Item> list;
 
     public ItemTagWrapper(String tagName) {
@@ -36,7 +34,7 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
 
     @Override
     public Item getItem() {
-        ITag tags = ItemTags.getCollection().getTagOrEmpty(new ResourceLocation(this.tag));
+        ITag<Item> tags = ItemTags.getCollection().getTagOrEmpty(new ResourceLocation(this.tag));
         this.list = tags.values();
         if(!this.list.isEmpty())
             this.item = this.list.get(0);

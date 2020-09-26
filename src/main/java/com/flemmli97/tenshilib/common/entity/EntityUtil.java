@@ -1,7 +1,5 @@
 package com.flemmli97.tenshilib.common.entity;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -11,15 +9,17 @@ import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 public class EntityUtil {
 
     @Nullable
     public static <T extends Entity> T findFromUUID(Class<T> clss, World world, UUID uuid) {
-        return findFromUUID(clss, world, uuid, Predicates.alwaysTrue());
+        return findFromUUID(clss, world, uuid, t -> true);
     }
 
     //TODO: Test on server
+    @SuppressWarnings("unchecked")
     @Nullable
     public static <T extends Entity> T findFromUUID(Class<T> clss, World world, UUID uuid, Predicate<T> pred) {
         if(world instanceof ServerWorld){

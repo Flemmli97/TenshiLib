@@ -29,7 +29,7 @@ public abstract class RenderTexture<T extends Entity> extends EntityRenderer<T> 
     }
 
     public void setColor(int hexColor) {
-        this.setColor(hexColor >> 16 & 255, hexColor >> 8 & 255, hexColor >> 0 & 255, hexColor >> 24 & 255);
+        this.setColor(hexColor >> 16 & 255, hexColor >> 8 & 255, hexColor & 255, hexColor >> 24 & 255);
     }
 
     public void setColor(int red, int green, int blue, int alpha) {
@@ -71,6 +71,6 @@ public abstract class RenderTexture<T extends Entity> extends EntityRenderer<T> 
 
     public float[] uvOffset(int timer) {
         int frame = timer % this.length;
-        return new float[]{(float) ((frame % this.columns) * this.uLength), (float) ((frame / this.columns) * this.vLength)};
+        return new float[]{(frame % this.columns) * this.uLength, (frame / this.columns) * this.vLength};
     }
 }
