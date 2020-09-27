@@ -138,6 +138,9 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             artifact jar
+            groupId modid
+            artifactId project.archivesBaseName
+            version project.version
         }
     }
     repositories {
