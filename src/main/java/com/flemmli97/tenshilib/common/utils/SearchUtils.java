@@ -9,7 +9,6 @@ public class SearchUtils {
      * Searches for the infimum value in the given array.
      * @param l The sorted list
      * @param search A function that should return 0,1,-1 indicating equals, greater or lesser
-     * @return
      */
     public static <T extends Comparable<T>> T searchInfFunc(List<T> l, Function<T,Integer> search, T defaultVal){
         if(l.isEmpty() || search.apply(l.get(0))>0)
@@ -21,7 +20,6 @@ public class SearchUtils {
      * Searches for the infimum value in the given array.
      * @param l The sorted list
      * @param search The value to search for
-     * @return
      */
     public static <T extends Comparable<T>> T searchInf(List<T> l, T search, T defaultVal){
         if(l.isEmpty() || l.get(0).compareTo(search)>0)
@@ -33,7 +31,6 @@ public class SearchUtils {
      * Searches for the infimum value in the given array.
      * @param arr The sorted array
      * @param search The value to search for
-     * @return
      */
     public static <T extends Comparable<T>> T searchInf(T[] arr, T search, T defaultVal){
         if(arr.length==0 || arr[0].compareTo(search)>0)

@@ -24,7 +24,7 @@ public interface IAnimated {
 
     static <T extends Entity & IAnimated> void sentToClient(T entity) {
         if(!entity.world.isRemote){
-            PacketHandler.sendToTracking(new S2CEntityAnimation<T>(entity), entity);
+            PacketHandler.sendToTracking(new S2CEntityAnimation<>(entity), entity);
         }
     }
 }

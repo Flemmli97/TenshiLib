@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 
 public class C2SPacketHit {
 
-    private HitType type;
+    private final HitType type;
 
     public C2SPacketHit(HitType type) {
         this.type = type;

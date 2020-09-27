@@ -71,6 +71,6 @@ public abstract class RenderTexture<T extends Entity> extends EntityRenderer<T> 
 
     public float[] uvOffset(int timer) {
         int frame = timer % this.length;
-        return new float[]{(frame % this.columns) * this.uLength, (frame / this.columns) * this.vLength};
+        return new float[]{(frame % this.columns) * this.uLength, (frame / (float) this.columns) * this.vLength};
     }
 }
