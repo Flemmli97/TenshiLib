@@ -5,10 +5,9 @@
   "refmap": "tenshilib.refmap.json",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-
+    "LivingEntityMixin"
   ],
   "client": [
-    "LivingEntityMixin",
     "RenderStateAccessors",
     "WorldRenderAccessor"
   ],
