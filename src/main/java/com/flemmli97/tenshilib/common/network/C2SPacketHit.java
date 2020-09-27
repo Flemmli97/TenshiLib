@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 
 public class C2SPacketHit {
 
-    public HitType type;
+    private HitType type;
 
     public C2SPacketHit(HitType type) {
         this.type = type;
@@ -44,10 +44,11 @@ public class C2SPacketHit {
     }
 
     public static void handlePacket(C2SPacketHit pkt, Supplier<NetworkEvent.Context> ctx) {
-        PlayerEntity player = ctx.get().getSender();
-        if (player == null)
-            return;
-        ItemStack stack = player.getHeldItemMainhand();
+        ctx.get().enqueueWork(()-> {
+            PlayerEntity player = ctx.get().getSender();
+            if (player == null)
+                return;
+            ItemStack stack = player.getHeldItemMainhand();
         /*if(pkt.type == HitType.EXT && stack.getItem() instanceof IExtendedWeapon){
             IExtendedWeapon item = (IExtendedWeapon) stack.getItem();
             RayTraceResult res = RayTraceUtils.calculateEntityFromLook(player, item.getRange());
@@ -62,7 +63,8 @@ public class C2SPacketHit {
             for(int i = 0; i < list.size(); i++)
                 attackTargetEntityWithCurrentItem(player, list.get(i), i == (list.size() - 1));
         }*/
-        ctx.get().setPacketHandled(true);
+            ctx.get().setPacketHandled(true);
+        });
     }
 
     /**
