@@ -147,7 +147,17 @@ publishing {
     }
     repositories {
         maven {
-            url "file:///${project.projectDir}/repo"
+            url "https://gitlab.com/api/v4/projects/21830712/packages/maven"
+            credentials(HttpHeaderCredentials) {
+                name = 'Deploy-Token'
+                value = project.findProperty("gpr.token") ?: System.getenv("GITLAB_MAVENREPO_TOKEN")
+            }
+            authentication {
+                header(HttpHeaderAuthentication)
+            }
         }
+        //maven {
+        //    url "file:///${project.projectDir}/repo"
+        //}
     }
 }

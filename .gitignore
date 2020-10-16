@@ -17,6 +17,7 @@ libs
 # gradle
 .gradle
 build
+repo
 
 # things
 .DS_Store
