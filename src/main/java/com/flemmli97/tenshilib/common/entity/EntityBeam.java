@@ -6,9 +6,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.network.play.server.SSpawnObjectPacket;
 import net.minecraft.util.EntityPredicates;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.EntityRayTraceResult;
@@ -38,17 +40,17 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
 
     private final Predicate<Entity> notShooter = (entity) -> entity != EntityBeam.this.getShooter() && EntityPredicates.NOT_SPECTATING.test(entity);
 
-    public EntityBeam(EntityType<EntityBeam> type, World world) {
+    public EntityBeam(EntityType<? extends EntityBeam> type, World world) {
         super(type, world);
         this.ignoreFrustumCheck = true;
     }
 
-    public EntityBeam(EntityType<EntityBeam> type, World world, double x, double y, double z) {
+    public EntityBeam(EntityType<? extends EntityBeam> type, World world, double x, double y, double z) {
         this(type, world);
         this.setPosition(x, y, z);
     }
 
-    public EntityBeam(EntityType<EntityBeam> type, World world, LivingEntity shooter) {
+    public EntityBeam(EntityType<? extends EntityBeam> type, World world, LivingEntity shooter) {
         this(type, world, shooter.getX(), shooter.getY() + shooter.getEyeHeight() - 0.10000000149011612D, shooter.getZ());
         this.shooter = shooter;
         this.dataManager.set(shooterUUID, shooter.getUniqueID().toString());
@@ -158,7 +160,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         }
     }
 
-    protected abstract void onImpact(RayTraceResult result);
+    public abstract void onImpact(EntityRayTraceResult result);
 
     public int livingTicks() {
         return this.livingTicks;
@@ -188,5 +190,10 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
             this.shooter = EntityUtil.findFromUUID(LivingEntity.class, this.world, UUID.fromString(this.dataManager.get(shooterUUID)));
         }
         return this.shooter;
+    }
+
+    @Override
+    public IPacket<?> createSpawnPacket() {
+        return new SSpawnObjectPacket(this);
     }
 }
