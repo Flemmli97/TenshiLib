@@ -50,7 +50,8 @@ minecraft {
 
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
-
+            //For linux intellij
+            environment 'PULSE_RUNTIME_PATH', '/run/user/1000/pulse'
             mods {
                 modid {
                     source sourceSets.main
