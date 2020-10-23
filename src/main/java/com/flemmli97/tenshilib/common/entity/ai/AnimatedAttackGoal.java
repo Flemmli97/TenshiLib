@@ -81,7 +81,7 @@ public abstract class AnimatedAttackGoal<T extends CreatureEntity & IAnimated> e
         }
         if (this.next == null && anim == null) {
             AnimatedAction choose;
-            if (this.iddleTime <= 0 && canChooseAttack(choose = this.randomAttack())) {
+            if (this.iddleTime <= 0 && this.canChooseAttack(choose = this.randomAttack())) {
                 this.next = choose;
                 this.iddleTime = this.coolDown(this.next);
                 this.movementDone=false;
