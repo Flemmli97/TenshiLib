@@ -1,5 +1,6 @@
 package com.flemmli97.tenshilib;
 
+import com.flemmli97.tenshilib.common.network.PacketHandler;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -18,6 +19,6 @@ public class TenshiLib {
 
     @SubscribeEvent
     public static void preInit(FMLCommonSetupEvent e) {
-
+        PacketHandler.register();
     }
 }
