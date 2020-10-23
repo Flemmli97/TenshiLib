@@ -5,12 +5,17 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
+import org.apache.commons.compress.utils.IOUtils;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class JsonConfig<T extends JsonElement> {
 
@@ -23,6 +28,25 @@ public class JsonConfig<T extends JsonElement> {
     private String name;
     private Gson gson = GSON;
 
+    public JsonConfig(File file, Class<T> type, @Nullable T defaultValue) {
+        this.file = file;
+        this.type = type;
+        this.name = this.file.getName();
+        if(this.file.getParentFile() == null)
+            this.file.mkdirs();
+        if(!this.file.exists())
+            try{
+                this.file.createNewFile();
+                if(defaultValue != null) {
+                    this.element = defaultValue;
+                    this.save();
+                }
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+        this.load();
+    }
+
     public JsonConfig(File file, Class<T> type, @Nullable File defaultConfig) {
         this.file = file;
         this.type = type;
@@ -32,8 +56,13 @@ public class JsonConfig<T extends JsonElement> {
         if(!this.file.exists())
             try{
                 this.file.createNewFile();
-                if(defaultConfig != null && defaultConfig.exists())
-                    Files.copy(defaultConfig, this.file);
+                if(defaultConfig != null && defaultConfig.exists()) {
+                    InputStream in = new FileInputStream(defaultConfig);
+                    OutputStream out = new FileOutputStream(this.file);
+                    IOUtils.copy(in, out);
+                    in.close();
+                    out.close();
+                }
             }catch(IOException e){
                 e.printStackTrace();
             }

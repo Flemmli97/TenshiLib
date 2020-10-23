@@ -16,6 +16,10 @@ public class SimpleItemStackWrapper extends ItemWrapper {
 
     protected int count;
 
+    public SimpleItemStackWrapper(String s){
+        this(s, 1);
+    }
+
     public SimpleItemStackWrapper(String s, int count) {
         super(s);
         this.count = count;

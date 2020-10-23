@@ -31,7 +31,7 @@ public class ItemWrapper implements IItemConfig<ItemWrapper> {
     public Item getItem() {
         if(this.item==null) {
             this.item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(this.reg));
-            if(item == Items.AIR && (this.reg.isEmpty() || this.reg.equals("minecraft:air")))
+            if(this.item == Items.AIR && (this.reg.isEmpty() || this.reg.equals("minecraft:air")))
                 TenshiLib.logger.error("Faulty item registry name {}", this.reg);
         }
         return this.item;
