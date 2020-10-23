@@ -29,6 +29,6 @@ public class PacketHandler {
     }
 
     public static <T> void sendToTracking(T message, Entity e){
-        dispatcher.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.noArg(), message);
+        dispatcher.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(()->e), message);
     }
 }
