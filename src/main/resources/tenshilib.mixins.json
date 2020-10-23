@@ -8,7 +8,9 @@
 
   ],
   "client": [
-
+    "ModelRendererAccessors",
+    "RenderStateAccessors",
+    "WorldRenderAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
