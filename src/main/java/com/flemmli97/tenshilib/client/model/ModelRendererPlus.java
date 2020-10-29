@@ -38,12 +38,24 @@ public class ModelRendererPlus extends ModelRenderer {
     }
 
     public void reset() {
-        this.rotateAngleX = this.defaultRotAngleX;
-        this.rotateAngleY = this.defaultRotAngleY;
-        this.rotateAngleZ = this.defaultRotAngleZ;
+        this.resetRotationPoints();
+        this.resetAngles();
+        this.resetScale();
+    }
+
+    public void resetRotationPoints(){
         this.rotationPointX = this.defaultRotPointX;
         this.rotationPointY = this.defaultRotPointY;
         this.rotationPointZ = this.defaultRotPointZ;
+    }
+
+    public void resetAngles(){
+        this.rotateAngleX = this.defaultRotAngleX;
+        this.rotateAngleY = this.defaultRotAngleY;
+        this.rotateAngleZ = this.defaultRotAngleZ;
+    }
+
+    public void resetScale(){
         this.scaleX = this.defaultScaleX;
         this.scaleY = this.defaultScaleY;
         this.scaleZ = this.defaultScaleZ;
