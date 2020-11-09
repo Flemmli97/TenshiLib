@@ -11,6 +11,7 @@ import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
+import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -29,6 +30,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -233,8 +235,7 @@ public abstract class EntityProjectile extends Entity {
 
         EntityRayTraceResult res;
         while ((res = this.getEntityHit(pos, to)) != null) {
-            if (!net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, res)) {
-                this.onEntityHit(res);
+            if (!net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, res) && this.onEntityHit(res)) {
                 this.attackedEntities.add(res.getEntity().getUniqueID());
                 if (this.maxPierceAmount() != -1 && this.attackedEntities.size() > this.maxPierceAmount())
                     this.onReachMaxPierce();
@@ -300,7 +301,7 @@ public abstract class EntityProjectile extends Entity {
         return 0.99f;
     }
 
-    protected abstract void onEntityHit(EntityRayTraceResult result);
+    protected abstract boolean onEntityHit(EntityRayTraceResult result);
 
     protected abstract void onBlockHit(BlockRayTraceResult result);
 
@@ -341,5 +342,10 @@ public abstract class EntityProjectile extends Entity {
             this.shooter = EntityUtil.findFromUUID(LivingEntity.class, this.world, UUID.fromString(this.dataManager.get(shooterUUID)));
         }
         return this.shooter;
+    }
+
+    @Override
+    public IPacket<?> createSpawnPacket() {
+        return NetworkHooks.getEntitySpawningPacket(this);
     }
 }
