@@ -2,9 +2,11 @@ package com.flemmli97.tenshilib.client.render;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 
 public abstract class RenderTexture<T extends Entity> extends EntityRenderer<T> {
@@ -50,11 +52,18 @@ public abstract class RenderTexture<T extends Entity> extends EntityRenderer<T> 
             //yaw = -this.renderManager.playerViewY + 180;
             //pitch = (this.renderManager.options.thirdPersonView == 2 ? 1 : -1) * this.renderManager.playerViewX;
         }
+        else {
+            RenderUtils.applyYawPitch(stack, yaw + this.yawOffset(), pitch + this.pitchOffset());
+        }
         float[] uvOffset = this.uvOffset(entity.ticksExisted);
-        RenderUtils.renderTexture(stack, buffer, this.getEntityTexture(entity), 0, 0, 0, this.xSize, this.ySize, this.red, this.blue,
-                this.green, this.alpha, yaw + this.yawOffset(), pitch + this.pitchOffset(), uvOffset[0], uvOffset[1], this.uLength, this.vLength);
+        RenderUtils.renderTexture(stack, buffer.getBuffer(this.getRenderType(entity, this.getEntityTexture(entity))), this.xSize, this.ySize, this.red, this.blue,
+                this.green, this.alpha, uvOffset[0], uvOffset[1], this.uLength, this.vLength, packedLight);
         super.render(entity, rotation, partialTicks, stack, buffer, packedLight);
         //}
+    }
+
+    protected RenderType getRenderType(T entity, ResourceLocation loc){
+        return RenderType.getEntityCutoutNoCull(loc);
     }
 
     public boolean facePlayer() {
