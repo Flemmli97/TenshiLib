@@ -9,10 +9,11 @@ import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.vector.Vector3f;
 
 public abstract class RenderProjectileModel<T extends Entity> extends EntityRenderer<T> {
 
-    private EntityModel<T> model;
+    protected final EntityModel<T> model;
 
     public RenderProjectileModel(EntityRendererManager renderManagerIn, EntityModel<T> model) {
         super(renderManagerIn);
@@ -22,14 +23,24 @@ public abstract class RenderProjectileModel<T extends Entity> extends EntityRend
     @Override
     public void render(T entity, float rotation, float partialTicks, MatrixStack stack, IRenderTypeBuffer buffer, int packedLight) {
         stack.push();
-        stack.scale(-1.0F, -1.0F, 1.0F);
-        float f = MathHelper.lerpAngle(entity.prevRotationYaw, entity.rotationYaw, partialTicks);
-        float f1 = MathHelper.lerp(partialTicks, entity.prevRotationPitch, entity.rotationPitch);
+        float yaw = MathHelper.lerp(partialTicks, entity.prevRotationYaw, entity.rotationYaw) + this.yawOffset();
+        float pitch = MathHelper.lerp(partialTicks, entity.prevRotationPitch, entity.rotationPitch) + this.pitchOffset();
+        float partialLivingTicks = entity.ticksExisted + partialTicks;
+
+        this.translate(entity, stack, pitch, yaw, partialTicks);
+
+        this.model.setLivingAnimations(entity, 0, 0, partialTicks);
+        this.model.setAngles(entity, 0, 0, partialLivingTicks, yaw, pitch);
+
         IVertexBuilder ivertexbuilder = buffer.getBuffer(this.model.getLayer(this.getEntityTexture(entity)));
-        //Setup rotation
         this.model.render(stack, ivertexbuilder, packedLight, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F, 1.0F, 1.0F);
         stack.pop();
         super.render(entity, rotation, partialTicks, stack, buffer, packedLight);
+    }
+
+    public void translate(T entity, MatrixStack stack, float pitch, float yaw, float partialTicks){
+        stack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180+yaw));
+        stack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(pitch));
     }
 
     public float yawOffset() {
