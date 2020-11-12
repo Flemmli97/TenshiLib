@@ -43,7 +43,7 @@ public abstract class EntityProjectile extends Entity {
 
     protected boolean inGround;
     protected int ticksInGround, livingTicks;
-    public List<UUID> attackedEntities = Lists.newArrayList();
+    public final List<UUID> attackedEntities = Lists.newArrayList();
 
     private BlockState ground;
     private BlockPos groundPos;

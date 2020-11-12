@@ -54,7 +54,7 @@ public class AnimatedAction {
     }
 
     public boolean checkID(AnimatedAction other){
-        return other == null ? false : this.id.equals(other.id);
+        return other != null && this.id.equals(other.id);
     }
 
     @Override

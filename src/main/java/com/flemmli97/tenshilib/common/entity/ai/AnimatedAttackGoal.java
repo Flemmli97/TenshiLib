@@ -14,7 +14,7 @@ import java.util.EnumSet;
 
 public abstract class AnimatedAttackGoal<T extends CreatureEntity & IAnimated> extends Goal {
 
-    protected T attacker;
+    protected final T attacker;
     protected LivingEntity target;
     protected AnimatedAction next;
     protected String prevAnim = "";

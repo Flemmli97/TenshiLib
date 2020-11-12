@@ -1,6 +1,5 @@
 package com.flemmli97.tenshilib.common.config;
 
-import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;

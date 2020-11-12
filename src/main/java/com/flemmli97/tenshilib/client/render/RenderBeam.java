@@ -2,8 +2,6 @@ package com.flemmli97.tenshilib.client.render;
 
 import com.flemmli97.tenshilib.api.entity.IBeamEntity;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -18,7 +16,6 @@ import net.minecraft.util.math.vector.Matrix3f;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.client.ForgeRenderTypes;
-import org.apache.commons.lang3.tuple.Pair;
 
 public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityRenderer<T> {
 
