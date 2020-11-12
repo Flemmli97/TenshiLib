@@ -10,6 +10,7 @@ import net.minecraft.entity.MoverType;
 import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.datasync.DataParameter;
@@ -283,6 +284,8 @@ public abstract class EntityProjectile extends Entity {
     }
 
     private EntityRayTraceResult getEntityHit(Vector3d from, Vector3d to) {
+        if(!this.isAlive())
+            return null;
         if (this.isPiercing()) {
             if (this.attackedEntities.size() < this.maxPierceAmount())
                 return ProjectileHelper.rayTraceEntities(this.world, this, from, to, this.getBoundingBox().expand(this.getMotion()).grow(1.0D), this::canHit);
@@ -311,12 +314,9 @@ public abstract class EntityProjectile extends Entity {
     @Override
     protected void readAdditional(CompoundNBT compound) {
         this.inGround = compound.getBoolean("InGround");
-        if (this.inGround) {
-            int[] arr = compound.getIntArray("GroundPos");
-            this.setInGround(new BlockPos(arr[0], arr[1], arr[2]));
-        }
-        if (compound.contains("Shooter"))
-            this.dataManager.set(shooterUUID, compound.getString("Shooter"));
+        if (this.inGround)
+            this.setInGround(NBTUtil.readBlockPos(compound.getCompound("GroundPos")));
+        this.dataManager.set(shooterUUID, compound.getString("Shooter"));
         this.shooter = this.getShooter();
         this.livingTicks = compound.getInt("LivingTicks");
         ListNBT list = compound.getList("AttackedEntities", Constants.NBT.TAG_STRING);
@@ -325,9 +325,8 @@ public abstract class EntityProjectile extends Entity {
 
     @Override
     protected void writeAdditional(CompoundNBT compound) {
-        if (this.inGround) {
-            compound.putIntArray("GroundPos", new int[]{this.groundPos.getX(), this.groundPos.getY(), this.groundPos.getZ()});
-        }
+        if (this.inGround)
+            compound.put("GroundPos", NBTUtil.writeBlockPos(this.groundPos));
         compound.putBoolean("InGround", this.inGround);
         compound.putString("Shooter", this.dataManager.get(shooterUUID));
         compound.putInt("LivingTicks", this.livingTicks);

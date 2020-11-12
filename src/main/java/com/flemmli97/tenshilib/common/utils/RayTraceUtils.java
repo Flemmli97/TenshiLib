@@ -42,15 +42,15 @@ public class RayTraceUtils {
                         && circ.intersects(living.world, living.getBoundingBox()));
     }
 
-    public static RayTraceResult calculateEntityFromLook(LivingEntity entity, float reach) {
+    public static EntityRayTraceResult calculateEntityFromLook(LivingEntity entity, float reach) {
         return calculateEntityFromLook(entity, reach, Entity.class);
     }
 
-    public static RayTraceResult calculateEntityFromLook(LivingEntity entity, float reach, Class<? extends Entity> clss) {
+    public static EntityRayTraceResult calculateEntityFromLook(LivingEntity entity, float reach, Class<? extends Entity> clss) {
         return calculateEntityFromLook(entity, entity.getEyePosition(1), entity.getLook(1), reach, clss, null);
     }
 
-    public static RayTraceResult calculateEntityFromLook(LivingEntity entity, Vector3d pos, Vector3d dir, float reach, Class<? extends Entity> clss,
+    public static EntityRayTraceResult calculateEntityFromLook(LivingEntity entity, Vector3d pos, Vector3d dir, float reach, Class<? extends Entity> clss,
             @Nullable Predicate<? super Entity> pred) {
         RayTraceResult blocks = entity.world.rayTraceBlocks(new RayTraceContext(pos, pos.add(dir.x * reach, dir.y * reach, dir.z * reach), RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, entity));
         reach = (float) blocks.getHitVec().distanceTo(pos);
@@ -103,7 +103,7 @@ public class RayTraceUtils {
             if (raytraceresult.getType() != RayTraceResult.Type.MISS) {
                 look = raytraceresult.getHitVec();
             }
-            RayTraceResult raytraceresult1 = ProjectileHelper.rayTraceEntities(e.world, e, posEye, look, e.getBoundingBox().expand(look).grow(1.0D), pred);
+            EntityRayTraceResult raytraceresult1 = ProjectileHelper.rayTraceEntities(e.world, e, posEye, look, e.getBoundingBox().expand(look).grow(1.0D), pred);
             if (raytraceresult1 != null) {
                 raytraceresult = raytraceresult1;
             }
