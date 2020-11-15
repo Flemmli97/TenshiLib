@@ -9,8 +9,9 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(WorldRenderer.class)
 public interface WorldRenderAccessor {
+
     @Invoker(value = "drawShapeOutline") //yarn: drawShapeOutline, drawShape
     static void drawShapeOutline(MatrixStack stack, IVertexBuilder buffer, VoxelShape shape, double x, double y, double z, float red, float green, float blue, float alpha) {
-
+        throw new IllegalStateException();
     }
 }

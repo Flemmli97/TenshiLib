@@ -7,33 +7,23 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(RenderState.class)
 public interface RenderStateAccessors {
 
-    @Accessor(value = "DISABLE_CULLING")
-    static RenderState.CullState disableCull() {
-        return null;
-    }
-
     @Accessor(value = "TRANSLUCENT_TRANSPARENCY")
-    static RenderState.TransparencyState translucent(){
-        return null;
-    }
-
-    @Accessor(value = "ONE_TENTH_ALPHA")
-    static RenderState.AlphaState oneTenthAlpha(){
-        return null;
+    static RenderState.TransparencyState translucent() {
+        throw new IllegalStateException();
     }
 
     @Accessor(value = "ITEM_TARGET")
-    static RenderState.TargetState itemTarget(){
-        return null;
+    static RenderState.TargetState itemTarget() {
+        throw new IllegalStateException();
     }
 
     @Accessor(value = "VIEW_OFFSET_Z_LAYERING")
-    static RenderState.LayerState offsetZLayer(){
-        return null;
+    static RenderState.LayerState offsetZLayer() {
+        throw new IllegalStateException();
     }
 
     @Accessor(value = "ALL_MASK")
-    static RenderState.WriteMaskState allMask(){
-        return null;
+    static RenderState.WriteMaskState allMask() {
+        throw new IllegalStateException();
     }
 }

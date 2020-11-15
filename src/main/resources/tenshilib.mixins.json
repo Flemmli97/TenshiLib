@@ -10,7 +10,9 @@
   "client": [
     "ModelRendererAccessors",
     "RenderStateAccessors",
-    "WorldRenderAccessor"
+    "WorldRenderAccessor",
+    "LivingOverlayMixin",
+    "OverlayTextureMixin"
   ],
   "injectors": {
     "defaultRequire": 1
