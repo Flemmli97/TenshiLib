@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * Intercepts the overlay uv in LivingRenderer
  */
 @Mixin(LivingRenderer.class)
-public class LivingOverlayMixin {
+public abstract class LivingOverlayMixin {
 
     @Inject(method = "getOverlay", at = @At(value = "HEAD"), cancellable = true)
     private static void overlay(LivingEntity entity, float f, CallbackInfoReturnable<Integer> info) {
