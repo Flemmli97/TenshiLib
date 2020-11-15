@@ -51,8 +51,7 @@ public abstract class RenderTexture<T extends Entity> extends EntityRenderer<T> 
             stack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180));
             //yaw = -this.renderManager.playerViewY + 180;
             //pitch = (this.renderManager.options.thirdPersonView == 2 ? 1 : -1) * this.renderManager.playerViewX;
-        }
-        else {
+        } else {
             RenderUtils.applyYawPitch(stack, yaw + this.yawOffset(), pitch + this.pitchOffset());
         }
         float[] uvOffset = this.uvOffset(entity.ticksExisted);
@@ -62,7 +61,7 @@ public abstract class RenderTexture<T extends Entity> extends EntityRenderer<T> 
         //}
     }
 
-    protected RenderType getRenderType(T entity, ResourceLocation loc){
+    protected RenderType getRenderType(T entity, ResourceLocation loc) {
         return RenderType.getEntityCutoutNoCull(loc);
     }
 

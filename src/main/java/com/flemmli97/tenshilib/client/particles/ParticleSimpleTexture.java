@@ -18,7 +18,7 @@ public abstract class ParticleSimpleTexture extends TexturedParticle {
     }
 
     public ParticleSimpleTexture(ClientWorld world, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn,
-            double zSpeedIn) {
+                                 double zSpeedIn) {
         super(world, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
     }
 

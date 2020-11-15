@@ -9,8 +9,8 @@ public interface IResetModel {
     void resetModel();
 
     default void resetChild(ModelRenderer model) {
-        for(ModelRenderer child : ((ModelRendererAccessors)model).getChildModels()){
-            if(child instanceof ModelRendererPlus)
+        for (ModelRenderer child : ((ModelRendererAccessors) model).getChildModels()) {
+            if (child instanceof ModelRendererPlus)
                 ((ModelRendererPlus) child).reset();
             this.resetChild(child);
         }

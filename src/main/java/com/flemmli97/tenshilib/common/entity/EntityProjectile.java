@@ -284,7 +284,7 @@ public abstract class EntityProjectile extends Entity {
     }
 
     private EntityRayTraceResult getEntityHit(Vector3d from, Vector3d to) {
-        if(!this.isAlive())
+        if (!this.isAlive())
             return null;
         if (this.isPiercing()) {
             if (this.attackedEntities.size() < this.maxPierceAmount())

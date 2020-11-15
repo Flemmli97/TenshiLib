@@ -47,7 +47,7 @@ public class Configuration<T> {
 
     public void loadConfig() {
         try {
-            if(!this.spec.isCorrect(this.config))
+            if (!this.spec.isCorrect(this.config))
                 this.spec.correct(this.config);
             this.config.load();
             this.load.accept(this.confHolder);
@@ -56,7 +56,7 @@ public class Configuration<T> {
         }
     }
 
-    public ForgeConfigSpec getSpec(){
+    public ForgeConfigSpec getSpec() {
         return this.spec;
     }
 

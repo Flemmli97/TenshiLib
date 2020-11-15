@@ -20,7 +20,7 @@ public class JsonModelHelper {
 
     /**
      * Creates a generic json file for item models from the specifide mod
-     * 
+     *
      * @param assetsFolder The folder where the json models end up at
      */
     public static void itemJson(File assetsFolder, Iterable<Item> list) {
@@ -37,7 +37,7 @@ public class JsonModelHelper {
                     json.name("textures");
                     json.beginObject();
                     json.name("layer0");
-                    json.value(item.getRegistryName().getNamespace()+":items/" + item.getRegistryName().getPath());
+                    json.value(item.getRegistryName().getNamespace() + ":items/" + item.getRegistryName().getPath());
                     json.endObject();
                     json.endObject();
                     writer.close();
@@ -50,11 +50,11 @@ public class JsonModelHelper {
 
     public static void blockJson(File assetsFolder, Iterable<Block> list, @Nullable Function<Block, String> parentModel) {
         try {
-            new File(assetsFolder+"/blockstates").mkdir();
-            new File(assetsFolder+"/model").mkdir();
-            new File(assetsFolder+"/item").mkdir();
+            new File(assetsFolder + "/blockstates").mkdir();
+            new File(assetsFolder + "/model").mkdir();
+            new File(assetsFolder + "/item").mkdir();
             for (Block block : list) {
-                File jsonFile = new File(assetsFolder+"/blockstates", block.getRegistryName().getPath() + ".json");
+                File jsonFile = new File(assetsFolder + "/blockstates", block.getRegistryName().getPath() + ".json");
                 if (!jsonFile.exists()) {
                     jsonFile.createNewFile();
                     FileWriter writer = new FileWriter(jsonFile);
@@ -72,7 +72,7 @@ public class JsonModelHelper {
                     writer.close();
                 }
 
-                File jsonFile2 = new File(assetsFolder+"/model", block.getRegistryName().getPath() + ".json");
+                File jsonFile2 = new File(assetsFolder + "/model", block.getRegistryName().getPath() + ".json");
                 if (!jsonFile2.exists()) {
                     jsonFile2.createNewFile();
                     FileWriter writer = new FileWriter(jsonFile2);
@@ -83,19 +83,19 @@ public class JsonModelHelper {
                     json.name("textures");
                     json.beginObject();
                     json.name("0");
-                    json.value(block.getRegistryName().getNamespace()+":blocks/"+ block.getRegistryName().getPath());
+                    json.value(block.getRegistryName().getNamespace() + ":blocks/" + block.getRegistryName().getPath());
                     json.endObject();
                     json.endObject();
                     writer.close();
                 }
-                File jsonFile3 = new File(assetsFolder+"/item", block.getRegistryName().getPath() + ".json");
+                File jsonFile3 = new File(assetsFolder + "/item", block.getRegistryName().getPath() + ".json");
                 if (!jsonFile3.exists()) {
                     jsonFile3.createNewFile();
                     FileWriter writer = new FileWriter(jsonFile3);
                     JsonWriter json = GSON.newJsonWriter(writer);
                     json.beginObject();
                     json.name("parent");
-                    json.value(block.getRegistryName().getNamespace()+":block/" + block.getRegistryName().getPath());
+                    json.value(block.getRegistryName().getNamespace() + ":block/" + block.getRegistryName().getPath());
                     json.endObject();
                     writer.close();
                 }

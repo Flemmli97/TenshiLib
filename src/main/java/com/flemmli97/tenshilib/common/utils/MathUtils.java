@@ -23,7 +23,7 @@ public class MathUtils {
         double x = pointX - centerX;
         double y = pointY - centerY;
         float d0 = MathHelper.sqrt(x * x + y * y);
-        return new double[] {x / d0 * radius + centerX, y / d0 * radius + centerY};
+        return new double[]{x / d0 * radius + centerX, y / d0 * radius + centerY};
     }
 
     public static double phiFromPoint(double centerX, double centerY, double pointX, double pointY) {
@@ -34,18 +34,19 @@ public class MathUtils {
         float rad = degToRad(density);
         float i = -rad;
         List<float[]> list = Lists.newArrayList();
-        while(i < 2 * Math.PI){
+        while (i < 2 * Math.PI) {
             i += rad;
-            list.add(new float[] {radius * MathHelper.cos(i), radius * MathHelper.sin(i)});
+            list.add(new float[]{radius * MathHelper.cos(i), radius * MathHelper.sin(i)});
         }
         return list;
     }
 
     /**
      * Rotates a vector around a rotation axis with the given angle
+     *
      * @param rotAxis Rotation axis vector. needs to be normalized.
-     * @param vec The vector to rotate
-     * @param angle Angle in radians
+     * @param vec     The vector to rotate
+     * @param angle   Angle in radians
      * @return The rotated vector
      */
     public static Vector3d rotate(Vector3d rotAxis, Vector3d vec, float angle) {

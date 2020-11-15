@@ -16,29 +16,29 @@ import java.util.Collection;
 public class ItemUtils {
 
     public static boolean isItemBetter(ItemStack stack, ItemStack currentEquipped) {
-        if(stack.getItem() instanceof ArmorItem){
-            if(!(currentEquipped.getItem() instanceof ArmorItem) || EnchantmentHelper.hasBindingCurse(currentEquipped))
+        if (stack.getItem() instanceof ArmorItem) {
+            if (!(currentEquipped.getItem() instanceof ArmorItem) || EnchantmentHelper.hasBindingCurse(currentEquipped))
                 return true;
-            else if(currentEquipped.getItem() instanceof ArmorItem){
+            else if (currentEquipped.getItem() instanceof ArmorItem) {
                 ArmorItem itemarmor = (ArmorItem) stack.getItem();
                 ArmorItem itemarmor1 = (ArmorItem) currentEquipped.getItem();
 
-                if(itemarmor.getDamageReduceAmount() == itemarmor1.getDamageReduceAmount()){
+                if (itemarmor.getDamageReduceAmount() == itemarmor1.getDamageReduceAmount()) {
                     return stack.getDamage() > currentEquipped.getDamage() || stack.hasTag() && !currentEquipped.hasTag();
-                }else{
+                } else {
                     return itemarmor.getDamageReduceAmount() > itemarmor1.getDamageReduceAmount();
                 }
             }
-        }else if(stack.getItem() instanceof BowItem){
-            if(currentEquipped.isEmpty())
+        } else if (stack.getItem() instanceof BowItem) {
+            if (currentEquipped.isEmpty())
                 return true;
-            if(currentEquipped.getItem() instanceof BowItem){
+            if (currentEquipped.getItem() instanceof BowItem) {
                 int power = EnchantmentHelper.getEnchantmentLevel(Enchantments.POWER, stack);
                 int power2 = EnchantmentHelper.getEnchantmentLevel(Enchantments.POWER, currentEquipped);
                 return power > power2;
             }
-        }else{
-            if(currentEquipped.isEmpty())
+        } else {
+            if (currentEquipped.isEmpty())
                 return true;
             return damage(stack) > damage(currentEquipped);
         }
@@ -49,21 +49,21 @@ public class ItemUtils {
         double dmg = 0;
         Collection<AttributeModifier> atts = stack.getAttributeModifiers(EquipmentSlotType.MAINHAND)
                 .get(Attributes.GENERIC_ATTACK_DAMAGE);
-        for(AttributeModifier mod : atts){
-            if(mod.getOperation() == AttributeModifier.Operation.ADDITION)
+        for (AttributeModifier mod : atts) {
+            if (mod.getOperation() == AttributeModifier.Operation.ADDITION)
                 dmg += mod.getAmount();
         }
         double value = dmg;
-        for(AttributeModifier mod : atts){
-            if(mod.getOperation() == AttributeModifier.Operation.MULTIPLY_BASE)
+        for (AttributeModifier mod : atts) {
+            if (mod.getOperation() == AttributeModifier.Operation.MULTIPLY_BASE)
                 value += dmg * mod.getAmount();
         }
-        for(AttributeModifier mod : atts){
-            if(mod.getOperation() == AttributeModifier.Operation.MULTIPLY_TOTAL)
+        for (AttributeModifier mod : atts) {
+            if (mod.getOperation() == AttributeModifier.Operation.MULTIPLY_TOTAL)
                 value *= 1 + mod.getAmount();
         }
         int sharp = EnchantmentHelper.getEnchantmentLevel(Enchantments.SHARPNESS, stack);
-        if(sharp > 0)
+        if (sharp > 0)
             value += sharp * 0.5 + 0.5;
         return Attributes.GENERIC_ATTACK_DAMAGE.clampValue(value);
     }
@@ -72,19 +72,19 @@ public class ItemUtils {
      * Tests, if the players inventory has enough space for the itemstack without actually adding it to the inventory
      */
     public static boolean hasSpace(PlayerEntity player, ItemStack stack) {
-        if(stack.isEmpty()){
+        if (stack.isEmpty()) {
             return false;
         }
         PlayerInventory inv = player.inventory;
         stack = stack.copy();
-        for(ItemStack invStack : inv.mainInventory){
-            if(invStack.isEmpty()){
+        for (ItemStack invStack : inv.mainInventory) {
+            if (invStack.isEmpty()) {
                 stack.setCount(stack.getCount() - stack.getMaxStackSize());
-            }else if(invStack.getCount() < invStack.getMaxStackSize() && ItemStack.areItemStacksEqual(stack, invStack)){
+            } else if (invStack.getCount() < invStack.getMaxStackSize() && ItemStack.areItemStacksEqual(stack, invStack)) {
                 int sub = invStack.getMaxStackSize() - invStack.getCount();
                 stack.setCount(stack.getCount() - sub);
             }
-            if(stack.getCount() <= 0){
+            if (stack.getCount() <= 0) {
                 break;
             }
         }

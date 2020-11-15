@@ -43,19 +43,19 @@ public class ModelRendererPlus extends ModelRenderer {
         this.resetScale();
     }
 
-    public void resetRotationPoints(){
+    public void resetRotationPoints() {
         this.rotationPointX = this.defaultRotPointX;
         this.rotationPointY = this.defaultRotPointY;
         this.rotationPointZ = this.defaultRotPointZ;
     }
 
-    public void resetAngles(){
+    public void resetAngles() {
         this.rotateAngleX = this.defaultRotAngleX;
         this.rotateAngleY = this.defaultRotAngleY;
         this.rotateAngleZ = this.defaultRotAngleZ;
     }
 
-    public void resetScale(){
+    public void resetScale() {
         this.scaleX = this.defaultScaleX;
         this.scaleY = this.defaultScaleY;
         this.scaleZ = this.defaultScaleZ;
@@ -91,7 +91,7 @@ public class ModelRendererPlus extends ModelRenderer {
     @Override
     public void rotate(MatrixStack matrixStack) {
         super.rotate(matrixStack);
-        if(this.scaleX != 1 || this.scaleY != 1 || this.scaleZ != 1)
+        if (this.scaleX != 1 || this.scaleY != 1 || this.scaleZ != 1)
             matrixStack.scale(this.scaleX, this.scaleY, this.scaleZ);
     }
 }

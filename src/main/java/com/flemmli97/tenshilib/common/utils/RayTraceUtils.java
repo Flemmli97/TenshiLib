@@ -14,20 +14,20 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Predicate;
-
-import javax.annotation.Nullable;
 
 
 public class RayTraceUtils {
 
     /**
      * Gets a list of entities in a certain fov around the player
+     *
      * @param reach Radius around the entity
-     * @param aoe FOV in degrees. 0 means vanilla raytracing. use 1 to have it like vanilla but get multiple entities.
+     * @param aoe   FOV in degrees. 0 means vanilla raytracing. use 1 to have it like vanilla but get multiple entities.
      */
     public static List<LivingEntity> getEntities(LivingEntity entity, float reach, float aoe) {
         return getEntitiesIn(LivingEntity.class, entity, entity.getPositionVec().add(0, entity.getHeight() / 2, 0), entity.getLook(1), reach,
@@ -51,7 +51,7 @@ public class RayTraceUtils {
     }
 
     public static EntityRayTraceResult calculateEntityFromLook(LivingEntity entity, Vector3d pos, Vector3d dir, float reach, Class<? extends Entity> clss,
-            @Nullable Predicate<? super Entity> pred) {
+                                                               @Nullable Predicate<? super Entity> pred) {
         RayTraceResult blocks = entity.world.rayTraceBlocks(new RayTraceContext(pos, pos.add(dir.x * reach, dir.y * reach, dir.z * reach), RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, entity));
         reach = (float) blocks.getHitVec().distanceTo(pos);
         Vector3d rangeVec = pos.add(dir.x * reach, dir.y * reach, dir.z * reach);
@@ -60,13 +60,13 @@ public class RayTraceUtils {
                 entity.getBoundingBox().expand(dir.x * reach, dir.y * reach, dir.z * reach).expand(1.0D, 1.0D, 1.0D),
                 (t) -> EntityPredicates.NOT_SPECTATING.test(t) && t != null && t != entity && t.canBeCollidedWith()
                         && (pred == null || pred.test(t)));
-        for(Entity e : list){
+        for (Entity e : list) {
             AxisAlignedBB axisalignedbb = e.getBoundingBox().grow(e.getCollisionBorderSize());
             Optional<Vector3d> raytraceresult = axisalignedbb.rayTrace(pos, rangeVec);
-            if(raytraceresult.isPresent()){
+            if (raytraceresult.isPresent()) {
                 double d3 = pos.distanceTo(raytraceresult.get());
 
-                if(d3 < reach){
+                if (d3 < reach) {
                     hitVec = raytraceresult.get();
                     return new EntityRayTraceResult(e, hitVec);
                 }
@@ -79,26 +79,26 @@ public class RayTraceUtils {
         int randX = pos.getX() + rand.nextInt(2 * range) - range;
         int randY = pos.getY() + rand.nextInt(2 * range) - range;
         int randZ = pos.getZ() + rand.nextInt(2 * range) - range;
-        if(!grounded){
+        if (!grounded) {
             BlockPos pos1 = new BlockPos(randX, randY, randZ);
-            while(Math.abs(randY - pos.getY()) < range && world.getBlockCollisions(e, e.getBoundingBox().offset(pos1)).allMatch(VoxelShape::isEmpty)){
+            while (Math.abs(randY - pos.getY()) < range && world.getBlockCollisions(e, e.getBoundingBox().offset(pos1)).allMatch(VoxelShape::isEmpty)) {
                 pos1 = pos1.up();
             }
             return pos1;
         }
         BlockPos pos1 = new BlockPos(randX, 0, randZ);
-        while(pos1.getY() < 255 && (!world.getBlockState(pos1.down()).isTopSolid(world, pos1.down(), e, Direction.UP))
-                || world.getBlockCollisions(e, e.getBoundingBox().offset(pos1)).allMatch(VoxelShape::isEmpty)){
+        while (pos1.getY() < 255 && (!world.getBlockState(pos1.down()).isTopSolid(world, pos1.down(), e, Direction.UP))
+                || world.getBlockCollisions(e, e.getBoundingBox().offset(pos1)).allMatch(VoxelShape::isEmpty)) {
             pos1 = pos1.up();
         }
         return pos1;
     }
 
     public static RayTraceResult entityRayTrace(Entity e, float range, RayTraceContext.BlockMode blockMode, RayTraceContext.FluidMode fluidMode,
-            boolean includeEntities, @Nullable Predicate<Entity> pred) {
+                                                boolean includeEntities, @Nullable Predicate<Entity> pred) {
         Vector3d posEye = e.getEyePosition(1);
         Vector3d look = posEye.add(e.getLookVec().scale(range));
-        if(includeEntities){
+        if (includeEntities) {
             RayTraceResult raytraceresult = e.world.rayTraceBlocks(new RayTraceContext(posEye, look, blockMode, fluidMode, e));
             if (raytraceresult.getType() != RayTraceResult.Type.MISS) {
                 look = raytraceresult.getHitVec();

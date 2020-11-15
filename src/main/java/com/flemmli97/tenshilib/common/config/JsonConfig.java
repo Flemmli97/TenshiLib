@@ -31,16 +31,16 @@ public class JsonConfig<T extends JsonElement> {
         this.file = file;
         this.type = type;
         this.name = this.file.getName();
-        if(this.file.getParentFile() == null)
+        if (this.file.getParentFile() == null)
             this.file.mkdirs();
-        if(!this.file.exists())
-            try{
+        if (!this.file.exists())
+            try {
                 this.file.createNewFile();
-                if(defaultValue != null) {
+                if (defaultValue != null) {
                     this.element = defaultValue;
                     this.save();
                 }
-            }catch(IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         this.load();
@@ -50,19 +50,19 @@ public class JsonConfig<T extends JsonElement> {
         this.file = file;
         this.type = type;
         this.name = this.file.getName();
-        if(this.file.getParentFile() == null)
+        if (this.file.getParentFile() == null)
             this.file.mkdirs();
-        if(!this.file.exists())
-            try{
+        if (!this.file.exists())
+            try {
                 this.file.createNewFile();
-                if(defaultConfig != null && defaultConfig.exists()) {
+                if (defaultConfig != null && defaultConfig.exists()) {
                     InputStream in = new FileInputStream(defaultConfig);
                     OutputStream out = new FileOutputStream(this.file);
                     IOUtils.copy(in, out);
                     in.close();
                     out.close();
                 }
-            }catch(IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         this.load();
@@ -114,21 +114,21 @@ public class JsonConfig<T extends JsonElement> {
     }
 
     public void load() {
-        try{
+        try {
             FileReader reader = new FileReader(this.file);
             this.element = this.gson.fromJson(reader, this.type);
             reader.close();
-        }catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public void save() {
-        try{
+        try {
             FileWriter writer = new FileWriter(this.file);
             this.gson.toJson(this.element, writer);
             writer.close();
-        }catch(JsonIOException | IOException e){
+        } catch (JsonIOException | IOException e) {
             e.printStackTrace();
         }
     }

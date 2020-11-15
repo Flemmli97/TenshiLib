@@ -28,7 +28,7 @@ public class PacketHandler {
         dispatcher.sendTo(message, player.connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
     }
 
-    public static <T> void sendToTracking(T message, Entity e){
-        dispatcher.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(()->e), message);
+    public static <T> void sendToTracking(T message, Entity e) {
+        dispatcher.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> e), message);
     }
 }

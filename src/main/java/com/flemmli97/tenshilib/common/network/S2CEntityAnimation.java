@@ -16,7 +16,7 @@ public class S2CEntityAnimation<T extends Entity & IAnimated> {
     private final int entityID;
     private final int animID;
 
-    private S2CEntityAnimation(int entityID, int animID){
+    private S2CEntityAnimation(int entityID, int animID) {
         this.entityID = entityID;
         this.animID = animID;
     }
@@ -24,14 +24,14 @@ public class S2CEntityAnimation<T extends Entity & IAnimated> {
     public S2CEntityAnimation(T entity) {
         this.entityID = entity.getEntityId();
         AnimatedAction anim = entity.getAnimation();
-        if(anim == null)
+        if (anim == null)
             this.animID = -2;
-        else if(anim == AnimatedAction.vanillaAttack)
+        else if (anim == AnimatedAction.vanillaAttack)
             this.animID = -1;
-        else{
+        else {
             int i = 0;
-            for(AnimatedAction a : entity.getAnimations()){
-                if(a.getID().equals(anim.getID()))
+            for (AnimatedAction a : entity.getAnimations()) {
+                if (a.getID().equals(anim.getID()))
                     break;
                 i++;
             }
@@ -49,7 +49,7 @@ public class S2CEntityAnimation<T extends Entity & IAnimated> {
     }
 
     public static <T extends Entity & IAnimated> void handlePacket(S2CEntityAnimation<T> pkt, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, ()->ClientPacketHandlers.updateAnim(pkt.entityID, pkt.animID)));
+        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ClientPacketHandlers.updateAnim(pkt.entityID, pkt.animID)));
         ctx.get().setPacketHandled(true);
     }
 }

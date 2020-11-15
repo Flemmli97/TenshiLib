@@ -18,12 +18,12 @@ public interface IAnimated {
     AnimatedAction[] getAnimations();
 
     default void tickAnimation() {
-        if(this.getAnimation() != null && this.getAnimation().tick())
+        if (this.getAnimation() != null && this.getAnimation().tick())
             this.setAnimation(null);
     }
 
     static <T extends Entity & IAnimated> void sentToClient(T entity) {
-        if(!entity.world.isRemote){
+        if (!entity.world.isRemote) {
             PacketHandler.sendToTracking(new S2CEntityAnimation<>(entity), entity);
         }
     }

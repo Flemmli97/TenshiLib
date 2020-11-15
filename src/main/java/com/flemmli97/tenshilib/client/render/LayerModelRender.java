@@ -16,6 +16,7 @@ public class LayerModelRender<T extends LivingEntity, M extends EntityModel<T>> 
     private final EntityModel<T> model;
     private final LivingRenderer<T, M> renderer;
     private final ResourceLocation texture;
+
     public LayerModelRender(LivingRenderer<T, M> renderer, EntityModel<T> model, ResourceLocation texture) {
         super(renderer);
         this.model = model;

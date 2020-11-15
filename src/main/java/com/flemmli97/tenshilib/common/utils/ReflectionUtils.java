@@ -8,48 +8,48 @@ public class ReflectionUtils {
 
     @SuppressWarnings("unchecked")
     public static <T> T getFieldValue(Field field, Object inst) {
-        try{
+        try {
             field.setAccessible(true);
             return (T) field.get(inst);
-        }catch(IllegalArgumentException | IllegalAccessException e){
+        } catch (IllegalArgumentException | IllegalAccessException e) {
             throw new ReflectionException(e);
         }
     }
 
     public static <T> void setFieldValue(Field field, Object inst, Object value) {
-        try{
+        try {
             field.setAccessible(true);
             field.set(inst, value);
-        }catch(IllegalArgumentException | IllegalAccessException e){
+        } catch (IllegalArgumentException | IllegalAccessException e) {
             throw new ReflectionException(e);
         }
     }
 
     public static Field getField(Class<?> clss, String name) {
-        try{
+        try {
             Field f = clss.getDeclaredField(name);
             f.setAccessible(true);
             return f;
-        }catch(NoSuchFieldException | SecurityException e){
+        } catch (NoSuchFieldException | SecurityException e) {
             throw new ReflectionException(e);
         }
     }
 
     public static Method getMethod(Class<?> clss, String name, Class<?>... args) {
-        try{
+        try {
             Method m = clss.getDeclaredMethod(name, args);
             m.setAccessible(true);
             return m;
-        }catch(SecurityException | NoSuchMethodException e){
+        } catch (SecurityException | NoSuchMethodException e) {
             throw new ReflectionException(e);
         }
     }
 
     public static Object invokeMethod(Method method, Object inst, Object... args) {
-        try{
+        try {
             method.setAccessible(true);
             return method.invoke(inst, args);
-        }catch(SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e){
+        } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw new ReflectionException(e);
         }
     }

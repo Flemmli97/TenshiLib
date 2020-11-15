@@ -31,17 +31,17 @@ public class RenderUtils {
     }
 
     public static void renderBlockOutline(MatrixStack matrixStack, IRenderTypeBuffer buffer, PlayerEntity player, BlockPos pos, float partialTicks, float red, float green, float blue, float alpha,
-            boolean ignoreDepth) {
+                                          boolean ignoreDepth) {
         BlockState state = player.world.getBlockState(pos);
         IVertexBuilder build;
-        if(ignoreDepth)
+        if (ignoreDepth)
             build = buffer.getBuffer(MoreRenderTypes.LINE_NODEPTH);
         else
             build = buffer.getBuffer(RenderType.getLines());
         ActiveRenderInfo renderInfo = Minecraft.getInstance().gameRenderer.getActiveRenderInfo();
         Vector3d rpos = renderInfo.getProjectedView();
         WorldRenderAccessor.drawShapeOutline(matrixStack, build, state.getShape(player.world, pos, ISelectionContext.forEntity(player)),
-                rpos.x,rpos.y,rpos.z, red, green, blue, alpha);
+                rpos.x, rpos.y, rpos.z, red, green, blue, alpha);
     }
 
     public static void renderAreaAround(MatrixStack matrixStack, IRenderTypeBuffer buffer, PlayerEntity player, BlockPos pos, float partialTicks, float radius) {
@@ -49,7 +49,7 @@ public class RenderUtils {
     }
 
     public static void renderAreaAround(MatrixStack matrixStack, IRenderTypeBuffer buffer, PlayerEntity player, BlockPos pos, float partialTicks, float radius, float red, float green, float blue,
-            float alpha, boolean ignoreDepth) {
+                                        float alpha, boolean ignoreDepth) {
         RenderUtils.renderBoundingBox(matrixStack, buffer, new AxisAlignedBB(0, 0, 0, 1, 1, 1).grow(radius).offset(pos.down()), player, partialTicks, red, green, blue,
                 alpha, ignoreDepth);
     }
@@ -59,19 +59,19 @@ public class RenderUtils {
     }
 
     public static void renderBoundingBox(MatrixStack matrixStack, IRenderTypeBuffer buffer, AxisAlignedBB aabb, PlayerEntity player, float partialTicks, float red, float green, float blue, float alpha,
-            boolean ignoreDepth) {
+                                         boolean ignoreDepth) {
         double playerX = player.lastTickPosX + (player.getX() - player.lastTickPosX) * partialTicks;
         double playerY = player.lastTickPosY + (player.getY() - player.lastTickPosY) * partialTicks;
         double playerZ = player.lastTickPosZ + (player.getZ() - player.lastTickPosZ) * partialTicks;
         IVertexBuilder build;
-        if(ignoreDepth)
+        if (ignoreDepth)
             build = buffer.getBuffer(MoreRenderTypes.LINE_NODEPTH);
         else
             build = buffer.getBuffer(RenderType.getLines());
         WorldRenderer.drawBox(matrixStack, build, aabb.grow(0.0020000000949949026D).offset(-playerX, -playerY, -playerZ), red, green, blue, alpha);
     }
 
-    public static void applyYawPitch(MatrixStack stack, float yaw, float pitch){
+    public static void applyYawPitch(MatrixStack stack, float yaw, float pitch) {
         stack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(yaw));
         stack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(pitch));
     }
@@ -94,9 +94,9 @@ public class RenderUtils {
         Matrix4f matrix4f = stack.peek().getModel();
         Matrix3f mat3f = stack.peek().getNormal();
         builder.vertex(matrix4f, -xSize, ySize, 0).color(red, green, blue, alpha).texture(u, v).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(mat3f, 0, 0, 1).endVertex();
-        builder.vertex(matrix4f, xSize, ySize, 0).color(red, green, blue, alpha).texture(u+uLength, v).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(mat3f, 0, 0, 1).endVertex();
-        builder.vertex(matrix4f, xSize, -ySize, 0).color(red, green, blue, alpha).texture(u+uLength, v+vLength).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(mat3f, 0, 0, 1).endVertex();
-        builder.vertex(matrix4f, -xSize, -ySize, 0).color(red, green, blue, alpha).texture(u, v+vLength).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(mat3f, 0, 0, 1).endVertex();
+        builder.vertex(matrix4f, xSize, ySize, 0).color(red, green, blue, alpha).texture(u + uLength, v).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(mat3f, 0, 0, 1).endVertex();
+        builder.vertex(matrix4f, xSize, -ySize, 0).color(red, green, blue, alpha).texture(u + uLength, v + vLength).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(mat3f, 0, 0, 1).endVertex();
+        builder.vertex(matrix4f, -xSize, -ySize, 0).color(red, green, blue, alpha).texture(u, v + vLength).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(mat3f, 0, 0, 1).endVertex();
     }
 
     public static void renderTexture(MatrixStack matrixStack, IVertexBuilder builder, float xSize, float ySize, int hexColor, int light) {

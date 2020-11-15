@@ -98,7 +98,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
 
     @Override
     public void updateYawPitch() {
-        if(this.getHitVecFromShooter() && this.getShooter() != null){
+        if (this.getHitVecFromShooter() && this.getShooter() != null) {
             LivingEntity e = this.getShooter();
             this.rotationPitch = e.rotationPitch;
             this.rotationYaw = e.rotationYaw;
@@ -128,17 +128,17 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
 
     @Override
     public void tick() {
-        if(this.getShooter() != null){
-            if(this.hit == null || this.getHitVecFromShooter())
+        if (this.getShooter() != null) {
+            if (this.hit == null || this.getHitVecFromShooter())
                 this.hit = RayTraceUtils.entityRayTrace(this.getHitVecFromShooter() ? this.getShooter() : this, this.getRange(), RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE,
                         !this.piercing(), this.notShooter);
         }
         this.updateYawPitch();
         super.tick();
         this.livingTicks++;
-        if(this.livingTicks >= this.livingTickMax())
+        if (this.livingTicks >= this.livingTickMax())
             this.remove();
-        if(!this.world.isRemote && this.hit != null && --this.coolDown <= 0){
+        if (!this.world.isRemote && this.hit != null && --this.coolDown <= 0) {
             Vector3d offSetPosVec = this.getPositionVec().add(this.getLookVec().scale(this.radius()));
             List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(this,
                     new AxisAlignedBB(this.getX(), this.getY(), this.getZ(), this.hit.getHitVec().x, this.hit.getHitVec().y, this.hit.getHitVec().z).grow(1));
@@ -186,7 +186,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
     @Override
     @Nullable
     public LivingEntity getShooter() {
-        if(this.shooter == null && !this.dataManager.get(shooterUUID).isEmpty()){
+        if (this.shooter == null && !this.dataManager.get(shooterUUID).isEmpty()) {
             this.shooter = EntityUtil.findFromUUID(LivingEntity.class, this.world, UUID.fromString(this.dataManager.get(shooterUUID)));
         }
         return this.shooter;

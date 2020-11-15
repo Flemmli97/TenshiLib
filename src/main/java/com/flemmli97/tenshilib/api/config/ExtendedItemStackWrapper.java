@@ -27,15 +27,15 @@ public class ExtendedItemStackWrapper extends SimpleItemStackWrapper {
         this(compound.getString("id"), compound.getInt("Count"), compound.getCompound("nbt"));
     }
 
-    public ExtendedItemStackWrapper(String item){
+    public ExtendedItemStackWrapper(String item) {
         this(item, 1);
     }
 
-    public ExtendedItemStackWrapper(String item, int count){
+    public ExtendedItemStackWrapper(String item, int count) {
         this(item, count, null);
     }
 
-    public ExtendedItemStackWrapper(String item, int count, CompoundNBT nbt){
+    public ExtendedItemStackWrapper(String item, int count, CompoundNBT nbt) {
         super(item, count);
     }
 
@@ -83,17 +83,17 @@ public class ExtendedItemStackWrapper extends SimpleItemStackWrapper {
     @Override
     public ItemStack getStack() {
         ItemStack stack = super.getStack();
-        if(!stack.isEmpty() && this.nbtTagCompound != null)
+        if (!stack.isEmpty() && this.nbtTagCompound != null)
             stack.setTag(this.nbtTagCompound.copy());
         return stack;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if(this == obj){
+        if (this == obj) {
             return true;
         }
-        if(obj instanceof ExtendedItemStackWrapper){
+        if (obj instanceof ExtendedItemStackWrapper) {
             ExtendedItemStackWrapper prop = (ExtendedItemStackWrapper) obj;
             return prop.toString().equals(this.toString());
         }
@@ -106,9 +106,9 @@ public class ExtendedItemStackWrapper extends SimpleItemStackWrapper {
         public JsonElement serialize(ExtendedItemStackWrapper src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject obj = new JsonObject();
             obj.add("item", new JsonPrimitive(src.reg));
-            if(src.count != 1)
+            if (src.count != 1)
                 obj.add("count", new JsonPrimitive(src.count));
-            if(src.nbtTagCompound != null)
+            if (src.nbtTagCompound != null)
                 obj.add("nbt", new JsonPrimitive(src.nbtTagCompound.toString()));
             return obj;
         }
@@ -117,14 +117,14 @@ public class ExtendedItemStackWrapper extends SimpleItemStackWrapper {
         public ExtendedItemStackWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonObject obj = json.getAsJsonObject();
             int count = 1;
-            if(obj.get("count") instanceof JsonPrimitive && obj.get("count").getAsJsonPrimitive().isNumber())
+            if (obj.get("count") instanceof JsonPrimitive && obj.get("count").getAsJsonPrimitive().isNumber())
                 count = obj.get("count").getAsInt();
             JsonObject nbt = obj.has("nbt") ? obj.get("nbt").getAsJsonObject() : null;
             CompoundNBT compound = null;
-            if(nbt != null){
-                try{
+            if (nbt != null) {
+                try {
                     compound = JsonToNBT.getTagFromJson(nbt.toString());
-                }catch(CommandSyntaxException e){
+                } catch (CommandSyntaxException e) {
                     e.printStackTrace();
                 }
             }

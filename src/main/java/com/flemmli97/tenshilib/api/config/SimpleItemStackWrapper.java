@@ -16,7 +16,7 @@ public class SimpleItemStackWrapper extends ItemWrapper {
 
     protected int count;
 
-    public SimpleItemStackWrapper(String s){
+    public SimpleItemStackWrapper(String s) {
         this(s, 1);
     }
 
@@ -33,7 +33,7 @@ public class SimpleItemStackWrapper extends ItemWrapper {
     @Override
     public ItemStack getStack() {
         ItemStack stack = super.getStack();
-        if(!stack.isEmpty())
+        if (!stack.isEmpty())
             stack.setCount(this.count);
         return stack;
     }
@@ -57,10 +57,10 @@ public class SimpleItemStackWrapper extends ItemWrapper {
 
     @Override
     public boolean equals(Object obj) {
-        if(this == obj){
+        if (this == obj) {
             return true;
         }
-        if(obj instanceof SimpleItemStackWrapper){
+        if (obj instanceof SimpleItemStackWrapper) {
             SimpleItemStackWrapper prop = (SimpleItemStackWrapper) obj;
             return prop.toString().equals(this.toString());
         }
@@ -73,7 +73,7 @@ public class SimpleItemStackWrapper extends ItemWrapper {
         public JsonElement serialize(SimpleItemStackWrapper src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject obj = new JsonObject();
             obj.add("item", new JsonPrimitive(src.reg));
-            if(src.count != 1)
+            if (src.count != 1)
                 obj.add("count", new JsonPrimitive(src.count));
             return obj;
         }
@@ -82,7 +82,7 @@ public class SimpleItemStackWrapper extends ItemWrapper {
         public SimpleItemStackWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonObject obj = json.getAsJsonObject();
             int count = 1;
-            if(obj.get("count") instanceof JsonPrimitive && obj.get("count").getAsJsonPrimitive().isNumber())
+            if (obj.get("count") instanceof JsonPrimitive && obj.get("count").getAsJsonPrimitive().isNumber())
                 count = obj.get("count").getAsInt();
             return new SimpleItemStackWrapper(obj.get("item").getAsString(), count);
         }

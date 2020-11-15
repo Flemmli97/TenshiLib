@@ -35,7 +35,7 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
     public Item getItem() {
         ITag<Item> tags = ItemTags.getCollection().getTagOrEmpty(new ResourceLocation(this.tag));
         this.list = tags.values();
-        if(!this.list.isEmpty())
+        if (!this.list.isEmpty())
             this.item = this.list.get(0);
         else
             this.item = Items.AIR;
@@ -71,10 +71,10 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
 
     @Override
     public boolean equals(Object obj) {
-        if(this == obj){
+        if (this == obj) {
             return true;
         }
-        if(obj instanceof ItemTagWrapper){
+        if (obj instanceof ItemTagWrapper) {
             ItemTagWrapper prop = (ItemTagWrapper) obj;
             return prop.writeToString().equals(this.toString());
         }
@@ -92,7 +92,7 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
         public JsonElement serialize(ItemTagWrapper src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject obj = new JsonObject();
             obj.add("tag", new JsonPrimitive(src.tag));
-            if(src.count != 1)
+            if (src.count != 1)
                 obj.add("count", new JsonPrimitive(src.count));
             return obj;
         }
@@ -101,7 +101,7 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
         public ItemTagWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonObject obj = json.getAsJsonObject();
             int count = 1;
-            if(obj.get("count") instanceof JsonPrimitive && obj.get("count").getAsJsonPrimitive().isNumber())
+            if (obj.get("count") instanceof JsonPrimitive && obj.get("count").getAsJsonPrimitive().isNumber())
                 count = obj.get("count").getAsInt();
             return new ItemTagWrapper(obj.get("tag").getAsString(), count);
         }

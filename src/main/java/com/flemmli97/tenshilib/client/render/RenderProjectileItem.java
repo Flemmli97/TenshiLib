@@ -26,15 +26,15 @@ public abstract class RenderProjectileItem<T extends Entity> extends EntityRende
     public void render(T entity, float rotation, float partialTicks, MatrixStack stack, IRenderTypeBuffer buffer, int packedLight) {
         stack.push();
         stack.scale(this.scaleX, this.scaleY, this.scaleZ);
-        stack.translate(0,0.15,0);
-        switch(this.getRenderType(entity)){
+        stack.translate(0, 0.15, 0);
+        switch (this.getRenderType(entity)) {
             case NORMAL:
                 stack.multiply(this.renderManager.getRotation());
                 stack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180.0F));
                 break;
             case WEAPON:
-                stack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(90+ MathHelper.lerp(partialTicks, entity.prevRotationYaw, entity.rotationYaw)));
-                stack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(135-MathHelper.lerp(partialTicks, entity.prevRotationPitch, entity.rotationPitch)));
+                stack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(90 + MathHelper.lerp(partialTicks, entity.prevRotationYaw, entity.rotationYaw)));
+                stack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(135 - MathHelper.lerp(partialTicks, entity.prevRotationPitch, entity.rotationPitch)));
                 break;
         }
         Minecraft.getInstance().getItemRenderer().renderItem(this.getRenderItemStack(entity), ItemCameraTransforms.TransformType.GROUND, packedLight, OverlayTexture.DEFAULT_UV, stack, buffer);

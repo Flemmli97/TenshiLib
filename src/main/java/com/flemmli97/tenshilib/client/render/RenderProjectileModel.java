@@ -38,8 +38,8 @@ public abstract class RenderProjectileModel<T extends Entity> extends EntityRend
         super.render(entity, rotation, partialTicks, stack, buffer, packedLight);
     }
 
-    public void translate(T entity, MatrixStack stack, float pitch, float yaw, float partialTicks){
-        stack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180+yaw));
+    public void translate(T entity, MatrixStack stack, float pitch, float yaw, float partialTicks) {
+        stack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180 + yaw));
         stack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(pitch));
     }
 

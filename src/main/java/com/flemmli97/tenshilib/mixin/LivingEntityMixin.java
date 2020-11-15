@@ -19,17 +19,17 @@ public class LivingEntityMixin implements ILastHand {
     private Hand prevSwungHand = Hand.OFF_HAND;
 
     @Inject(method = "getHeldItemOffhand", at = @At(value = "HEAD"), cancellable = true)
-    private void offhandItem(CallbackInfoReturnable<ItemStack> info){
-        if(((LivingEntity)(Object)this).world.isRemote && ((LivingEntity)(Object)this).getHeldItemMainhand().getItem() instanceof IDualWeapon){
-            info.setReturnValue(((IDualWeapon) ((LivingEntity)(Object)this).getHeldItemMainhand().getItem()).offHandStack(((LivingEntity)(Object)this)));
+    private void offhandItem(CallbackInfoReturnable<ItemStack> info) {
+        if (((LivingEntity) (Object) this).world.isRemote && ((LivingEntity) (Object) this).getHeldItemMainhand().getItem() instanceof IDualWeapon) {
+            info.setReturnValue(((IDualWeapon) ((LivingEntity) (Object) this).getHeldItemMainhand().getItem()).offHandStack(((LivingEntity) (Object) this)));
             info.cancel();
         }
     }
 
     @Inject(method = "getHeldItem", at = @At(value = "HEAD"), cancellable = true)
-    private void offhandItemGeneric(Hand hand, CallbackInfoReturnable<ItemStack> info){
-        if(hand == Hand.OFF_HAND && ((LivingEntity)(Object)this).world.isRemote && ((LivingEntity)(Object)this).getHeldItemMainhand().getItem() instanceof IDualWeapon){
-            info.setReturnValue(((IDualWeapon) ((LivingEntity)(Object)this).getHeldItemMainhand().getItem()).offHandStack(((LivingEntity)(Object)this)));
+    private void offhandItemGeneric(Hand hand, CallbackInfoReturnable<ItemStack> info) {
+        if (hand == Hand.OFF_HAND && ((LivingEntity) (Object) this).world.isRemote && ((LivingEntity) (Object) this).getHeldItemMainhand().getItem() instanceof IDualWeapon) {
+            info.setReturnValue(((IDualWeapon) ((LivingEntity) (Object) this).getHeldItemMainhand().getItem()).offHandStack(((LivingEntity) (Object) this)));
             info.cancel();
         }
     }
@@ -37,14 +37,12 @@ public class LivingEntityMixin implements ILastHand {
     @Inject(method = "swingHand", at = @At(value = "HEAD"), cancellable = true) //mcp: swing
     private void swingHook(Hand hand, boolean updateSelf, CallbackInfo info) {
         if (((LivingEntity) (Object) this).getHeldItemMainhand().getItem() instanceof IDualWeapon) {
-            if(hand == this.prevSwungHand) {
+            if (hand == this.prevSwungHand) {
                 info.cancel();
-                ((LivingEntity) (Object) this).swingHand(hand==Hand.MAIN_HAND?Hand.OFF_HAND:Hand.MAIN_HAND, updateSelf);
-            }
-            else
+                ((LivingEntity) (Object) this).swingHand(hand == Hand.MAIN_HAND ? Hand.OFF_HAND : Hand.MAIN_HAND, updateSelf);
+            } else
                 this.prevSwungHand = hand;
-        }
-        else
+        } else
             this.prevSwungHand = Hand.OFF_HAND;
     }
 

@@ -41,15 +41,15 @@ public abstract class AnimatedAttackGoal<T extends CreatureEntity & IAnimated> e
 
     @Override
     public void resetTask() {
-        this.next=null;
-        this.target=null;
-        this.iddleTime=0;
-        this.movementDone=false;
+        this.next = null;
+        this.target = null;
+        this.iddleTime = 0;
+        this.movementDone = false;
         this.attacker.getNavigator().clearPath();
         this.attacker.setMoveForward(0);
         this.attacker.setMoveStrafing(0);
-        this.prevAnim="";
-        this.pathFindDelay=0;
+        this.prevAnim = "";
+        this.pathFindDelay = 0;
     }
 
     public abstract AnimatedAction randomAttack();
@@ -62,14 +62,15 @@ public abstract class AnimatedAttackGoal<T extends CreatureEntity & IAnimated> e
 
     public abstract int coolDown(AnimatedAction anim);
 
-    public boolean canChooseAttack(AnimatedAction anim){
+    public boolean canChooseAttack(AnimatedAction anim) {
         return true;
     }
 
-    public void setupValues(){
+    public void setupValues() {
         this.target = this.attacker.getAttackTarget();
         this.distanceToTargetSq = this.attacker.getDistanceSq(this.target);
     }
+
     @Override
     public void tick() {
         AnimatedAction anim = this.attacker.getAnimation();
@@ -84,7 +85,7 @@ public abstract class AnimatedAttackGoal<T extends CreatureEntity & IAnimated> e
             if (this.iddleTime <= 0 && this.canChooseAttack(choose = this.randomAttack())) {
                 this.next = choose;
                 this.iddleTime = this.coolDown(this.next);
-                this.movementDone=false;
+                this.movementDone = false;
             } else {
                 this.handleIddle();
                 this.iddleTime--;
@@ -93,7 +94,7 @@ public abstract class AnimatedAttackGoal<T extends CreatureEntity & IAnimated> e
         if (this.next != null) {
             this.handlePreAttack();
             if (this.movementDone) {
-                if(anim==null)
+                if (anim == null)
                     this.attacker.setAnimation(this.next);
                 this.next = null;
             }
@@ -167,7 +168,7 @@ public abstract class AnimatedAttackGoal<T extends CreatureEntity & IAnimated> e
         double x = this.attacker.getX() - this.target.getX();
         double z = this.attacker.getZ() - this.target.getZ();
         double r = x * x + z * z;
-        this.attacker.getMoveHelper().strafe(r < (radius - 1.5) * (radius - 1.5) ? -0.5f : r > (radius + 1.5) * (radius + 1.5)?0.5f:0, clockWise ? speed : -speed);
+        this.attacker.getMoveHelper().strafe(r < (radius - 1.5) * (radius - 1.5) ? -0.5f : r > (radius + 1.5) * (radius + 1.5) ? 0.5f : 0, clockWise ? speed : -speed);
     }
 
     protected void teleportAround(double posX, double posY, double posZ, int range) {

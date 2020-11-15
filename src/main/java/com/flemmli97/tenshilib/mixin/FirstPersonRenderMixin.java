@@ -27,14 +27,14 @@ public class FirstPersonRenderMixin {
     private float equippedProgressOffHand;
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/player/ClientPlayerEntity;getCooledAttackStrength(F)F"), cancellable = true)
-    private void adjustForDual(CallbackInfo info){
-        if(Minecraft.getInstance().player.getHeldItemMainhand().getItem() instanceof IDualWeapon){
+    private void adjustForDual(CallbackInfo info) {
+        if (Minecraft.getInstance().player.getHeldItemMainhand().getItem() instanceof IDualWeapon) {
             info.cancel();
             this.handleDualAnims();
         }
     }
 
-    private void handleDualAnims(){
+    private void handleDualAnims() {
         AbstractClientPlayerEntity player = Minecraft.getInstance().player;
         ItemStack main = player.getHeldItemMainhand();
         ItemStack off = player.getHeldItemOffhand();
@@ -44,16 +44,14 @@ public class FirstPersonRenderMixin {
         float f;
         float f2;
 
-        if(requipM){
+        if (requipM) {
             requipO = true;
             f = player.getCooledAttackStrength(1.0F);
             f2 = f;
-        }
-        else if(((ILastHand)player).lastSwungHand() == Hand.MAIN_HAND){
+        } else if (((ILastHand) player).lastSwungHand() == Hand.MAIN_HAND) {
             f = player.getCooledAttackStrength(1.0F);
             f2 = 1;//((IPlayerOffhandCooldown)player).getOffhandCooldown(1.0F);
-        }
-        else {
+        } else {
             f2 = player.getCooledAttackStrength(1.0F);
             f = 1;//((IPlayerOffhandCooldown)player).getOffhandCooldown(1.0F);
         }
@@ -62,8 +60,8 @@ public class FirstPersonRenderMixin {
             this.itemStackMainHand = main;
         if (!requipO && this.itemStackOffHand != off)
             this.itemStackOffHand = off;
-        this.equippedProgressMainHand += MathHelper.clamp((!requipM? f * f * f : 0) - this.equippedProgressMainHand, -0.4F, 0.4F);
-        this.equippedProgressOffHand += MathHelper.clamp((!requipO? f2 * f2 * f2 : 0) - this.equippedProgressOffHand, -0.4F, 0.4F);
+        this.equippedProgressMainHand += MathHelper.clamp((!requipM ? f * f * f : 0) - this.equippedProgressMainHand, -0.4F, 0.4F);
+        this.equippedProgressOffHand += MathHelper.clamp((!requipO ? f2 * f2 * f2 : 0) - this.equippedProgressOffHand, -0.4F, 0.4F);
         if (this.equippedProgressMainHand < 0.1F) {
             this.itemStackMainHand = main;
         }

@@ -3,7 +3,7 @@ package com.flemmli97.tenshilib.common.entity;
 public class AnimatedAction {
 
     public static final AnimatedAction vanillaAttack = new AnimatedAction(20, 1, "vanilla");
-    public static final AnimatedAction[] vanillaAttackOnly = new AnimatedAction[] {vanillaAttack};
+    public static final AnimatedAction[] vanillaAttackOnly = new AnimatedAction[]{vanillaAttack};
 
     private final int length, attackTime;
     private final String id;
@@ -53,7 +53,7 @@ public class AnimatedAction {
         return this.id;
     }
 
-    public boolean checkID(AnimatedAction other){
+    public boolean checkID(AnimatedAction other) {
         return other != null && this.id.equals(other.id);
     }
 
@@ -64,7 +64,7 @@ public class AnimatedAction {
 
     @Override
     public boolean equals(Object o) {
-        if(o instanceof AnimatedAction)
+        if (o instanceof AnimatedAction)
             return this.toString().equals(o.toString());
         return false;
     }

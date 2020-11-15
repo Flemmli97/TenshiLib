@@ -44,7 +44,7 @@ public class C2SPacketHit {
     }
 
     public static void handlePacket(C2SPacketHit pkt, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(()-> {
+        ctx.get().enqueueWork(() -> {
             PlayerEntity player = ctx.get().getSender();
             if (player == null)
                 return;
@@ -74,10 +74,10 @@ public class C2SPacketHit {
         if (!ForgeHooks.onPlayerAttackTarget(player, target)) return;
         if (target.canBeAttackedWithItem()) {
             if (!target.hitByEntity(player)) {
-                float f = (float)player.getAttributeValue(Attributes.GENERIC_ATTACK_DAMAGE);
+                float f = (float) player.getAttributeValue(Attributes.GENERIC_ATTACK_DAMAGE);
                 float f1;
                 if (target instanceof LivingEntity) {
-                    f1 = EnchantmentHelper.getModifierForCreature(player.getHeldItemMainhand(), ((LivingEntity)target).getCreatureAttribute());
+                    f1 = EnchantmentHelper.getModifierForCreature(player.getHeldItemMainhand(), ((LivingEntity) target).getCreatureAttribute());
                 } else {
                     f1 = EnchantmentHelper.getModifierForCreature(player.getHeldItemMainhand(), CreatureAttribute.UNDEFINED);
                 }
@@ -85,7 +85,7 @@ public class C2SPacketHit {
                 float f2 = player.getCooledAttackStrength(0.5F);
                 f = f * (0.2F + f2 * f2 * 0.8F);
                 f1 = f1 * f2;
-                if(resetCooldown)
+                if (resetCooldown)
                     player.resetCooldown();
                 if (f > 0.0F || f1 > 0.0F) {
                     boolean flag = f2 > 0.9F;
@@ -109,7 +109,7 @@ public class C2SPacketHit {
                     boolean flag4 = false;
                     int j = EnchantmentHelper.getFireAspectModifier(player);
                     if (target instanceof LivingEntity) {
-                        f4 = ((LivingEntity)target).getHealth();
+                        f4 = ((LivingEntity) target).getHealth();
                         if (j > 0 && !target.isBurning()) {
                             flag4 = true;
                             target.setFire(1);
@@ -120,9 +120,9 @@ public class C2SPacketHit {
                     if (flag5) {
                         if (i > 0) {
                             if (target instanceof LivingEntity) {
-                                ((LivingEntity)target).takeKnockback((float)i * 0.5F, MathHelper.sin(player.rotationYaw * ((float)Math.PI / 180F)), (-MathHelper.cos(player.rotationYaw * ((float)Math.PI / 180F))));
+                                ((LivingEntity) target).takeKnockback((float) i * 0.5F, MathHelper.sin(player.rotationYaw * ((float) Math.PI / 180F)), (-MathHelper.cos(player.rotationYaw * ((float) Math.PI / 180F))));
                             } else {
-                                target.addVelocity((-MathHelper.sin(player.rotationYaw * ((float)Math.PI / 180F)) * (float)i * 0.5F), 0.1D, (MathHelper.cos(player.rotationYaw * ((float)Math.PI / 180F)) * (float)i * 0.5F));
+                                target.addVelocity((-MathHelper.sin(player.rotationYaw * ((float) Math.PI / 180F)) * (float) i * 0.5F), 0.1D, (MathHelper.cos(player.rotationYaw * ((float) Math.PI / 180F)) * (float) i * 0.5F));
                             }
 
                             player.setMotion(player.getMotion().mul(0.6D, 1.0D, 0.6D));
@@ -130,7 +130,7 @@ public class C2SPacketHit {
                         }
 
                         if (target instanceof ServerPlayerEntity && target.velocityChanged) {
-                            ((ServerPlayerEntity)target).connection.sendPacket(new SEntityVelocityPacket(target));
+                            ((ServerPlayerEntity) target).connection.sendPacket(new SEntityVelocityPacket(target));
                             target.velocityChanged = false;
                             target.setMotion(vector3d);
                         }
@@ -154,19 +154,19 @@ public class C2SPacketHit {
 
                         player.setLastAttackedEntity(target);
                         if (target instanceof LivingEntity) {
-                            EnchantmentHelper.applyThornEnchantments((LivingEntity)target, player);
+                            EnchantmentHelper.applyThornEnchantments((LivingEntity) target, player);
                         }
 
                         EnchantmentHelper.applyArthropodEnchantments(player, target);
                         ItemStack itemstack1 = player.getHeldItemMainhand();
                         Entity entity = target;
                         if (target instanceof EnderDragonPartEntity) {
-                            entity = ((EnderDragonPartEntity)target).dragon;
+                            entity = ((EnderDragonPartEntity) target).dragon;
                         }
 
                         if (!player.world.isRemote && !itemstack1.isEmpty() && entity instanceof LivingEntity) {
                             ItemStack copy = itemstack1.copy();
-                            itemstack1.hitEntity((LivingEntity)entity, player);
+                            itemstack1.hitEntity((LivingEntity) entity, player);
                             if (itemstack1.isEmpty()) {
                                 ForgeEventFactory.onPlayerDestroyItem(player, copy, Hand.MAIN_HAND);
                                 player.setHeldItem(Hand.MAIN_HAND, ItemStack.EMPTY);
@@ -174,15 +174,15 @@ public class C2SPacketHit {
                         }
 
                         if (target instanceof LivingEntity) {
-                            float f5 = f4 - ((LivingEntity)target).getHealth();
+                            float f5 = f4 - ((LivingEntity) target).getHealth();
                             player.addStat(Stats.DAMAGE_DEALT, Math.round(f5 * 10.0F));
                             if (j > 0) {
                                 target.setFire(j * 4);
                             }
 
                             if (player.world instanceof ServerWorld && f5 > 2.0F) {
-                                int k = (int)(f5 * 0.5D);
-                                ((ServerWorld)player.world).spawnParticle(ParticleTypes.DAMAGE_INDICATOR, target.getX(), target.getBodyY(0.5D), target.getZ(), k, 0.1D, 0.0D, 0.1D, 0.2D);
+                                int k = (int) (f5 * 0.5D);
+                                ((ServerWorld) player.world).spawnParticle(ParticleTypes.DAMAGE_INDICATOR, target.getX(), target.getBodyY(0.5D), target.getZ(), k, 0.1D, 0.0D, 0.1D, 0.2D);
                             }
                         }
 
@@ -198,6 +198,7 @@ public class C2SPacketHit {
             }
         }
     }
+
     public enum HitType {
         EXT, AOE
     }
