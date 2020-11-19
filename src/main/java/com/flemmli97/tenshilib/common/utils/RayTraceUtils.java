@@ -10,7 +10,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
@@ -75,22 +74,32 @@ public class RayTraceUtils {
         return null;
     }
 
+    /**
+     * Returns a random collision free position around the given blockpos.
+     * Null if it was not possible
+     */
+    @Nullable
     public static BlockPos randomPosAround(World world, Entity e, BlockPos pos, int range, boolean grounded, Random rand) {
         int randX = pos.getX() + rand.nextInt(2 * range) - range;
         int randY = pos.getY() + rand.nextInt(2 * range) - range;
         int randZ = pos.getZ() + rand.nextInt(2 * range) - range;
         if (!grounded) {
             BlockPos pos1 = new BlockPos(randX, randY, randZ);
-            while (Math.abs(randY - pos.getY()) < range && world.getBlockCollisions(e, e.getBoundingBox().offset(pos1)).allMatch(VoxelShape::isEmpty)) {
+            while (Math.abs(randY - pos1.getY()) < range && !world.isSpaceEmpty(e.getBoundingBox().offset(pos1))) {
                 pos1 = pos1.up();
             }
+            if (!world.isSpaceEmpty(e.getBoundingBox().offset(pos1)))
+                return null;
             return pos1;
         }
-        BlockPos pos1 = new BlockPos(randX, 0, randZ);
-        while (pos1.getY() < 255 && (!world.getBlockState(pos1.down()).isTopSolid(world, pos1.down(), e, Direction.UP))
-                || world.getBlockCollisions(e, e.getBoundingBox().offset(pos1)).allMatch(VoxelShape::isEmpty)) {
+        int y = pos.getY() - range;
+        BlockPos pos1 = new BlockPos(randX, y, randZ);
+        while (pos1.getY() - y < range && (!world.getBlockState(pos1.down()).isTopSolid(world, pos1.down(), e, Direction.UP)
+                || !world.isSpaceEmpty(e.getBoundingBox().offset(pos1)))) {
             pos1 = pos1.up();
         }
+        if (!world.isSpaceEmpty(e.getBoundingBox().offset(pos1)))
+            return null;
         return pos1;
     }
 

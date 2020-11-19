@@ -36,9 +36,9 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
     private int coolDown;
     private RayTraceResult hit;
 
-    protected static final DataParameter<String> shooterUUID = EntityDataManager.createKey(EntityBeam.class, DataSerializers.STRING);
+    protected static final DataParameter<Optional<UUID>> shooterUUID = EntityDataManager.createKey(EntityBeam.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 
-    private final Predicate<Entity> notShooter = (entity) -> entity != EntityBeam.this.getShooter() && EntityPredicates.NOT_SPECTATING.test(entity);
+    private final Predicate<Entity> notShooter = (entity) -> entity != EntityBeam.this.getOwner() && EntityPredicates.NOT_SPECTATING.test(entity);
 
     public EntityBeam(EntityType<? extends EntityBeam> type, World world) {
         super(type, world);
@@ -53,7 +53,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
     public EntityBeam(EntityType<? extends EntityBeam> type, World world, LivingEntity shooter) {
         this(type, world, shooter.getX(), shooter.getY() + shooter.getEyeHeight() - 0.10000000149011612D, shooter.getZ());
         this.shooter = shooter;
-        this.dataManager.set(shooterUUID, shooter.getUniqueID().toString());
+        this.dataManager.set(shooterUUID, Optional.of(shooter.getUniqueID()));
         this.setRotation(shooter.rotationYawHead, shooter.rotationPitch);
     }
 
@@ -98,8 +98,8 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
 
     @Override
     public void updateYawPitch() {
-        if (this.getHitVecFromShooter() && this.getShooter() != null) {
-            LivingEntity e = this.getShooter();
+        if (this.getHitVecFromShooter() && this.getOwner() != null) {
+            LivingEntity e = this.getOwner();
             this.rotationPitch = e.rotationPitch;
             this.rotationYaw = e.rotationYaw;
             this.prevRotationPitch = e.prevRotationPitch;
@@ -123,14 +123,14 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
 
     @Override
     protected void registerData() {
-        this.dataManager.register(shooterUUID, "");
+        this.dataManager.register(shooterUUID, Optional.empty());
     }
 
     @Override
     public void tick() {
-        if (this.getShooter() != null) {
+        if (this.getOwner() != null) {
             if (this.hit == null || this.getHitVecFromShooter())
-                this.hit = RayTraceUtils.entityRayTrace(this.getHitVecFromShooter() ? this.getShooter() : this, this.getRange(), RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE,
+                this.hit = RayTraceUtils.entityRayTrace(this.getHitVecFromShooter() ? this.getOwner() : this, this.getRange(), RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE,
                         !this.piercing(), this.notShooter);
         }
         this.updateYawPitch();
@@ -141,9 +141,9 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         if (!this.world.isRemote && this.hit != null && --this.coolDown <= 0) {
             Vector3d offSetPosVec = this.getPositionVec().add(this.getLookVec().scale(this.radius()));
             List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(this,
-                    new AxisAlignedBB(this.getX(), this.getY(), this.getZ(), this.hit.getHitVec().x, this.hit.getHitVec().y, this.hit.getHitVec().z).grow(1));
+                    new AxisAlignedBB(this.getX(), this.getY(), this.getZ(), this.hit.getHitVec().x, this.hit.getHitVec().y, this.hit.getHitVec().z).grow(this.radius()));
             for (Entity entity : list) {
-                if (entity.canBeCollidedWith() && entity != this.getShooter()) {
+                if (entity.canBeCollidedWith() && entity != this.getOwner()) {
                     AxisAlignedBB axisalignedbb = entity.getBoundingBox().grow(this.radius() + 0.30000001192092896D);
                     Optional<Vector3d> res = axisalignedbb.rayTrace(offSetPosVec, this.hit.getHitVec());
                     if (res.isPresent()) {
@@ -172,22 +172,28 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
 
     @Override
     public void readAdditional(CompoundNBT compound) {
-        this.dataManager.set(shooterUUID, compound.getString("Shooter"));
-        this.shooter = this.getShooter();
+        if (compound.hasUniqueId("Shooter"))
+            this.dataManager.set(shooterUUID, Optional.of(compound.getUniqueId("Shooter")));
+        this.shooter = this.getOwner();
         this.livingTicks = compound.getInt("LivingTicks");
     }
 
     @Override
     public void writeAdditional(CompoundNBT compound) {
-        compound.putString("Shooter", this.dataManager.get(shooterUUID));
+        this.dataManager.get(shooterUUID).ifPresent(uuid -> compound.putUniqueId("Shooter", uuid));
         compound.putInt("LivingTicks", this.livingTicks);
     }
 
     @Override
+    public UUID ownerUUID() {
+        return this.dataManager.get(shooterUUID).orElse(null);
+    }
+
+    @Override
     @Nullable
-    public LivingEntity getShooter() {
-        if (this.shooter == null && !this.dataManager.get(shooterUUID).isEmpty()) {
-            this.shooter = EntityUtil.findFromUUID(LivingEntity.class, this.world, UUID.fromString(this.dataManager.get(shooterUUID)));
+    public LivingEntity getOwner() {
+        if (this.shooter == null) {
+            this.dataManager.get(shooterUUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(LivingEntity.class, this.world, uuid));
         }
         return this.shooter;
     }

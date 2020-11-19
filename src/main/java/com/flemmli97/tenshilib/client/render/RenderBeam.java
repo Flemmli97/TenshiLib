@@ -61,7 +61,7 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
         matrixStack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(-MathHelper.lerp(partialTicks, entity.prevRotationPitch, entity.rotationPitch)));
         matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(30));
         int layer = 3;
-        if (entity.getShooter() == Minecraft.getInstance().player) {
+        if (entity.getOwner() == Minecraft.getInstance().player) {
             layer = 1;
             matrixStack.translate(0, -0.1, 0);
         }

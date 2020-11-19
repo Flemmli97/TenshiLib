@@ -1,5 +1,6 @@
 package com.flemmli97.tenshilib.common.entity;
 
+import com.flemmli97.tenshilib.api.entity.IOwnable;
 import com.google.common.collect.Lists;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -35,9 +36,10 @@ import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-public abstract class EntityProjectile extends Entity {
+public abstract class EntityProjectile extends Entity implements IOwnable<LivingEntity> {
 
     private LivingEntity shooter;
 
@@ -48,7 +50,7 @@ public abstract class EntityProjectile extends Entity {
     private BlockState ground;
     private BlockPos groundPos;
 
-    protected static final DataParameter<String> shooterUUID = EntityDataManager.createKey(EntityProjectile.class, DataSerializers.STRING);
+    protected static final DataParameter<Optional<UUID>> shooterUUID = EntityDataManager.createKey(EntityProjectile.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 
     public EntityProjectile(EntityType<? extends EntityProjectile> type, World world) {
         super(type, world);
@@ -62,7 +64,7 @@ public abstract class EntityProjectile extends Entity {
     public EntityProjectile(EntityType<? extends EntityProjectile> type, World world, LivingEntity shooter) {
         this(type, world, shooter.getX(), shooter.getY() + shooter.getEyeHeight() - 0.10000000149011612D, shooter.getZ());
         this.shooter = shooter;
-        this.dataManager.set(shooterUUID, shooter.getUniqueID().toString());
+        this.dataManager.set(shooterUUID, Optional.of(shooter.getUniqueID()));
         this.setRotation(shooter.rotationYaw, shooter.rotationPitch);
     }
 
@@ -95,7 +97,7 @@ public abstract class EntityProjectile extends Entity {
 
     @Override
     protected void registerData() {
-        this.dataManager.register(shooterUUID, "");
+        this.dataManager.register(shooterUUID, Optional.empty());
     }
 
     @Override
@@ -268,6 +270,7 @@ public abstract class EntityProjectile extends Entity {
         this.ticksInGround = 0;
     }
 
+    @Override
     public void move(MoverType type, Vector3d to) {
         super.move(type, to);
         if (type != MoverType.SELF && this.noGround()) {
@@ -277,7 +280,7 @@ public abstract class EntityProjectile extends Entity {
 
     private boolean canHit(Entity entity) {
         if (entity.canBeCollidedWith()) {
-            if (this.getShooter() == null || (!this.getShooter().isRidingSameEntity(entity) && ((this.canHitShooter() && this.ticksExisted > 2) || entity != this.getShooter())))
+            if (this.getOwner() == null || (!this.getOwner().isRidingSameEntity(entity) && ((this.canHitShooter() && this.ticksExisted > 2) || entity != this.getOwner())))
                 return (!this.attackedEntities.contains(entity.getUniqueID()));
         }
         return false;
@@ -316,8 +319,9 @@ public abstract class EntityProjectile extends Entity {
         this.inGround = compound.getBoolean("InGround");
         if (this.inGround)
             this.setInGround(NBTUtil.readBlockPos(compound.getCompound("GroundPos")));
-        this.dataManager.set(shooterUUID, compound.getString("Shooter"));
-        this.shooter = this.getShooter();
+        if (compound.hasUniqueId("Shooter"))
+            this.dataManager.set(shooterUUID, Optional.of(compound.getUniqueId("Shooter")));
+        this.shooter = this.getOwner();
         this.livingTicks = compound.getInt("LivingTicks");
         ListNBT list = compound.getList("AttackedEntities", Constants.NBT.TAG_STRING);
         list.forEach(tag -> this.attackedEntities.add(UUID.fromString(tag.getString())));
@@ -328,19 +332,25 @@ public abstract class EntityProjectile extends Entity {
         if (this.inGround)
             compound.put("GroundPos", NBTUtil.writeBlockPos(this.groundPos));
         compound.putBoolean("InGround", this.inGround);
-        compound.putString("Shooter", this.dataManager.get(shooterUUID));
+        this.dataManager.get(shooterUUID).ifPresent(uuid -> compound.putUniqueId("Shooter", uuid));
         compound.putInt("LivingTicks", this.livingTicks);
         ListNBT list = new ListNBT();
         this.attackedEntities.forEach(uuid -> list.add(StringNBT.of(uuid.toString())));
         compound.put("AttackedEntities", list);
     }
 
+    @Override
     @Nullable
-    public LivingEntity getShooter() {
-        if (this.shooter == null && !this.dataManager.get(shooterUUID).isEmpty()) {
-            this.shooter = EntityUtil.findFromUUID(LivingEntity.class, this.world, UUID.fromString(this.dataManager.get(shooterUUID)));
+    public LivingEntity getOwner() {
+        if (this.shooter == null) {
+            this.dataManager.get(shooterUUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(LivingEntity.class, this.world, uuid));
         }
         return this.shooter;
+    }
+
+    @Override
+    public UUID ownerUUID() {
+        return this.dataManager.get(shooterUUID).orElse(null);
     }
 
     @Override

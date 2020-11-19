@@ -3,9 +3,7 @@ package com.flemmli97.tenshilib.api.entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.vector.Vector3d;
 
-import javax.annotation.Nullable;
-
-public interface IBeamEntity {
+public interface IBeamEntity extends IOwnable<LivingEntity> {
 
     Vector3d startVec();
 
@@ -14,7 +12,4 @@ public interface IBeamEntity {
     int livingTickMax();
 
     void updateYawPitch();
-
-    @Nullable
-    LivingEntity getShooter();
 }
