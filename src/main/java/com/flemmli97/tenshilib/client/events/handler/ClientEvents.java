@@ -1,21 +1,19 @@
 package com.flemmli97.tenshilib.client.events.handler;
 
-import com.flemmli97.tenshilib.TenshiLib;
 import com.flemmli97.tenshilib.api.item.IAOEWeapon;
 import com.flemmli97.tenshilib.api.item.IExtendedWeapon;
+import com.flemmli97.tenshilib.common.item.SpawnEgg;
 import com.flemmli97.tenshilib.common.network.C2SPacketHit;
 import com.flemmli97.tenshilib.common.network.PacketHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = TenshiLib.MODID, value = Dist.CLIENT)
-public class EventHandler {
+public class ClientEvents {
 
     @SubscribeEvent
     public static void clickSpecial(InputEvent.ClickInputEvent event) {
@@ -32,5 +30,11 @@ public class EventHandler {
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    public static void itemColors(ColorHandlerEvent.Item event) {
+        for (SpawnEgg egg : SpawnEgg.getEggs())
+            event.getItemColors().register((stack, i) -> egg.getColor(i), egg);
     }
 }

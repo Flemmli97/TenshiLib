@@ -139,9 +139,9 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         if (this.livingTicks >= this.livingTickMax())
             this.remove();
         if (!this.world.isRemote && this.hit != null && --this.coolDown <= 0) {
-            Vector3d offSetPosVec = this.getPositionVec().add(this.getLookVec().scale(this.radius()));
+            Vector3d offSetPosVec = this.getPositionVec();//.add(this.getLookVec().scale(this.radius()));
             List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(this,
-                    new AxisAlignedBB(this.getX(), this.getY(), this.getZ(), this.hit.getHitVec().x, this.hit.getHitVec().y, this.hit.getHitVec().z).grow(this.radius()));
+                    new AxisAlignedBB(this.getX(), this.getY(), this.getZ(), this.hit.getHitVec().x, this.hit.getHitVec().y, this.hit.getHitVec().z).grow(1));
             for (Entity entity : list) {
                 if (entity.canBeCollidedWith() && entity != this.getOwner()) {
                     AxisAlignedBB axisalignedbb = entity.getBoundingBox().grow(this.radius() + 0.30000001192092896D);
