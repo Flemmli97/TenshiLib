@@ -28,8 +28,8 @@ public class ItemLayer<T extends LivingEntity, M extends EntityModel<T> & IItemA
     @Override
     public void render(MatrixStack stack, IRenderTypeBuffer buffer, int light, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         boolean flag = entity.getPrimaryHand() == HandSide.RIGHT;
-        ItemStack leftStack = flag ? entity.getHeldItemOffhand() : entity.getHeldItemMainhand();
-        ItemStack rightStack = flag ? entity.getHeldItemMainhand() : entity.getHeldItemOffhand();
+        ItemStack leftStack = this.heldItemLeft(entity, flag);
+        ItemStack rightStack = this.heldItemRight(entity, flag);
         if (!leftStack.isEmpty() || !rightStack.isEmpty()) {
             stack.push();
             if (this.getEntityModel().isChild)
@@ -38,6 +38,14 @@ public class ItemLayer<T extends LivingEntity, M extends EntityModel<T> & IItemA
             this.renderItem(entity, leftStack, ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND, HandSide.LEFT, stack, buffer, light);
             stack.pop();
         }
+    }
+
+    protected ItemStack heldItemLeft(T entity, boolean rightHanded) {
+        return rightHanded ? entity.getHeldItemOffhand() : entity.getHeldItemMainhand();
+    }
+
+    protected ItemStack heldItemRight(T entity, boolean rightHanded) {
+        return rightHanded ? entity.getHeldItemMainhand() : entity.getHeldItemOffhand();
     }
 
     protected void renderItem(T entity, ItemStack stack, ItemCameraTransforms.TransformType transformType, HandSide hand, MatrixStack matrixStack, IRenderTypeBuffer buffer, int light) {
