@@ -1,6 +1,7 @@
 package com.flemmli97.tenshilib.common.entity;
 
 import com.flemmli97.tenshilib.api.entity.IBeamEntity;
+import com.flemmli97.tenshilib.common.utils.MathUtils;
 import com.flemmli97.tenshilib.common.utils.RayTraceUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -33,12 +34,12 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
 
     private LivingEntity shooter;
     protected int livingTicks;
-    private int coolDown;
-    private RayTraceResult hit;
+    protected int coolDown;
+    protected RayTraceResult hit;
 
     protected static final DataParameter<Optional<UUID>> shooterUUID = EntityDataManager.createKey(EntityBeam.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 
-    private final Predicate<Entity> notShooter = (entity) -> entity != EntityBeam.this.getOwner() && EntityPredicates.NOT_SPECTATING.test(entity);
+    protected final Predicate<Entity> notShooter = (entity) -> entity != EntityBeam.this.getOwner() && EntityPredicates.NOT_SPECTATING.test(entity);
 
     public EntityBeam(EntityType<? extends EntityBeam> type, World world) {
         super(type, world);
@@ -126,27 +127,34 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         this.dataManager.register(shooterUUID, Optional.empty());
     }
 
+
     @Override
     public void tick() {
-        if (this.getOwner() != null) {
-            if (this.hit == null || this.getHitVecFromShooter())
-                this.hit = RayTraceUtils.entityRayTrace(this.getHitVecFromShooter() ? this.getOwner() : this, this.getRange(), RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE,
-                        !this.piercing(), this.notShooter);
-        }
         this.updateYawPitch();
+        if (this.hit == null || this.getHitVecFromShooter())
+            this.hit = RayTraceUtils.entityRayTrace(this, this.getRange(), RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE,
+                    !this.piercing(), this.notShooter);
         super.tick();
         this.livingTicks++;
         if (this.livingTicks >= this.livingTickMax())
             this.remove();
         if (!this.world.isRemote && this.hit != null && --this.coolDown <= 0) {
-            Vector3d offSetPosVec = this.getPositionVec();//.add(this.getLookVec().scale(this.radius()));
+            Vector3d offSetPos = this.getPositionVec().add(this.getLookVec().scale(this.radius()));
+            Vector3d dirHit = this.hit.getHitVec().subtract(offSetPos);
+            dirHit = dirHit.scale(Math.max(0, dirHit.length()-this.radius()));
             List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(this,
-                    new AxisAlignedBB(this.getX(), this.getY(), this.getZ(), this.hit.getHitVec().x, this.hit.getHitVec().y, this.hit.getHitVec().z).grow(1));
+                    new AxisAlignedBB(this.getX(), this.getY(), this.getZ(), this.hit.getHitVec().x, this.hit.getHitVec().y, this.hit.getHitVec().z).grow(this.radius()+1));
             for (Entity entity : list) {
                 if (entity.canBeCollidedWith() && entity != this.getOwner()) {
-                    AxisAlignedBB axisalignedbb = entity.getBoundingBox().grow(this.radius() + 0.30000001192092896D);
-                    Optional<Vector3d> res = axisalignedbb.rayTrace(offSetPosVec, this.hit.getHitVec());
-                    if (res.isPresent()) {
+                    AxisAlignedBB aabb = entity.getBoundingBox();
+                    Vector3d closest = MathUtils.closestPointToLine(aabb.getCenter(), offSetPos, dirHit);
+                    boolean check = aabb.contains(closest);
+                    if(!check) {
+                        Optional<Vector3d> oth = aabb.rayTrace(closest, entity.getBoundingBox().getCenter());
+                        double range = this.radius() + 0.3;
+                        check = oth.isPresent() && closest.squareDistanceTo(oth.get()) <=range*range;
+                    }
+                    if(check) {
                         EntityRayTraceResult raytraceresult = new EntityRayTraceResult(entity);
                         if (!ForgeEventFactory.onProjectileImpact(this, raytraceresult)) {
                             this.onImpact(raytraceresult);

@@ -62,8 +62,12 @@ public class MathUtils {
         return new Vector3d(x, y, z);
     }
 
-    public static Vector3d closestPointToLine(Vector3d point, Vector3d l1, Vector3d dir) {
-        return new Vector3d(MathHelper.clamp(point.x, l1.x, dir.x), MathHelper.clamp(point.y, l1.y, dir.y), MathHelper.clamp(point.z, l1.z, dir.z));
+    public static Vector3d closestPointToLine(Vector3d point, Vector3d from, Vector3d dir) {
+        if(dir.equals(Vector3d.ZERO))
+            return from;
+        double lengthSq = dir.lengthSquared();
+        double x = Math.max(0, Math.min(1, point.subtract(from).dotProduct(dir)/lengthSq));
+        return from.add(dir.scale(x));
     }
 
     public static Vector3d farestPointToLine(Vector3d point, Vector3d l1, Vector3d dir) {
