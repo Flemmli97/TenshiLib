@@ -1,5 +1,6 @@
 package com.flemmli97.tenshilib.api.config;
 
+import com.flemmli97.tenshilib.common.utils.JsonUtils;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -81,10 +82,7 @@ public class SimpleItemStackWrapper extends ItemWrapper {
         @Override
         public SimpleItemStackWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonObject obj = json.getAsJsonObject();
-            int count = 1;
-            if (obj.get("count") instanceof JsonPrimitive && obj.get("count").getAsJsonPrimitive().isNumber())
-                count = obj.get("count").getAsInt();
-            return new SimpleItemStackWrapper(obj.get("item").getAsString(), count);
+            return new SimpleItemStackWrapper(obj.get("item").getAsString(), JsonUtils.get(obj, "count", 1));
         }
     }
 }

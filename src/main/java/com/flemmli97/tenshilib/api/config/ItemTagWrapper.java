@@ -1,5 +1,6 @@
 package com.flemmli97.tenshilib.api.config;
 
+import com.flemmli97.tenshilib.common.utils.JsonUtils;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -100,9 +101,7 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
         @Override
         public ItemTagWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonObject obj = json.getAsJsonObject();
-            int count = 1;
-            if (obj.get("count") instanceof JsonPrimitive && obj.get("count").getAsJsonPrimitive().isNumber())
-                count = obj.get("count").getAsInt();
+            int count = JsonUtils.get(obj, "count", 1);
             return new ItemTagWrapper(obj.get("tag").getAsString(), count);
         }
     }

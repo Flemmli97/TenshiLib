@@ -3,6 +3,7 @@ package com.flemmli97.tenshilib.client.model;
 
 import com.flemmli97.tenshilib.TenshiLib;
 import com.flemmli97.tenshilib.common.utils.ArrayUtils;
+import com.flemmli97.tenshilib.common.utils.JsonUtils;
 import com.flemmli97.tenshilib.common.utils.MathUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -74,9 +75,9 @@ public class BlockBenchAnimations {
         private final List<AnimationComponent> components = Lists.newArrayList();
 
         public Animation(Model model, JsonObject json) {
-            this.length = (int) Math.floor((json.get("animation_length").getAsDouble() * 20) + 1);
-            this.loop = json.has("loop") && json.get("loop").getAsBoolean();
-            JsonObject components = json.getAsJsonObject("bones");
+            this.length = (int) Math.floor((JsonUtils.get(json, "animation_length", 0.0) * 20) + 1);
+            this.loop = JsonUtils.get(json, "loop", false);
+            JsonObject components = JsonUtils.getObj(json, "bones");
             for (Field field : model.getClass().getFields()) {
                 if (ModelRenderer.class.isAssignableFrom(field.getType()) && components.has(field.getName())) {
                     try {
