@@ -82,9 +82,10 @@ public class SpawnEgg extends Item {
     /**
      * IDK how to find it faster since its saved as suppliers
      */
-    public static Optional<SpawnEgg> fromType(EntityType<?> type){
-        return EGGSSUP.entrySet().stream().filter(e->e.getKey().get() == type).findFirst().map(Map.Entry::getValue);
+    public static Optional<SpawnEgg> fromType(EntityType<?> type) {
+        return EGGSSUP.entrySet().stream().filter(e -> e.getKey().get() == type).findFirst().map(Map.Entry::getValue);
     }
+
     /**
      * Additional hook to modify the entity
      */

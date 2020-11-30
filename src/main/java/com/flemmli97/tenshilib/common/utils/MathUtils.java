@@ -63,10 +63,10 @@ public class MathUtils {
     }
 
     public static Vector3d closestPointToLine(Vector3d point, Vector3d from, Vector3d dir) {
-        if(dir.equals(Vector3d.ZERO))
+        if (dir.equals(Vector3d.ZERO))
             return from;
         double lengthSq = dir.lengthSquared();
-        double x = Math.max(0, Math.min(1, point.subtract(from).dotProduct(dir)/lengthSq));
+        double x = Math.max(0, Math.min(1, point.subtract(from).dotProduct(dir) / lengthSq));
         return from.add(dir.scale(x));
     }
 

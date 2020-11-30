@@ -141,20 +141,20 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         if (!this.world.isRemote && this.hit != null && --this.coolDown <= 0) {
             Vector3d offSetPos = this.getPositionVec().add(this.getLookVec().scale(this.radius()));
             Vector3d dirHit = this.hit.getHitVec().subtract(offSetPos);
-            dirHit = dirHit.scale(Math.max(0, dirHit.length()-this.radius()));
+            dirHit = dirHit.scale(Math.max(0, dirHit.length() - this.radius()));
             List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(this,
-                    new AxisAlignedBB(this.getX(), this.getY(), this.getZ(), this.hit.getHitVec().x, this.hit.getHitVec().y, this.hit.getHitVec().z).grow(this.radius()+1));
+                    new AxisAlignedBB(this.getX(), this.getY(), this.getZ(), this.hit.getHitVec().x, this.hit.getHitVec().y, this.hit.getHitVec().z).grow(this.radius() + 1));
             for (Entity entity : list) {
                 if (entity.canBeCollidedWith() && entity != this.getOwner()) {
                     AxisAlignedBB aabb = entity.getBoundingBox();
                     Vector3d closest = MathUtils.closestPointToLine(aabb.getCenter(), offSetPos, dirHit);
                     boolean check = aabb.contains(closest);
-                    if(!check) {
+                    if (!check) {
                         Optional<Vector3d> oth = aabb.rayTrace(closest, entity.getBoundingBox().getCenter());
                         double range = this.radius() + 0.3;
-                        check = oth.isPresent() && closest.squareDistanceTo(oth.get()) <=range*range;
+                        check = oth.isPresent() && closest.squareDistanceTo(oth.get()) <= range * range;
                     }
-                    if(check) {
+                    if (check) {
                         EntityRayTraceResult raytraceresult = new EntityRayTraceResult(entity);
                         if (!ForgeEventFactory.onProjectileImpact(this, raytraceresult)) {
                             this.onImpact(raytraceresult);
