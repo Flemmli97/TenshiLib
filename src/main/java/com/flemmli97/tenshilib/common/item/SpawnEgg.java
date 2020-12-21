@@ -3,7 +3,6 @@ package com.flemmli97.tenshilib.common.item;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.dispenser.IDispenseItemBehavior;
@@ -116,17 +115,18 @@ public class SpawnEgg extends Item {
             BlockPos blockpos = ctx.getPos();
             Direction direction = ctx.getFace();
             BlockState blockstate = world.getBlockState(blockpos);
-            if (blockstate.isIn(Blocks.SPAWNER)) {
-                TileEntity tileentity = world.getTileEntity(blockpos);
-                if (tileentity instanceof MobSpawnerTileEntity) {
-                    AbstractSpawner abstractspawner = ((MobSpawnerTileEntity) tileentity).getSpawnerBaseLogic();
-                    EntityType<?> entitytype1 = this.getType(stack.getTag());
-                    abstractspawner.setEntityType(entitytype1);
-                    tileentity.markDirty();
-                    world.notifyBlockUpdate(blockpos, blockstate, blockstate, 3);
-                    stack.shrink(1);
-                    return ActionResultType.CONSUME;
-                }
+            TileEntity tile = world.getTileEntity(blockpos);
+            ActionResultType onBlock = this.onBlockUse(stack, blockpos, blockstate, tile);
+            if(onBlock != ActionResultType.PASS)
+                return onBlock;
+            if (tile instanceof MobSpawnerTileEntity) {
+                AbstractSpawner abstractspawner = ((MobSpawnerTileEntity) tile).getSpawnerBaseLogic();
+                EntityType<?> entitytype1 = this.getType(stack.getTag());
+                abstractspawner.setEntityType(entitytype1);
+                tile.markDirty();
+                world.notifyBlockUpdate(blockpos, blockstate, blockstate, 3);
+                stack.shrink(1);
+                return ActionResultType.CONSUME;
             }
 
             BlockPos blockpos1 = blockstate.getCollisionShape(world, blockpos).isEmpty() ? blockpos : blockpos.offset(direction);
@@ -137,6 +137,10 @@ public class SpawnEgg extends Item {
             }
             return ActionResultType.CONSUME;
         }
+    }
+
+    public ActionResultType onBlockUse(ItemStack stack, BlockPos pos, BlockState state, @Nullable TileEntity tile){
+        return ActionResultType.PASS;
     }
 
     @Override
