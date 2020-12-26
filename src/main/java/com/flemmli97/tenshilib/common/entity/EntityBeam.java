@@ -145,7 +145,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
             List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(this,
                     new AxisAlignedBB(this.getX(), this.getY(), this.getZ(), this.hit.getHitVec().x, this.hit.getHitVec().y, this.hit.getHitVec().z).grow(this.radius() + 1));
             for (Entity entity : list) {
-                if (entity.canBeCollidedWith() && entity != this.getOwner()) {
+                if (entity != this.getOwner()) {
                     AxisAlignedBB aabb = entity.getBoundingBox();
                     Vector3d closest = MathUtils.closestPointToLine(aabb.getCenter(), offSetPos, dirHit);
                     boolean check = aabb.contains(closest);

@@ -28,17 +28,22 @@ public class RayTraceUtils {
      * @param reach Radius around the entity
      * @param aoe   FOV in degrees. 0 means vanilla raytracing. use 1 to have it like vanilla but get multiple entities.
      */
-    public static List<LivingEntity> getEntities(LivingEntity entity, float reach, float aoe) {
-        return getEntitiesIn(LivingEntity.class, entity, entity.getPositionVec().add(0, entity.getHeight() / 2, 0), entity.getLook(1), reach,
+    public static <T extends Entity> List<T> getEntities(Class<T> clss, LivingEntity entity, float reach, float aoe) {
+        return getEntitiesIn(clss, entity, entity.getPositionVec().add(0, entity.getHeight() / 2, 0), entity.getLook(1), reach,
                 aoe, null);
     }
 
-    public static <T extends LivingEntity> List<T> getEntitiesIn(Class<T> clss, LivingEntity entity, Vector3d pos, Vector3d look, float reach,
+    public static <T extends Entity> List<T> getEntities(Class<T> clss, LivingEntity entity, float reach, float aoe, Predicate<T> pred) {
+        return getEntitiesIn(clss, entity, entity.getPositionVec().add(0, entity.getHeight() / 2, 0), entity.getLook(1), reach,
+                aoe, pred);
+    }
+
+    public static <T extends Entity> List<T> getEntitiesIn(Class<T> clss, LivingEntity entity, Vector3d pos, Vector3d look, float reach,
                                                                  float aoe, Predicate<T> pred) {
         CircleSector circ = new CircleSector(pos, look, reach, aoe, entity);
         return entity.world.getEntitiesWithinAABB(clss, entity.getBoundingBox().grow(reach),
-                (living) -> living != entity && (pred == null || pred.test(living)) && !living.isOnSameTeam(entity) && living.canBeCollidedWith()
-                        && circ.intersects(living.world, living.getBoundingBox()));
+                t -> t != entity && (pred == null || pred.test(t)) && !t.isOnSameTeam(entity)
+                        && circ.intersects(t.world, t.getBoundingBox()));
     }
 
     public static EntityRayTraceResult calculateEntityFromLook(LivingEntity entity, float reach) {
@@ -57,7 +62,7 @@ public class RayTraceUtils {
         Vector3d hitVec;
         List<Entity> list = entity.world.getEntitiesWithinAABB(clss,
                 entity.getBoundingBox().expand(dir.x * reach, dir.y * reach, dir.z * reach).expand(1.0D, 1.0D, 1.0D),
-                (t) -> EntityPredicates.NOT_SPECTATING.test(t) && t != null && t != entity && t.canBeCollidedWith()
+                (t) -> EntityPredicates.NOT_SPECTATING.test(t) && t != null && t != entity
                         && (pred == null || pred.test(t)));
         for (Entity e : list) {
             AxisAlignedBB axisalignedbb = e.getBoundingBox().grow(e.getCollisionBorderSize());

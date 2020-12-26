@@ -279,10 +279,8 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
     }
 
     private boolean canHit(Entity entity) {
-        if (entity.canBeCollidedWith()) {
-            if (this.getOwner() == null || (!this.getOwner().isRidingSameEntity(entity) && ((this.canHitShooter() && this.ticksExisted > 2) || entity != this.getOwner())))
-                return (!this.attackedEntities.contains(entity.getUniqueID()));
-        }
+        if (this.getOwner() == null || (!this.getOwner().isRidingSameEntity(entity) && ((this.canHitShooter() && this.ticksExisted > 2) || entity != this.getOwner())))
+            return (!this.attackedEntities.contains(entity.getUniqueID()));
         return false;
     }
 
