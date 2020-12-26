@@ -64,7 +64,7 @@ public class C2SPacketHit {
             }
             if (pkt.type == HitType.AOE && stack.getItem() instanceof IAOEWeapon) {
                 IAOEWeapon item = (IAOEWeapon) stack.getItem();
-                List<Entity> list = RayTraceUtils.getEntities(Entity.class, player, item.getRange(), item.getFOV());
+                List<Entity> list = RayTraceUtils.getEntities(player, item.getRange(), item.getFOV());
                 if (MinecraftForge.EVENT_BUS.post(new AOEAttackEvent(player, list)) || list.isEmpty())
                     return;
                 for (int i = 0; i < list.size(); i++)
