@@ -27,12 +27,11 @@ public class RayTraceUtils {
      * @param aoe   FOV in degrees. 0 means vanilla raytracing. use 1 to have it like vanilla but get multiple entities.
      */
     public static List<Entity> getEntities(LivingEntity entity, float reach, float aoe) {
-        return getEntitiesIn(entity, entity.getPositionVec().add(0, entity.getHeight() / 2, 0), entity.getLook(1), reach,
-                aoe, null);
+        return getEntities(entity, reach, aoe, null);
     }
 
     public static List<Entity> getEntities(LivingEntity entity, float reach, float aoe, Predicate<Entity> pred) {
-        return getEntitiesIn(entity, entity.getPositionVec().add(0, entity.getHeight() / 2, 0), entity.getLook(1), reach,
+        return getEntitiesIn(entity, entity.getPositionVec().add(0, entity.getEyeHeight(), 0), entity.getLook(1), reach,
                 aoe, pred);
     }
 
