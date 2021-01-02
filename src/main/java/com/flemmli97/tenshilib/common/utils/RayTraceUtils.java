@@ -35,6 +35,11 @@ public class RayTraceUtils {
                 aoe, pred);
     }
 
+    public static List<Entity> getEntitiesIgnorePitch(LivingEntity entity, float reach, float aoe, Predicate<Entity> pred) {
+        return getEntitiesIn(entity, entity.getPositionVec().add(0, entity.getEyeHeight(), 0), Vector3d.fromPitchYaw(0, entity.getYaw(1)), reach,
+                aoe, pred);
+    }
+
     public static List<Entity> getEntitiesIn(LivingEntity entity, Vector3d pos, Vector3d look, float reach,
                                                                  float aoe, Predicate<Entity> pred) {
         CircleSector circ = new CircleSector(pos, look, reach, aoe, entity);
