@@ -5,7 +5,6 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -26,49 +25,64 @@ public class RenderUtils {
 
     public static final int defaultColor = 0xFFFFFFFF;
 
-    public static void renderBlockOutline(MatrixStack matrixStack, IRenderTypeBuffer buffer, PlayerEntity player, BlockPos pos, float partialTicks) {
-        renderBlockOutline(matrixStack, buffer, player, pos, partialTicks, 0, 0, 0, 1, false);
+    public static void renderBlockOutline(MatrixStack matrixStack, IRenderTypeBuffer buffer, PlayerEntity player, BlockPos pos, float partialTicks, boolean drawImmediately) {
+        renderBlockOutline(matrixStack, buffer, player, pos, partialTicks, 0, 0, 0, 1, false, drawImmediately);
     }
 
+    /**
+     * Renders the block shape at the given position
+     * @param ignoreDepth Doesnt work atm
+     * @param drawImmediately Most of the time this should be true.
+     *                        Else it will get drawn next frame and the position will be offset by player movement
+     */
     public static void renderBlockOutline(MatrixStack matrixStack, IRenderTypeBuffer buffer, PlayerEntity player, BlockPos pos, float partialTicks, float red, float green, float blue, float alpha,
-                                          boolean ignoreDepth) {
+                                          boolean ignoreDepth, boolean drawImmediately) {
         BlockState state = player.world.getBlockState(pos);
-        IVertexBuilder build;
-        if (ignoreDepth)
-            build = buffer.getBuffer(MoreRenderTypes.LINE_NODEPTH);
-        else
-            build = buffer.getBuffer(RenderType.getLines());
-        ActiveRenderInfo renderInfo = Minecraft.getInstance().gameRenderer.getActiveRenderInfo();
-        Vector3d rpos = renderInfo.getProjectedView();
-        WorldRenderAccessor.drawShapeOutline(matrixStack, build, state.getShape(player.world, pos, ISelectionContext.forEntity(player)),
-                rpos.x, rpos.y, rpos.z, red, green, blue, alpha);
+        RenderType renderType;
+        if (ignoreDepth) {
+            renderType = MoreRenderTypes.LINE_NODEPTH;
+        } else {
+            renderType = RenderType.getLines();
+        }
+        Vector3d vec = Minecraft.getInstance().gameRenderer.getActiveRenderInfo().getProjectedView();
+        WorldRenderAccessor.drawShapeOutline(matrixStack, buffer.getBuffer(renderType), state.getShape(player.world, pos, ISelectionContext.forEntity(player)),
+                pos.getX()-vec.x, pos.getY()-vec.y, pos.getZ()-vec.z, red, green, blue, alpha);
+        if(drawImmediately && buffer instanceof IRenderTypeBuffer.Impl)
+            ((IRenderTypeBuffer.Impl) buffer).draw(renderType);
     }
 
-    public static void renderAreaAround(MatrixStack matrixStack, IRenderTypeBuffer buffer, PlayerEntity player, BlockPos pos, float partialTicks, float radius) {
-        RenderUtils.renderBoundingBox(matrixStack, buffer, new AxisAlignedBB(0, 0, 0, 1, 1, 1).grow(radius).offset(pos.down()), player, partialTicks);
+    public static void renderAreaAround(MatrixStack matrixStack, IRenderTypeBuffer buffer, BlockPos pos, float radius, boolean drawImmediately) {
+        renderBoundingBox(matrixStack, buffer, new AxisAlignedBB(0, 0, 0, 1, 1, 1).grow(radius).offset(pos.down()), drawImmediately);
     }
 
-    public static void renderAreaAround(MatrixStack matrixStack, IRenderTypeBuffer buffer, PlayerEntity player, BlockPos pos, float partialTicks, float radius, float red, float green, float blue,
-                                        float alpha, boolean ignoreDepth) {
-        RenderUtils.renderBoundingBox(matrixStack, buffer, new AxisAlignedBB(0, 0, 0, 1, 1, 1).grow(radius).offset(pos.down()), player, partialTicks, red, green, blue,
-                alpha, ignoreDepth);
+    public static void renderAreaAround(MatrixStack matrixStack, IRenderTypeBuffer buffer, BlockPos pos, float radius, float red, float green, float blue,
+                                        float alpha, boolean ignoreDepth, boolean drawImmediately) {
+        renderBoundingBox(matrixStack, buffer, new AxisAlignedBB(0, 0, 0, 1, 1, 1).grow(radius).offset(pos.down()), red, green, blue,
+                alpha, ignoreDepth, drawImmediately);
     }
 
-    public static void renderBoundingBox(MatrixStack matrixStack, IRenderTypeBuffer buffer, AxisAlignedBB aabb, PlayerEntity player, float partialTicks) {
-        RenderUtils.renderBoundingBox(matrixStack, buffer, aabb, player, partialTicks, 1, 0.5F, 0.5F, 1, false);
+    public static void renderBoundingBox(MatrixStack matrixStack, IRenderTypeBuffer buffer, AxisAlignedBB aabb, boolean drawImmediately) {
+        RenderUtils.renderBoundingBox(matrixStack, buffer, aabb, 1, 0.5F, 0.5F, 1, false, drawImmediately);
     }
 
-    public static void renderBoundingBox(MatrixStack matrixStack, IRenderTypeBuffer buffer, AxisAlignedBB aabb, PlayerEntity player, float partialTicks, float red, float green, float blue, float alpha,
-                                         boolean ignoreDepth) {
-        double playerX = player.lastTickPosX + (player.getX() - player.lastTickPosX) * partialTicks;
-        double playerY = player.lastTickPosY + (player.getY() - player.lastTickPosY) * partialTicks;
-        double playerZ = player.lastTickPosZ + (player.getZ() - player.lastTickPosZ) * partialTicks;
-        IVertexBuilder build;
-        if (ignoreDepth)
-            build = buffer.getBuffer(MoreRenderTypes.LINE_NODEPTH);
-        else
-            build = buffer.getBuffer(RenderType.getLines());
-        WorldRenderer.drawBox(matrixStack, build, aabb.grow(0.0020000000949949026D).offset(-playerX, -playerY, -playerZ), red, green, blue, alpha);
+    /**
+     * Renders the given bounding box similiar to entity hit boxes
+     * @param ignoreDepth Doesnt work atm
+     * @param drawImmediately Most of the time this should be true.
+     *                        Else it will get drawn next frame and the position will be offset by player movement
+     */
+    public static void renderBoundingBox(MatrixStack matrixStack, IRenderTypeBuffer buffer, AxisAlignedBB aabb, float red, float green, float blue, float alpha,
+                                         boolean ignoreDepth, boolean drawImmediately) {
+        Vector3d vec = Minecraft.getInstance().gameRenderer.getActiveRenderInfo().getProjectedView();
+        RenderType renderType;
+        if (ignoreDepth) {
+            renderType = MoreRenderTypes.LINE_NODEPTH;
+        } else {
+            renderType = RenderType.getLines();
+        }
+        WorldRenderer.drawBox(matrixStack, buffer.getBuffer(renderType), aabb.grow(0.002).offset(-vec.x, -vec.y, -vec.z), red, green, blue, alpha);
+        if(drawImmediately && buffer instanceof IRenderTypeBuffer.Impl)
+            ((IRenderTypeBuffer.Impl) buffer).draw();
     }
 
     public static void applyYawPitch(MatrixStack stack, float yaw, float pitch) {

@@ -26,4 +26,9 @@ public interface RenderStateAccessors {
     static RenderState.WriteMaskState allMask() {
         throw new IllegalStateException();
     }
+
+    @Accessor("ALWAYS_DEPTH_TEST")
+    static RenderState.DepthTestState alwaysDepthTest(){
+        throw new IllegalStateException();
+    }
 }
