@@ -1,6 +1,13 @@
 TenshiLib 1.3.1
 ================
-- generic animated attack ai
+- Dependency fix
+- Generic animated attack ai
+- Add any time callable config system (builtin of forge only at the very beginning and only one config per mod)
+- Fix and change several rendering stuff
+- Fix and change aoe attacks
+- Fix bounding box render
+- Add spawn egg item and system since vanillas is not expandable
+- IOwnable to specify an entity (living or not) can have an owner. Vanilla yeeted it
 
 TenshiLib 1.3.0
 ================
