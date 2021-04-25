@@ -86,7 +86,7 @@ public class SpawnEgg extends Item {
     }
 
     public static Optional<SpawnEgg> fromID(ResourceLocation id) {
-        return EGGSSUP.entrySet().stream().filter(e -> e.getKey().get().getRegistryName() == id).findFirst().map(Map.Entry::getValue);
+        return EGGSSUP.entrySet().stream().filter(e -> e.getKey().get().getRegistryName().equals(id)).findFirst().map(Map.Entry::getValue);
     }
 
     /**
