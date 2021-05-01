@@ -9,10 +9,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
@@ -41,7 +44,7 @@ public class RayTraceUtils {
     }
 
     public static List<Entity> getEntitiesIn(LivingEntity entity, Vector3d pos, Vector3d look, float reach,
-                                                                 float aoe, Predicate<Entity> pred) {
+                                             float aoe, Predicate<Entity> pred) {
         CircleSector circ = new CircleSector(pos, look, reach, aoe, entity);
         return entity.world.getEntitiesInAABBexcluding(entity, entity.getBoundingBox().grow(reach),
                 t -> t != entity && (pred == null || pred.test(t)) && !t.isOnSameTeam(entity) && t.canBeCollidedWith()
@@ -134,4 +137,32 @@ public class RayTraceUtils {
             boolean returnLastUncollidableBlock) {
         return entityRayTrace(e, range, returnLastUncollidableBlock, returnLastUncollidableBlock, returnLastUncollidableBlock, false, null);
     }*/
+
+    /**
+     * Gets a list of vectors rotated around the given axis by the given angles
+     *
+     * @param dir    The vector to rotate
+     * @param axis   The axis to rotate the vector around
+     * @param minDeg Minimum rotation in degrees
+     * @param maxDeg Maximum rotation in degrees
+     * @param step   Angle change per rotation in degrees
+     */
+    public static List<Vector3f> rotatedVecs(Vector3d dir, Vector3d axis, float minDeg, float maxDeg, float step) {
+        List<Vector3f> list = new ArrayList<>();
+        Vector3f axisf = new Vector3f(axis);
+        list.add(new Vector3f(dir));
+        for (float y = step; y <= maxDeg; y += step) {
+            Quaternion quaternion = new Quaternion(axisf, y, true);
+            Vector3f newDir = new Vector3f(dir);
+            newDir.func_214905_a(quaternion);
+            list.add(newDir);
+        }
+        for (float y = -step; y >= minDeg; y -= step) {
+            Quaternion quaternion = new Quaternion(axisf, y, true);
+            Vector3f newDir = new Vector3f(dir);
+            newDir.func_214905_a(quaternion);
+            list.add(newDir);
+        }
+        return list;
+    }
 }
