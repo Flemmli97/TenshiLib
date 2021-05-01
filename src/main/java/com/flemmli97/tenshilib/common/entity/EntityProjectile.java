@@ -46,6 +46,7 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
     protected boolean inGround;
     protected int ticksInGround, livingTicks;
     public final List<UUID> attackedEntities = Lists.newArrayList();
+    public final List<UUID> checkedEntities = Lists.newArrayList();
 
     private BlockState ground;
     private BlockPos groundPos;
@@ -123,9 +124,22 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
         this.getMotion().add(throwerMotion.x, 0, throwerMotion.z);
     }
 
+    /**
+     * Shoots directly at the given position
+     */
     public void shootAtPosition(double x, double y, double z, float velocity, float inaccuracy) {
-        Vector3d dir = new Vector3d(x - this.getX(), y - this.getY(), z - this.getZ()).scale(1 / velocity);
+        Vector3d dir = new Vector3d(x - this.getX(), y - this.getY(), z - this.getZ());
         this.shoot(dir.x, dir.y, dir.z, velocity, inaccuracy);
+    }
+
+    /**
+     * Shoot at the given entity. Unlike #shootAtPosition this doesnt shoot directly where the entity is but rather through it (like arrows)
+     * @param yOffsetModifier Modifies the offset of the y motion based on distance to target. Vanilla arrows use 0.2
+     */
+    public void shootAtEntity(Entity target, float velocity, float inaccuracy, float yOffsetModifier) {
+        Vector3d dir = (new Vector3d(target.getX() - this.getX(), target.getBodyY(0.33) - this.getY(), target.getZ() - this.getZ()));
+        double l = Math.sqrt(dir.x * dir.x + dir.z * dir.z);
+        this.shoot(dir.x, dir.y + l * yOffsetModifier, dir.z, velocity, inaccuracy);
     }
 
     public void shoot(double x, double y, double z, float velocity, float inaccuracy) {
@@ -238,7 +252,8 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
 
         EntityRayTraceResult res;
         while ((res = this.getEntityHit(pos, to)) != null) {
-            if (!net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, res) && this.onEntityHit(res)) {
+            this.checkedEntities.add(res.getEntity().getUniqueID());
+            if (!net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, res) && !this.attackedEntities.contains(res.getEntity().getUniqueID()) && this.onEntityHit(res)) {
                 this.attackedEntities.add(res.getEntity().getUniqueID());
                 if (this.maxPierceAmount() != -1 && this.attackedEntities.size() > this.maxPierceAmount())
                     this.onReachMaxPierce();
@@ -280,7 +295,7 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
 
     private boolean canHit(Entity entity) {
         if (this.getOwner() == null || (!this.getOwner().isRidingSameEntity(entity) && ((this.canHitShooter() && this.ticksExisted > 2) || entity != this.getOwner())))
-            return (!this.attackedEntities.contains(entity.getUniqueID()));
+            return (!this.checkedEntities.contains(entity.getUniqueID()));
         return false;
     }
 
