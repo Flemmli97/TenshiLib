@@ -31,7 +31,8 @@ public class RenderUtils {
 
     /**
      * Renders the block shape at the given position
-     * @param ignoreDepth Doesnt work atm
+     *
+     * @param ignoreDepth     Doesnt work atm
      * @param drawImmediately Most of the time this should be true.
      *                        Else it will get drawn next frame and the position will be offset by player movement
      */
@@ -46,8 +47,8 @@ public class RenderUtils {
         }
         Vector3d vec = Minecraft.getInstance().gameRenderer.getActiveRenderInfo().getProjectedView();
         WorldRenderAccessor.drawShapeOutline(matrixStack, buffer.getBuffer(renderType), state.getShape(player.world, pos, ISelectionContext.forEntity(player)),
-                pos.getX()-vec.x, pos.getY()-vec.y, pos.getZ()-vec.z, red, green, blue, alpha);
-        if(drawImmediately && buffer instanceof IRenderTypeBuffer.Impl)
+                pos.getX() - vec.x, pos.getY() - vec.y, pos.getZ() - vec.z, red, green, blue, alpha);
+        if (drawImmediately && buffer instanceof IRenderTypeBuffer.Impl)
             ((IRenderTypeBuffer.Impl) buffer).draw(renderType);
     }
 
@@ -67,7 +68,8 @@ public class RenderUtils {
 
     /**
      * Renders the given bounding box similiar to entity hit boxes
-     * @param ignoreDepth Doesnt work atm
+     *
+     * @param ignoreDepth     Doesnt work atm
      * @param drawImmediately Most of the time this should be true.
      *                        Else it will get drawn next frame and the position will be offset by player movement
      */
@@ -81,7 +83,7 @@ public class RenderUtils {
             renderType = RenderType.getLines();
         }
         WorldRenderer.drawBox(matrixStack, buffer.getBuffer(renderType), aabb.grow(0.002).offset(-vec.x, -vec.y, -vec.z), red, green, blue, alpha);
-        if(drawImmediately && buffer instanceof IRenderTypeBuffer.Impl)
+        if (drawImmediately && buffer instanceof IRenderTypeBuffer.Impl)
             ((IRenderTypeBuffer.Impl) buffer).draw();
     }
 

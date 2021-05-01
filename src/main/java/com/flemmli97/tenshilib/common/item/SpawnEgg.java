@@ -121,7 +121,7 @@ public class SpawnEgg extends Item {
             BlockState blockstate = world.getBlockState(blockpos);
             TileEntity tile = world.getTileEntity(blockpos);
             ActionResultType onBlock = this.onBlockUse(stack, blockpos, blockstate, tile);
-            if(onBlock != ActionResultType.PASS)
+            if (onBlock != ActionResultType.PASS)
                 return onBlock;
             if (tile instanceof MobSpawnerTileEntity) {
                 AbstractSpawner abstractspawner = ((MobSpawnerTileEntity) tile).getSpawnerBaseLogic();
@@ -143,7 +143,7 @@ public class SpawnEgg extends Item {
         }
     }
 
-    public ActionResultType onBlockUse(ItemStack stack, BlockPos pos, BlockState state, @Nullable TileEntity tile){
+    public ActionResultType onBlockUse(ItemStack stack, BlockPos pos, BlockState state, @Nullable TileEntity tile) {
         return ActionResultType.PASS;
     }
 

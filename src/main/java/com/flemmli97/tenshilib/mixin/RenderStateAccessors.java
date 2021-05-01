@@ -28,7 +28,7 @@ public interface RenderStateAccessors {
     }
 
     @Accessor("ALWAYS_DEPTH_TEST")
-    static RenderState.DepthTestState alwaysDepthTest(){
+    static RenderState.DepthTestState alwaysDepthTest() {
         throw new IllegalStateException();
     }
 }

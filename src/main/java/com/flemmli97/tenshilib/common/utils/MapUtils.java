@@ -44,6 +44,7 @@ public class MapUtils {
     }
 
     public static <K, V> String toString(Map<K, V> map, Function<K, String> key, Function<V, String> val) {
-        return map.entrySet().stream().map(e->key.apply(e.getKey()) + "="+val.apply(e.getValue()))
+        return map.entrySet().stream().map(e -> key.apply(e.getKey()) + "=" + val.apply(e.getValue()))
                 .collect(Collectors.joining(", ", "{", "}"));
-    }}
+    }
+}

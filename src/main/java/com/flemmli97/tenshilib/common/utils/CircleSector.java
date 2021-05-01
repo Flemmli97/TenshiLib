@@ -46,7 +46,7 @@ public class CircleSector {
         return false;
     }
 
-    public void display(ServerWorld world){
+    public void display(ServerWorld world) {
         float rot = -this.theta;
         Vector3d ray = MathUtils.rotate(this.rotAxis, this.look, rot);
         while (rot <= this.theta) {
@@ -55,11 +55,11 @@ public class CircleSector {
             float reach = (float) blocks.getHitVec().distanceTo(this.center);
             Vector3d from = this.look;
             Vector3d to = ray.scale(reach).scale(0.1);
-            for(int i = 0; i < 10; i++){
-                if(i == 9)
-                    world.spawnParticle(ParticleTypes.FLAME, from.x, from.y, from.z, 1,0,0,0,0);
+            for (int i = 0; i < 10; i++) {
+                if (i == 9)
+                    world.spawnParticle(ParticleTypes.FLAME, from.x, from.y, from.z, 1, 0, 0, 0, 0);
                 else
-                    world.spawnParticle(ParticleTypes.END_ROD, from.x, from.y, from.z, 1,0,0,0,0);
+                    world.spawnParticle(ParticleTypes.END_ROD, from.x, from.y, from.z, 1, 0, 0, 0, 0);
                 from = from.add(to);
             }
             ray = MathUtils.rotate(this.rotAxis, this.look, rot += this.rotAmount);

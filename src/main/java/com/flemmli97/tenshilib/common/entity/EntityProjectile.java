@@ -134,6 +134,7 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
 
     /**
      * Shoot at the given entity. Unlike #shootAtPosition this doesnt shoot directly where the entity is but rather through it (like arrows)
+     *
      * @param yOffsetModifier Modifies the offset of the y motion based on distance to target. Vanilla arrows use 0.2
      */
     public void shootAtEntity(Entity target, float velocity, float inaccuracy, float yOffsetModifier) {
