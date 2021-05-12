@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface IOwnable<T extends LivingEntity> {
 
     @Nullable
-    UUID ownerUUID();
+    UUID getOwnerUUID();
 
     @Nullable
     T getOwner();

@@ -193,7 +193,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
     }
 
     @Override
-    public UUID ownerUUID() {
+    public UUID getOwnerUUID() {
         return this.dataManager.get(shooterUUID).orElse(null);
     }
 

@@ -363,7 +363,7 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
     }
 
     @Override
-    public UUID ownerUUID() {
+    public UUID getOwnerUUID() {
         return this.dataManager.get(shooterUUID).orElse(null);
     }
 
