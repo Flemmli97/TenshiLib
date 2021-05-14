@@ -152,17 +152,18 @@ public class RayTraceUtils {
         Vector3f axisf = new Vector3f(axis);
         list.add(new Vector3f(dir));
         for (float y = step; y <= maxDeg; y += step) {
-            Quaternion quaternion = new Quaternion(axisf, y, true);
-            Vector3f newDir = new Vector3f(dir);
-            newDir.func_214905_a(quaternion);
-            list.add(newDir);
+            list.add(rotatedAround(dir, axisf, y));
         }
-        for (float y = -step; y >= minDeg; y -= step) {
-            Quaternion quaternion = new Quaternion(axisf, y, true);
-            Vector3f newDir = new Vector3f(dir);
-            newDir.func_214905_a(quaternion);
-            list.add(newDir);
+        for (float y = minDeg; y <= -step; y += step) {
+            list.add(rotatedAround(dir, axisf, y));
         }
         return list;
+    }
+
+    public static Vector3f rotatedAround(Vector3d dir, Vector3f axis, float deg) {
+        Quaternion quaternion = new Quaternion(axis, deg, true);
+        Vector3f newDir = new Vector3f(dir);
+        newDir.func_214905_a(quaternion);
+        return newDir;
     }
 }

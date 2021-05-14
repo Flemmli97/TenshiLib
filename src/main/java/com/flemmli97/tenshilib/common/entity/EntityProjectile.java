@@ -63,7 +63,7 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
     }
 
     public EntityProjectile(EntityType<? extends EntityProjectile> type, World world, LivingEntity shooter) {
-        this(type, world, shooter.getX(), shooter.getY() + shooter.getEyeHeight() - 0.10000000149011612D, shooter.getZ());
+        this(type, world, shooter.getX(), shooter.getY() + shooter.getEyeHeight() - 0.1, shooter.getZ());
         this.shooter = shooter;
         this.dataManager.set(shooterUUID, Optional.of(shooter.getUniqueID()));
         this.setRotation(shooter.rotationYaw, shooter.rotationPitch);
@@ -252,7 +252,7 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
         }
 
         EntityRayTraceResult res;
-        while ((res = this.getEntityHit(pos, to)) != null) {
+        while ((res = this.getEntityHit(pos, to)) != null && this.isAlive()) {
             this.checkedEntities.add(res.getEntity().getUniqueID());
             if (!net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, res) && !this.attackedEntities.contains(res.getEntity().getUniqueID()) && this.onEntityHit(res)) {
                 this.attackedEntities.add(res.getEntity().getUniqueID());
@@ -294,22 +294,26 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
         }
     }
 
-    private boolean canHit(Entity entity) {
+    protected boolean canHit(Entity entity) {
         if (this.getOwner() == null || (!this.getOwner().isRidingSameEntity(entity) && ((this.canHitShooter() && this.ticksExisted > 2) || entity != this.getOwner())))
-            return (!this.checkedEntities.contains(entity.getUniqueID()));
+            return this.check(entity) && !this.checkedEntities.contains(entity.getUniqueID());
         return false;
+    }
+
+    private boolean check(Entity e) {
+        return this.getPositionVec().add(this.getLookVec()).squareDistanceTo(e.getPositionVec()) < this.getPositionVec().subtract(this.getLookVec()).squareDistanceTo(e.getPositionVec());
     }
 
     private EntityRayTraceResult getEntityHit(Vector3d from, Vector3d to) {
         if (!this.isAlive())
             return null;
         if (this.isPiercing()) {
-            if (this.attackedEntities.size() < this.maxPierceAmount())
-                return ProjectileHelper.rayTraceEntities(this.world, this, from, to, this.getBoundingBox().expand(this.getMotion()).grow(1.0D), this::canHit);
+            if (this.maxPierceAmount() == -1 || this.attackedEntities.size() < this.maxPierceAmount())
+                return ProjectileHelper.rayTraceEntities(this.world, this, from, to, this.getBoundingBox().expand(this.getMotion()).grow(this.radius() + 1.0D), this::canHit);
             return null;
         }
         if (this.attackedEntities.size() < 1)
-            return ProjectileHelper.rayTraceEntities(this.world, this, from, to, this.getBoundingBox().expand(this.getMotion()).grow(1.0D), this::canHit);
+            return ProjectileHelper.rayTraceEntities(this.world, this, from, to, this.getBoundingBox().expand(this.getMotion()).grow(this.radius() + 1.0D), this::canHit);
         return null;
     }
 

@@ -1,7 +1,6 @@
 package com.flemmli97.tenshilib.common.entity;
 
 import com.flemmli97.tenshilib.api.entity.IBeamEntity;
-import com.flemmli97.tenshilib.common.utils.MathUtils;
 import com.flemmli97.tenshilib.common.utils.RayTraceUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -52,7 +51,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
     }
 
     public EntityBeam(EntityType<? extends EntityBeam> type, World world, LivingEntity shooter) {
-        this(type, world, shooter.getX(), shooter.getY() + shooter.getEyeHeight() - 0.10000000149011612D, shooter.getZ());
+        this(type, world, shooter.getX(), shooter.getY() + shooter.getEyeHeight() - 0.1, shooter.getZ());
         this.shooter = shooter;
         this.dataManager.set(shooterUUID, Optional.of(shooter.getUniqueID()));
         this.setRotation(shooter.rotationYawHead, shooter.rotationPitch);
@@ -132,40 +131,35 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
     public void tick() {
         this.updateYawPitch();
         if (this.hit == null || this.getHitVecFromShooter())
-            this.hit = RayTraceUtils.entityRayTrace(this, this.getRange(), RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE,
-                    !this.piercing(), this.notShooter);
+            this.hit = this.getHitRay();
         super.tick();
         this.livingTicks++;
         if (this.livingTicks >= this.livingTickMax())
             this.remove();
-        if (!this.world.isRemote && this.hit != null && --this.coolDown <= 0) {
-            Vector3d offSetPos = this.getPositionVec().add(this.getLookVec().scale(this.radius()));
-            Vector3d dirHit = this.hit.getHitVec().subtract(offSetPos);
-            dirHit = dirHit.scale(Math.max(0, dirHit.length() - this.radius()));
+        if (!this.world.isRemote && this.hit != null && --this.coolDown <= 0 && this.isAlive()) {
             List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(this,
                     new AxisAlignedBB(this.getX(), this.getY(), this.getZ(), this.hit.getHitVec().x, this.hit.getHitVec().y, this.hit.getHitVec().z).grow(this.radius() + 1));
             for (Entity entity : list) {
-                if (entity != this.getOwner()) {
-                    AxisAlignedBB aabb = entity.getBoundingBox();
-                    Vector3d closest = MathUtils.closestPointToLine(aabb.getCenter(), offSetPos, dirHit);
-                    boolean check = aabb.contains(closest);
-                    if (!check) {
-                        Optional<Vector3d> oth = aabb.rayTrace(closest, entity.getBoundingBox().getCenter());
-                        double range = this.radius() + 0.3;
-                        check = oth.isPresent() && closest.squareDistanceTo(oth.get()) <= range * range;
-                    }
-                    if (check) {
-                        EntityRayTraceResult raytraceresult = new EntityRayTraceResult(entity);
-                        if (!ForgeEventFactory.onProjectileImpact(this, raytraceresult)) {
-                            this.onImpact(raytraceresult);
-                            this.coolDown = this.attackCooldown();
-                            if (!this.piercing())
-                                return;
-                        }
+                if (entity != this.getOwner() && this.check(entity)) {
+                    EntityRayTraceResult raytraceresult = new EntityRayTraceResult(entity);
+                    if (!ForgeEventFactory.onProjectileImpact(this, raytraceresult)) {
+                        this.onImpact(raytraceresult);
+                        this.coolDown = this.attackCooldown();
+                        if (!this.piercing())
+                            return;
                     }
                 }
             }
         }
+    }
+
+    public RayTraceResult getHitRay(){
+        return RayTraceUtils.entityRayTrace(this, this.getRange(), RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE,
+                !this.piercing(), this.notShooter);
+    }
+
+    protected boolean check(Entity e) {
+        return this.getPositionVec().add(this.getLookVec()).squareDistanceTo(e.getPositionVec()) < this.getPositionVec().subtract(this.getLookVec()).squareDistanceTo(e.getPositionVec());
     }
 
     public abstract void onImpact(EntityRayTraceResult result);
