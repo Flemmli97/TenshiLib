@@ -1,9 +1,8 @@
 package com.flemmli97.tenshilib.common.utils;
 
-import com.google.common.collect.Lists;
-
 import javax.annotation.Nullable;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -90,7 +89,7 @@ public class ArrayUtils {
     public static <T, M> M[] arrayConverter(T[] ts, Function<T, M> parser, Class<M> clss, boolean allowNullReturn, boolean allowNullValue) {
         if (allowNullReturn && ts == null)
             return null;
-        List<M> list = Lists.newArrayList();
+        List<M> list = new ArrayList<>();
         if (ts != null)
             for (T t : ts)
                 if (allowNullValue || t != null)
@@ -111,8 +110,7 @@ public class ArrayUtils {
     }
 
     public static <T> T[] combine(T[] array, T[][] toAdd) {
-        List<T> list = Lists.newArrayList();
-        list.addAll(Arrays.asList(array));
+        List<T> list = new ArrayList<>(Arrays.asList(array));
         for (T[] a : toAdd) {
             list.addAll(Arrays.asList(a));
         }

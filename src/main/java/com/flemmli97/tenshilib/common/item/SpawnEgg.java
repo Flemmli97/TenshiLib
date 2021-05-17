@@ -156,11 +156,10 @@ public class SpawnEgg extends Item {
         } else if (!(world instanceof ServerWorld)) {
             return ActionResult.success(stack);
         } else {
-            BlockRayTraceResult blockraytraceresult = raytraceresult;
-            BlockPos blockpos = blockraytraceresult.getPos();
+            BlockPos blockpos = raytraceresult.getPos();
             if (!(world.getBlockState(blockpos).getBlock() instanceof FlowingFluidBlock)) {
                 return ActionResult.pass(stack);
-            } else if (world.isBlockModifiable(player, blockpos) && player.canPlayerEdit(blockpos, blockraytraceresult.getFace(), stack)) {
+            } else if (world.isBlockModifiable(player, blockpos) && player.canPlayerEdit(blockpos, raytraceresult.getFace(), stack)) {
                 Entity e = spawnEntity((ServerWorld) world, player, stack, blockpos, SpawnReason.SPAWN_EGG, true, true, false);
                 if (e != null) {
                     if (!player.abilities.isCreativeMode)

@@ -1,14 +1,13 @@
 package com.flemmli97.tenshilib.common.entity;
 
 import com.flemmli97.tenshilib.api.entity.IOwnable;
-import com.google.common.collect.Lists;
+import com.flemmli97.tenshilib.common.utils.RayTraceUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MoverType;
-import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
@@ -35,6 +34,7 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,8 +45,8 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
 
     protected boolean inGround;
     protected int ticksInGround, livingTicks;
-    public final List<UUID> attackedEntities = Lists.newArrayList();
-    public final List<UUID> checkedEntities = Lists.newArrayList();
+    public final List<UUID> attackedEntities = new ArrayList<>();
+    public final List<UUID> checkedEntities = new ArrayList<>();
 
     private BlockState ground;
     private BlockPos groundPos;
@@ -251,16 +251,6 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
             to = raytraceresult.getHitVec();
         }
 
-        EntityRayTraceResult res;
-        while ((res = this.getEntityHit(pos, to)) != null && this.isAlive()) {
-            this.checkedEntities.add(res.getEntity().getUniqueID());
-            if (!net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, res) && !this.attackedEntities.contains(res.getEntity().getUniqueID()) && this.onEntityHit(res)) {
-                this.attackedEntities.add(res.getEntity().getUniqueID());
-                if (this.maxPierceAmount() != -1 && this.attackedEntities.size() > this.maxPierceAmount())
-                    this.onReachMaxPierce();
-            }
-        }
-
         if (raytraceresult.getType() == RayTraceResult.Type.BLOCK) {
             BlockPos blockpos = raytraceresult.getPos();
             BlockState blockstate = this.world.getBlockState(blockpos);
@@ -273,6 +263,16 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
                 }
             } else if (!net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, raytraceresult))
                 this.onBlockHit(raytraceresult);
+        } else {
+            EntityRayTraceResult res;
+            while ((res = this.getEntityHit(pos, to)) != null && this.isAlive()) {
+                this.checkedEntities.add(res.getEntity().getUniqueID());
+                if (!net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, res) && !this.attackedEntities.contains(res.getEntity().getUniqueID()) && this.onEntityHit(res)) {
+                    this.attackedEntities.add(res.getEntity().getUniqueID());
+                    if (this.maxPierceAmount() != -1 && this.attackedEntities.size() > this.maxPierceAmount())
+                        this.onReachMaxPierce();
+                }
+            }
         }
     }
 
@@ -295,25 +295,25 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
     }
 
     protected boolean canHit(Entity entity) {
-        if (this.getOwner() == null || (!this.getOwner().isRidingSameEntity(entity) && ((this.canHitShooter() && this.ticksExisted > 2) || entity != this.getOwner())))
-            return this.check(entity) && !this.checkedEntities.contains(entity.getUniqueID());
+        if (!entity.isSpectator() && entity.isAlive() && entity.canBeCollidedWith()) {
+            if (this.getOwner() == null || (!this.getOwner().isRidingSameEntity(entity) && ((this.canHitShooter() && this.ticksExisted > 5) || entity != this.getOwner())))
+                return !this.checkedEntities.contains(entity.getUniqueID());
+        }
         return false;
     }
 
-    private boolean check(Entity e) {
-        return this.getPositionVec().add(this.getLookVec()).squareDistanceTo(e.getPositionVec()) < this.getPositionVec().subtract(this.getLookVec()).squareDistanceTo(e.getPositionVec());
-    }
-
-    private EntityRayTraceResult getEntityHit(Vector3d from, Vector3d to) {
+    protected EntityRayTraceResult getEntityHit(Vector3d from, Vector3d to) {
         if (!this.isAlive())
             return null;
         if (this.isPiercing()) {
             if (this.maxPierceAmount() == -1 || this.attackedEntities.size() < this.maxPierceAmount())
-                return ProjectileHelper.rayTraceEntities(this.world, this, from, to, this.getBoundingBox().expand(this.getMotion()).grow(this.radius() + 1.0D), this::canHit);
+                return RayTraceUtils.projectileHit(this.world, this, this.getBoundingBox().expand(this.getMotion()).grow(1.0D), this::canHit, 0);
+            //return RayTraceUtils.projectileRayTrace(this.world, this, from, to, this.getBoundingBox().expand(this.getMotion()).grow(this.radius() + 1.0D), this::canHit, this.radius());
             return null;
         }
         if (this.attackedEntities.size() < 1)
-            return ProjectileHelper.rayTraceEntities(this.world, this, from, to, this.getBoundingBox().expand(this.getMotion()).grow(this.radius() + 1.0D), this::canHit);
+            return RayTraceUtils.projectileHit(this.world, this, this.getBoundingBox().expand(this.getMotion()).grow(1.0D), this::canHit, 0);
+        //return RayTraceUtils.projectileRayTrace(this.world, this, from, to, this.getBoundingBox().expand(this.getMotion()).grow(this.radius() + 1.0D), this::canHit,  this.radius());
         return null;
     }
 

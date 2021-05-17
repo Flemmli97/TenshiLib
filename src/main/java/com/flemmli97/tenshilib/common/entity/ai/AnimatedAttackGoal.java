@@ -29,14 +29,13 @@ public abstract class AnimatedAttackGoal<T extends CreatureEntity & IAnimated> e
 
     @Override
     public boolean shouldExecute() {
-        LivingEntity entitylivingbase = this.attacker.getAttackTarget();
-        return entitylivingbase != null && entitylivingbase.isAlive();
+        LivingEntity living = this.attacker.getAttackTarget();
+        return living != null && living.isAlive() && this.attacker.isWithinHomeDistanceFromPosition(living.getBlockPos());
     }
 
     @Override
     public boolean shouldContinueExecuting() {
-        LivingEntity living = this.attacker.getAttackTarget();
-        return living != null && living.isAlive() && this.attacker.isWithinHomeDistanceFromPosition(living.getBlockPos());
+        return this.shouldExecute();
     }
 
     @Override

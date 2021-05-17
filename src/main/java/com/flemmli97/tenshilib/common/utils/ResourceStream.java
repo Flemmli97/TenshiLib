@@ -8,8 +8,16 @@ import java.io.InputStream;
 
 public class ResourceStream {
 
-    public static InputStream getStream(String modid, String dir, String fileName) throws FileNotFoundException {
+    public static InputStream getAssetsStream(String modid, String dir, String fileName) throws FileNotFoundException {
         InputStream input = ResourceStream.class.getResourceAsStream("/assets/" + modid + "/" + dir + "/" + fileName);
+        if (input != null)
+            return input;
+        TenshiLib.logger.error("Error reading file {}", fileName);
+        throw new FileNotFoundException();
+    }
+
+    public static InputStream getDataStream(String modid, String dir, String fileName) throws FileNotFoundException {
+        InputStream input = ResourceStream.class.getResourceAsStream("/data/" + modid + "/" + dir + "/" + fileName);
         if (input != null)
             return input;
         TenshiLib.logger.error("Error reading file {}", fileName);

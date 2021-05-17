@@ -5,8 +5,6 @@ import com.flemmli97.tenshilib.TenshiLib;
 import com.flemmli97.tenshilib.common.utils.ArrayUtils;
 import com.flemmli97.tenshilib.common.utils.JsonUtils;
 import com.flemmli97.tenshilib.common.utils.MathUtils;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -20,8 +18,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +32,7 @@ public class BlockBenchAnimations {
 
     private static final Gson gson = new Gson();
 
-    private final Map<String, Animation> animations = Maps.newHashMap();
+    private final Map<String, Animation> animations = new HashMap<>();
 
     public BlockBenchAnimations(Model model, ResourceLocation res) {
         InputStream input = BlockBenchAnimations.class.getResourceAsStream("/assets/" + res.getNamespace() + "/" + res.getPath());
@@ -72,7 +72,7 @@ public class BlockBenchAnimations {
 
         public final int length;
         public final boolean loop;
-        private final List<AnimationComponent> components = Lists.newArrayList();
+        private final List<AnimationComponent> components = new ArrayList<>();
 
         public Animation(Model model, JsonObject json) {
             this.length = (int) Math.floor((JsonUtils.get(json, "animation_length", 0.0) * 20) + 1);

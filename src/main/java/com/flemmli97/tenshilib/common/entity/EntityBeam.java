@@ -1,6 +1,7 @@
 package com.flemmli97.tenshilib.common.entity;
 
 import com.flemmli97.tenshilib.api.entity.IBeamEntity;
+import com.flemmli97.tenshilib.common.utils.MathUtils;
 import com.flemmli97.tenshilib.common.utils.RayTraceUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -23,6 +24,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.network.NetworkHooks;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +37,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
     protected int livingTicks;
     protected int coolDown;
     protected RayTraceResult hit;
+    protected Vector3d hitVec;
 
     protected static final DataParameter<Optional<UUID>> shooterUUID = EntityDataManager.createKey(EntityBeam.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 
@@ -61,9 +64,17 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         double dx = x + (this.rand.nextGaussian() * accuracyMod) - this.getX();
         double dy = y + (this.rand.nextGaussian() * accuracyMod) - this.getY();
         double dz = z + (this.rand.nextGaussian() * accuracyMod) - this.getZ();
-        double dis = MathHelper.sqrt(dx * dx + dy * dy + dz * dz);
-        this.rotationYaw = (float) (MathHelper.atan2(dz, dx) * 180.0 / Math.PI) - 90;
-        this.rotationPitch = (float) (Math.acos(dy / dis) * 180.0 / Math.PI) - 90;
+        this.setRotationToDir(dx, dy, dz, accuracyMod);
+    }
+
+
+    public void setRotationToDir(double x, double y, double z, float accuracyMod) {
+        x += this.rand.nextGaussian() * accuracyMod;
+        y += this.rand.nextGaussian() * accuracyMod;
+        z += this.rand.nextGaussian() * accuracyMod;
+        double dis = MathHelper.sqrt(x * x + y * y + z * z);
+        this.rotationYaw = (float) (MathHelper.atan2(z, x) * 180.0 / Math.PI) - 90;
+        this.rotationPitch = (float) (Math.acos(y / dis) * 180.0 / Math.PI) - 90;
     }
 
     @Override
@@ -73,7 +84,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
 
     @Override
     public Vector3d hitVec() {
-        return this.hit != null ? this.hit.getHitVec() : this.startVec();
+        return this.hit != null ? this.hitVec : this.startVec();
     }
 
     public float getRange() {
@@ -126,21 +137,27 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         this.dataManager.register(shooterUUID, Optional.empty());
     }
 
-
     @Override
     public void tick() {
         this.updateYawPitch();
-        if (this.hit == null || this.getHitVecFromShooter())
+        if (this.hit == null || this.getHitVecFromShooter()) {
             this.hit = this.getHitRay();
+            this.hitVec = this.hit.getHitVec();
+            if (this.hit.getType() == RayTraceResult.Type.BLOCK) {
+                Vector3d dir = this.hitVec.subtract(this.getPositionVec()).normalize();
+                this.hitVec = this.hitVec.subtract(dir.scale(this.radius() * 0.3));
+            }
+        }
         super.tick();
         this.livingTicks++;
         if (this.livingTicks >= this.livingTickMax())
             this.remove();
         if (!this.world.isRemote && this.hit != null && --this.coolDown <= 0 && this.isAlive()) {
             List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(this,
-                    new AxisAlignedBB(this.getX(), this.getY(), this.getZ(), this.hit.getHitVec().x, this.hit.getHitVec().y, this.hit.getHitVec().z).grow(this.radius() + 1));
+                    new AxisAlignedBB(this.getX(), this.getY(), this.getZ(), this.hitVec.x, this.hitVec.y, this.hitVec.z).grow(1 + this.radius()));
+            Vector3d pos = this.getPositionVec();
             for (Entity entity : list) {
-                if (entity != this.getOwner() && this.check(entity)) {
+                if (entity != this.getOwner() && this.check(entity, pos, this.hitVec)) {
                     EntityRayTraceResult raytraceresult = new EntityRayTraceResult(entity);
                     if (!ForgeEventFactory.onProjectileImpact(this, raytraceresult)) {
                         this.onImpact(raytraceresult);
@@ -153,13 +170,22 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         }
     }
 
-    public RayTraceResult getHitRay(){
+    public RayTraceResult getHitRay() {
         return RayTraceUtils.entityRayTrace(this, this.getRange(), RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE,
-                !this.piercing(), this.notShooter);
+                !this.piercing(), true, this.notShooter);
     }
 
-    protected boolean check(Entity e) {
-        return this.getPositionVec().add(this.getLookVec()).squareDistanceTo(e.getPositionVec()) < this.getPositionVec().subtract(this.getLookVec()).squareDistanceTo(e.getPositionVec());
+    protected boolean check(Entity e, Vector3d from, Vector3d to) {
+        AxisAlignedBB aabb = e.getBoundingBox().grow(this.radius() + 0.3);
+        Optional<Vector3d> ray = aabb.rayTrace(from, to);
+        if (!ray.isPresent() && !aabb.contains(this.getPositionVec()))
+            return false;
+        if (this.radius() == 0)
+            return true;
+        double dist = MathUtils.distTo(e, from, to);
+        Vector3d dir = to.subtract(from).normalize().scale(0.1);
+        double maxdist = this.radius() + e.getWidth() + 0.3;
+        return dist <= maxdist * maxdist && MathUtils.isInFront(e.getPositionVec(), from, dir);
     }
 
     public abstract void onImpact(EntityRayTraceResult result);
@@ -200,6 +226,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         return this.shooter;
     }
 
+    @Nonnull
     @Override
     public IPacket<?> createSpawnPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);

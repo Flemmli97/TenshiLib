@@ -1,9 +1,12 @@
 package com.flemmli97.tenshilib.common.utils;
 
-import com.google.common.collect.Lists;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
+import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MathUtils {
@@ -33,7 +36,7 @@ public class MathUtils {
     public static List<float[]> pointsOfCircle(float radius, int density) {
         float rad = degToRad(density);
         float i = -rad;
-        List<float[]> list = Lists.newArrayList();
+        List<float[]> list = new ArrayList<>();
         while (i < 2 * Math.PI) {
             i += rad;
             list.add(new float[]{radius * MathHelper.cos(i), radius * MathHelper.sin(i)});
@@ -68,6 +71,48 @@ public class MathUtils {
         double lengthSq = dir.lengthSquared();
         double x = Math.max(0, Math.min(1, point.subtract(from).dotProduct(dir) / lengthSq));
         return from.add(dir.scale(x));
+    }
+
+    /**
+     * Checks if the given point is in front of the line.
+     * The line here is assumed to be a finite line with the given starting point.
+     *
+     * @param pos  The given point
+     * @param from The starting point of the line
+     * @param dir  The direction vector of the line.
+     */
+    public static boolean isInFront(Vector3d pos, Vector3d from, Vector3d dir) {
+        return from.add(dir).squareDistanceTo(pos) < from.subtract(dir).squareDistanceTo(pos);
+    }
+
+    /**
+     * Returns the points on the given AABBs that are the closest to each other.
+     */
+    public static Pair<Vector3d, Vector3d> closestPointsAABB(AxisAlignedBB axisalignedbb, AxisAlignedBB axisalignedbb2) {
+        Vector3d first = new Vector3d(axisalignedbb.minX <= axisalignedbb2.minX ? axisalignedbb2.minX : axisalignedbb.maxX >= axisalignedbb2.maxX ? axisalignedbb2.maxX : axisalignedbb.minX,
+                axisalignedbb.minY <= axisalignedbb2.minY ? axisalignedbb2.minY : axisalignedbb.maxY >= axisalignedbb2.maxY ? axisalignedbb2.maxY : axisalignedbb.minY,
+                axisalignedbb.minZ <= axisalignedbb2.minZ ? axisalignedbb2.minZ : axisalignedbb.maxZ >= axisalignedbb2.maxZ ? axisalignedbb2.maxZ : axisalignedbb.minZ);
+        Vector3d second = new Vector3d(axisalignedbb2.minX <= axisalignedbb.minX ? axisalignedbb.minX : axisalignedbb2.maxX >= axisalignedbb.maxX ? axisalignedbb.maxX : axisalignedbb2.minX,
+                axisalignedbb2.minY <= axisalignedbb.minY ? axisalignedbb.minY : axisalignedbb2.maxY >= axisalignedbb.maxY ? axisalignedbb.maxY : axisalignedbb2.minY,
+                axisalignedbb2.minZ <= axisalignedbb.minZ ? axisalignedbb.minZ : axisalignedbb2.maxZ >= axisalignedbb.maxZ ? axisalignedbb.maxZ : axisalignedbb2.minZ);
+        return Pair.of(first, second);
+    }
+
+    /**
+     * Rough distance to the given entity from the given ray. Kinda bruteforcing it since everything else i tried didnt have
+     * the desired effect
+     */
+    public static double distTo(Entity e, Vector3d from, Vector3d to) {
+        double d = Double.MAX_VALUE;
+        Vector3d dir = to.subtract(from);
+        for (double height = 0; height <= e.getHeight(); height += e.getHeight() * 0.1) {
+            Vector3d point = e.getPositionVec().add(0, height, 0);
+            double nD = MathUtils.closestPointToLine(point, from, dir).squareDistanceTo(point);
+            if (nD < d) {
+                d = nD;
+            }
+        }
+        return d;
     }
 
     public static Vector3d farestPointToLine(Vector3d point, Vector3d l1, Vector3d dir) {

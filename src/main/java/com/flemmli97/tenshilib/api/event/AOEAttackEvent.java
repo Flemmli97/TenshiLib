@@ -10,7 +10,7 @@ import java.util.List;
 @Cancelable
 public class AOEAttackEvent extends PlayerEvent {
 
-    private List<Entity> list;
+    private final List<Entity> list;
 
     public AOEAttackEvent(PlayerEntity player, List<Entity> attackList) {
         super(player);

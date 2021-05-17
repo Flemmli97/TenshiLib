@@ -33,6 +33,7 @@ public abstract class ParticleSimpleTexture extends TexturedParticle {
         return IParticleRenderType.CUSTOM;
     }
 
+    @Override
     public float getScale(float partialTicks) {
         return this.particleScale;
     }

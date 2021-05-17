@@ -1,7 +1,6 @@
 package com.flemmli97.tenshilib.common.utils;
 
-import com.google.common.collect.Lists;
-
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -20,14 +19,14 @@ public class MapUtils {
     }
 
     public static <K, V> List<String> toListKey(Map<K, V> map, Function<K, String> key) {
-        List<String> list = Lists.newArrayList();
+        List<String> list = new ArrayList<>();
         for (Map.Entry<K, V> e : map.entrySet())
             list.add(key.apply(e.getKey()) + " - " + e.getValue());
         return list;
     }
 
     public static <K, V> List<String> toListVal(Map<K, V> map, Function<V, String> val) {
-        List<String> list = Lists.newArrayList();
+        List<String> list = new ArrayList<>();
         for (Map.Entry<K, V> e : map.entrySet())
             list.add(e.getKey() + " - " + val.apply(e.getValue()));
         return list;
@@ -37,7 +36,7 @@ public class MapUtils {
      * Turns a map into a list of string in form "key - value". For consistency the map should be sorted or provide a consistent order
      */
     public static <K, V> List<String> mapToStringList(Map<K, V> map, Function<K, String> key, Function<V, String> val) {
-        List<String> list = Lists.newArrayList();
+        List<String> list = new ArrayList<>();
         for (Map.Entry<K, V> e : map.entrySet())
             list.add(key.apply(e.getKey()) + " - " + val.apply(e.getValue()));
         return list;

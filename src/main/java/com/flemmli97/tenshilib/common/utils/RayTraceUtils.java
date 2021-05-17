@@ -5,6 +5,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.util.Direction;
 import net.minecraft.util.EntityPredicates;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceContext;
@@ -13,10 +14,12 @@ import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.world.World;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Predicate;
 
@@ -57,8 +60,8 @@ public class RayTraceUtils {
 
     public static EntityRayTraceResult calculateEntityFromLook(LivingEntity entity, Vector3d pos, Vector3d dir, float reach,
                                                                @Nullable Predicate<Entity> pred) {
-        Vector3d end = pos.add(dir.scale(reach));
-        return ProjectileHelper.rayTraceEntities(entity.world, entity, pos, pos.add(dir.scale(reach)), entity.getBoundingBox().expand(end).grow(1), (t) -> EntityPredicates.NOT_SPECTATING.test(t) && t.canBeCollidedWith()
+        Vector3d scaledDir = dir.scale(reach);
+        return ProjectileHelper.rayTraceEntities(entity.world, entity, pos, pos.add(scaledDir), entity.getBoundingBox().expand(scaledDir).grow(1), (t) -> EntityPredicates.NOT_SPECTATING.test(t) && t.canBeCollidedWith()
                 && (pred == null || pred.test(t)));
         /*RayTraceResult blocks = entity.world.rayTraceBlocks(new RayTraceContext(pos, pos.add(dir.x * reach, dir.y * reach, dir.z * reach), RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, entity));
         reach = (float) blocks.getHitVec().distanceTo(pos);
@@ -116,7 +119,7 @@ public class RayTraceUtils {
     }
 
     public static RayTraceResult entityRayTrace(Entity e, float range, RayTraceContext.BlockMode blockMode, RayTraceContext.FluidMode fluidMode,
-                                                boolean includeEntities, @Nullable Predicate<Entity> pred) {
+                                                boolean includeEntities, boolean getEntityHitVec, @Nullable Predicate<Entity> pred) {
         Vector3d posEye = e.getEyePosition(1);
         Vector3d look = posEye.add(e.getLookVec().scale(range));
         if (includeEntities) {
@@ -124,7 +127,12 @@ public class RayTraceUtils {
             if (raytraceresult.getType() != RayTraceResult.Type.MISS) {
                 look = raytraceresult.getHitVec();
             }
-            EntityRayTraceResult raytraceresult1 = ProjectileHelper.rayTraceEntities(e.world, e, posEye, look, e.getBoundingBox().expand(look).grow(1.0D), pred);
+            EntityRayTraceResult raytraceresult1;
+            if (getEntityHitVec)
+                raytraceresult1 = rayTraceEntities(e.world, e, posEye, look, e.getBoundingBox().expand(look).grow(1.0D), pred);
+            else
+                raytraceresult1 = ProjectileHelper.rayTraceEntities(e.world, e, posEye, look, e.getBoundingBox().expand(look).grow(1.0D), pred);
+
             if (raytraceresult1 != null) {
                 raytraceresult = raytraceresult1;
             }
@@ -133,10 +141,82 @@ public class RayTraceUtils {
         return e.world.rayTraceBlocks(new RayTraceContext(posEye, look, blockMode, fluidMode, e));
     }
 
+    /**
+     * Like {@link ProjectileHelper#rayTraceEntities} but also saves the hit vector
+     */
+    @Nullable
+    public static EntityRayTraceResult rayTraceEntities(World world, Entity e, Vector3d from, Vector3d to, AxisAlignedBB aabb, Predicate<Entity> pred) {
+        double d0 = Double.MAX_VALUE;
+        Entity entity = null;
+        Vector3d hit = null;
+        for (Entity entity1 : world.getEntitiesInAABBexcluding(e, aabb, pred)) {
+            AxisAlignedBB axisalignedbb = entity1.getBoundingBox().grow((double) 0.3F);
+            Optional<Vector3d> optional = axisalignedbb.rayTrace(from, to);
+            if (optional.isPresent()) {
+                double d1 = from.squareDistanceTo(optional.get());
+                if (d1 < d0) {
+                    entity = entity1;
+                    d0 = d1;
+                    hit = optional.get();
+                }
+            }
+        }
+
+        return entity == null ? null : new EntityRayTraceResult(entity, hit);
+    }
     /*public static RayTraceResult entityRayTrace(Entity e, float range, boolean stopOnLiquid, boolean ignoreBlockWithoutBoundingBox,
             boolean returnLastUncollidableBlock) {
         return entityRayTrace(e, range, returnLastUncollidableBlock, returnLastUncollidableBlock, returnLastUncollidableBlock, false, null);
     }*/
+
+    /**
+     * Gets the entity the projectile is hitting. Unlike vanilla which uses a raytrace this is a bounding box check.
+     * Vanilla ignores practically the projectiles bounding box making bigger projectile the same as small ones.
+     *
+     * @param entity The projectile entity. Also technically doesnt can be any Entity
+     * @param check  The AABB to check entitys in.
+     * @param pred   Entity filter
+     */
+    public static EntityRayTraceResult projectileHit(World world, Entity entity, AxisAlignedBB check, Predicate<Entity> pred, double boundingBoxGrowth) {
+        AxisAlignedBB entityBB = entity.getBoundingBox().grow(boundingBoxGrowth);
+        for (Entity entity1 : world.getEntitiesInAABBexcluding(entity, check, pred)) {
+            AxisAlignedBB axisalignedbb = entity1.getBoundingBox().grow(0.3F);
+            if (entityBB.intersects(axisalignedbb)) {
+                return new EntityRayTraceResult(entity1);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets the entity the projectile is hitting. Technically not a raytrace but a bounding box check.
+     * Unused atm.
+     * Problem: with radius > 1 can hit entities behind walls.
+     *
+     * @param entity The projectile entity. Also technically doesnt can be any Entity
+     * @param from   Raytrace starting point
+     * @param to     Raytrace end point
+     * @param check  The AABB to check entitys in.
+     * @param pred   Entity filter
+     * @param radius Radius of the projectile collision.
+     */
+    public static EntityRayTraceResult projectileRayTrace(World world, Entity entity, Vector3d from, Vector3d to, AxisAlignedBB check, Predicate<Entity> pred, double radius) {
+        double distVar = Double.MAX_VALUE;
+        Entity ret = null;
+        from = from.add(0, entity.getHeight() * 0.5, 0);
+        Vector3d dir = to.subtract(from);
+        AxisAlignedBB entityBB = entity.getBoundingBox();
+        for (Entity entity1 : world.getEntitiesInAABBexcluding(entity, check, pred)) {
+            AxisAlignedBB axisalignedbb = entity1.getBoundingBox().grow(0.3F);
+            Pair<Vector3d, Vector3d> points = MathUtils.closestPointsAABB(entityBB, axisalignedbb);
+            double dist = points.getLeft().squareDistanceTo(points.getRight());
+            if (dist < distVar && dist <= radius * radius && (radius == 0 || MathUtils.isInFront(entity1.getPositionVec(), from, dir))) {
+                ret = entity1;
+                distVar = dist;
+            }
+        }
+        return ret == null ? null : new EntityRayTraceResult(ret);
+    }
 
     /**
      * Gets a list of vectors rotated around the given axis by the given angles

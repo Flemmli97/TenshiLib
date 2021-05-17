@@ -112,12 +112,12 @@ public abstract class EntityDamageCloud extends Entity implements IOwnable<Livin
             }
             if (this.canStartDamage() && this.isAlive()) {
                 List<LivingEntity> targets = this.world.getEntitiesWithinAABB(LivingEntity.class, this.damageBoundingBox(), this::canHit);
-                for(LivingEntity living : targets) {
-                    if (this.maxHitCount() == -1 || this.attackedEntities < this.maxHitCount()){
-                        if(this.damageEntity(living))
+                for (LivingEntity living : targets) {
+                    if (this.maxHitCount() == -1 || this.attackedEntities < this.maxHitCount()) {
+                        if (this.damageEntity(living))
                             this.attackedEntities++;
                     }
-                    if(this.maxHitCount() != -1 && this.attackedEntities >= this.maxHitCount()) {
+                    if (this.maxHitCount() != -1 && this.attackedEntities >= this.maxHitCount()) {
                         this.onMaxEntities();
                         break;
                     }
@@ -127,9 +127,7 @@ public abstract class EntityDamageCloud extends Entity implements IOwnable<Livin
     }
 
     protected boolean canHit(LivingEntity entity) {
-        if (this.getOwner() == null || (!this.getOwner().isRidingSameEntity(entity) && ((this.canHitShooter() && this.ticksExisted > 2) || entity != this.getOwner())))
-            return true;
-        return false;
+        return this.getOwner() == null || (!this.getOwner().isRidingSameEntity(entity) && ((this.canHitShooter() && this.ticksExisted > 2) || entity != this.getOwner()));
     }
 
     protected abstract boolean damageEntity(LivingEntity target);
@@ -138,7 +136,7 @@ public abstract class EntityDamageCloud extends Entity implements IOwnable<Livin
         this.remove();
     }
 
-    protected AxisAlignedBB damageBoundingBox(){
+    protected AxisAlignedBB damageBoundingBox() {
         float radius = this.getRadius();
         return this.getBoundingBox().grow(radius, 0.3, radius);
     }
