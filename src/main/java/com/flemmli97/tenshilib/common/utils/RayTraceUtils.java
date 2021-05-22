@@ -42,16 +42,16 @@ public class RayTraceUtils {
     }
 
     public static List<Entity> getEntitiesIgnorePitch(LivingEntity entity, float reach, float aoe, Predicate<Entity> pred) {
-        return getEntitiesIn(entity, entity.getPositionVec().add(0, entity.getEyeHeight(), 0), Vector3d.fromPitchYaw(0, entity.getYaw(1)), reach,
+        return getEntitiesIn(entity, entity.getPositionVec().add(0, 0.1, 0), Vector3d.fromPitchYaw(0, entity.getYaw(1)), reach,
                 aoe, pred);
     }
 
     public static List<Entity> getEntitiesIn(LivingEntity entity, Vector3d pos, Vector3d look, float reach,
                                              float aoe, Predicate<Entity> pred) {
         CircleSector circ = new CircleSector(pos, look, reach, aoe, entity);
-        return entity.world.getEntitiesInAABBexcluding(entity, entity.getBoundingBox().grow(reach),
+        return entity.world.getEntitiesInAABBexcluding(entity, entity.getBoundingBox().grow(reach + 1),
                 t -> t != entity && (pred == null || pred.test(t)) && !t.isOnSameTeam(entity) && t.canBeCollidedWith()
-                        && circ.intersects(t.world, t.getBoundingBox()));
+                        && circ.intersects(t.world, t.getBoundingBox().grow(0, t.getHeight() <= 0.3 ? t.getHeight() : 0, 0)));
     }
 
     public static EntityRayTraceResult calculateEntityFromLook(LivingEntity entity, float reach) {

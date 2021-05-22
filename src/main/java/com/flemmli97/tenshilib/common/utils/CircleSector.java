@@ -6,6 +6,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceContext;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -39,8 +40,10 @@ public class CircleSector {
         Vector3d ray = MathUtils.rotate(this.rotAxis, this.look, rot);
         this.vecs.add(ray);
         while (rot <= this.theta) {
-            ray = MathUtils.rotate(this.rotAxis, this.look, rot += this.rotAmount);
-            this.vecs.add(ray);
+            if(rot != 0) {
+                ray = MathUtils.rotate(this.rotAxis, this.look, rot += this.rotAmount);
+                this.vecs.add(ray);
+            }
         }
     }
 
@@ -49,9 +52,12 @@ public class CircleSector {
             return true;
         for (Vector3d ray : this.vecs) {
             BlockRayTraceResult blocks = world.rayTraceBlocks(new RayTraceContext(this.center,
-                    this.center.add(ray.scale(this.radius)), RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, this.entity));
-            float reach = (float) blocks.getHitVec().distanceTo(this.center);
-            if (aabb.rayTrace(this.center, this.center.add(ray.scale(reach))).isPresent())
+                    this.center.add(ray), RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, this.entity));
+            if(blocks.getType() != RayTraceResult.Type.MISS)
+                ray = blocks.getHitVec();
+            else
+                ray = this.center.add(ray);
+            if (aabb.rayTrace(this.center, ray).isPresent())
                 return true;
         }
         return false;
