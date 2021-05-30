@@ -36,14 +36,16 @@ public class CircleSector {
     }
 
     private void calculateVecs() {
+        this.vecs.add(this.look);
         float rot = -this.theta;
-        Vector3d ray = MathUtils.rotate(this.rotAxis, this.look, rot);
-        this.vecs.add(ray);
-        while (rot <= this.theta) {
-            if(rot != 0) {
-                ray = MathUtils.rotate(this.rotAxis, this.look, rot += this.rotAmount);
-                this.vecs.add(ray);
-            }
+        while (rot < 0) {
+            this.vecs.add(MathUtils.rotate(this.rotAxis, this.look, rot));
+            rot += this.rotAmount;
+        }
+        rot = this.theta;
+        while (rot > 0) {
+            this.vecs.add(MathUtils.rotate(this.rotAxis, this.look, rot));
+            rot -= this.rotAmount;
         }
     }
 

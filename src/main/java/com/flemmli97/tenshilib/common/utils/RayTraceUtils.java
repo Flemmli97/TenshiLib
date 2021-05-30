@@ -173,16 +173,16 @@ public class RayTraceUtils {
      * Gets the entity the projectile is hitting. Unlike vanilla which uses a raytrace this is a bounding box check.
      * Vanilla ignores practically the projectiles bounding box making bigger projectile the same as small ones.
      *
-     * @param entity The projectile entity. Also technically doesnt can be any Entity
+     * @param entity The projectile entity. Also technically doesnt need to be a projectile can be any Entity
      * @param check  The AABB to check entitys in.
      * @param pred   Entity filter
      */
     public static EntityRayTraceResult projectileHit(World world, Entity entity, AxisAlignedBB check, Predicate<Entity> pred, double boundingBoxGrowth) {
         AxisAlignedBB entityBB = entity.getBoundingBox().grow(boundingBoxGrowth);
-        for (Entity entity1 : world.getEntitiesInAABBexcluding(entity, check, pred)) {
-            AxisAlignedBB axisalignedbb = entity1.getBoundingBox().grow(0.3F);
+        for (Entity target : world.getEntitiesInAABBexcluding(entity, check, pred)) {
+            AxisAlignedBB axisalignedbb = target.getBoundingBox().grow(0.3F);
             if (entityBB.intersects(axisalignedbb)) {
-                return new EntityRayTraceResult(entity1);
+                return new EntityRayTraceResult(target);
             }
         }
         return null;
