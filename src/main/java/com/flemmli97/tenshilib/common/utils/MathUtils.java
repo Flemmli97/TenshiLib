@@ -53,16 +53,19 @@ public class MathUtils {
      * @return The rotated vector
      */
     public static Vector3d rotate(Vector3d rotAxis, Vector3d vec, float angle) {
-        double rot = rotAxis.x * vec.x + rotAxis.y * vec.y + rotAxis.z * vec.z;
-        double x = rotAxis.x * rot * (1 - MathHelper.cos(angle))
-                + vec.x * MathHelper.cos(angle) + (-rotAxis.z * vec.y + rotAxis.y * vec.z) * MathHelper.sin(angle);
+        double[] res = rotate(rotAxis.x, rotAxis.y, rotAxis.z, vec.x, vec.y, vec.z, angle);
+        return new Vector3d(res[0], res[1], res[2]);
+    }
 
-        double y = rotAxis.y * rot * (1 - MathHelper.cos(angle))
-                + vec.y * MathHelper.cos(angle) + (rotAxis.z * vec.x - rotAxis.x * vec.z) * MathHelper.sin(angle);
-
-        double z = rotAxis.z * rot * (1 - MathHelper.cos(angle))
-                + vec.z * MathHelper.cos(angle) + (-rotAxis.y * vec.x + rotAxis.x * vec.y) * MathHelper.sin(angle);
-        return new Vector3d(x, y, z);
+    /**
+     * Rotates a vector around a rotation axis with the given angle
+     */
+    public static double[] rotate(double axisX, double axisY, double axisZ, double vecX, double vecY, double vecZ, float angle) {
+        double rot = axisX * vecX + axisY * vecY + axisZ * vecZ;
+        double x = axisX * rot * (1 - MathHelper.cos(angle)) + vecX * MathHelper.cos(angle) + (-axisZ * vecY + axisY * vecZ) * MathHelper.sin(angle);
+        double y = axisY * rot * (1 - MathHelper.cos(angle)) + vecY * MathHelper.cos(angle) + (axisZ * vecX - axisX * vecZ) * MathHelper.sin(angle);
+        double z = axisZ * rot * (1 - MathHelper.cos(angle)) + vecZ * MathHelper.cos(angle) + (-axisY * vecX + axisX * vecY) * MathHelper.sin(angle);
+        return new double[] {x, y, z};
     }
 
     public static Vector3d closestPointToLine(Vector3d point, Vector3d from, Vector3d dir) {
