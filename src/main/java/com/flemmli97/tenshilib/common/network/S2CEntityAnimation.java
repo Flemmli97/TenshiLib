@@ -49,7 +49,7 @@ public class S2CEntityAnimation<T extends Entity & IAnimated> {
     }
 
     public static <T extends Entity & IAnimated> void handlePacket(S2CEntityAnimation<T> pkt, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ClientPacketHandlers.updateAnim(pkt.entityID, pkt.animID)));
+        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandlers.updateAnim(pkt.entityID, pkt.animID)));
         ctx.get().setPacketHandled(true);
     }
 }
