@@ -65,7 +65,7 @@ public class MathUtils {
         double x = axisX * rot * (1 - MathHelper.cos(angle)) + vecX * MathHelper.cos(angle) + (-axisZ * vecY + axisY * vecZ) * MathHelper.sin(angle);
         double y = axisY * rot * (1 - MathHelper.cos(angle)) + vecY * MathHelper.cos(angle) + (axisZ * vecX - axisX * vecZ) * MathHelper.sin(angle);
         double z = axisZ * rot * (1 - MathHelper.cos(angle)) + vecZ * MathHelper.cos(angle) + (-axisY * vecX + axisX * vecY) * MathHelper.sin(angle);
-        return new double[] {x, y, z};
+        return new double[]{x, y, z};
     }
 
     public static Vector3d closestPointToLine(Vector3d point, Vector3d from, Vector3d dir) {

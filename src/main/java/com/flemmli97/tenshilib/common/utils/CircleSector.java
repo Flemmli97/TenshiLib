@@ -55,7 +55,7 @@ public class CircleSector {
         for (Vector3d ray : this.vecs) {
             BlockRayTraceResult blocks = world.rayTraceBlocks(new RayTraceContext(this.center,
                     this.center.add(ray), RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, this.entity));
-            if(blocks.getType() != RayTraceResult.Type.MISS)
+            if (blocks.getType() != RayTraceResult.Type.MISS)
                 ray = blocks.getHitVec();
             else
                 ray = this.center.add(ray);
