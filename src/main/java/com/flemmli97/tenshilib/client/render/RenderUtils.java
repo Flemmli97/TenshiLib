@@ -49,7 +49,7 @@ public class RenderUtils {
         WorldRenderAccessor.drawShapeOutline(matrixStack, buffer.getBuffer(renderType), state.getShape(player.world, pos, ISelectionContext.forEntity(player)),
                 pos.getX() - vec.x, pos.getY() - vec.y, pos.getZ() - vec.z, red, green, blue, alpha);
         if (drawImmediately && buffer instanceof IRenderTypeBuffer.Impl)
-            ((IRenderTypeBuffer.Impl) buffer).draw(renderType);
+            ((IRenderTypeBuffer.Impl) buffer).finish(renderType);
     }
 
     public static void renderAreaAround(MatrixStack matrixStack, IRenderTypeBuffer buffer, BlockPos pos, float radius, boolean drawImmediately) {
@@ -82,14 +82,14 @@ public class RenderUtils {
         } else {
             renderType = RenderType.getLines();
         }
-        WorldRenderer.drawBox(matrixStack, buffer.getBuffer(renderType), aabb.grow(0.002).offset(-vec.x, -vec.y, -vec.z), red, green, blue, alpha);
+        WorldRenderer.drawBoundingBox(matrixStack, buffer.getBuffer(renderType), aabb.grow(0.002).offset(-vec.x, -vec.y, -vec.z), red, green, blue, alpha);
         if (drawImmediately && buffer instanceof IRenderTypeBuffer.Impl)
-            ((IRenderTypeBuffer.Impl) buffer).draw();
+            ((IRenderTypeBuffer.Impl) buffer).finish();
     }
 
     public static void applyYawPitch(MatrixStack stack, float yaw, float pitch) {
-        stack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(yaw));
-        stack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(pitch));
+        stack.rotate(Vector3f.YP.rotationDegrees(yaw));
+        stack.rotate(Vector3f.XP.rotationDegrees(pitch));
     }
 
     public static void renderTexture(MatrixStack matrixStack, IVertexBuilder builder, float xSize, float ySize, int light) {
@@ -107,12 +107,12 @@ public class RenderUtils {
     public static void renderTexture(MatrixStack stack, IVertexBuilder builder, float xSize, float ySize, int red, int green, int blue, int alpha, float u, float v, float uLength, float vLength, int light) {
         xSize = xSize / 2f;
         ySize = ySize / 2f;
-        Matrix4f matrix4f = stack.peek().getModel();
-        Matrix3f mat3f = stack.peek().getNormal();
-        builder.vertex(matrix4f, -xSize, ySize, 0).color(red, green, blue, alpha).texture(u, v).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(mat3f, 0, 0, 1).endVertex();
-        builder.vertex(matrix4f, xSize, ySize, 0).color(red, green, blue, alpha).texture(u + uLength, v).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(mat3f, 0, 0, 1).endVertex();
-        builder.vertex(matrix4f, xSize, -ySize, 0).color(red, green, blue, alpha).texture(u + uLength, v + vLength).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(mat3f, 0, 0, 1).endVertex();
-        builder.vertex(matrix4f, -xSize, -ySize, 0).color(red, green, blue, alpha).texture(u, v + vLength).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(mat3f, 0, 0, 1).endVertex();
+        Matrix4f matrix4f = stack.getLast().getMatrix();
+        Matrix3f mat3f = stack.getLast().getNormal();
+        builder.pos(matrix4f, -xSize, ySize, 0).color(red, green, blue, alpha).tex(u, v).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(mat3f, 0, 0, 1).endVertex();
+        builder.pos(matrix4f, xSize, ySize, 0).color(red, green, blue, alpha).tex(u + uLength, v).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(mat3f, 0, 0, 1).endVertex();
+        builder.pos(matrix4f, xSize, -ySize, 0).color(red, green, blue, alpha).tex(u + uLength, v + vLength).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(mat3f, 0, 0, 1).endVertex();
+        builder.pos(matrix4f, -xSize, -ySize, 0).color(red, green, blue, alpha).tex(u, v + vLength).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(mat3f, 0, 0, 1).endVertex();
     }
 
     public static void renderTexture(MatrixStack matrixStack, IVertexBuilder builder, float xSize, float ySize, int hexColor, int light) {

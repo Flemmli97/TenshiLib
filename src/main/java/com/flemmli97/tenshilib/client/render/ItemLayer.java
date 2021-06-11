@@ -52,11 +52,11 @@ public class ItemLayer<T extends LivingEntity, M extends EntityModel<T> & IItemA
         if (!stack.isEmpty()) {
             matrixStack.push();
             this.getEntityModel().transform(hand, matrixStack);
-            matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(-90.0F));
-            matrixStack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180.0F));
+            matrixStack.rotate(Vector3f.XP.rotationDegrees(-90.0F));
+            matrixStack.rotate(Vector3f.YP.rotationDegrees(180.0F));
             boolean flag = hand == HandSide.LEFT;
             this.getEntityModel().postTransform(flag, matrixStack);
-            Minecraft.getInstance().getFirstPersonRenderer().renderItem(entity, stack, transformType, flag, matrixStack, buffer, light);
+            Minecraft.getInstance().getFirstPersonRenderer().renderItemSide(entity, stack, transformType, flag, matrixStack, buffer, light);
             matrixStack.pop();
         }
     }

@@ -100,20 +100,20 @@ public class RayTraceUtils {
         int randZ = pos.getZ() + rand.nextInt(2 * range) - range;
         if (!grounded) {
             BlockPos pos1 = new BlockPos(randX, randY, randZ);
-            while (Math.abs(randY - pos1.getY()) < range && !world.isSpaceEmpty(e.getBoundingBox().offset(pos1))) {
+            while (Math.abs(randY - pos1.getY()) < range && !world.hasNoCollisions(e.getBoundingBox().offset(pos1))) {
                 pos1 = pos1.up();
             }
-            if (!world.isSpaceEmpty(e.getBoundingBox().offset(pos1)))
+            if (!world.hasNoCollisions(e.getBoundingBox().offset(pos1)))
                 return null;
             return pos1;
         }
         int y = pos.getY() - range;
         BlockPos pos1 = new BlockPos(randX, y, randZ);
         while (pos1.getY() - y < range && (!world.getBlockState(pos1.down()).isTopSolid(world, pos1.down(), e, Direction.UP)
-                || !world.isSpaceEmpty(e.getBoundingBox().offset(pos1)))) {
+                || !world.hasNoCollisions(e.getBoundingBox().offset(pos1)))) {
             pos1 = pos1.up();
         }
-        if (!world.isSpaceEmpty(e.getBoundingBox().offset(pos1)))
+        if (!world.hasNoCollisions(e.getBoundingBox().offset(pos1)))
             return null;
         return pos1;
     }
@@ -243,7 +243,7 @@ public class RayTraceUtils {
     public static Vector3f rotatedAround(Vector3d dir, Vector3f axis, float deg) {
         Quaternion quaternion = new Quaternion(axis, deg, true);
         Vector3f newDir = new Vector3f(dir);
-        newDir.func_214905_a(quaternion);
+        newDir.transform(quaternion);
         return newDir;
     }
 }

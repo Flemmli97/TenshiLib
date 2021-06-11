@@ -30,17 +30,17 @@ public abstract class RenderProjectileModel<T extends Entity> extends EntityRend
         this.translate(entity, stack, pitch, yaw, partialTicks);
 
         this.model.setLivingAnimations(entity, 0, 0, partialTicks);
-        this.model.setAngles(entity, 0, 0, partialLivingTicks, yaw, pitch);
+        this.model.setRotationAngles(entity, 0, 0, partialLivingTicks, yaw, pitch);
 
-        IVertexBuilder ivertexbuilder = buffer.getBuffer(this.model.getLayer(this.getEntityTexture(entity)));
-        this.model.render(stack, ivertexbuilder, packedLight, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F, 1.0F, 1.0F);
+        IVertexBuilder ivertexbuilder = buffer.getBuffer(this.model.getRenderType(this.getEntityTexture(entity)));
+        this.model.render(stack, ivertexbuilder, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
         stack.pop();
         super.render(entity, rotation, partialTicks, stack, buffer, packedLight);
     }
 
     public void translate(T entity, MatrixStack stack, float pitch, float yaw, float partialTicks) {
-        stack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180 + yaw));
-        stack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(pitch));
+        stack.rotate(Vector3f.YP.rotationDegrees(180 + yaw));
+        stack.rotate(Vector3f.XP.rotationDegrees(pitch));
     }
 
     public float yawOffset() {

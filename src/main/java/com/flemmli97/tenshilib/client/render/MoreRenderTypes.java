@@ -12,6 +12,6 @@ public class MoreRenderTypes {
 
     private static final RenderState.DepthTestState NO_DEPTH = new RenderState.DepthTestState("never", GL11.GL_NEVER);
 
-    public static final RenderType LINE_NODEPTH = RenderType.of("ttenshilib:line_no_depth", DefaultVertexFormats.POSITION_COLOR, 1, 256, RenderType.State.builder().lineWidth(new RenderState.LineState(OptionalDouble.empty())).layering(RenderStateAccessors.offsetZLayer()).transparency(RenderStateAccessors.translucent()).depthTest(RenderStateAccessors.alwaysDepthTest()).target(RenderStateAccessors.itemTarget()).writeMaskState(RenderStateAccessors.allMask()).build(false));
+    public static final RenderType LINE_NODEPTH = RenderType.makeType("ttenshilib:line_no_depth", DefaultVertexFormats.POSITION_COLOR, 1, 256, RenderType.State.getBuilder().line(new RenderState.LineState(OptionalDouble.empty())).layer(RenderStateAccessors.offsetZLayer()).transparency(RenderStateAccessors.translucent()).depthTest(RenderStateAccessors.alwaysDepthTest()).target(RenderStateAccessors.itemTarget()).writeMask(RenderStateAccessors.allMask()).build(false));
 
 }

@@ -30,7 +30,7 @@ public abstract class AnimatedAttackGoal<T extends CreatureEntity & IAnimated> e
     @Override
     public boolean shouldExecute() {
         LivingEntity living = this.attacker.getAttackTarget();
-        return living != null && living.isAlive() && this.attacker.isWithinHomeDistanceFromPosition(living.getBlockPos());
+        return living != null && living.isAlive() && this.attacker.isWithinHomeDistanceFromPosition(living.getPosition());
     }
 
     @Override
@@ -137,35 +137,35 @@ public abstract class AnimatedAttackGoal<T extends CreatureEntity & IAnimated> e
         double x = Math.cos(angle) * minDis;
         double z = Math.sin(angle) * minDis;
         float min = minDis * minDis;
-        BlockPos pos = this.attacker.getBlockPos().add(x, 0.0, z);
-        if (away.getDistanceSq(Vector3d.ofCenter(pos)) > min && this.attacker.isWithinHomeDistanceFromPosition(pos)) {
+        BlockPos pos = this.attacker.getPosition().add(x, 0.0, z);
+        if (away.getDistanceSq(Vector3d.copyCentered(pos)) > min && this.attacker.isWithinHomeDistanceFromPosition(pos)) {
             return pos;
         }
-        return this.attacker.getBlockPos();
+        return this.attacker.getPosition();
     }
 
     /**
      * Circle around given point. y coord not needed
      */
     protected void circleAround(double posX, double posZ, float radius, boolean clockWise, float speed) {
-        double x = this.attacker.getX() - posX;
-        double z = this.attacker.getZ() - posZ;
+        double x = this.attacker.getPosX() - posX;
+        double z = this.attacker.getPosZ() - posZ;
         double r = x * x + z * z;
         if (r < (radius - 1.5) * (radius - 1.5) || r > (radius + 1.5) * (radius + 1.5)) {
-            double[] c = MathUtils.closestOnCircle(posX, posZ, this.attacker.getX(), this.attacker.getZ(), radius);
-            this.attacker.getNavigator().tryMoveToXYZ(c[0], this.attacker.getY(), c[1], speed);
+            double[] c = MathUtils.closestOnCircle(posX, posZ, this.attacker.getPosX(), this.attacker.getPosZ(), radius);
+            this.attacker.getNavigator().tryMoveToXYZ(c[0], this.attacker.getPosY(), c[1], speed);
         } else {
-            double angle = MathUtils.phiFromPoint(posX, posZ, this.attacker.getX(), this.attacker.getZ()) + (clockWise ? MathUtils.degToRad(15) : -MathUtils.degToRad(15));
+            double angle = MathUtils.phiFromPoint(posX, posZ, this.attacker.getPosX(), this.attacker.getPosZ()) + (clockWise ? MathUtils.degToRad(15) : -MathUtils.degToRad(15));
             double nPosX = radius * Math.cos(angle);
             double nPosZ = radius * Math.sin(angle);
-            this.attacker.getNavigator().tryMoveToXYZ(posX + nPosX, this.attacker.getY(), posZ + nPosZ, speed);
+            this.attacker.getNavigator().tryMoveToXYZ(posX + nPosX, this.attacker.getPosY(), posZ + nPosZ, speed);
         }
     }
 
     protected void circleAroundTargetFacing(float radius, boolean clockWise, float speed) {
         this.attacker.faceEntity(this.target, 30, 30);
-        double x = this.attacker.getX() - this.target.getX();
-        double z = this.attacker.getZ() - this.target.getZ();
+        double x = this.attacker.getPosX() - this.target.getPosX();
+        double z = this.attacker.getPosZ() - this.target.getPosZ();
         double r = x * x + z * z;
         this.attacker.getMoveHelper().strafe(r < (radius - 1.5) * (radius - 1.5) ? -0.5f : r > (radius + 1.5) * (radius + 1.5) ? 0.5f : 0, clockWise ? speed : -speed);
     }

@@ -23,9 +23,9 @@ public abstract class ParticleSimpleTexture extends TexturedParticle {
     }
 
     @Override
-    public void buildGeometry(IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {
+    public void renderParticle(IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {
         Minecraft.getInstance().getTextureManager().bindTexture(this.texture());
-        super.buildGeometry(buffer, renderInfo, partialTicks);
+        super.renderParticle(buffer, renderInfo, partialTicks);
     }
 
     @Override

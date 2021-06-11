@@ -81,7 +81,7 @@ public class C2SPacketHit {
         if (!ForgeHooks.onPlayerAttackTarget(player, target)) return;
         if (target.canBeAttackedWithItem()) {
             if (!target.hitByEntity(player)) {
-                float baseDmg = (float) player.getAttributeValue(Attributes.GENERIC_ATTACK_DAMAGE);
+                float baseDmg = (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE);
                 float enchantBonus;
                 if (target instanceof LivingEntity) {
                     enchantBonus = EnchantmentHelper.getModifierForCreature(player.getHeldItemMainhand(), ((LivingEntity) target).getCreatureAttribute());
@@ -98,7 +98,7 @@ public class C2SPacketHit {
                     boolean flag = cooldown > 0.9F;
                     int knocback = EnchantmentHelper.getKnockbackModifier(player);
                     if (player.isSprinting() && flag) {
-                        player.world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK, player.getSoundCategory(), 1.0F, 1.0F);
+                        player.world.playSound(null, player.getPosX(), player.getPosY(), player.getPosZ(), SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK, player.getSoundCategory(), 1.0F, 1.0F);
                         ++knocback;
                     }
 
@@ -124,7 +124,7 @@ public class C2SPacketHit {
                     if (flag5) {
                         if (knocback > 0) {
                             if (target instanceof LivingEntity) {
-                                ((LivingEntity) target).takeKnockback((float) knocback * 0.5F, MathHelper.sin(player.rotationYaw * ((float) Math.PI / 180F)), (-MathHelper.cos(player.rotationYaw * ((float) Math.PI / 180F))));
+                                ((LivingEntity) target).applyKnockback((float) knocback * 0.5F, MathHelper.sin(player.rotationYaw * ((float) Math.PI / 180F)), (-MathHelper.cos(player.rotationYaw * ((float) Math.PI / 180F))));
                             } else {
                                 target.addVelocity((-MathHelper.sin(player.rotationYaw * ((float) Math.PI / 180F)) * (float) knocback * 0.5F), 0.1D, (MathHelper.cos(player.rotationYaw * ((float) Math.PI / 180F)) * (float) knocback * 0.5F));
                             }
@@ -140,15 +140,15 @@ public class C2SPacketHit {
                         }
 
                         if (crit) {
-                            player.world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, player.getSoundCategory(), 1.0F, 1.0F);
+                            player.world.playSound(null, player.getPosX(), player.getPosY(), player.getPosZ(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, player.getSoundCategory(), 1.0F, 1.0F);
                             player.onCriticalHit(target);
                         }
 
                         if (!crit) {
                             if (flag) {
-                                player.world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, player.getSoundCategory(), 1.0F, 1.0F);
+                                player.world.playSound(null, player.getPosX(), player.getPosY(), player.getPosZ(), SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, player.getSoundCategory(), 1.0F, 1.0F);
                             } else {
-                                player.world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_WEAK, player.getSoundCategory(), 1.0F, 1.0F);
+                                player.world.playSound(null, player.getPosX(), player.getPosY(), player.getPosZ(), SoundEvents.ENTITY_PLAYER_ATTACK_WEAK, player.getSoundCategory(), 1.0F, 1.0F);
                             }
                         }
 
@@ -186,13 +186,13 @@ public class C2SPacketHit {
 
                             if (player.world instanceof ServerWorld && f5 > 2.0F) {
                                 int k = (int) (f5 * 0.5D);
-                                ((ServerWorld) player.world).spawnParticle(ParticleTypes.DAMAGE_INDICATOR, target.getX(), target.getBodyY(0.5D), target.getZ(), k, 0.1D, 0.0D, 0.1D, 0.2D);
+                                ((ServerWorld) player.world).spawnParticle(ParticleTypes.DAMAGE_INDICATOR, target.getPosX(), target.getPosYHeight(0.5D), target.getPosZ(), k, 0.1D, 0.0D, 0.1D, 0.2D);
                             }
                         }
 
                         player.addExhaustion(0.1F);
                     } else {
-                        player.world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_NODAMAGE, player.getSoundCategory(), 1.0F, 1.0F);
+                        player.world.playSound(null, player.getPosX(), player.getPosY(), player.getPosZ(), SoundEvents.ENTITY_PLAYER_ATTACK_NODAMAGE, player.getSoundCategory(), 1.0F, 1.0F);
                         if (burn) {
                             target.extinguish();
                         }

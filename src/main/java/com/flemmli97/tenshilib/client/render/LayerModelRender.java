@@ -38,15 +38,15 @@ public class LayerModelRender<T extends LivingEntity, M extends EntityModel<T>> 
             matrixStack.translate(0.0F, 0.2F, 0.0F);
         }
         this.model.setLivingAnimations(entity, limbSwing, limbSwingAmount, partialTicks);
-        this.model.setAngles(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+        this.model.setRotationAngles(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
         Minecraft mc = Minecraft.getInstance();
         boolean flag = !entity.isInvisible();
         boolean flag1 = !flag && !entity.isInvisibleToPlayer(mc.player);
-        boolean flag2 = mc.hasOutline(entity);
+        boolean flag2 = mc.isEntityGlowing(entity);
         RenderType rendertype = this.getRenderType(entity, flag, flag1, flag2);
         if (rendertype != null) {
             IVertexBuilder ivertexbuilder = buffer.getBuffer(rendertype);
-            int i = LivingRenderer.getOverlay(entity, 0);
+            int i = LivingRenderer.getPackedOverlay(entity, 0);
             this.model.render(matrixStack, ivertexbuilder, packedLightIn, i, 1.0F, 1.0F, 1.0F, flag1 ? 0.15F : 1.0F);
         }
         matrixStack.pop();
@@ -57,7 +57,7 @@ public class LayerModelRender<T extends LivingEntity, M extends EntityModel<T>> 
         if (canSee) {
             return RenderType.getItemEntityTranslucentCull(resourcelocation);
         } else if (invis) {
-            return this.model.getLayer(resourcelocation);
+            return this.model.getRenderType(resourcelocation);
         } else {
             return glowing ? RenderType.getOutline(resourcelocation) : null;
         }

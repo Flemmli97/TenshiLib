@@ -48,7 +48,7 @@ public class ItemUtils {
     public static double damage(ItemStack stack) {
         double dmg = 0;
         Collection<AttributeModifier> atts = stack.getAttributeModifiers(EquipmentSlotType.MAINHAND)
-                .get(Attributes.GENERIC_ATTACK_DAMAGE);
+                .get(Attributes.ATTACK_DAMAGE);
         for (AttributeModifier mod : atts) {
             if (mod.getOperation() == AttributeModifier.Operation.ADDITION)
                 dmg += mod.getAmount();
@@ -65,7 +65,7 @@ public class ItemUtils {
         int sharp = EnchantmentHelper.getEnchantmentLevel(Enchantments.SHARPNESS, stack);
         if (sharp > 0)
             value += sharp * 0.5 + 0.5;
-        return Attributes.GENERIC_ATTACK_DAMAGE.clampValue(value);
+        return Attributes.ATTACK_DAMAGE.clampValue(value);
     }
 
     /**

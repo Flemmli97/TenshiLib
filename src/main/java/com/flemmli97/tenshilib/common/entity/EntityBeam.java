@@ -54,16 +54,16 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
     }
 
     public EntityBeam(EntityType<? extends EntityBeam> type, World world, LivingEntity shooter) {
-        this(type, world, shooter.getX(), shooter.getY() + shooter.getEyeHeight() - 0.1, shooter.getZ());
+        this(type, world, shooter.getPosX(), shooter.getPosY() + shooter.getEyeHeight() - 0.1, shooter.getPosZ());
         this.shooter = shooter;
         this.dataManager.set(shooterUUID, Optional.of(shooter.getUniqueID()));
         this.setRotation(shooter.rotationYawHead, shooter.rotationPitch);
     }
 
     public void setRotationTo(double x, double y, double z, float accuracyMod) {
-        double dx = x + (this.rand.nextGaussian() * accuracyMod) - this.getX();
-        double dy = y + (this.rand.nextGaussian() * accuracyMod) - this.getY();
-        double dz = z + (this.rand.nextGaussian() * accuracyMod) - this.getZ();
+        double dx = x + (this.rand.nextGaussian() * accuracyMod) - this.getPosX();
+        double dy = y + (this.rand.nextGaussian() * accuracyMod) - this.getPosY();
+        double dz = z + (this.rand.nextGaussian() * accuracyMod) - this.getPosZ();
         this.setRotationToDir(dx, dy, dz, accuracyMod);
     }
 
@@ -115,7 +115,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
             this.rotationYaw = e.rotationYaw;
             this.prevRotationPitch = e.prevRotationPitch;
             this.prevRotationYaw = e.prevRotationYaw;
-            this.setPosition(e.getX(), e.getY() + e.getEyeHeight() - 0.10000000149011612D, e.getZ());
+            this.setPosition(e.getPosX(), e.getPosY() + e.getEyeHeight() - 0.10000000149011612D, e.getPosZ());
         }
     }
 
@@ -154,7 +154,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
             this.remove();
         if (!this.world.isRemote && this.hit != null && --this.coolDown <= 0 && this.isAlive()) {
             List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(this,
-                    new AxisAlignedBB(this.getX(), this.getY(), this.getZ(), this.hitVec.x, this.hitVec.y, this.hitVec.z).grow(1 + this.radius()));
+                    new AxisAlignedBB(this.getPosX(), this.getPosY(), this.getPosZ(), this.hitVec.x, this.hitVec.y, this.hitVec.z).grow(1 + this.radius()));
             Vector3d pos = this.getPositionVec();
             for (Entity entity : list) {
                 if (entity != this.getOwner() && this.check(entity, pos, this.hitVec)) {

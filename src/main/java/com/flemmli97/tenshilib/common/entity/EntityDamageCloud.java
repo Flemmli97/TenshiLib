@@ -40,7 +40,7 @@ public abstract class EntityDamageCloud extends Entity implements IOwnable<Livin
     }
 
     public EntityDamageCloud(EntityType<? extends EntityDamageCloud> type, World world, LivingEntity shooter) {
-        this(type, world, shooter.getX(), shooter.getY(), shooter.getZ());
+        this(type, world, shooter.getPosX(), shooter.getPosY(), shooter.getPosZ());
         this.shooter = shooter;
         this.dataManager.set(shooterUUID, Optional.of(shooter.getUniqueID()));
         this.setRotation(shooter.rotationYaw, shooter.rotationPitch);

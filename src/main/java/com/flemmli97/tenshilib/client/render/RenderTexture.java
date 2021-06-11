@@ -47,8 +47,8 @@ public abstract class RenderTexture<T extends Entity> extends EntityRenderer<T> 
         float yaw = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks + 180;
         float pitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
         if (this.facePlayer()) {
-            stack.multiply(this.renderManager.getRotation());
-            stack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180));
+            stack.rotate(this.renderManager.getCameraOrientation());
+            stack.rotate(Vector3f.YP.rotationDegrees(180));
             //yaw = -this.renderManager.playerViewY + 180;
             //pitch = (this.renderManager.options.thirdPersonView == 2 ? 1 : -1) * this.renderManager.playerViewX;
         } else {

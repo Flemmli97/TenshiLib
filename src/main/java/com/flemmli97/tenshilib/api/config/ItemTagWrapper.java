@@ -34,8 +34,8 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
 
     @Override
     public Item getItem() {
-        ITag<Item> tags = ItemTags.getCollection().getTagOrEmpty(new ResourceLocation(this.tag));
-        this.list = tags.values();
+        ITag<Item> tags = ItemTags.getCollection().getTagByID(new ResourceLocation(this.tag));
+        this.list = tags.getAllElements();
         if (!this.list.isEmpty())
             this.item = this.list.get(0);
         else

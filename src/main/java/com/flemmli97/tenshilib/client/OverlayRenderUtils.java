@@ -10,6 +10,6 @@ public class OverlayRenderUtils {
         IOverlayEntityRender overlay = (IOverlayEntityRender) entity;
         int oV = (int) (f * 15);
         int oU = (entity.hurtTime > 0 || entity.deathTime > 0) ? 3 : 10;
-        return OverlayTexture.packUv(overlay.overlayU(oV), overlay.overlayV(oU));
+        return OverlayTexture.getPackedUV(overlay.overlayU(oV), overlay.overlayV(oU));
     }
 }

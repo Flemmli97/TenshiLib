@@ -133,7 +133,7 @@ public class SpawnEgg extends Item {
                 return ActionResultType.CONSUME;
             }
 
-            BlockPos blockpos1 = blockstate.getCollisionShape(world, blockpos).isEmpty() ? blockpos : blockpos.offset(direction);
+            BlockPos blockpos1 = blockstate.getCollisionShapeUncached(world, blockpos).isEmpty() ? blockpos : blockpos.offset(direction);
 
             Entity e = spawnEntity((ServerWorld) world, ctx.getPlayer(), stack, blockpos1, SpawnReason.SPAWN_EGG, true, true, !Objects.equals(blockpos, blockpos1) && direction == Direction.UP);
             if (e != null) {
@@ -152,24 +152,24 @@ public class SpawnEgg extends Item {
         ItemStack stack = player.getHeldItem(hand);
         BlockRayTraceResult raytraceresult = rayTrace(world, player, RayTraceContext.FluidMode.SOURCE_ONLY);
         if (raytraceresult.getType() != RayTraceResult.Type.BLOCK) {
-            return ActionResult.pass(stack);
+            return ActionResult.resultPass(stack);
         } else if (!(world instanceof ServerWorld)) {
-            return ActionResult.success(stack);
+            return ActionResult.resultSuccess(stack);
         } else {
             BlockPos blockpos = raytraceresult.getPos();
             if (!(world.getBlockState(blockpos).getBlock() instanceof FlowingFluidBlock)) {
-                return ActionResult.pass(stack);
+                return ActionResult.resultPass(stack);
             } else if (world.isBlockModifiable(player, blockpos) && player.canPlayerEdit(blockpos, raytraceresult.getFace(), stack)) {
                 Entity e = spawnEntity((ServerWorld) world, player, stack, blockpos, SpawnReason.SPAWN_EGG, true, true, false);
                 if (e != null) {
                     if (!player.abilities.isCreativeMode)
                         stack.shrink(1);
                     player.addStat(Stats.ITEM_USED.get(this));
-                    return ActionResult.consume(stack);
+                    return ActionResult.resultConsume(stack);
                 }
-                return ActionResult.pass(stack);
+                return ActionResult.resultPass(stack);
             } else {
-                return ActionResult.fail(stack);
+                return ActionResult.resultFail(stack);
             }
         }
     }
@@ -183,7 +183,7 @@ public class SpawnEgg extends Item {
         if (e != null) {
             if (!item.onEntitySpawned(e, stack, player) || (forgeCheck && e instanceof MobEntity && ForgeEventFactory.doSpecialSpawn((MobEntity) e, world, pos.getX(), pos.getY(), pos.getZ(), null, reason)))
                 return null;
-            world.spawnEntityAndPassengers(e);
+            world.func_242417_l(e);
         }
         return e;
     }
@@ -229,7 +229,7 @@ public class SpawnEgg extends Item {
                     mob.setLocationAndAngles(pos.getX(), pos.getY(), pos.getZ(), 0.0F, 0.0F);
                     if (!this.onEntitySpawned(mob, stack, player))
                         return Optional.empty();
-                    world.spawnEntityAndPassengers(mob);
+                    world.func_242417_l(mob);
                     ITextComponent comp = this.getEntityName(stack);
                     if (comp != null) {
                         mob.setCustomName(comp);

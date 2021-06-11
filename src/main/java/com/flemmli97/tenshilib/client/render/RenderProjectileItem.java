@@ -29,22 +29,22 @@ public abstract class RenderProjectileItem<T extends Entity> extends EntityRende
         stack.translate(0, 0.15, 0);
         switch (this.getRenderType(entity)) {
             case NORMAL:
-                stack.multiply(this.renderManager.getRotation());
-                stack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180.0F));
+                stack.rotate(this.renderManager.getCameraOrientation());
+                stack.rotate(Vector3f.YP.rotationDegrees(180.0F));
                 break;
             case WEAPON:
-                stack.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(90 + MathHelper.lerp(partialTicks, entity.prevRotationYaw, entity.rotationYaw)));
-                stack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(135 - MathHelper.lerp(partialTicks, entity.prevRotationPitch, entity.rotationPitch)));
+                stack.rotate(Vector3f.YP.rotationDegrees(90 + MathHelper.lerp(partialTicks, entity.prevRotationYaw, entity.rotationYaw)));
+                stack.rotate(Vector3f.ZP.rotationDegrees(135 - MathHelper.lerp(partialTicks, entity.prevRotationPitch, entity.rotationPitch)));
                 break;
         }
-        Minecraft.getInstance().getItemRenderer().renderItem(this.getRenderItemStack(entity), ItemCameraTransforms.TransformType.GROUND, packedLight, OverlayTexture.DEFAULT_UV, stack, buffer);
+        Minecraft.getInstance().getItemRenderer().renderItem(this.getRenderItemStack(entity), ItemCameraTransforms.TransformType.GROUND, packedLight, OverlayTexture.NO_OVERLAY, stack, buffer);
         stack.pop();
         super.render(entity, rotation, partialTicks, stack, buffer, packedLight);
     }
 
     @Override
     public ResourceLocation getEntityTexture(T entity) {
-        return PlayerContainer.BLOCK_ATLAS_TEXTURE;
+        return PlayerContainer.LOCATION_BLOCKS_TEXTURE;
     }
 
     public abstract ItemStack getRenderItemStack(T entity);

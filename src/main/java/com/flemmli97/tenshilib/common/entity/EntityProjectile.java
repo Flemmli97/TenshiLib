@@ -63,7 +63,7 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
     }
 
     public EntityProjectile(EntityType<? extends EntityProjectile> type, World world, LivingEntity shooter) {
-        this(type, world, shooter.getX(), shooter.getY() + shooter.getEyeHeight() - 0.1, shooter.getZ());
+        this(type, world, shooter.getPosX(), shooter.getPosY() + shooter.getEyeHeight() - 0.1, shooter.getPosZ());
         this.shooter = shooter;
         this.dataManager.set(shooterUUID, Optional.of(shooter.getUniqueID()));
         this.setRotation(shooter.rotationYaw, shooter.rotationPitch);
@@ -128,7 +128,7 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
      * Shoots directly at the given position
      */
     public void shootAtPosition(double x, double y, double z, float velocity, float inaccuracy) {
-        Vector3d dir = new Vector3d(x - this.getX(), y - this.getY(), z - this.getZ());
+        Vector3d dir = new Vector3d(x - this.getPosX(), y - this.getPosY(), z - this.getPosZ());
         this.shoot(dir.x, dir.y, dir.z, velocity, inaccuracy);
     }
 
@@ -138,7 +138,7 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
      * @param yOffsetModifier Modifies the offset of the y motion based on distance to target. Vanilla arrows use 0.2
      */
     public void shootAtEntity(Entity target, float velocity, float inaccuracy, float yOffsetModifier) {
-        Vector3d dir = (new Vector3d(target.getX() - this.getX(), target.getBodyY(0.33) - this.getY(), target.getZ() - this.getZ()));
+        Vector3d dir = (new Vector3d(target.getPosX() - this.getPosX(), target.getPosYHeight(0.33) - this.getPosY(), target.getPosZ() - this.getPosZ()));
         double l = Math.sqrt(dir.x * dir.x + dir.z * dir.z);
         this.shoot(dir.x, dir.y + l * yOffsetModifier, dir.z, velocity, inaccuracy);
     }
@@ -164,7 +164,7 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
             this.rotationYaw = (float) (MathHelper.atan2(x, z) * (180F / (float) Math.PI));
             this.prevRotationPitch = this.rotationPitch;
             this.prevRotationYaw = this.rotationYaw;
-            this.setLocationAndAngles(this.getX(), this.getY(), this.getZ(), this.rotationYaw, this.rotationPitch);
+            this.setLocationAndAngles(this.getPosX(), this.getPosY(), this.getPosZ(), this.rotationYaw, this.rotationPitch);
         }
     }
 
@@ -194,7 +194,7 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
             this.prevRotationPitch = this.rotationPitch;
         }
 
-        BlockState inState = this.world.getBlockState(this.getBlockPos());
+        BlockState inState = this.world.getBlockState(this.getPosition());
         if (this.inGround) {
             if (inState != this.ground && this.noGround())
                 this.resetInGround();
@@ -209,9 +209,9 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
         if (!this.world.isRemote)
             this.doCollision();
 
-        double newX = this.getX() + motion.x;
-        double newY = this.getY() + motion.y;
-        double newZ = this.getZ() + motion.z;
+        double newX = this.getPosX() + motion.x;
+        double newY = this.getPosY() + motion.y;
+        double newZ = this.getPosZ() + motion.z;
 
         float f = MathHelper.sqrt(horizontalMag(motion));
         this.rotationYaw = this.updateRotation(this.prevRotationYaw, (float) (MathHelper.atan2(motion.x, motion.z) * (180D / Math.PI)));
@@ -220,7 +220,7 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
         float friction;
         if (this.isInWater()) {
             for (int i = 0; i < 4; ++i) {
-                this.world.addParticle(ParticleTypes.BUBBLE, this.getX() * 0.25D, this.getY() * 0.25D, this.getZ() * 0.25D, motion.x, motion.y, motion.z);
+                this.world.addParticle(ParticleTypes.BUBBLE, this.getPosX() * 0.25D, this.getPosY() * 0.25D, this.getPosZ() * 0.25D, motion.x, motion.y, motion.z);
             }
             friction = 0.8F;
         } else {
@@ -254,11 +254,11 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
         if (raytraceresult.getType() == RayTraceResult.Type.BLOCK) {
             BlockPos blockpos = raytraceresult.getPos();
             BlockState blockstate = this.world.getBlockState(blockpos);
-            if (blockstate.isIn(Blocks.NETHER_PORTAL)) {
+            if (blockstate.matchesBlock(Blocks.NETHER_PORTAL)) {
                 this.setPortal(blockpos);
-            } else if (blockstate.isIn(Blocks.END_GATEWAY)) {
+            } else if (blockstate.matchesBlock(Blocks.END_GATEWAY)) {
                 TileEntity tileentity = this.world.getTileEntity(blockpos);
-                if (tileentity instanceof EndGatewayTileEntity && EndGatewayTileEntity.method_30276(this)) {
+                if (tileentity instanceof EndGatewayTileEntity && EndGatewayTileEntity.func_242690_a(this)) {
                     ((EndGatewayTileEntity) tileentity).teleportEntity(this);
                 }
             } else if (!net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, raytraceresult))
@@ -277,7 +277,7 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
     }
 
     private boolean noGround() {
-        return this.inGround && this.world.isSpaceEmpty((new AxisAlignedBB(this.getPositionVec(), this.getPositionVec())).grow(0.06D));
+        return this.inGround && this.world.hasNoCollisions((new AxisAlignedBB(this.getPositionVec(), this.getPositionVec())).grow(0.06D));
     }
 
     private void resetInGround() {
@@ -353,7 +353,7 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
         this.dataManager.get(shooterUUID).ifPresent(uuid -> compound.putUniqueId("Shooter", uuid));
         compound.putInt("LivingTicks", this.livingTicks);
         ListNBT list = new ListNBT();
-        this.attackedEntities.forEach(uuid -> list.add(StringNBT.of(uuid.toString())));
+        this.attackedEntities.forEach(uuid -> list.add(StringNBT.valueOf(uuid.toString())));
         compound.put("AttackedEntities", list);
     }
 

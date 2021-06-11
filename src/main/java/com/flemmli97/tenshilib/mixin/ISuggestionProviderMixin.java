@@ -16,7 +16,7 @@ public abstract class ISuggestionProviderMixin {
 
     @Inject(method = "func_210512_a", at = @At(value = "INVOKE"), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
     static <T> void autocomplete(Iterable<T> registry, String str, Function<T, ResourceLocation> func, Consumer<T> cons, CallbackInfoReturnable<T> info, boolean flag, T t, ResourceLocation resourceLocation) {
-        if (ISuggestionProvider.method_27136(str, resourceLocation.getPath())) {
+        if (ISuggestionProvider.func_237256_a_(str, resourceLocation.getPath())) {
             cons.accept(t);
             info.cancel();
         }

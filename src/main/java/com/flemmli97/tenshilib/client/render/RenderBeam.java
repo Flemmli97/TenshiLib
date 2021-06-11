@@ -57,9 +57,9 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
         float dist = (float) entity.hitVec().distanceTo(entity.startVec());
         float width = this.widthFunc(entity);
         matrixStack.push();
-        matrixStack.multiply(Vector3f.NEGATIVE_Y.getDegreesQuaternion(MathHelper.lerp(partialTicks, entity.prevRotationYaw, entity.rotationYaw) + 90));
-        matrixStack.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(-MathHelper.lerp(partialTicks, entity.prevRotationPitch, entity.rotationPitch)));
-        matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(30));
+        matrixStack.rotate(Vector3f.YN.rotationDegrees(MathHelper.lerp(partialTicks, entity.prevRotationYaw, entity.rotationYaw) + 90));
+        matrixStack.rotate(Vector3f.ZP.rotationDegrees(-MathHelper.lerp(partialTicks, entity.prevRotationPitch, entity.rotationPitch)));
+        matrixStack.rotate(Vector3f.XP.rotationDegrees(30));
         int layer = 3;
         if (entity.getOwner() == Minecraft.getInstance().player) {
             layer = 1;
@@ -71,7 +71,7 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
             IVertexBuilder builder = buffer.getBuffer(this.getRenderLayer(entity, this.startTexture(entity).res));
             matrixStack.push();
             for (int i = 0; i < layer; i++) {
-                matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(60));
+                matrixStack.rotate(Vector3f.XP.rotationDegrees(60));
                 this.renderBeam(matrixStack, builder, width, startLength, 0, this.currentAnimation(entity, BeamPart.START), this.animationFrames(BeamPart.START), packedLight);
             }
             matrixStack.pop();
@@ -83,7 +83,7 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
             length -= endLength;
             matrixStack.push();
             for (int i = 0; i < layer; i++) {
-                matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(60));
+                matrixStack.rotate(Vector3f.XP.rotationDegrees(60));
                 this.renderBeam(matrixStack, builder, width, endLength, startLength + length, this.currentAnimation(entity, BeamPart.END),
                         this.animationFrames(BeamPart.END), packedLight);
             }
@@ -92,7 +92,7 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
         IVertexBuilder builder = buffer.getBuffer(this.getRenderLayer(entity, this.getEntityTexture(entity)));
         float[] segments = this.segmentLength() == 0 ? new float[]{length} : this.split(length);
         for (int i = 0; i < layer; i++) {
-            matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(60));
+            matrixStack.rotate(Vector3f.XP.rotationDegrees(60));
             for (int d = 0; d < segments.length; d++)
                 this.renderBeam(matrixStack, builder, width, segments[d], startLength + d * this.segmentLength(), this.currentAnimation(entity, BeamPart.MIDDLE),
                         this.animationFrames(BeamPart.MIDDLE), packedLight);
@@ -106,8 +106,8 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
     }
 
     protected void renderBeam(MatrixStack stack, IVertexBuilder build, float width, float length, float offset, float vMin, float vMax, int light) {
-        Matrix4f matrix4f = stack.peek().getModel();
-        Matrix3f mat3f = stack.peek().getNormal();
+        Matrix4f matrix4f = stack.getLast().getMatrix();
+        Matrix3f mat3f = stack.getLast().getNormal();
         this.buildVertex(matrix4f, mat3f, build, offset, width, 0, 0, Math.max(0, vMin), 0, 0, 1, light);
         this.buildVertex(matrix4f, mat3f, build, offset + length, width, 0, 1, Math.max(0, vMin), 0, 0, 1, light);
         this.buildVertex(matrix4f, mat3f, build, offset + length, -width, 0, 1, Math.min(1, vMax), 0, 0, 1, light);
@@ -115,8 +115,8 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
     }
 
     protected void buildVertex(Matrix4f matrix4f, Matrix3f matrix3f, IVertexBuilder builder, float x, float y, float z, float u, float v, float nX, float nY, float nZ, int light) {
-        builder.vertex(matrix4f, x, y, z).color(255, 255, 255, 255)
-                .texture(u, v).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(matrix3f, nX, nY, nZ).endVertex();
+        builder.pos(matrix4f, x, y, z).color(255, 255, 255, 255)
+                .tex(u, v).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(matrix3f, nX, nY, nZ).endVertex();
     }
 
     /**

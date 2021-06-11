@@ -89,8 +89,8 @@ public class ModelRendererPlus extends ModelRenderer {
     }
 
     @Override
-    public void rotate(MatrixStack matrixStack) {
-        super.rotate(matrixStack);
+    public void translateRotate(MatrixStack matrixStack) {
+        super.translateRotate(matrixStack);
         if (this.scaleX != 1 || this.scaleY != 1 || this.scaleZ != 1)
             matrixStack.scale(this.scaleX, this.scaleY, this.scaleZ);
     }
