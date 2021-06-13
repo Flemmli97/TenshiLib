@@ -12,7 +12,7 @@ public interface RenderStateAccessors {
         throw new IllegalStateException();
     }
 
-    @Accessor(value = "ITEM_TARGET")
+    @Accessor(value = "ITEM_ENTITY_TARGET")
     static RenderState.TargetState itemTarget() {
         throw new IllegalStateException();
     }
@@ -22,12 +22,12 @@ public interface RenderStateAccessors {
         throw new IllegalStateException();
     }
 
-    @Accessor(value = "ALL_MASK")
+    @Accessor(value = "COLOR_DEPTH_WRITE")
     static RenderState.WriteMaskState allMask() {
         throw new IllegalStateException();
     }
 
-    @Accessor("ALWAYS_DEPTH_TEST")
+    @Accessor("DEPTH_ALWAYS")
     static RenderState.DepthTestState alwaysDepthTest() {
         throw new IllegalStateException();
     }

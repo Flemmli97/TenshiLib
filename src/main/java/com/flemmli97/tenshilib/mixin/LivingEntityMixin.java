@@ -34,7 +34,7 @@ public class LivingEntityMixin implements ILastHand {
         }
     }
 
-    @Inject(method = "swingHand", at = @At(value = "HEAD"), cancellable = true) //mcp: swing
+    @Inject(method = "swing", at = @At(value = "HEAD"), cancellable = true) //mcp: swing
     private void swingHook(Hand hand, boolean updateSelf, CallbackInfo info) {
         if (((LivingEntity) (Object) this).getHeldItemMainhand().getItem() instanceof IDualWeapon) {
             if (hand == this.prevSwungHand) {
