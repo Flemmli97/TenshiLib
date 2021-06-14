@@ -51,7 +51,7 @@ public class RayTraceUtils {
         CircleSector circ = new CircleSector(pos, look, reach, aoe, entity);
         return entity.world.getEntitiesInAABBexcluding(entity, entity.getBoundingBox().grow(reach + 1),
                 t -> t != entity && (pred == null || pred.test(t)) && !t.isOnSameTeam(entity) && t.canBeCollidedWith()
-                        && circ.intersects(t.world, t.getBoundingBox().grow(0, t.getHeight() <= 0.3 ? t.getHeight() : 0, 0)));
+                        && circ.intersects(t.world, t.getBoundingBox().grow(0.15, t.getHeight() <= 0.3 ? t.getHeight() : 0.15, 0.15)));
     }
 
     public static EntityRayTraceResult calculateEntityFromLook(LivingEntity entity, float reach) {

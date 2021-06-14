@@ -11,4 +11,8 @@ public interface IAOEWeapon {
      * @return FOV of the weapons aoe area in degree. E.g. getFOV()==10 would mean all entities at the crosshair position +- 10 degrees left and right. Max 180
      */
     float getFOV();
+
+    default boolean doSweepingAttack() {
+        return true;
+    }
 }

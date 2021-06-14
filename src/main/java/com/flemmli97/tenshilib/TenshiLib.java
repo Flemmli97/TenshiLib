@@ -1,6 +1,7 @@
 package com.flemmli97.tenshilib;
 
 import com.flemmli97.tenshilib.client.events.handler.ClientEvents;
+import com.flemmli97.tenshilib.common.events.CommonEvents;
 import com.flemmli97.tenshilib.common.item.SpawnEgg;
 import com.flemmli97.tenshilib.common.network.PacketHandler;
 import net.minecraft.block.DispenserBlock;
@@ -26,6 +27,7 @@ public class TenshiLib {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         IEventBus forgeBus = MinecraftForge.EVENT_BUS;
         modBus.addListener(this::preInit);
+        forgeBus.addListener(CommonEvents::leftClickBlock);
         modBus.addListener(ClientEvents::itemColors);
         forgeBus.addListener(ClientEvents::clickSpecial);
     }

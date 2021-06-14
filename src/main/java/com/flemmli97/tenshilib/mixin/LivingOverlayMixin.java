@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(LivingRenderer.class)
 public abstract class LivingOverlayMixin {
 
-    @Inject(method = "getOverlayProgress", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "getPackedOverlay", at = @At(value = "HEAD"), cancellable = true)
     private static void overlay(LivingEntity entity, float f, CallbackInfoReturnable<Integer> info) {
         if (entity instanceof IOverlayEntityRender) {
             info.setReturnValue(OverlayRenderUtils.getColor(entity, f));
