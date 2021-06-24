@@ -68,6 +68,14 @@ public class MathUtils {
         return new double[]{x, y, z};
     }
 
+    public static float[] rotate(float axisX, float axisY, float axisZ, float vecX, float vecY, float vecZ, float angle) {
+        float rot = axisX * vecX + axisY * vecY + axisZ * vecZ;
+        float x = axisX * rot * (1 - MathHelper.cos(angle)) + vecX * MathHelper.cos(angle) + (-axisZ * vecY + axisY * vecZ) * MathHelper.sin(angle);
+        float y = axisY * rot * (1 - MathHelper.cos(angle)) + vecY * MathHelper.cos(angle) + (axisZ * vecX - axisX * vecZ) * MathHelper.sin(angle);
+        float z = axisZ * rot * (1 - MathHelper.cos(angle)) + vecZ * MathHelper.cos(angle) + (-axisY * vecX + axisX * vecY) * MathHelper.sin(angle);
+        return new float[]{x, y, z};
+    }
+
     public static Vector3d closestPointToLine(Vector3d point, Vector3d from, Vector3d dir) {
         if (dir.equals(Vector3d.ZERO))
             return from;

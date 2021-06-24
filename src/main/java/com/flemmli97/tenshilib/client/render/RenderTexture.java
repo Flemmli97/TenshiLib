@@ -12,12 +12,10 @@ import net.minecraft.util.math.vector.Vector3f;
 public abstract class RenderTexture<T extends Entity> extends EntityRenderer<T> {
 
     public final float xSize, ySize;
-    private int red = 255;
-    private int green = 255;
-    private int blue = 255;
-    private int alpha = 255;
     public final int rows, columns, length;
     public final float uLength, vLength;
+
+    protected final RenderUtils.TextureBuilder textureBuilder = new RenderUtils.TextureBuilder();
 
     public RenderTexture(EntityRendererManager renderManager, float xSize, float ySize, int rows, int columns) {
         super(renderManager);
@@ -28,17 +26,15 @@ public abstract class RenderTexture<T extends Entity> extends EntityRenderer<T> 
         this.length = rows * columns;
         this.uLength = 1F / columns;
         this.vLength = 1F / rows;
+        this.textureBuilder.setUVLength(this.uLength, this.vLength);
     }
 
     public void setColor(int hexColor) {
-        this.setColor(hexColor >> 16 & 255, hexColor >> 8 & 255, hexColor & 255, hexColor >> 24 & 255);
+        this.textureBuilder.setColor(hexColor);
     }
 
     public void setColor(int red, int green, int blue, int alpha) {
-        this.red = red;
-        this.blue = blue;
-        this.green = green;
-        this.alpha = alpha;
+        this.textureBuilder.setColor(red, green, blue, alpha);
     }
 
     @Override
@@ -55,8 +51,9 @@ public abstract class RenderTexture<T extends Entity> extends EntityRenderer<T> 
             RenderUtils.applyYawPitch(stack, yaw + this.yawOffset(), pitch + this.pitchOffset());
         }
         float[] uvOffset = this.uvOffset(entity.ticksExisted);
-        RenderUtils.renderTexture(stack, buffer.getBuffer(this.getRenderType(entity, this.getEntityTexture(entity))), this.xSize, this.ySize, this.red, this.blue,
-                this.green, this.alpha, uvOffset[0], uvOffset[1], this.uLength, this.vLength, packedLight);
+        this.textureBuilder.setUV(uvOffset[0], uvOffset[1]);
+        this.textureBuilder.setLight(packedLight);
+        RenderUtils.renderTexture(stack, buffer.getBuffer(this.getRenderType(entity, this.getEntityTexture(entity))), this.xSize, this.ySize, this.textureBuilder);
         super.render(entity, rotation, partialTicks, stack, buffer, packedLight);
         //}
     }

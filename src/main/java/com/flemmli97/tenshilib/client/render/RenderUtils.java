@@ -92,34 +92,66 @@ public class RenderUtils {
         stack.rotate(Vector3f.XP.rotationDegrees(pitch));
     }
 
-    public static void renderTexture(MatrixStack matrixStack, IVertexBuilder builder, float xSize, float ySize, int light) {
-        renderTexture(matrixStack, builder, xSize, ySize, 255, 255, 255, 255, 0, 0, 1, 1, light);
-    }
-
-    public static void renderTexture(MatrixStack matrixStack, IVertexBuilder buffer, float xSize, float ySize, float red, float green, float blue, float alpha, int light) {
-        renderTexture(matrixStack, buffer, xSize, ySize, (int) (red * 255), (int) (green * 255), (int) (blue * 255), (int) (alpha * 255), light);
-    }
-
-    public static void renderTexture(MatrixStack matrixStack, IVertexBuilder builder, float xSize, float ySize, int red, int green, int blue, int alpha, int light) {
-        renderTexture(matrixStack, builder, xSize, ySize, red, green, blue, alpha, 0, 0, 1, 1, light);
-    }
-
-    public static void renderTexture(MatrixStack stack, IVertexBuilder builder, float xSize, float ySize, int red, int green, int blue, int alpha, float u, float v, float uLength, float vLength, int light) {
+    /**
+     * Renders a texture
+     * @param stack
+     * @param builder
+     * @param xSize
+     * @param ySize
+     * @param textureBuilder Structure containing rendering info like color etc. mutable. Cache an instance of it.
+     */
+    public static void renderTexture(MatrixStack stack, IVertexBuilder builder, float xSize, float ySize, TextureBuilder textureBuilder) {
         xSize = xSize / 2f;
         ySize = ySize / 2f;
         Matrix4f matrix4f = stack.getLast().getMatrix();
         Matrix3f mat3f = stack.getLast().getNormal();
-        builder.pos(matrix4f, -xSize, ySize, 0).color(red, green, blue, alpha).tex(u, v).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(mat3f, 0, 0, 1).endVertex();
-        builder.pos(matrix4f, xSize, ySize, 0).color(red, green, blue, alpha).tex(u + uLength, v).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(mat3f, 0, 0, 1).endVertex();
-        builder.pos(matrix4f, xSize, -ySize, 0).color(red, green, blue, alpha).tex(u + uLength, v + vLength).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(mat3f, 0, 0, 1).endVertex();
-        builder.pos(matrix4f, -xSize, -ySize, 0).color(red, green, blue, alpha).tex(u, v + vLength).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(mat3f, 0, 0, 1).endVertex();
+        builder.pos(matrix4f, -xSize, ySize, 0).color(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).tex(textureBuilder.u, textureBuilder.v).overlay(textureBuilder.overlay).lightmap(textureBuilder.light).normal(mat3f, 0, 0, 1).endVertex();
+        builder.pos(matrix4f, xSize, ySize, 0).color(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).tex(textureBuilder.u + textureBuilder.uLength, textureBuilder.v).overlay(textureBuilder.overlay).lightmap(textureBuilder.light).normal(mat3f, 0, 0, 1).endVertex();
+        builder.pos(matrix4f, xSize, -ySize, 0).color(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).tex(textureBuilder.u + textureBuilder.uLength, textureBuilder.v + textureBuilder.vLength).overlay(textureBuilder.overlay).lightmap(textureBuilder.light).normal(mat3f, 0, 0, 1).endVertex();
+        builder.pos(matrix4f, -xSize, -ySize, 0).color(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).tex(textureBuilder.u, textureBuilder.v + textureBuilder.vLength).overlay(textureBuilder.overlay).lightmap(textureBuilder.light).normal(mat3f, 0, 0, 1).endVertex();
     }
 
-    public static void renderTexture(MatrixStack matrixStack, IVertexBuilder builder, float xSize, float ySize, int hexColor, int light) {
-        int red = hexColor >> 16 & 255;
-        int green = hexColor >> 8 & 255;
-        int blue = hexColor & 255;
-        int alpha = hexColor >> 24 & 255;
-        renderTexture(matrixStack, builder, xSize, ySize, red, green, blue, alpha, light);
+    public static class TextureBuilder {
+
+        private int red = 255, green = 255, blue = 255, alpha = 255;
+        private float u, v, uLength = 1, vLength = 1;
+        private int light = 0xf000f0, overlay = OverlayTexture.NO_OVERLAY;
+
+        public void setUV(float u, float v) {
+            this.u = u;
+            this.v = v;
+        }
+
+        public void setUVLength(float uLength, float vLength) {
+            this.uLength = uLength;
+            this.vLength = vLength;
+        }
+
+        public void setColor(int hexColor) {
+            int red = hexColor >> 16 & 255;
+            int green = hexColor >> 8 & 255;
+            int blue = hexColor & 255;
+            int alpha = hexColor >> 24 & 255;
+            this.setColor(red, green, blue, alpha);
+        }
+
+        public void setColor(int red, int green, int blue, int alpha) {
+            this.red = red;
+            this.green = green;
+            this.blue = blue;
+            this.alpha = alpha;
+        }
+
+        public void setColor(float red, float green, float blue, float alpha) {
+            this.setColor((int) red * 255, (int) green * 255, (int) blue * 255, (int) alpha * 255);
+        }
+
+        public void setOverlay(int overlay) {
+            this.overlay = overlay;
+        }
+
+        public void setLight(int light) {
+            this.light = light;
+        }
     }
 }
