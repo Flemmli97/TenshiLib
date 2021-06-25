@@ -20,10 +20,14 @@ import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import java.util.Random;
+
 @OnlyIn(Dist.CLIENT)
 public class RenderUtils {
 
     public static final int defaultColor = 0xFFFFFFFF;
+    private static final float triangleMult = (float) (Math.sqrt(3.0D) / 2.0D);
+    private static final Random random = new Random(432L);
 
     public static void renderBlockOutline(MatrixStack matrixStack, IRenderTypeBuffer buffer, PlayerEntity player, BlockPos pos, float partialTicks, boolean drawImmediately) {
         renderBlockOutline(matrixStack, buffer, player, pos, partialTicks, 0, 0, 0, 1, false, drawImmediately);
@@ -94,6 +98,7 @@ public class RenderUtils {
 
     /**
      * Renders a texture
+     *
      * @param stack
      * @param builder
      * @param xSize
@@ -109,6 +114,94 @@ public class RenderUtils {
         builder.pos(matrix4f, xSize, ySize, 0).color(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).tex(textureBuilder.u + textureBuilder.uLength, textureBuilder.v).overlay(textureBuilder.overlay).lightmap(textureBuilder.light).normal(mat3f, 0, 0, 1).endVertex();
         builder.pos(matrix4f, xSize, -ySize, 0).color(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).tex(textureBuilder.u + textureBuilder.uLength, textureBuilder.v + textureBuilder.vLength).overlay(textureBuilder.overlay).lightmap(textureBuilder.light).normal(mat3f, 0, 0, 1).endVertex();
         builder.pos(matrix4f, -xSize, -ySize, 0).color(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).tex(textureBuilder.u, textureBuilder.v + textureBuilder.vLength).overlay(textureBuilder.overlay).lightmap(textureBuilder.light).normal(mat3f, 0, 0, 1).endVertex();
+    }
+
+    public static void renderGradientBeams3d(MatrixStack stack, IRenderTypeBuffer renderTypeBuffer, float length, float width, int ticks, float partialTicks, int amount, int endRed, int endGreen, int endBlue, int endAlpha) {
+        stack.push();
+        random.setSeed(432L);
+        for (int i = 0; i < amount; i++) {
+            stack.rotate(Vector3f.XP.rotationDegrees(random.nextFloat() * 360.0F + partialTicks));
+            stack.rotate(Vector3f.YP.rotationDegrees(random.nextFloat() * 360.0F + partialTicks));
+            stack.rotate(Vector3f.ZP.rotationDegrees(random.nextFloat() * 360.0F + partialTicks));
+            float ticker = (ticks + partialTicks) / 200;
+            int alpha = (int) (255.0F * (1.0F - ticker));
+            renderGradientBeam3d(stack, renderTypeBuffer, length, width, 255, 255, 255, alpha, endRed, endGreen, endBlue, endAlpha);
+        }
+        stack.pop();
+    }
+
+    public static void renderGradientBeam3d(MatrixStack stack, IRenderTypeBuffer renderTypeBuffer, float length, float width, int endRed, int endGreen, int endBlue, int endAlpha) {
+        renderGradientBeam3d(stack, renderTypeBuffer, length, width, 255, 255, 255, 255, endRed, endGreen, endBlue, endAlpha);
+    }
+
+    public static void renderGradientBeam3d(MatrixStack stack, IRenderTypeBuffer renderTypeBuffer, float length, float width, int alpha, int endRed, int endGreen, int endBlue, int endAlpha) {
+        renderGradientBeam3d(stack, renderTypeBuffer, length, width, 255, 255, 255, alpha, endRed, endGreen, endBlue, endAlpha);
+    }
+
+    /**
+     * Renders a gradient triangular cone shaped beam similar to the beams displayed during the enderdragons death
+     */
+    public static void renderGradientBeam3d(MatrixStack stack, IRenderTypeBuffer renderTypeBuffer, float length, float width,
+                                            int red, int green, int blue, int alpha, int endRed, int endGreen, int endBlue, int endAlpha) {
+        float heightHalf = triangleMult * width * 0.5f;
+        float widthHalf = width * 0.5f;
+        Matrix4f matrix4f = stack.getLast().getMatrix();
+        IVertexBuilder buffer = renderTypeBuffer.getBuffer(RenderType.getLightning());
+        buffer.pos(matrix4f, 0, 0, 0).color(red, green, blue, alpha).endVertex();
+        buffer.pos(matrix4f, 0, 0, 0).color(red, green, blue, alpha).endVertex();
+        buffer.pos(matrix4f, -widthHalf, length, -heightHalf).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+        buffer.pos(matrix4f, widthHalf, length, -heightHalf).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+
+        buffer.pos(matrix4f, 0, 0, 0).color(red, green, blue, alpha).endVertex();
+        buffer.pos(matrix4f, 0, 0, 0).color(red, green, blue, alpha).endVertex();
+        buffer.pos(matrix4f, widthHalf, length, -heightHalf).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+        buffer.pos(matrix4f, 0, length, heightHalf).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+
+        buffer.pos(matrix4f, 0, 0, 0).color(red, green, blue, alpha).endVertex();
+        buffer.pos(matrix4f, 0, 0, 0).color(red, green, blue, alpha).endVertex();
+        buffer.pos(matrix4f, 0, length, heightHalf).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+        buffer.pos(matrix4f, -widthHalf, length, -heightHalf).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+    }
+
+    public static void renderGradientBeams(MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, float length, float width, int ticks, float partialTicks, int amount, int endRed, int endGreen, int endBlue, int endAlpha) {
+        matrixStack.push();
+        random.setSeed(432L);
+        for (int i = 0; i < amount; i++) {
+            matrixStack.rotate(Vector3f.XP.rotationDegrees(random.nextFloat() * 360.0F + partialTicks));
+            matrixStack.rotate(Vector3f.YP.rotationDegrees(random.nextFloat() * 360.0F + partialTicks));
+            matrixStack.rotate(Vector3f.ZP.rotationDegrees(random.nextFloat() * 360.0F + partialTicks));
+            float ticker = (ticks + partialTicks) / 200;
+            int alpha = (int) (255.0F * (1.0F - ticker));
+            renderGradientBeam(matrixStack, renderTypeBuffer, length, width, 255, 255, 255, alpha, endRed, endGreen, endBlue, endAlpha);
+        }
+        matrixStack.pop();
+    }
+
+    public static void renderGradientBeam(MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, float length, float width, int endRed, int endGreen, int endBlue, int endAlpha) {
+        renderGradientBeam(matrixStack, renderTypeBuffer, length, width, 255, 255, 255, 255, endRed, endGreen, endBlue, endAlpha);
+    }
+
+    public static void renderGradientBeam(MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, float length, float width, int alpha, int endRed, int endGreen, int endBlue, int endAlpha) {
+        renderGradientBeam(matrixStack, renderTypeBuffer, length, width, 255, 255, 255, alpha, endRed, endGreen, endBlue, endAlpha);
+    }
+
+    /**
+     * Like {@link RenderUtils#renderGradientBeam3d} but 2d instead of cone shaped
+     */
+    public static void renderGradientBeam(MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, float length, float width,
+                                          int red, int green, int blue, int alpha, int endRed, int endGreen, int endBlue, int endAlpha) {
+        float widthHalf = width * 0.5f;
+        Matrix4f matrix4f = matrixStack.getLast().getMatrix();
+        IVertexBuilder buffer = renderTypeBuffer.getBuffer(RenderType.getLightning());
+        buffer.pos(matrix4f, 0, 0, 0).color(red, green, blue, alpha).endVertex();
+        buffer.pos(matrix4f, 0, 0, 0).color(red, green, blue, alpha).endVertex();
+        buffer.pos(matrix4f, -widthHalf, length, 0).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+        buffer.pos(matrix4f, widthHalf, length, 0).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+
+        buffer.pos(matrix4f, 0, 0, 0).color(red, green, blue, alpha).endVertex();
+        buffer.pos(matrix4f, 0, 0, 0).color(red, green, blue, alpha).endVertex();
+        buffer.pos(matrix4f, widthHalf, length, 0).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+        buffer.pos(matrix4f, -widthHalf, length, 0).color(endRed, endGreen, endBlue, endAlpha).endVertex();
     }
 
     public static class TextureBuilder {
