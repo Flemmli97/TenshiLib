@@ -99,7 +99,7 @@ public class BlockBenchAnimations {
 
         @Override
         public String toString() {
-            return String.format("\nloop: %b, length: %d, components: %s", this.loop, this.length, this.components.toString());
+            return String.format("\nloop: %b, length: %d, components: %s", this.loop, this.length, this.components);
         }
     }
 

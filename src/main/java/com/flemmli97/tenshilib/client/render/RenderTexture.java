@@ -39,14 +39,11 @@ public abstract class RenderTexture<T extends Entity> extends EntityRenderer<T> 
 
     @Override
     public void render(T entity, float rotation, float partialTicks, MatrixStack stack, IRenderTypeBuffer buffer, int packedLight) {
-        //if(!this.){
         float yaw = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks + 180;
         float pitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
         if (this.facePlayer()) {
             stack.rotate(this.renderManager.getCameraOrientation());
             stack.rotate(Vector3f.YP.rotationDegrees(180));
-            //yaw = -this.renderManager.playerViewY + 180;
-            //pitch = (this.renderManager.options.thirdPersonView == 2 ? 1 : -1) * this.renderManager.playerViewX;
         } else {
             RenderUtils.applyYawPitch(stack, yaw + this.yawOffset(), pitch + this.pitchOffset());
         }
@@ -55,7 +52,6 @@ public abstract class RenderTexture<T extends Entity> extends EntityRenderer<T> 
         this.textureBuilder.setLight(packedLight);
         RenderUtils.renderTexture(stack, buffer.getBuffer(this.getRenderType(entity, this.getEntityTexture(entity))), this.xSize, this.ySize, this.textureBuilder);
         super.render(entity, rotation, partialTicks, stack, buffer, packedLight);
-        //}
     }
 
     protected RenderType getRenderType(T entity, ResourceLocation loc) {

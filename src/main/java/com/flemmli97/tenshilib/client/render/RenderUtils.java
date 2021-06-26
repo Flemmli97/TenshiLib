@@ -98,12 +98,7 @@ public class RenderUtils {
 
     /**
      * Renders a texture
-     *
-     * @param stack
-     * @param builder
-     * @param xSize
-     * @param ySize
-     * @param textureBuilder Structure containing rendering info like color etc. mutable. Cache an instance of it.
+     * @param textureBuilder Structure containing rendering info like color etc. Is mutable so cache an instance of it.
      */
     public static void renderTexture(MatrixStack stack, IVertexBuilder builder, float xSize, float ySize, TextureBuilder textureBuilder) {
         xSize = xSize / 2f;
@@ -116,92 +111,74 @@ public class RenderUtils {
         builder.pos(matrix4f, -xSize, -ySize, 0).color(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).tex(textureBuilder.u, textureBuilder.v + textureBuilder.vLength).overlay(textureBuilder.overlay).lightmap(textureBuilder.light).normal(mat3f, 0, 0, 1).endVertex();
     }
 
-    public static void renderGradientBeams3d(MatrixStack stack, IRenderTypeBuffer renderTypeBuffer, float length, float width, int ticks, float partialTicks, int amount, int endRed, int endGreen, int endBlue, int endAlpha) {
+    public static void renderGradientBeams3d(MatrixStack stack, IRenderTypeBuffer renderTypeBuffer, float length, float width, int ticks, float partialTicks, float rotationPerTick, int amount, BeamBuilder builder) {
         stack.push();
         random.setSeed(432L);
         for (int i = 0; i < amount; i++) {
-            stack.rotate(Vector3f.XP.rotationDegrees(random.nextFloat() * 360.0F + partialTicks));
-            stack.rotate(Vector3f.YP.rotationDegrees(random.nextFloat() * 360.0F + partialTicks));
-            stack.rotate(Vector3f.ZP.rotationDegrees(random.nextFloat() * 360.0F + partialTicks));
-            float ticker = (ticks + partialTicks) / 200;
-            int alpha = (int) (255.0F * (1.0F - ticker));
-            renderGradientBeam3d(stack, renderTypeBuffer, length, width, 255, 255, 255, alpha, endRed, endGreen, endBlue, endAlpha);
+            float ticker = ticks + partialTicks;
+            stack.rotate(Vector3f.XP.rotationDegrees(random.nextFloat() * 360.0F));
+            stack.rotate(Vector3f.YP.rotationDegrees(random.nextFloat() * 360.0F));
+            stack.rotate(Vector3f.ZP.rotationDegrees(random.nextFloat() * 360.0F + ticker * rotationPerTick));
+            renderGradientBeam3d(stack, renderTypeBuffer, length, width, builder);
         }
         stack.pop();
     }
 
-    public static void renderGradientBeam3d(MatrixStack stack, IRenderTypeBuffer renderTypeBuffer, float length, float width, int endRed, int endGreen, int endBlue, int endAlpha) {
-        renderGradientBeam3d(stack, renderTypeBuffer, length, width, 255, 255, 255, 255, endRed, endGreen, endBlue, endAlpha);
-    }
-
-    public static void renderGradientBeam3d(MatrixStack stack, IRenderTypeBuffer renderTypeBuffer, float length, float width, int alpha, int endRed, int endGreen, int endBlue, int endAlpha) {
-        renderGradientBeam3d(stack, renderTypeBuffer, length, width, 255, 255, 255, alpha, endRed, endGreen, endBlue, endAlpha);
-    }
-
     /**
      * Renders a gradient triangular cone shaped beam similar to the beams displayed during the enderdragons death
+     * @param builder Structure containing rendering info like color etc. Is mutable so cache an instance of it.
      */
-    public static void renderGradientBeam3d(MatrixStack stack, IRenderTypeBuffer renderTypeBuffer, float length, float width,
-                                            int red, int green, int blue, int alpha, int endRed, int endGreen, int endBlue, int endAlpha) {
+    public static void renderGradientBeam3d(MatrixStack stack, IRenderTypeBuffer renderTypeBuffer, float length, float width, BeamBuilder builder) {
         float heightHalf = triangleMult * width * 0.5f;
         float widthHalf = width * 0.5f;
         Matrix4f matrix4f = stack.getLast().getMatrix();
-        IVertexBuilder buffer = renderTypeBuffer.getBuffer(RenderType.getLightning());
-        buffer.pos(matrix4f, 0, 0, 0).color(red, green, blue, alpha).endVertex();
-        buffer.pos(matrix4f, 0, 0, 0).color(red, green, blue, alpha).endVertex();
-        buffer.pos(matrix4f, -widthHalf, length, -heightHalf).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-        buffer.pos(matrix4f, widthHalf, length, -heightHalf).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+        IVertexBuilder buffer = renderTypeBuffer.getBuffer(builder.renderType);
+        buffer.pos(matrix4f, 0, 0, 0).color(builder.red, builder.green, builder.blue, builder.alpha).endVertex();
+        buffer.pos(matrix4f, 0, 0, 0).color(builder.red, builder.green, builder.blue, builder.alpha).endVertex();
+        buffer.pos(matrix4f, -widthHalf, length, -heightHalf).color(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha).endVertex();
+        buffer.pos(matrix4f, widthHalf, length, -heightHalf).color(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha).endVertex();
 
-        buffer.pos(matrix4f, 0, 0, 0).color(red, green, blue, alpha).endVertex();
-        buffer.pos(matrix4f, 0, 0, 0).color(red, green, blue, alpha).endVertex();
-        buffer.pos(matrix4f, widthHalf, length, -heightHalf).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-        buffer.pos(matrix4f, 0, length, heightHalf).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+        buffer.pos(matrix4f, 0, 0, 0).color(builder.red, builder.green, builder.blue, builder.alpha).endVertex();
+        buffer.pos(matrix4f, 0, 0, 0).color(builder.red, builder.green, builder.blue, builder.alpha).endVertex();
+        buffer.pos(matrix4f, widthHalf, length, -heightHalf).color(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha).endVertex();
+        buffer.pos(matrix4f, 0, length, heightHalf).color(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha).endVertex();
 
-        buffer.pos(matrix4f, 0, 0, 0).color(red, green, blue, alpha).endVertex();
-        buffer.pos(matrix4f, 0, 0, 0).color(red, green, blue, alpha).endVertex();
-        buffer.pos(matrix4f, 0, length, heightHalf).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-        buffer.pos(matrix4f, -widthHalf, length, -heightHalf).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+        buffer.pos(matrix4f, 0, 0, 0).color(builder.red, builder.green, builder.blue, builder.alpha).endVertex();
+        buffer.pos(matrix4f, 0, 0, 0).color(builder.red, builder.green, builder.blue, builder.alpha).endVertex();
+        buffer.pos(matrix4f, 0, length, heightHalf).color(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha).endVertex();
+        buffer.pos(matrix4f, -widthHalf, length, -heightHalf).color(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha).endVertex();
     }
 
-    public static void renderGradientBeams(MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, float length, float width, int ticks, float partialTicks, int amount, int endRed, int endGreen, int endBlue, int endAlpha) {
+    public static void renderGradientBeams(MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, float length, float width, int ticks, float partialTicks, float rotationPerTick, int amount, BeamBuilder builder) {
         matrixStack.push();
         random.setSeed(432L);
         for (int i = 0; i < amount; i++) {
-            matrixStack.rotate(Vector3f.XP.rotationDegrees(random.nextFloat() * 360.0F + partialTicks));
-            matrixStack.rotate(Vector3f.YP.rotationDegrees(random.nextFloat() * 360.0F + partialTicks));
-            matrixStack.rotate(Vector3f.ZP.rotationDegrees(random.nextFloat() * 360.0F + partialTicks));
-            float ticker = (ticks + partialTicks) / 200;
-            int alpha = (int) (255.0F * (1.0F - ticker));
-            renderGradientBeam(matrixStack, renderTypeBuffer, length, width, 255, 255, 255, alpha, endRed, endGreen, endBlue, endAlpha);
+            float ticker = ticks + partialTicks;
+            matrixStack.rotate(Vector3f.XP.rotationDegrees(random.nextFloat() * 360.0F));
+            matrixStack.rotate(Vector3f.YP.rotationDegrees(random.nextFloat() * 360.0F));
+            matrixStack.rotate(Vector3f.ZP.rotationDegrees(random.nextFloat() * 360.0F + ticker * rotationPerTick));
+            renderGradientBeam(matrixStack, renderTypeBuffer, length, width, builder);
         }
         matrixStack.pop();
     }
 
-    public static void renderGradientBeam(MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, float length, float width, int endRed, int endGreen, int endBlue, int endAlpha) {
-        renderGradientBeam(matrixStack, renderTypeBuffer, length, width, 255, 255, 255, 255, endRed, endGreen, endBlue, endAlpha);
-    }
-
-    public static void renderGradientBeam(MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, float length, float width, int alpha, int endRed, int endGreen, int endBlue, int endAlpha) {
-        renderGradientBeam(matrixStack, renderTypeBuffer, length, width, 255, 255, 255, alpha, endRed, endGreen, endBlue, endAlpha);
-    }
-
     /**
      * Like {@link RenderUtils#renderGradientBeam3d} but 2d instead of cone shaped
+     * @param builder Structure containing rendering info like color etc. Is mutable so cache an instance of it.
      */
-    public static void renderGradientBeam(MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, float length, float width,
-                                          int red, int green, int blue, int alpha, int endRed, int endGreen, int endBlue, int endAlpha) {
+    public static void renderGradientBeam(MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, float length, float width, BeamBuilder builder) {
         float widthHalf = width * 0.5f;
         Matrix4f matrix4f = matrixStack.getLast().getMatrix();
-        IVertexBuilder buffer = renderTypeBuffer.getBuffer(RenderType.getLightning());
-        buffer.pos(matrix4f, 0, 0, 0).color(red, green, blue, alpha).endVertex();
-        buffer.pos(matrix4f, 0, 0, 0).color(red, green, blue, alpha).endVertex();
-        buffer.pos(matrix4f, -widthHalf, length, 0).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-        buffer.pos(matrix4f, widthHalf, length, 0).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+        IVertexBuilder buffer = renderTypeBuffer.getBuffer(builder.renderType);
+        buffer.pos(matrix4f, 0, 0, 0).color(builder.red, builder.green, builder.blue, builder.alpha).endVertex();
+        buffer.pos(matrix4f, 0, 0, 0).color(builder.red, builder.green, builder.blue, builder.alpha).endVertex();
+        buffer.pos(matrix4f, -widthHalf, length, 0).color(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha).endVertex();
+        buffer.pos(matrix4f, widthHalf, length, 0).color(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha).endVertex();
 
-        buffer.pos(matrix4f, 0, 0, 0).color(red, green, blue, alpha).endVertex();
-        buffer.pos(matrix4f, 0, 0, 0).color(red, green, blue, alpha).endVertex();
-        buffer.pos(matrix4f, widthHalf, length, 0).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-        buffer.pos(matrix4f, -widthHalf, length, 0).color(endRed, endGreen, endBlue, endAlpha).endVertex();
+        buffer.pos(matrix4f, 0, 0, 0).color(builder.red, builder.green, builder.blue, builder.alpha).endVertex();
+        buffer.pos(matrix4f, 0, 0, 0).color(builder.red, builder.green, builder.blue, builder.alpha).endVertex();
+        buffer.pos(matrix4f, widthHalf, length, 0).color(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha).endVertex();
+        buffer.pos(matrix4f, -widthHalf, length, 0).color(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha).endVertex();
     }
 
     public static class TextureBuilder {
@@ -245,6 +222,47 @@ public class RenderUtils {
 
         public void setLight(int light) {
             this.light = light;
+        }
+    }
+
+    public static class BeamBuilder {
+
+        private int red = 255, green = 255, blue = 255, alpha = 255;
+        private int endRed = 255, endGreen = 0, endBlue = 255, endAlpha = 0;
+        private RenderType renderType = RenderType.getLightning();
+
+        public void setStartColor(int hexColor) {
+            int red = hexColor >> 16 & 255;
+            int green = hexColor >> 8 & 255;
+            int blue = hexColor & 255;
+            int alpha = hexColor >> 24 & 255;
+            this.setStartColor(red, green, blue, alpha);
+        }
+
+        public void setStartColor(int red, int green, int blue, int alpha) {
+            this.red = red;
+            this.green = green;
+            this.blue = blue;
+            this.alpha = alpha;
+        }
+
+        public void setEndColor(int hexColor) {
+            int red = hexColor >> 16 & 255;
+            int green = hexColor >> 8 & 255;
+            int blue = hexColor & 255;
+            int alpha = hexColor >> 24 & 255;
+            this.setEndColor(red, green, blue, alpha);
+        }
+
+        public void setEndColor(int red, int green, int blue, int alpha) {
+            this.endRed = red;
+            this.endGreen = green;
+            this.endBlue = blue;
+            this.endAlpha = alpha;
+        }
+
+        public void setRenderType(RenderType renderType) {
+            this.renderType = renderType;
         }
     }
 }

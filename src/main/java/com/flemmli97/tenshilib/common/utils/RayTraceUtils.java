@@ -150,7 +150,7 @@ public class RayTraceUtils {
         Entity entity = null;
         Vector3d hit = null;
         for (Entity entity1 : world.getEntitiesInAABBexcluding(e, aabb, pred)) {
-            AxisAlignedBB axisalignedbb = entity1.getBoundingBox().grow((double) 0.3F);
+            AxisAlignedBB axisalignedbb = entity1.getBoundingBox().grow(0.3F);
             Optional<Vector3d> optional = axisalignedbb.rayTrace(from, to);
             if (optional.isPresent()) {
                 double d1 = from.squareDistanceTo(optional.get());

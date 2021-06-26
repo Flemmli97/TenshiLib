@@ -91,9 +91,4 @@ public class ItemUtils {
         return stack.getCount() <= 0;
     }
 
-    /*public static boolean areItemsStackable(ItemStack stack1, ItemStack stack2) {
-        return (stack1.isEmpty() && stack2.isEmpty()) || (!stack1.isEmpty() && !stack2.isEmpty() && stack1.getItem() == stack2.getItem()
-                && stack1.getMetadata() == stack2.getMetadata() && ((!stack1.hasTagCompound() && !stack2.hasTagCompound()) || (stack1.hasTagCompound()
-                && (stack1.getTagCompound().equals(stack2.getTagCompound()) && stack1.areCapsCompatible(stack2)))));
-    }*/
 }

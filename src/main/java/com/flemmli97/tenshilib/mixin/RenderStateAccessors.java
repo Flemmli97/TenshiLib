@@ -17,6 +17,21 @@ public interface RenderStateAccessors {
         throw new IllegalStateException();
     }
 
+    @Accessor(value = "TRANSLUCENT_TARGET")
+    static RenderState.TargetState translucentTarget() {
+        throw new IllegalStateException();
+    }
+
+    @Accessor(value = "WEATHER_TARGET")
+    static RenderState.TargetState weatherTarget() {
+        throw new IllegalStateException();
+    }
+
+    @Accessor(value = "SHADE_ENABLED")
+    static RenderState.ShadeModelState enableShade() {
+        throw new IllegalStateException();
+    }
+
     @Accessor(value = "VIEW_OFFSET_Z_LAYERING")
     static RenderState.LayerState offsetZLayer() {
         throw new IllegalStateException();
