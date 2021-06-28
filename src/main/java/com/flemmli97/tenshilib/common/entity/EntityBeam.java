@@ -41,7 +41,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
 
     protected static final DataParameter<Optional<UUID>> shooterUUID = EntityDataManager.createKey(EntityBeam.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 
-    protected final Predicate<Entity> notShooter = (entity) -> entity != EntityBeam.this.getOwner() && EntityPredicates.NOT_SPECTATING.test(entity);
+    protected final Predicate<Entity> notShooter = (entity) -> entity != EntityBeam.this.getOwner() && EntityPredicates.NOT_SPECTATING.test(entity) && entity.canBeCollidedWith();
 
     public EntityBeam(EntityType<? extends EntityBeam> type, World world) {
         super(type, world);
@@ -176,6 +176,8 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
     }
 
     protected boolean check(Entity e, Vector3d from, Vector3d to) {
+        if (e.isSpectator() || !e.isAlive() || !e.canBeCollidedWith())
+            return false;
         AxisAlignedBB aabb = e.getBoundingBox().grow(this.radius() + 0.3);
         Optional<Vector3d> ray = aabb.rayTrace(from, to);
         if (!ray.isPresent() && !aabb.contains(this.getPositionVec()))
