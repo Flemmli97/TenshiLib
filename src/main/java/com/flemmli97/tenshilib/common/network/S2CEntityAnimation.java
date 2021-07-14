@@ -11,7 +11,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class S2CEntityAnimation<T extends Entity & IAnimated<T>> {
+public class S2CEntityAnimation<T extends Entity & IAnimated> {
 
     private final int entityID;
     private final int animID;
@@ -34,21 +34,23 @@ public class S2CEntityAnimation<T extends Entity & IAnimated<T>> {
                                 break;
                             i++;
                         }
-                        return i;
+                        if (i < entity.getAnimationHandler().getAnimations().length)
+                            return i;
+                        return -2;
                     }
                 }).orElse(-2);
     }
 
-    public static <T extends Entity & IAnimated<T>> S2CEntityAnimation<T> fromBytes(PacketBuffer buf) {
+    public static <T extends Entity & IAnimated> S2CEntityAnimation<T> fromBytes(PacketBuffer buf) {
         return new S2CEntityAnimation<>(buf.readInt(), buf.readInt());
     }
 
-    public static <T extends Entity & IAnimated<T>> void toBytes(S2CEntityAnimation<T> pkt, PacketBuffer buf) {
+    public static <T extends Entity & IAnimated> void toBytes(S2CEntityAnimation<T> pkt, PacketBuffer buf) {
         buf.writeInt(pkt.entityID);
         buf.writeInt(pkt.animID);
     }
 
-    public static <T extends Entity & IAnimated<T>> void handlePacket(S2CEntityAnimation<T> pkt, Supplier<NetworkEvent.Context> ctx) {
+    public static <T extends Entity & IAnimated> void handlePacket(S2CEntityAnimation<T> pkt, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandlers.updateAnim(pkt.entityID, pkt.animID)));
         ctx.get().setPacketHandled(true);
     }

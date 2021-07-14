@@ -13,7 +13,7 @@ import net.minecraft.util.math.vector.Vector3d;
 import java.util.EnumSet;
 import java.util.Optional;
 
-public abstract class AnimatedAttackGoal<T extends CreatureEntity & IAnimated<T>> extends Goal {
+public abstract class AnimatedAttackGoal<T extends CreatureEntity & IAnimated> extends Goal {
 
     protected final T attacker;
     protected LivingEntity target;
