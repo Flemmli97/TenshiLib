@@ -1,4 +1,4 @@
-package com.flemmli97.tenshilib.common.entity;
+package com.flemmli97.tenshilib.api.entity;
 
 public class AnimatedAction {
 

@@ -1,7 +1,7 @@
 package com.flemmli97.tenshilib.common.entity.ai;
 
+import com.flemmli97.tenshilib.api.entity.AnimatedAction;
 import com.flemmli97.tenshilib.api.entity.IAnimated;
-import com.flemmli97.tenshilib.common.entity.AnimatedAction;
 import com.flemmli97.tenshilib.common.utils.MathUtils;
 import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.LivingEntity;
@@ -11,8 +11,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 
 import java.util.EnumSet;
+import java.util.Optional;
 
-public abstract class AnimatedAttackGoal<T extends CreatureEntity & IAnimated> extends Goal {
+public abstract class AnimatedAttackGoal<T extends CreatureEntity & IAnimated<T>> extends Goal {
 
     protected final T attacker;
     protected LivingEntity target;
@@ -72,14 +73,14 @@ public abstract class AnimatedAttackGoal<T extends CreatureEntity & IAnimated> e
 
     @Override
     public void tick() {
-        AnimatedAction anim = this.attacker.getAnimation();
+        Optional<AnimatedAction> anim = this.attacker.getAnimationHandler().getAnimation();
         this.setupValues();
         --this.pathFindDelay;
-        if (anim != null) {
-            this.prevAnim = anim.getID();
-            this.handleAttack(anim);
+        if (anim.isPresent()) {
+            this.prevAnim = anim.get().getID();
+            this.handleAttack(anim.get());
         }
-        if (this.next == null && anim == null) {
+        if (this.next == null && !anim.isPresent()) {
             AnimatedAction choose;
             if (this.iddleTime <= 0 && this.canChooseAttack(choose = this.randomAttack())) {
                 this.next = choose;
@@ -93,8 +94,8 @@ public abstract class AnimatedAttackGoal<T extends CreatureEntity & IAnimated> e
         if (this.next != null) {
             this.handlePreAttack();
             if (this.movementDone) {
-                if (anim == null)
-                    this.attacker.setAnimation(this.next);
+                if (!anim.isPresent())
+                    this.attacker.getAnimationHandler().setAnimation(this.next);
                 this.next = null;
             }
         }

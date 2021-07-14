@@ -15,9 +15,9 @@ public class ColoredParticle extends SpriteTexturedParticle {
 
     protected boolean randomMovements, gravity;
 
-    protected ColoredParticle(ClientWorld world, double x, double y, double z, double motionX, double motionY, double motionZ,
-                              ColoredParticleData colorData, IAnimatedSprite sprite, int maxAge, float minAgeRand, float maxAgeRand,
-                              boolean collide, boolean randomMovements, boolean gravity) {
+    public ColoredParticle(ClientWorld world, double x, double y, double z, double motionX, double motionY, double motionZ,
+                           ColoredParticleData colorData, IAnimatedSprite sprite, int maxAge, float minAgeRand, float maxAgeRand,
+                           boolean collide, boolean randomMovements, boolean gravity) {
         super(world, x, y, z);
         this.motionX = motionX;
         this.motionY = motionY;

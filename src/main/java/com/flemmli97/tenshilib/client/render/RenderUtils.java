@@ -98,6 +98,7 @@ public class RenderUtils {
 
     /**
      * Renders a texture
+     *
      * @param textureBuilder Structure containing rendering info like color etc. Is mutable so cache an instance of it.
      */
     public static void renderTexture(MatrixStack stack, IVertexBuilder builder, float xSize, float ySize, TextureBuilder textureBuilder) {
@@ -126,6 +127,7 @@ public class RenderUtils {
 
     /**
      * Renders a gradient triangular cone shaped beam similar to the beams displayed during the enderdragons death
+     *
      * @param builder Structure containing rendering info like color etc. Is mutable so cache an instance of it.
      */
     public static void renderGradientBeam3d(MatrixStack stack, IRenderTypeBuffer renderTypeBuffer, float length, float width, BeamBuilder builder) {
@@ -164,6 +166,7 @@ public class RenderUtils {
 
     /**
      * Like {@link RenderUtils#renderGradientBeam3d} but 2d instead of cone shaped
+     *
      * @param builder Structure containing rendering info like color etc. Is mutable so cache an instance of it.
      */
     public static void renderGradientBeam(MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, float length, float width, BeamBuilder builder) {

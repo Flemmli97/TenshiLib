@@ -13,11 +13,11 @@ public class ColoredParticleData implements IParticleData {
 
     public static Codec<ColoredParticleData> codec(ParticleType<ColoredParticleData> type) {
         return RecordCodecBuilder.create((builder) -> builder.group(
-                Codec.FLOAT.fieldOf("r").forGetter((inst) -> inst.getRed()),
-                Codec.FLOAT.fieldOf("g").forGetter((inst) -> inst.getGreen()),
-                Codec.FLOAT.fieldOf("b").forGetter((inst) -> inst.getBlue()),
-                Codec.FLOAT.fieldOf("alpha").forGetter((inst) -> inst.getAlpha()),
-                Codec.FLOAT.fieldOf("scale").forGetter((inst) -> inst.getScale()))
+                Codec.FLOAT.fieldOf("r").forGetter(ColoredParticleData::getRed),
+                Codec.FLOAT.fieldOf("g").forGetter(ColoredParticleData::getGreen),
+                Codec.FLOAT.fieldOf("b").forGetter(ColoredParticleData::getBlue),
+                Codec.FLOAT.fieldOf("alpha").forGetter(ColoredParticleData::getAlpha),
+                Codec.FLOAT.fieldOf("scale").forGetter(ColoredParticleData::getScale))
                 .apply(builder, (r, g, b, a, scale) -> new ColoredParticleData(type, r, g, b, a, scale)));
     }
 
@@ -45,11 +45,11 @@ public class ColoredParticleData implements IParticleData {
 
 
     private final ParticleType<? extends ColoredParticleData> type;
-    private float red;
-    private float green;
-    private float blue;
-    private float alpha;
-    private float scale;
+    private final float red;
+    private final float green;
+    private final float blue;
+    private final float alpha;
+    private final float scale;
 
     public ColoredParticleData(ParticleType<? extends ColoredParticleData> type, float red, float green, float blue, float alpha) {
         this(type, red, green, blue, alpha, 1);
