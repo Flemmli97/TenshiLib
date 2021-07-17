@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 public class AnimationHandler<T extends Entity & IAnimated> {
 
-    private Optional<AnimatedAction> currentAnim;
+    private Optional<AnimatedAction> currentAnim = Optional.empty();
     private final T entity;
     private final AnimatedAction[] anims;
     private Function<AnimatedAction, Boolean> onAnimationSetFunc;

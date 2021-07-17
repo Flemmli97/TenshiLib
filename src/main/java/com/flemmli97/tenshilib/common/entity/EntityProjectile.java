@@ -8,6 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MoverType;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
@@ -39,7 +40,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public abstract class EntityProjectile extends Entity implements IOwnable<LivingEntity> {
+public abstract class EntityProjectile extends ProjectileEntity implements IOwnable<LivingEntity> {
 
     private LivingEntity shooter;
 
@@ -143,6 +144,7 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
         this.shoot(dir.x, dir.y + l * yOffsetModifier, dir.z, velocity, inaccuracy);
     }
 
+    @Override
     public void shoot(double x, double y, double z, float velocity, float inaccuracy) {
         Vector3d vector3d = (new Vector3d(x, y, z)).normalize().add(this.rand.nextGaussian() * 0.0075F * inaccuracy, this.rand.nextGaussian() * 0.0075F * inaccuracy, this.rand.nextGaussian() * 0.0075F * inaccuracy).scale(velocity);
         this.setMotion(vector3d);
@@ -267,7 +269,7 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
             EntityRayTraceResult res;
             while ((res = this.getEntityHit(pos, to)) != null && this.isAlive()) {
                 this.checkedEntities.add(res.getEntity().getUniqueID());
-                if (!net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, res) && !this.attackedEntities.contains(res.getEntity().getUniqueID()) && this.onEntityHit(res)) {
+                if (!net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, res) && !this.attackedEntities.contains(res.getEntity().getUniqueID()) && this.entityRayTraceHit(res)) {
                     this.attackedEntities.add(res.getEntity().getUniqueID());
                     if (this.maxPierceAmount() != -1 && this.attackedEntities.size() > this.maxPierceAmount())
                         this.onReachMaxPierce();
@@ -325,7 +327,7 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
         return 0.99f;
     }
 
-    protected abstract boolean onEntityHit(EntityRayTraceResult result);
+    protected abstract boolean entityRayTraceHit(EntityRayTraceResult result);
 
     protected abstract void onBlockHit(BlockRayTraceResult result);
 
@@ -374,5 +376,35 @@ public abstract class EntityProjectile extends Entity implements IOwnable<Living
     @Override
     public IPacket<?> createSpawnPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
+    }
+
+    /*===== Things below here don't actually get called. They just delegate to the actual implementation. =====*/
+
+    @Override
+    protected final void onEntityHit(EntityRayTraceResult result) {
+        this.entityRayTraceHit(result);
+    }
+
+    @Override
+    protected final void func_230299_a_(BlockRayTraceResult result) {
+        super.func_230299_a_(result);
+        this.onBlockHit(result);
+    }
+
+    @Override
+    public final void setShooter(@Nullable Entity entity) {
+        if (entity == null) {
+            this.shooter = null;
+            this.dataManager.set(shooterUUID, Optional.empty());
+        } else if (entity instanceof LivingEntity) {
+            this.shooter = (LivingEntity) entity;
+            this.dataManager.set(shooterUUID, Optional.of(entity.getUniqueID()));
+        }
+    }
+
+    @Override
+    @Nullable
+    public final Entity getShooter() {
+        return this.getOwner();
     }
 }
