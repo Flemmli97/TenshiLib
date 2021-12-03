@@ -10,6 +10,10 @@ public class AnimatedAction {
     private float ticker;
     private float speed = 1;
 
+    public AnimatedAction(int length, String id) {
+        this(length, 1, id, id);
+    }
+
     public AnimatedAction(int length, int attackTime, String id) {
         this(length, attackTime, id, id);
     }
@@ -24,7 +28,7 @@ public class AnimatedAction {
      */
     public AnimatedAction(int length, int attackTime, String id, String animationClient) {
         this.length = length;
-        this.attackTime = attackTime;
+        this.attackTime = Math.max(1, attackTime);
         this.id = id;
         this.animationClient = animationClient;
     }
