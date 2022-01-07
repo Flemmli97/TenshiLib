@@ -1,0 +1,21 @@
+modLoader = "javafml"
+loaderVersion = "[38,)"
+license="All rights reserved"
+issueTrackerURL="https://github.com/Flemmli97/TenshiLib/issues"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/tenshilib"
+# logoFile=""
+credits=""
+authors="Flemmli97"
+[[mods]]
+modId = "tenshilib"
+version = "${version}"
+displayName = "TenshiLib"
+# updateJSONURL=""
+authors="Flemmli97"
+description='''Core and library mod for most of my mods. Contains useful hooks and functions'''
+[[dependencies.tenshilib]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.18,)"
+ordering = "NONE"
+side = "BOTH"

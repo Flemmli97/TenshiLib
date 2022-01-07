@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "tenshilib",
+  "version": "${version}",
+  "name": "TenshiLib",
+  "description": "Core and library mod for most of my mods. Contains useful hooks and functions",
+  "authors": [
+    "Flemmli97"
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/tenshilib-fabric",
+    "sources": "https://github.com/Flemmli97/TenshiLib"
+  },
+  "license": "ARR",
+  "icon": "assets/examplemod/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "io.github.flemmli97.tenshilib.fabric.TenshiLibFabric"
+    ]
+  },
+  "mixins": [
+    "tenshilib.mixins.json",
+    "tenshilib.fabric.mixins.json"
+  ],
+  "accessWidener": "tenshilib.accesswidener",
+  "depends": {
+    "fabric": "*",
+    "minecraft": ">=1.18"
+  },
+  "suggests": {
+    "flamingo": "*"
+  }
+}
