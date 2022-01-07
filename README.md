@@ -15,6 +15,6 @@ dependencies {
     modImplementation("io.github.flemmli97:tenshilib:${minecraft_version}-${flan_version}:${mod_loader}")
     
     //Forge==========    
-    compile fg.deobf("io.github.flemmli97:flan:${minecraft_version}-${flan_version}:${mod_loader}")
+    compile fg.deobf("io.github.flemmli97:tenshilib:${minecraft_version}-${flan_version}:${mod_loader}")
 }
 ```
