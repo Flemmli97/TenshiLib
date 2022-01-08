@@ -9,10 +9,11 @@
   ],
   "contact": {
     "homepage": "https://www.curseforge.com/minecraft/mc-mods/tenshilib-fabric",
+    "issues": "https://github.com/Flemmli97/TenshiLib/issues",
     "sources": "https://github.com/Flemmli97/TenshiLib"
   },
   "license": "ARR",
-  "icon": "assets/examplemod/icon.png",
+  "icon": "icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
@@ -27,8 +28,5 @@
   "depends": {
     "fabric": "*",
     "minecraft": ">=1.18"
-  },
-  "suggests": {
-    "flamingo": "*"
   }
 }
