@@ -18,6 +18,9 @@
   "entrypoints": {
     "main": [
       "io.github.flemmli97.tenshilib.fabric.TenshiLibFabric"
+    ],
+    "client": [
+      "io.github.flemmli97.tenshilib.fabric.TenshiLibFabricClient"
     ]
   },
   "mixins": [

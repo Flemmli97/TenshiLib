@@ -3,7 +3,7 @@ package io.github.flemmli97.tenshilib.fabric.client.events;
 import io.github.flemmli97.tenshilib.api.item.IAOEWeapon;
 import io.github.flemmli97.tenshilib.api.item.IExtendedWeapon;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
-import io.github.flemmli97.tenshilib.fabric.network.PacketHandler;
+import io.github.flemmli97.tenshilib.fabric.client.ClientPacketHandler;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.ItemStack;
@@ -16,11 +16,11 @@ public class ClientEvents {
         if (client.hitResult != null && client.hitResult.getType() != HitResult.Type.BLOCK) {
             ItemStack main = client.player.getMainHandItem();
             if (main.getItem() instanceof IExtendedWeapon) {
-                PacketHandler.sendWeaponHitPkt(false);
+                ClientPacketHandler.sendWeaponHitPkt(false);
                 client.player.resetAttackStrengthTicker();
                 return true;
             } else if (main.getItem() instanceof IAOEWeapon) {
-                PacketHandler.sendWeaponHitPkt(true);
+                ClientPacketHandler.sendWeaponHitPkt(true);
                 client.player.resetAttackStrengthTicker();
                 return true;
             }
