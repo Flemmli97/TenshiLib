@@ -20,7 +20,7 @@
       "io.github.flemmli97.tenshilib.fabric.TenshiLibFabric"
     ],
     "client": [
-      "io.github.flemmli97.tenshilib.fabric.TenshiLibFabricClient"
+      "io.github.flemmli97.tenshilib.fabric.client.TenshiLibFabricClient"
     ]
   },
   "mixins": [
