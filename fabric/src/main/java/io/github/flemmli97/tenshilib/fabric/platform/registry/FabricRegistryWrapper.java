@@ -1,6 +1,6 @@
-package io.github.flemmli97.tenshilib.fabric;
+package io.github.flemmli97.tenshilib.fabric.platform.registry;
 
-import io.github.flemmli97.tenshilib.SimpleRegistryWrapper;
+import io.github.flemmli97.tenshilib.platform.registry.SimpleRegistryWrapper;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 

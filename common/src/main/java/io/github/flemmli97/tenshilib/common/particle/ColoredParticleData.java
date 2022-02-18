@@ -4,7 +4,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.flemmli97.tenshilib.RegistryHelper;
+import io.github.flemmli97.tenshilib.platform.registry.RegistryHelper;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.FriendlyByteBuf;
@@ -13,11 +13,11 @@ public class ColoredParticleData implements ParticleOptions {
 
     public static Codec<ColoredParticleData> codec(ParticleType<ColoredParticleData> type) {
         return RecordCodecBuilder.create((builder) -> builder.group(
-                Codec.FLOAT.fieldOf("r").forGetter(ColoredParticleData::getRed),
-                Codec.FLOAT.fieldOf("g").forGetter(ColoredParticleData::getGreen),
-                Codec.FLOAT.fieldOf("b").forGetter(ColoredParticleData::getBlue),
-                Codec.FLOAT.fieldOf("alpha").forGetter(ColoredParticleData::getAlpha),
-                Codec.FLOAT.fieldOf("scale").forGetter(ColoredParticleData::getScale))
+                        Codec.FLOAT.fieldOf("r").forGetter(ColoredParticleData::getRed),
+                        Codec.FLOAT.fieldOf("g").forGetter(ColoredParticleData::getGreen),
+                        Codec.FLOAT.fieldOf("b").forGetter(ColoredParticleData::getBlue),
+                        Codec.FLOAT.fieldOf("alpha").forGetter(ColoredParticleData::getAlpha),
+                        Codec.FLOAT.fieldOf("scale").forGetter(ColoredParticleData::getScale))
                 .apply(builder, (r, g, b, a, scale) -> new ColoredParticleData(type, r, g, b, a, scale)));
     }
 
@@ -80,7 +80,7 @@ public class ColoredParticleData implements ParticleOptions {
 
     @Override
     public String writeToString() {
-        return RegistryHelper.particles().getIDFrom(this.getType()).toString();
+        return RegistryHelper.instance().particles().getIDFrom(this.getType()).toString();
     }
 
     public float getRed() {

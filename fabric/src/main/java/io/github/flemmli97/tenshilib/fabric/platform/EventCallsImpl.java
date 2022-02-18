@@ -1,10 +1,10 @@
-package io.github.flemmli97.tenshilib.fabric;
+package io.github.flemmli97.tenshilib.fabric.platform;
 
-import io.github.flemmli97.tenshilib.EventCalls;
 import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.common.entity.EntityBeam;
 import io.github.flemmli97.tenshilib.fabric.events.AOEAttackEvent;
 import io.github.flemmli97.tenshilib.fabric.network.PacketHandler;
+import io.github.flemmli97.tenshilib.platform.EventCalls;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -22,41 +22,49 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.List;
 
 
-public class EventCallsImpl {
+public class EventCallsImpl extends EventCalls {
 
-    public static boolean aoeAttackCall(Player player, ItemStack stack, List<Entity> list) {
+    public static void init() {
+        INSTANCE = new EventCallsImpl();
+    }
+
+    @Override
+    public boolean aoeAttackCall(Player player, ItemStack stack, List<Entity> list) {
         return AOEAttackEvent.ATTACK.invoker().call(player, stack, list);
     }
 
-    public static void registerAOEEventHandler(EventCalls.Func3<Player, ItemStack, List<Entity>, Boolean> func) {
-        AOEAttackEvent.ATTACK.register(func::apply);
-    }
-
-    public static boolean playerAttackCall(Player player, Entity target) {
+    @Override
+    public boolean playerAttackCall(Player player, Entity target) {
         return AttackEntityCallback.EVENT.invoker().interact(player, player.getLevel(), InteractionHand.MAIN_HAND, target, null) != InteractionResult.PASS;
     }
 
-    public static Pair<Boolean, Float> criticalAttackCall(Player player, Entity target, boolean crit, float dmgMod) {
+    @Override
+    public Pair<Boolean, Float> criticalAttackCall(Player player, Entity target, boolean crit, float dmgMod) {
         return Pair.of(true, dmgMod);
     }
 
-    public static void destroyItemCall(Player player, ItemStack stack, InteractionHand hand) {
+    @Override
+    public void destroyItemCall(Player player, ItemStack stack, InteractionHand hand) {
 
     }
 
-    public static boolean specialSpawnCall(Mob entity, Level world, float x, float y, float z, BaseSpawner spawner, MobSpawnType spawnReason) {
+    @Override
+    public boolean specialSpawnCall(Mob entity, Level world, float x, float y, float z, BaseSpawner spawner, MobSpawnType spawnReason) {
         return false;
     }
 
-    public static boolean projectileHitCall(Projectile projectile, HitResult result) {
+    @Override
+    public boolean projectileHitCall(Projectile projectile, HitResult result) {
         return false;
     }
 
-    public static boolean beamHitCall(EntityBeam beam, HitResult result) {
+    @Override
+    public boolean beamHitCall(EntityBeam beam, HitResult result) {
         return false;
     }
 
-    public static <T extends Entity & IAnimated> void sendEntityAnimationPacket(T entity) {
+    @Override
+    public <T extends Entity & IAnimated> void sendEntityAnimationPacket(T entity) {
         PacketHandler.updateAnimationPkt(entity);
     }
 }

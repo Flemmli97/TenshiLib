@@ -1,9 +1,9 @@
 package io.github.flemmli97.tenshilib.common.entity;
 
-import io.github.flemmli97.tenshilib.EventCalls;
 import io.github.flemmli97.tenshilib.api.entity.IBeamEntity;
 import io.github.flemmli97.tenshilib.common.utils.MathUtils;
 import io.github.flemmli97.tenshilib.common.utils.RayTraceUtils;
+import io.github.flemmli97.tenshilib.platform.EventCalls;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
@@ -155,7 +155,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
             for (Entity entity : list) {
                 if (entity != this.getOwner() && this.check(entity, pos, this.hitVec)) {
                     EntityHitResult raytraceresult = new EntityHitResult(entity);
-                    if (!EventCalls.beamHitCall(this, raytraceresult)) {
+                    if (!EventCalls.instance().beamHitCall(this, raytraceresult)) {
                         this.onImpact(raytraceresult);
                         this.coolDown = this.attackCooldown();
                         if (!this.piercing())

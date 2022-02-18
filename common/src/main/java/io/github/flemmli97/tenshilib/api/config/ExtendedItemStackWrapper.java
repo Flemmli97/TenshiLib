@@ -9,8 +9,8 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import io.github.flemmli97.tenshilib.RegistryHelper;
 import io.github.flemmli97.tenshilib.common.utils.JsonUtils;
+import io.github.flemmli97.tenshilib.platform.registry.RegistryHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.world.item.ItemStack;
@@ -68,7 +68,7 @@ public class ExtendedItemStackWrapper extends SimpleItemStackWrapper {
     public String writeToString() {
         CompoundTag nbt = new CompoundTag();
         nbt.put("nbt", this.nbtTagCompound.copy());
-        nbt.putString("id", RegistryHelper.items().getIDFrom(this.item).toString());
+        nbt.putString("id", RegistryHelper.instance().items().getIDFrom(this.item).toString());
         nbt.putInt("Count", this.count);
         return nbt.toString();
     }

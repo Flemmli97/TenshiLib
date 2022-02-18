@@ -5,6 +5,8 @@ import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import io.github.flemmli97.tenshilib.forge.client.events.ClientEvents;
 import io.github.flemmli97.tenshilib.forge.events.CommonEvents;
 import io.github.flemmli97.tenshilib.forge.network.PacketHandler;
+import io.github.flemmli97.tenshilib.forge.platform.ClientCallsImpl;
+import io.github.flemmli97.tenshilib.forge.platform.EventCallsImpl;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -18,6 +20,10 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 public class TenshiLibForge {
 
     public TenshiLibForge() {
+        EventCallsImpl.init();
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            ClientCallsImpl.init();
+        }
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         IEventBus forgeBus = MinecraftForge.EVENT_BUS;
         modBus.addListener(TenshiLibForge::preInit);
@@ -25,6 +31,7 @@ public class TenshiLibForge {
         forgeBus.addListener(CommonEvents::disableOffhand);
         forgeBus.addListener(CommonEvents::disableOffhandBlock);
         if (FMLEnvironment.dist == Dist.CLIENT) {
+            ClientCallsImpl.init();
             modBus.addListener(ClientEvents::reloadListener);
             modBus.addListener(ClientEvents::itemColors);
             forgeBus.addListener(ClientEvents::clickSpecial);

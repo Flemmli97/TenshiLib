@@ -1,4 +1,4 @@
-package io.github.flemmli97.tenshilib;
+package io.github.flemmli97.tenshilib.platform.registry;
 
 import net.minecraft.resources.ResourceLocation;
 

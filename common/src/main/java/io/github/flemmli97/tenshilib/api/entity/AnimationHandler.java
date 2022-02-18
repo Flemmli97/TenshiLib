@@ -1,6 +1,6 @@
 package io.github.flemmli97.tenshilib.api.entity;
 
-import io.github.flemmli97.tenshilib.EventCalls;
+import io.github.flemmli97.tenshilib.platform.EventCalls;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,7 +54,7 @@ public class AnimationHandler<T extends Entity & IAnimated> {
             return;
         this.currentAnim = anim == null ? null : anim.create();
         if (!this.entity.level.isClientSide) {
-            EventCalls.sendEntityAnimationPacket(this.entity);
+            EventCalls.instance().sendEntityAnimationPacket(this.entity);
         }
     }
 

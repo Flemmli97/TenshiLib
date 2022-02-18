@@ -6,7 +6,7 @@ import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import io.github.flemmli97.tenshilib.api.entity.IBeamEntity;
-import io.github.flemmli97.tenshilib.client.ClientCalls;
+import io.github.flemmli97.tenshilib.platform.ClientCalls;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -155,7 +155,7 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
     }
 
     protected RenderType getRenderLayer(T entity, ResourceLocation loc) {
-        return ClientCalls.getBeamRenderType(loc);
+        return ClientCalls.instance().getBeamRenderType(loc);
     }
 
     public record ResourcePair(ResourceLocation res, float size) {
