@@ -1,3 +1,7 @@
+TenshiLib 1.5.1
+================
+- Save json configs after loading
+
 TenshiLib 1.5.0
 ================
 - Internal changes

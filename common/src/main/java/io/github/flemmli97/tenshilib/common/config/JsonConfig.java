@@ -120,6 +120,7 @@ public class JsonConfig<T> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.save();
     }
 
     public void save() {
