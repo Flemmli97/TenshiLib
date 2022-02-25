@@ -3,40 +3,41 @@ package io.github.flemmli97.tenshilib.common.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
-import org.apache.commons.compress.utils.IOUtils;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
+import io.github.flemmli97.tenshilib.TenshiLib;
+import org.apache.logging.log4j.core.util.FileWatcher;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Set;
 
 public class JsonConfig<T> {
 
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-    private final File file;
+    private static final Gson GSONCommentSaver = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+
+    private final Path file;
     private T element;
     private final Class<T> type;
     private boolean mcRestart, worldRestart;
     private String name;
     private Gson gson = GSON;
 
-    public JsonConfig(File file, Class<T> type, @Nullable T defaultValue) {
+    public JsonConfig(Path file, Class<T> type, @Nullable T defaultValue) {
         this.file = file;
         this.type = type;
-        this.name = this.file.getName();
-        if (!this.file.getParentFile().exists())
-            this.file.getParentFile().mkdirs();
-        if (!this.file.exists())
+        this.name = this.file.getFileName().toString();
+        this.element = defaultValue;
+        if (!Files.exists(file))
             try {
-                this.file.createNewFile();
-                if (defaultValue != null) {
-                    this.element = defaultValue;
+                Files.createFile(file);
+                if (this.element != null) {
                     this.save();
                 }
             } catch (IOException e) {
@@ -45,21 +46,15 @@ public class JsonConfig<T> {
         this.load();
     }
 
-    public JsonConfig(File file, Class<T> type, @Nullable File defaultConfig) {
+    public JsonConfig(Path file, Class<T> type, @Nullable Path defaultConfig) {
         this.file = file;
         this.type = type;
-        this.name = this.file.getName();
-        if (!this.file.getParentFile().exists())
-            this.file.getParentFile().mkdirs();
-        if (!this.file.exists())
+        this.name = this.file.getFileName().toString();
+        if (!Files.exists(file))
             try {
-                this.file.createNewFile();
-                if (defaultConfig != null && defaultConfig.exists()) {
-                    InputStream in = new FileInputStream(defaultConfig);
-                    OutputStream out = new FileOutputStream(this.file);
-                    IOUtils.copy(in, out);
-                    in.close();
-                    out.close();
+                Files.createFile(file);
+                if (defaultConfig != null && Files.exists(defaultConfig)) {
+                    Files.copy(defaultConfig, file);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -73,7 +68,7 @@ public class JsonConfig<T> {
         return this;
     }
 
-    public File getConfigFile() {
+    public Path getConfigPath() {
         return this.file;
     }
 
@@ -114,9 +109,29 @@ public class JsonConfig<T> {
 
     public void load() {
         try {
-            FileReader reader = new FileReader(this.file);
-            this.element = this.gson.fromJson(reader, this.type);
+            FileReader reader = new FileReader(this.file.toFile());
+            if (this.element instanceof CommentedJsonConfig conf) {
+                Set<String> faulty = conf.deserialize(this.gson.fromJson(reader, JsonObject.class), this.gson);
+                if(!faulty.isEmpty())
+                    throw new JsonSyntaxException("Faulty keys " + faulty);
+            }
+            else
+                this.element = this.gson.fromJson(reader, this.type);
             reader.close();
+        } catch (IllegalStateException | JsonSyntaxException e) {
+            try {
+                TenshiLib.logger.error("Json config doesn't match expected config. Creating a backup. This is probably caused either by a config update or malformed json.");
+                e.printStackTrace();
+                int back = 0;
+                String file = this.file.getFileName().toString() + "_back";
+                while(Files.exists(this.file.getParent().resolve(file))) {
+                    back++;
+                    file = file + back;
+                }
+                Files.copy(this.file, this.file.getParent().resolve(file));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -125,8 +140,11 @@ public class JsonConfig<T> {
 
     public void save() {
         try {
-            FileWriter writer = new FileWriter(this.file);
-            this.gson.toJson(this.element, writer);
+            FileWriter writer = new FileWriter(this.file.toFile());
+            if (this.element instanceof CommentedJsonConfig conf)
+                this.gson.toJson(conf.serialize(this.gson), writer);
+            else
+                this.gson.toJson(this.element, writer);
             writer.close();
         } catch (JsonIOException | IOException e) {
             e.printStackTrace();
