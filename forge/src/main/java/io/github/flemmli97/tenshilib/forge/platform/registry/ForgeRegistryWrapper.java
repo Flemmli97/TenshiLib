@@ -5,6 +5,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
+import java.util.Collection;
+
 public record ForgeRegistryWrapper<T extends IForgeRegistryEntry<T>>(
         IForgeRegistry<T> registry) implements SimpleRegistryWrapper<T> {
 
@@ -21,5 +23,10 @@ public record ForgeRegistryWrapper<T extends IForgeRegistryEntry<T>>(
     @Override
     public Iterable<T> getIterator() {
         return this.registry;
+    }
+
+    @Override
+    public Collection<T> values() {
+        return this.registry.getValues();
     }
 }

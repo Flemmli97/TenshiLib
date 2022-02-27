@@ -4,7 +4,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.flemmli97.tenshilib.platform.registry.RegistryHelper;
+import io.github.flemmli97.tenshilib.platform.PlatformUtils;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.FriendlyByteBuf;
@@ -80,7 +80,7 @@ public class ColoredParticleData implements ParticleOptions {
 
     @Override
     public String writeToString() {
-        return RegistryHelper.instance().particles().getIDFrom(this.getType()).toString();
+        return PlatformUtils.INSTANCE.particles().getIDFrom(this.getType()).toString();
     }
 
     public float getRed() {

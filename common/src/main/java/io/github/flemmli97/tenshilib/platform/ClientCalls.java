@@ -3,13 +3,11 @@ package io.github.flemmli97.tenshilib.platform;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 
-public abstract class ClientCalls {
+public interface ClientCalls {
 
-    protected static ClientCalls INSTANCE;
+    ClientCalls INSTANCE = InitUtil.getPlatformInstance(ClientCalls.class,
+            "io.github.flemmli97.tenshilib.fabric.platform.ClientCallsImpl",
+            "io.github.flemmli97.tenshilib.forge.platform.ClientCallsImpl");
 
-    public static ClientCalls instance() {
-        return INSTANCE;
-    }
-
-    public abstract RenderType getBeamRenderType(ResourceLocation loc);
+    RenderType getBeamRenderType(ResourceLocation loc);
 }

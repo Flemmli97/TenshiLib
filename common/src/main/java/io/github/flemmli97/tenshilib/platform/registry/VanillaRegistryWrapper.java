@@ -1,10 +1,12 @@
-package io.github.flemmli97.tenshilib.fabric.platform.registry;
+package io.github.flemmli97.tenshilib.platform.registry;
 
-import io.github.flemmli97.tenshilib.platform.registry.SimpleRegistryWrapper;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 
-public record FabricRegistryWrapper<T>(Registry<T> delegate) implements SimpleRegistryWrapper<T> {
+import java.util.Collection;
+import java.util.stream.Collectors;
+
+public record VanillaRegistryWrapper<T>(Registry<T> delegate) implements SimpleRegistryWrapper<T> {
 
     @Override
     public T getFromId(ResourceLocation id) {
@@ -19,5 +21,10 @@ public record FabricRegistryWrapper<T>(Registry<T> delegate) implements SimpleRe
     @Override
     public Iterable<T> getIterator() {
         return this.delegate;
+    }
+
+    @Override
+    public Collection<T> values() {
+        return this.delegate.stream().collect(Collectors.toUnmodifiableSet());
     }
 }

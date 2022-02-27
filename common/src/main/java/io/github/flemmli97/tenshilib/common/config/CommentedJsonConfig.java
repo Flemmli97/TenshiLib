@@ -49,10 +49,10 @@ public class CommentedJsonConfig {
     public Set<String> deserialize(JsonObject object, Gson gson) {
         Set<String> faulty = new HashSet<>();
         int version = GsonHelper.getAsInt(object, "version", 0);
-        if(version < this.confVersion)
+        if (version < this.confVersion)
             faulty.add("Config Version");
-        for(Map.Entry<String, CommentedVal<?>> e : this.configVals.entrySet()) {
-            if(object.has(e.getKey())) {
+        for (Map.Entry<String, CommentedVal<?>> e : this.configVals.entrySet()) {
+            if (object.has(e.getKey())) {
                 CommentedVal<Object> val = (CommentedVal<Object>) e.getValue();
                 try {
                     val.set(gson.fromJson(object.get(e.getKey()).getAsJsonObject().get("input"), val.input.getClass()));

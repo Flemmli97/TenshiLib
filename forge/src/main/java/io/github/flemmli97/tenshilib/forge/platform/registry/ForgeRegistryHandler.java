@@ -7,14 +7,28 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.function.Supplier;
 
-public record ForgeRegistryHandler<T extends IForgeRegistryEntry<T>>(
-        DeferredRegister<T> deferredRegister) implements PlatformRegistry<T> {
+public class ForgeRegistryHandler<T extends IForgeRegistryEntry<T>> implements PlatformRegistry<T> {
 
+    private final DeferredRegister<T> deferredRegister;
+
+    private final Set<RegistryObjectWrapper<T>> entries = new LinkedHashSet<>();
+    private final Set<RegistryObjectWrapper<T>> entriesView = Collections.unmodifiableSet(this.entries);
+
+    public ForgeRegistryHandler(DeferredRegister<T> deferredRegister) {
+        this.deferredRegister = deferredRegister;
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
     public <I extends T> RegistryEntrySupplier<I> register(String name, Supplier<? extends I> sup) {
-        return new RegistryObjectWrapper<>(this.deferredRegister.register(name, sup));
+        RegistryObjectWrapper<I> entry = new RegistryObjectWrapper<>(this.deferredRegister.register(name, sup));
+        this.entries.add((RegistryObjectWrapper<T>) entry);
+        return entry;
     }
 
     @Override
@@ -24,7 +38,7 @@ public record ForgeRegistryHandler<T extends IForgeRegistryEntry<T>>(
     }
 
     @Override
-    public Collection<? extends Supplier<T>> getEntries() {
-        return this.deferredRegister.getEntries();
+    public Collection<? extends RegistryEntrySupplier<T>> getEntries() {
+        return this.entriesView;
     }
 }

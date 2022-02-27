@@ -54,7 +54,7 @@ public class AnimationHandler<T extends Entity & IAnimated> {
             return;
         this.currentAnim = anim == null ? null : anim.create();
         if (!this.entity.level.isClientSide) {
-            EventCalls.instance().sendEntityAnimationPacket(this.entity);
+            EventCalls.INSTANCE.sendEntityAnimationPacket(this.entity);
         }
     }
 

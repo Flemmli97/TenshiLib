@@ -6,7 +6,6 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import io.github.flemmli97.tenshilib.TenshiLib;
-import org.apache.logging.log4j.core.util.FileWatcher;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.FileReader;
@@ -112,10 +111,9 @@ public class JsonConfig<T> {
             FileReader reader = new FileReader(this.file.toFile());
             if (this.element instanceof CommentedJsonConfig conf) {
                 Set<String> faulty = conf.deserialize(this.gson.fromJson(reader, JsonObject.class), this.gson);
-                if(!faulty.isEmpty())
+                if (!faulty.isEmpty())
                     throw new JsonSyntaxException("Faulty keys " + faulty);
-            }
-            else
+            } else
                 this.element = this.gson.fromJson(reader, this.type);
             reader.close();
         } catch (IllegalStateException | JsonSyntaxException e) {
@@ -124,7 +122,7 @@ public class JsonConfig<T> {
                 e.printStackTrace();
                 int back = 0;
                 String file = this.file.getFileName().toString() + "_back";
-                while(Files.exists(this.file.getParent().resolve(file))) {
+                while (Files.exists(this.file.getParent().resolve(file))) {
                     back++;
                     file = file + back;
                 }

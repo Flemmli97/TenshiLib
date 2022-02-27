@@ -9,7 +9,7 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import io.github.flemmli97.tenshilib.TenshiLib;
-import io.github.flemmli97.tenshilib.platform.registry.RegistryHelper;
+import io.github.flemmli97.tenshilib.platform.PlatformUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -30,7 +30,7 @@ public class ItemWrapper implements IItemConfig<ItemWrapper> {
     @Override
     public Item getItem() {
         if (this.item == null) {
-            this.item = RegistryHelper.instance().items().getFromId(new ResourceLocation(this.reg));
+            this.item = PlatformUtils.INSTANCE.items().getFromId(new ResourceLocation(this.reg));
             if (this.item == Items.AIR && (this.reg.isEmpty() || this.reg.equals("minecraft:air")))
                 TenshiLib.logger.error("Faulty item registry name {}", this.reg);
         }

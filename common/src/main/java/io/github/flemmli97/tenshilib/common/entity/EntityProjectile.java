@@ -263,13 +263,13 @@ public abstract class EntityProjectile extends Projectile {
                 if (tileentity instanceof TheEndGatewayBlockEntity && TheEndGatewayBlockEntity.canEntityTeleport(this)) {
                     TheEndGatewayBlockEntity.teleportEntity(this.level, blockpos, blockstate, this, (TheEndGatewayBlockEntity) tileentity);
                 }
-            } else if (!EventCalls.instance().projectileHitCall(this, raytraceresult))
+            } else if (!EventCalls.INSTANCE.projectileHitCall(this, raytraceresult))
                 this.onBlockHit(raytraceresult);
         } else {
             EntityHitResult res;
             while ((res = this.getEntityHit(pos, to)) != null && this.isAlive()) {
                 this.checkedEntities.add(res.getEntity().getUUID());
-                if (!EventCalls.instance().projectileHitCall(this, res) && !this.attackedEntities.contains(res.getEntity().getUUID()) && this.entityRayTraceHit(res)) {
+                if (!EventCalls.INSTANCE.projectileHitCall(this, res) && !this.attackedEntities.contains(res.getEntity().getUUID()) && this.entityRayTraceHit(res)) {
                     this.attackedEntities.add(res.getEntity().getUUID());
                     if (this.maxPierceAmount() != -1 && this.attackedEntities.size() > this.maxPierceAmount())
                         this.onReachMaxPierce();

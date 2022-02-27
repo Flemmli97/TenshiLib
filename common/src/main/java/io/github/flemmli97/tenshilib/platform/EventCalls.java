@@ -16,31 +16,29 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
 
-public abstract class EventCalls {
+public interface EventCalls {
 
-    protected static EventCalls INSTANCE;
+    EventCalls INSTANCE = InitUtil.getPlatformInstance(EventCalls.class,
+            "io.github.flemmli97.tenshilib.fabric.platform.EventCallsImpl",
+            "io.github.flemmli97.tenshilib.forge.platform.EventCallsImpl");
 
-    public static EventCalls instance() {
-        return INSTANCE;
-    }
+    boolean aoeAttackCall(Player player, ItemStack item, List<Entity> list);
 
-    public abstract boolean aoeAttackCall(Player player, ItemStack item, List<Entity> list);
+    boolean playerAttackCall(Player player, Entity target);
 
-    public abstract boolean playerAttackCall(Player player, Entity target);
+    Pair<Boolean, Float> criticalAttackCall(Player player, Entity target, boolean crit, float dmgMod);
 
-    public abstract Pair<Boolean, Float> criticalAttackCall(Player player, Entity target, boolean crit, float dmgMod);
+    void destroyItemCall(Player player, ItemStack stack, InteractionHand hand);
 
-    public abstract void destroyItemCall(Player player, ItemStack stack, InteractionHand hand);
+    boolean specialSpawnCall(Mob entity, Level world, float x, float y, float z, BaseSpawner spawner, MobSpawnType spawnReason);
 
-    public abstract boolean specialSpawnCall(Mob entity, Level world, float x, float y, float z, BaseSpawner spawner, MobSpawnType spawnReason);
+    boolean projectileHitCall(Projectile projectile, HitResult result);
 
-    public abstract boolean projectileHitCall(Projectile projectile, HitResult result);
+    boolean beamHitCall(EntityBeam beam, HitResult result);
 
-    public abstract boolean beamHitCall(EntityBeam beam, HitResult result);
+    <T extends Entity & IAnimated> void sendEntityAnimationPacket(T entity);
 
-    public abstract <T extends Entity & IAnimated> void sendEntityAnimationPacket(T entity);
-
-    public interface Func3<A, B, C, D> {
+    interface Func3<A, B, C, D> {
         D apply(A a, B b, C c);
     }
 }

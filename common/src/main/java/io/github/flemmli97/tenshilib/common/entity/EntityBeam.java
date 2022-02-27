@@ -155,7 +155,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
             for (Entity entity : list) {
                 if (entity != this.getOwner() && this.check(entity, pos, this.hitVec)) {
                     EntityHitResult raytraceresult = new EntityHitResult(entity);
-                    if (!EventCalls.instance().beamHitCall(this, raytraceresult)) {
+                    if (!EventCalls.INSTANCE.beamHitCall(this, raytraceresult)) {
                         this.onImpact(raytraceresult);
                         this.coolDown = this.attackCooldown();
                         if (!this.piercing())

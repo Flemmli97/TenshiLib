@@ -12,5 +12,5 @@ public interface PlatformRegistry<T> {
      */
     void finalize(Object r);
 
-    Collection<? extends Supplier<T>> getEntries();
+    Collection<? extends RegistryEntrySupplier<T>> getEntries();
 }

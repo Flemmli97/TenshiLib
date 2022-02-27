@@ -3,7 +3,7 @@ package io.github.flemmli97.tenshilib.common.item;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import io.github.flemmli97.tenshilib.platform.EventCalls;
-import io.github.flemmli97.tenshilib.platform.registry.RegistryHelper;
+import io.github.flemmli97.tenshilib.platform.PlatformUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
@@ -86,7 +86,7 @@ public class SpawnEgg extends Item {
     }
 
     public static Optional<SpawnEgg> fromID(ResourceLocation id) {
-        return EGGSSUP.entrySet().stream().filter(e -> RegistryHelper.instance().entities().getIDFrom(e.getKey().get()).equals(id)).findFirst().map(Map.Entry::getValue);
+        return EGGSSUP.entrySet().stream().filter(e -> PlatformUtils.INSTANCE.entities().getIDFrom(e.getKey().get()).equals(id)).findFirst().map(Map.Entry::getValue);
     }
 
     /**
@@ -180,7 +180,7 @@ public class SpawnEgg extends Item {
         EntityType<?> type = item.getType(stack.getTag());
         Entity e = type.create(world, stack.getTag(), item.getEntityName(stack), player, pos, reason, updateLocation, doCollisionOffset);
         if (e != null) {
-            if (!item.onEntitySpawned(e, stack, player) || (forgeCheck && e instanceof Mob && EventCalls.instance().specialSpawnCall((Mob) e, world, pos.getX(), pos.getY(), pos.getZ(), null, reason)))
+            if (!item.onEntitySpawned(e, stack, player) || (forgeCheck && e instanceof Mob && EventCalls.INSTANCE.specialSpawnCall((Mob) e, world, pos.getX(), pos.getY(), pos.getZ(), null, reason)))
                 return null;
             world.addFreshEntityWithPassengers(e);
         }
@@ -195,7 +195,7 @@ public class SpawnEgg extends Item {
         if (nbt != null && nbt.contains("EntityTag", Tag.TAG_COMPOUND)) {
             CompoundTag compoundnbt = nbt.getCompound("EntityTag");
             if (compoundnbt.contains("id", Tag.TAG_STRING)) {
-                EntityType<?> type = RegistryHelper.instance().entities().getFromId(new ResourceLocation(compoundnbt.getString("id")));
+                EntityType<?> type = PlatformUtils.INSTANCE.entities().getFromId(new ResourceLocation(compoundnbt.getString("id")));
                 return type != null ? type : this.typeIn.get();
             }
         }

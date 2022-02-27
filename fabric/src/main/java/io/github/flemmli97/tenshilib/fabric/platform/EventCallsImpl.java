@@ -22,11 +22,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.List;
 
 
-public class EventCallsImpl extends EventCalls {
-
-    public static void init() {
-        INSTANCE = new EventCallsImpl();
-    }
+public class EventCallsImpl implements EventCalls {
 
     @Override
     public boolean aoeAttackCall(Player player, ItemStack stack, List<Entity> list) {

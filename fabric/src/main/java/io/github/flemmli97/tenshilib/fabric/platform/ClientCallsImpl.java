@@ -4,11 +4,7 @@ import io.github.flemmli97.tenshilib.platform.ClientCalls;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 
-public class ClientCallsImpl extends ClientCalls {
-
-    public static void init() {
-        INSTANCE = new ClientCallsImpl();
-    }
+public class ClientCallsImpl implements ClientCalls {
 
     @Override
     public RenderType getBeamRenderType(ResourceLocation loc) {

@@ -2,7 +2,6 @@ package io.github.flemmli97.tenshilib.fabric.client;
 
 import io.github.flemmli97.tenshilib.client.AnimationManager;
 import io.github.flemmli97.tenshilib.fabric.client.events.ClientEvents;
-import io.github.flemmli97.tenshilib.fabric.platform.ClientCallsImpl;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
@@ -14,7 +13,6 @@ import net.minecraft.server.packs.resources.ResourceManager;
 public class TenshiLibFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        ClientCallsImpl.init();
         ClientPacketHandler.register();
         ClientEvents.itemColors();
         if (!FabricLoader.getInstance().isDevelopmentEnvironment()) //For some reason this doesnt get remapped in dev and thus crashes

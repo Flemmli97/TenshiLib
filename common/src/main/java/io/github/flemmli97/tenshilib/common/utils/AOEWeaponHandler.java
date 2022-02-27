@@ -31,7 +31,7 @@ public class AOEWeaponHandler {
         if (player.level.isClientSide)
             return;
         List<Entity> list = RayTraceUtils.getEntities(player, weapon.getRange(), weapon.getFOV());
-        if (EventCalls.instance().aoeAttackCall(player, stack, list) || list.isEmpty())
+        if (EventCalls.INSTANCE.aoeAttackCall(player, stack, list) || list.isEmpty())
             return;
         for (int i = 0; i < list.size(); i++)
             attack(player, list.get(i), i == (list.size() - 1), weapon.doSweepingAttack());
@@ -41,7 +41,7 @@ public class AOEWeaponHandler {
      * Exact same like in {@link Player#attack(Entity)} but with the option of disabling the cooldown and no sweep attack
      */
     public static void attack(Player player, Entity target, boolean resetCooldown, boolean canDoSweep) {
-        if (!EventCalls.instance().playerAttackCall(player, target)) return;
+        if (!EventCalls.INSTANCE.playerAttackCall(player, target)) return;
         if (target.isAttackable()) {
             if (!target.skipAttackInteraction(player)) {
                 float baseDmg = (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE);
@@ -66,7 +66,7 @@ public class AOEWeaponHandler {
                     }
 
                     boolean crit = flag && player.fallDistance > 0.0F && !player.isOnGround() && !player.onClimbable() && !player.isInWater() && !player.hasEffect(MobEffects.BLINDNESS) && !player.isPassenger() && target instanceof LivingEntity && !player.isSprinting();
-                    Pair<Boolean, Float> critCall = EventCalls.instance().criticalAttackCall(player, target, crit, crit ? 1.5F : 1.0F);
+                    Pair<Boolean, Float> critCall = EventCalls.INSTANCE.criticalAttackCall(player, target, crit, crit ? 1.5F : 1.0F);
                     crit = critCall.getKey();
                     if (crit) {
                         baseDmg *= critCall.getRight();
@@ -140,7 +140,7 @@ public class AOEWeaponHandler {
                             ItemStack copy = itemstack1.copy();
                             itemstack1.hurtEnemy((LivingEntity) entity, player);
                             if (itemstack1.isEmpty()) {
-                                EventCalls.instance().destroyItemCall(player, copy, InteractionHand.MAIN_HAND);
+                                EventCalls.INSTANCE.destroyItemCall(player, copy, InteractionHand.MAIN_HAND);
                                 player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
                             }
                         }

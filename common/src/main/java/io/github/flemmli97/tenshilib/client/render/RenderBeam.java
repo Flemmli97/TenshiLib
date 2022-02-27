@@ -155,7 +155,7 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
     }
 
     protected RenderType getRenderLayer(T entity, ResourceLocation loc) {
-        return ClientCalls.instance().getBeamRenderType(loc);
+        return ClientCalls.INSTANCE.getBeamRenderType(loc);
     }
 
     public record ResourcePair(ResourceLocation res, float size) {
