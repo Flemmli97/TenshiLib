@@ -138,26 +138,28 @@ public class CommentedJsonConfig {
         }
 
         public IntVal defineInRange(String name, int value, int min, int max) {
+            List<String> comment = this.comments != null ? this.comments : new ArrayList<>();
             if (Integer.MAX_VALUE == max)
-                this.comments.add("Range: > " + min);
+                comment.add("Range: > " + min);
             else if (Integer.MIN_VALUE == min)
-                this.comments.add("Range: < " + min);
+                comment.add("Range: < " + min);
             else
-                this.comments.add("Range: " + min + " ~ " + max);
-            IntVal commentedVal = new IntVal(this.comments, value, min, max);
+                comment.add("Range: " + min + " ~ " + max);
+            IntVal commentedVal = new IntVal(comment, value, min, max);
             this.comments = null;
             this.conf.put(name, commentedVal);
             return commentedVal;
         }
 
         public DoubleVal defineInRange(String name, double value, double min, double max) {
+            List<String> comment = this.comments != null ? this.comments : new ArrayList<>();
             if (Double.MAX_VALUE == max)
-                this.comments.add("Range: > " + min);
+                comment.add("Range: > " + min);
             else if (Double.MIN_VALUE == min)
-                this.comments.add("Range: < " + min);
+                comment.add("Range: < " + min);
             else
-                this.comments.add("Range: " + min + " ~ " + max);
-            DoubleVal commentedVal = new DoubleVal(this.comments, value, min, max);
+                comment.add("Range: " + min + " ~ " + max);
+            DoubleVal commentedVal = new DoubleVal(comment, value, min, max);
             this.comments = null;
             this.conf.put(name, commentedVal);
             return commentedVal;

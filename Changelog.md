@@ -1,3 +1,7 @@
+TenshiLib 1.6.1
+================
+- Fix nullpointer with config sometimes
+
 TenshiLib 1.6.0
 ================
 - Save json configs after loading
