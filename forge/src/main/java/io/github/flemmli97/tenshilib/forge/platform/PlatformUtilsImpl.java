@@ -15,11 +15,8 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.StaticTagHelper;
-import net.minecraft.tags.StaticTags;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -148,28 +145,6 @@ public class PlatformUtilsImpl extends PlatformUtils {
     @Override
     public <T extends BlockEntity> BlockEntityType<T> blockEntityType(BiFunction<BlockPos, BlockState, T> func, Block... blocks) {
         return BlockEntityType.Builder.of(func::apply, blocks).build(null);
-    }
-
-    @Override
-    public Tag.Named<Item> itemTag(ResourceLocation res, boolean optional) {
-        return optional ? ItemTags.createOptional(res) : ItemTags.bind(res.toString());
-    }
-
-    @Override
-    public Tag.Named<Block> blockTag(ResourceLocation res, boolean optional) {
-        return optional ? BlockTags.createOptional(res) : BlockTags.bind(res.toString());
-    }
-
-    @Override
-    public Tag.Named<EntityType<?>> entityTag(ResourceLocation res, boolean optional) {
-        return optional ? EntityTypeTags.createOptional(res) : EntityTypeTags.bind(res.toString());
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> Tag.Named<T> tag(ResourceKey<Registry<T>> key, ResourceLocation res, boolean optional) {
-        StaticTagHelper<T> helper = (StaticTagHelper<T>) StaticTags.get(key.location());
-        return optional ? helper.createOptional(res, null) : helper.bind(res.toString());
     }
 
     protected Optional<IForgeRegistry<?>> forgeRegistryFrom(ResourceKey<? extends Registry<?>> key) {

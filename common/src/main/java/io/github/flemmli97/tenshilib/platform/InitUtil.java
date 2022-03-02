@@ -23,7 +23,7 @@ public class InitUtil {
         }
         if (clss == null)
             TenshiLib.logger.fatal("No Implementation of " + abstractClss + " found with given paths " + Arrays.toString(impls));
-        if (clss != null && abstractClss.isAssignableFrom(clss)) {
+        else if (abstractClss.isAssignableFrom(clss)) {
             try {
                 Constructor<T> constructor = (Constructor<T>) clss.getDeclaredConstructor();
                 return constructor.newInstance();

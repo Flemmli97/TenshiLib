@@ -12,16 +12,12 @@ import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.fabricmc.fabric.api.tag.TagFactory;
-import net.fabricmc.fabric.impl.tag.extension.TagFactoryImpl;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.StaticTagHelper;
-import net.minecraft.tags.Tag;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -124,27 +120,6 @@ public class PlatformUtilsImpl extends PlatformUtils {
     @Override
     public <T extends BlockEntity> BlockEntityType<T> blockEntityType(BiFunction<BlockPos, BlockState, T> func, Block... blocks) {
         return FabricBlockEntityTypeBuilder.create(func::apply, blocks).build();
-    }
-
-    @Override
-    public Tag.Named<Item> itemTag(ResourceLocation res, boolean optional) {
-        return TagFactory.ITEM.create(res);
-    }
-
-    @Override
-    public Tag.Named<Block> blockTag(ResourceLocation res, boolean optional) {
-        return TagFactory.BLOCK.create(res);
-    }
-
-    @Override
-    public Tag.Named<EntityType<?>> entityTag(ResourceLocation res, boolean optional) {
-        return TagFactory.ENTITY_TYPE.create(res);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> Tag.Named<T> tag(ResourceKey<Registry<T>> key, ResourceLocation res, boolean optional) {
-        return ((StaticTagHelper<T>) TagFactoryImpl.TAG_LISTS.get(key)).bind(res.toString());
     }
 
     @Override

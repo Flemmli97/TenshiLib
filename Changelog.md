@@ -1,3 +1,7 @@
+TenshiLib 1.6.2
+================
+- 1.18.2
+
 TenshiLib 1.6.1
 ================
 - Fix nullpointer with config sometimes

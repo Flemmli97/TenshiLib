@@ -8,20 +8,26 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mojang.datafixers.util.Pair;
 import io.github.flemmli97.tenshilib.common.utils.JsonUtils;
+import io.github.flemmli97.tenshilib.platform.PlatformUtils;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ItemTagWrapper extends SimpleItemStackWrapper {
 
     private String tag;
-    private List<Item> list;
+    private List<Item> list = new ArrayList<>();
+    private TagKey<Item> key;
 
     public ItemTagWrapper(String tagName) {
         this(tagName, 1);
@@ -34,8 +40,10 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
 
     @Override
     public Item getItem() {
-        Tag<Item> tags = ItemTags.getAllTags().getTagOrEmpty(new ResourceLocation(this.tag));
-        this.list = tags.getValues();
+        if(this.key == null)
+            this.key = PlatformUtils.INSTANCE.itemTag(new ResourceLocation(this.tag));
+        Optional<HolderSet.Named<Item>> t = Registry.ITEM.getTag(this.key);
+        t.ifPresent(set -> set.forEach(holder -> this.list.add(holder.value())));
         if (!this.list.isEmpty())
             this.item = this.list.get(0);
         else

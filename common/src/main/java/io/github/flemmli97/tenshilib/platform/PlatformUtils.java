@@ -10,6 +10,7 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -102,18 +103,21 @@ public abstract class PlatformUtils {
 
     public abstract <T extends BlockEntity> BlockEntityType<T> blockEntityType(BiFunction<BlockPos, BlockState, T> func, Block... blocks);
 
-    public abstract Tag.Named<Item> itemTag(ResourceLocation res, boolean optional);
+    public TagKey<Item> itemTag(ResourceLocation res) {
+        return TagKey.create(Registry.ITEM_REGISTRY, res);
+    }
 
-    public abstract Tag.Named<Block> blockTag(ResourceLocation res, boolean optional);
+    public TagKey<Block> blockTag(ResourceLocation res) {
+        return TagKey.create(Registry.BLOCK_REGISTRY, res);
+    }
 
-    public abstract Tag.Named<EntityType<?>> entityTag(ResourceLocation res, boolean optional);
+    public TagKey<EntityType<?>> entityTag(ResourceLocation res) {
+        return TagKey.create(Registry.ENTITY_TYPE_REGISTRY, res);
+    }
 
-    /**
-     * Be sure that the tag registry exists before calling this
-     * optional does nothing on fabric
-     * on forge creates an IOptionalNamedTag
-     */
-    public abstract <T> Tag.Named<T> tag(ResourceKey<Registry<T>> key, ResourceLocation res, boolean optional);
+    public <T> TagKey<T> tag(ResourceKey<Registry<T>> key, ResourceLocation res) {
+        return TagKey.create(key, res);
+    }
 
     /**
      * Register an handler for this event without depending on platform loader
