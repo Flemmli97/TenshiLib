@@ -2,6 +2,7 @@ TenshiLib 1.6.3
 ================
 - More helper methods
 - Fix crash on fabric
+- fix json config issues
 
 TenshiLib 1.6.2
 ================

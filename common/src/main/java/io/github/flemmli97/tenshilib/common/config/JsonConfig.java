@@ -33,7 +33,8 @@ public class JsonConfig<T> {
         this.type = type;
         this.name = this.file.getFileName().toString();
         this.element = defaultValue;
-        if (!Files.exists(file))
+        if (!Files.exists(file)) {
+            file.getParent().toFile().mkdirs();
             try {
                 Files.createFile(file);
                 if (this.element != null) {
@@ -42,6 +43,7 @@ public class JsonConfig<T> {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
         this.load();
     }
 
@@ -49,7 +51,8 @@ public class JsonConfig<T> {
         this.file = file;
         this.type = type;
         this.name = this.file.getFileName().toString();
-        if (!Files.exists(file))
+        if (!Files.exists(file)) {
+            file.getParent().toFile().mkdirs();
             try {
                 Files.createFile(file);
                 if (defaultConfig != null && Files.exists(defaultConfig)) {
@@ -58,6 +61,7 @@ public class JsonConfig<T> {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
         this.load();
     }
 

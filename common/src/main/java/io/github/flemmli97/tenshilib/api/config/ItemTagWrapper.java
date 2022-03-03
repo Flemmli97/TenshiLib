@@ -8,7 +8,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.mojang.datafixers.util.Pair;
 import io.github.flemmli97.tenshilib.common.utils.JsonUtils;
 import io.github.flemmli97.tenshilib.platform.PlatformUtils;
 import net.minecraft.core.HolderSet;
@@ -40,7 +39,7 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
 
     @Override
     public Item getItem() {
-        if(this.key == null)
+        if (this.key == null)
             this.key = PlatformUtils.INSTANCE.itemTag(new ResourceLocation(this.tag));
         Optional<HolderSet.Named<Item>> t = Registry.ITEM.getTag(this.key);
         t.ifPresent(set -> set.forEach(holder -> this.list.add(holder.value())));
