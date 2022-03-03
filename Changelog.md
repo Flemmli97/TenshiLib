@@ -1,3 +1,8 @@
+TenshiLib 1.6.3
+================
+- More helper methods
+- Fix crash on fabric
+
 TenshiLib 1.6.2
 ================
 - 1.18.2

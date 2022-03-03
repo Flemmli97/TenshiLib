@@ -15,6 +15,7 @@ public class AnimationHandler<T extends Entity & IAnimated> {
     private final AnimatedAction[] anims;
     private Function<AnimatedAction, Boolean> onAnimationSetFunc;
     private Consumer<AnimatedAction> onAnimationSetCons;
+    private Consumer<AnimatedAction> onRunAnimation;
 
     public AnimationHandler(T entity, AnimatedAction[] anims) {
         this.entity = entity;
@@ -32,6 +33,14 @@ public class AnimationHandler<T extends Entity & IAnimated> {
         return this;
     }
 
+    /**
+     * Adds a handler for an AnimatedAction.
+     */
+    public AnimationHandler<T> addActionHandle(Consumer<AnimatedAction> handleAction) {
+        this.onRunAnimation = handleAction;
+        return this;
+    }
+
     @Nullable
     public AnimatedAction getAnimation() {
         return this.currentAnim;
@@ -41,6 +50,11 @@ public class AnimationHandler<T extends Entity & IAnimated> {
         if (this.isCurrentAnim(id)) {
             anim.accept(this.getAnimation());
         }
+    }
+
+    public void runIfNotNull(Consumer<AnimatedAction> cons) {
+        if (this.currentAnim != null)
+            cons.accept(this.currentAnim);
     }
 
     public boolean hasAnimation() {
@@ -76,7 +90,11 @@ public class AnimationHandler<T extends Entity & IAnimated> {
     }
 
     public void tick() {
-        if (this.hasAnimation() && this.getAnimation().tick())
-            this.setAnimation(null);
+        if (this.hasAnimation()) {
+            if (this.getAnimation().tick())
+                this.setAnimation(null);
+            else if (this.onRunAnimation != null)
+                this.onRunAnimation.accept(this.getAnimation());
+        }
     }
 }
