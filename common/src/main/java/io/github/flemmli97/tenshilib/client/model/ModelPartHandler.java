@@ -25,6 +25,15 @@ public class ModelPartHandler {
         this.mainPart.getMappedParts(this.childrenToName);
     }
 
+    /**
+     * If you have multiple "main" parts
+     */
+    public ModelPartHandler(ModelPart root) {
+        this.mainPart = new ModelPartExtended(root);
+        this.childrenToName.put("root", this.mainPart);
+        this.mainPart.getMappedParts(this.childrenToName);
+    }
+
     public ModelPartExtended getPart(String name) {
         ModelPartExtended modelPart = this.childrenToName.get(name);
         if (modelPart == null) {

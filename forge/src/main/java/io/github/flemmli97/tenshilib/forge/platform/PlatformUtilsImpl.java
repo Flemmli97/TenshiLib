@@ -14,9 +14,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -108,14 +105,14 @@ public class PlatformUtilsImpl extends PlatformUtils {
     @Override
     public <T> SimpleRegistryWrapper<T> registry(ResourceKey<? extends Registry<T>> key) {
         return this.forgeRegistryFrom(key).map(reg -> ((SimpleRegistryWrapper<T>) new ForgeRegistryWrapper<>(reg)))
-                .orElse(new VanillaRegistryWrapper<T>(this.registryFrom(key)));
+                .orElseGet(() -> new VanillaRegistryWrapper<T>(this.registryFrom(key)));
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> PlatformRegistry<T> of(ResourceKey<? extends Registry<T>> key, String modid) {
         return this.forgeRegistryFrom(key).map(reg -> ((PlatformRegistry<T>) new ForgeRegistryHandler<>(DeferredRegister.create(reg, modid))))
-                .orElse(super.of(key, modid));
+                .orElseGet(() -> super.of(key, modid));
     }
 
     @Override
@@ -134,7 +131,7 @@ public class PlatformUtilsImpl extends PlatformUtils {
 
     @Override
     public CreativeModeTab tab(ResourceLocation label, Supplier<ItemStack> icon) {
-        return new CreativeModeTab(label.toString()) {
+        return new CreativeModeTab(String.format("%s.%s", label.getNamespace(), label.getPath())) {
             @Override
             public ItemStack makeIcon() {
                 return icon.get();
