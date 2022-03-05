@@ -3,6 +3,7 @@ package io.github.flemmli97.tenshilib.common.config;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import io.github.flemmli97.tenshilib.TenshiLib;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
 import org.apache.commons.lang3.tuple.Pair;
@@ -119,6 +120,7 @@ public class CommentedJsonConfig {
 
         private List<String> comments;
         private final Map<String, CommentedVal<?>> conf = new LinkedHashMap<>();
+        private String path = "";
 
         public Builder comment(String... comments) {
             List<String> list = new ArrayList<>();
@@ -130,11 +132,37 @@ public class CommentedJsonConfig {
             return this;
         }
 
+        public Builder push(String path) {
+            if (this.path.isEmpty())
+                this.path = path;
+            else
+                this.path = path + "." + this.path;
+            return this;
+        }
+
+        public Builder pop() {
+            if (this.path.isEmpty()) {
+                TenshiLib.logger.error("Tried to pop config with empty path!");
+                return this;
+            }
+            int i = this.path.indexOf(".");
+            if (i >= 0 && i + 1 < this.path.length())
+                this.path = this.path.substring(i + 1);
+            else
+                this.path = "";
+            return this;
+        }
+
         public <T> CommentedVal<T> define(String name, T value) {
-            CommentedVal<T> commentedVal = new CommentedVal<>(this.comments, value);
-            this.conf.put(name, commentedVal);
+            return this.define(name, new CommentedVal<>(this.comments, value));
+        }
+
+        private <C, T extends CommentedVal<C>> T define(String name, T val) {
+            if (!this.path.isEmpty())
+                name = this.path + "." + name;
+            this.conf.put(name, val);
             this.comments = null;
-            return commentedVal;
+            return val;
         }
 
         public IntVal defineInRange(String name, int value, int min, int max) {
@@ -145,10 +173,7 @@ public class CommentedJsonConfig {
                 comment.add("Range: < " + min);
             else
                 comment.add("Range: " + min + " ~ " + max);
-            IntVal commentedVal = new IntVal(comment, value, min, max);
-            this.comments = null;
-            this.conf.put(name, commentedVal);
-            return commentedVal;
+            return this.define(name, new IntVal(comment, value, min, max));
         }
 
         public DoubleVal defineInRange(String name, double value, double min, double max) {
@@ -159,10 +184,7 @@ public class CommentedJsonConfig {
                 comment.add("Range: < " + min);
             else
                 comment.add("Range: " + min + " ~ " + max);
-            DoubleVal commentedVal = new DoubleVal(comment, value, min, max);
-            this.comments = null;
-            this.conf.put(name, commentedVal);
-            return commentedVal;
+            return this.define(name, new DoubleVal(comment, value, min, max));
         }
 
         public static <C> Pair<JsonConfig<CommentedJsonConfig>, C> create(Path file, int version, Function<Builder, C> cons) {
