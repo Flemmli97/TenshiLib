@@ -43,6 +43,13 @@ public class ModelPartHandler {
         }
     }
 
+    /**
+     * Used only in animation
+     */
+    protected ModelPartExtended getPartNullable(String name) {
+        return this.childrenToName.get(name);
+    }
+
     public void resetPoses() {
         this.mainPart.resetAll();
     }

@@ -135,7 +135,9 @@ public class BlockBenchAnimations {
         }
 
         public void animate(ExtendedModel model, int ticker, float partialTicks) {
-            ModelPartHandler.ModelPartExtended modelPart = model.getHandler().getPart(this.name);
+            ModelPartHandler.ModelPartExtended modelPart = model.getHandler().getPartNullable(this.name);
+            if (modelPart == null)
+                return;
             float actualTick = Math.max(ticker - 1 + partialTicks, 0);
             if (this.positions != null) {
                 if (this.positions.length == 1) {
