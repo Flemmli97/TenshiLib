@@ -89,6 +89,51 @@ public class MathUtils {
     }
 
     /**
+     * Creates an array of all corner points of a regular polygon
+     *
+     * @param shape The number of corners of the polygon. E.g. 3 for a triangle
+     * @param width The width of the outer circle
+     * @return Array of pairs of (x, y) coords
+     */
+    public static double[][] createRegularPolygonPoints(int shape, float width) {
+        if (shape <= 2)
+            throw new IllegalArgumentException("Can't create a polygon with 2 or less corners!");
+        double[][] res = new double[shape][];
+        Vec3 base = new Vec3(width, 0, 0);
+        float rotatePer = 360 / (float) shape;
+        Vec3 axis = new Vec3(0, 0, 1);
+        if (shape % 2 == 0)
+            base = MathUtils.rotate(axis, base, MathUtils.degToRad(rotatePer * 0.5f));
+        res[0] = new double[]{base.x, base.y};
+        float angle = rotatePer;
+        for (int i = 1; i < shape; i++) {
+            Vec3 rotated = MathUtils.rotate(axis, base, MathUtils.degToRad(angle));
+            angle += rotatePer;
+            res[i] = new double[]{rotated.x, rotated.y, rotated.z};
+        }
+        return res;
+    }
+
+    public static float[][] createRegularPolygonPointsF(int shape, float width) {
+        if (shape <= 2)
+            throw new IllegalArgumentException("Can't create a polygon with 2 or less corners!");
+        float[][] res = new float[shape][];
+        Vec3 base = new Vec3(width, 0, 0);
+        float rotatePer = 360 / (float) shape;
+        Vec3 axis = new Vec3(0, 0, 1);
+        if (shape % 2 == 0)
+            base = MathUtils.rotate(axis, base, MathUtils.degToRad(rotatePer * 0.5f));
+        res[0] = new float[]{(float) base.x, (float) base.y};
+        float angle = rotatePer;
+        for (int i = 1; i < shape; i++) {
+            Vec3 rotated = MathUtils.rotate(axis, base, MathUtils.degToRad(angle));
+            angle += rotatePer;
+            res[i] = new float[]{(float) rotated.x, (float) rotated.y};
+        }
+        return res;
+    }
+
+    /**
      * Checks if the given point is in front of the line.
      * The line here is assumed to be a finite line with the given starting point.
      *
