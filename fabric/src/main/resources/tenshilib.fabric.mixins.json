@@ -7,7 +7,8 @@
     "ServerPlayerGameModeMixin"
   ],
   "client": [
-    "MinecraftMixin"
+    "MinecraftMixin",
+    "ParticleEngineMixin"
   ],
   "injectors": {
     "defaultRequire": 1
