@@ -33,10 +33,14 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
     }
 
     public RenderBeam(EntityRendererProvider.Context ctx, float width, int polygon) {
+        this(ctx, width, width - 0.25f, polygon);
+    }
+
+    public RenderBeam(EntityRendererProvider.Context ctx, float glowWidth, float innerWidth, int polygon) {
         super(ctx);
-        this.radius = width;
-        this.points = MathUtils.createRegularPolygonPointsF(polygon, width - 0.25f);
-        this.pointsGlow = MathUtils.createRegularPolygonPointsF(polygon, width);
+        this.radius = glowWidth;
+        this.points = MathUtils.createRegularPolygonPointsF(polygon, innerWidth);
+        this.pointsGlow = MathUtils.createRegularPolygonPointsF(polygon, glowWidth);
     }
 
     public void setColor(int hexColor) {

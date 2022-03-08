@@ -1,3 +1,7 @@
+TenshiLib 1.6.4
+================
+- Fixes and improvements. Mostly internal
+
 TenshiLib 1.6.3
 ================
 - More helper methods
