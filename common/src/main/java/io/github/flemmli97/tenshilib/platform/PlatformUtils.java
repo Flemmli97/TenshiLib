@@ -62,7 +62,6 @@ public abstract class PlatformUtils {
      */
     public abstract <T> SimpleRegistryWrapper<T> registry(ResourceKey<? extends Registry<T>> key);
 
-    @SuppressWarnings("unchecked")
     public <T> ResourceLocation idOf(T t, ResourceKey<? extends Registry<T>> key) {
         return this.registryFrom(key).getKey(t);
     }
@@ -72,7 +71,6 @@ public abstract class PlatformUtils {
      * The registry needs to exist for the key else an exeption will be thrown.
      * Registering to custom registries is not possible since T needs to also implement IForgeRegistryEntry on forge
      */
-    @SuppressWarnings("unchecked")
     public <T> PlatformRegistry<T> of(ResourceKey<? extends Registry<T>> key, String modid) {
         return new VanillaRegistryHandler<>(key, modid);
     }

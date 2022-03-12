@@ -1,5 +1,6 @@
 package io.github.flemmli97.tenshilib.common.config;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Json config with comments that is syntax wise simliar to setup to the forge config.
@@ -26,12 +28,16 @@ import java.util.function.Function;
 public class CommentedJsonConfig {
 
     private final Map<String, CommentedVal<?>> configVals;
+    public final Map<String, List<String>> categoryComments;
+    private final Runnable reloadHandler;
 
     private final int confVersion;
 
-    private CommentedJsonConfig(int version, Map<String, CommentedVal<?>> map) {
+    private CommentedJsonConfig(int version, Runnable reloadHandler, Map<String, CommentedVal<?>> map, Map<String, List<String>> categoryComments) {
         this.confVersion = version;
         this.configVals = map;
+        this.categoryComments = categoryComments;
+        this.reloadHandler = reloadHandler;
     }
 
     public JsonObject serialize(Gson gson) {
@@ -65,14 +71,24 @@ public class CommentedJsonConfig {
         return faulty;
     }
 
+    public Map<String, CommentedVal<?>> getConfigVals() {
+        return ImmutableMap.copyOf(this.configVals);
+    }
+
+    public void onReload() {
+        this.reloadHandler.run();
+    }
+
     public static class CommentedVal<T> {
 
         protected final List<String> __comments;
         protected T input;
+        protected final T defaultVal;
 
         private CommentedVal(List<String> comments, T input) {
             this.__comments = comments;
             this.input = input;
+            this.defaultVal = input;
         }
 
         public T get() {
@@ -86,7 +102,7 @@ public class CommentedJsonConfig {
 
     public static class IntVal extends CommentedVal<Integer> {
 
-        private transient final int min, max;
+        protected transient final int min, max;
 
         private IntVal(List<String> comments, int input, int min, int max) {
             super(comments, input);
@@ -102,7 +118,7 @@ public class CommentedJsonConfig {
 
     public static class DoubleVal extends CommentedVal<Double> {
 
-        private final transient double min, max;
+        protected final transient double min, max;
 
         private DoubleVal(List<String> comments, double input, double min, double max) {
             super(comments, input);
@@ -116,11 +132,24 @@ public class CommentedJsonConfig {
         }
     }
 
+    public static class ListVal<T> extends CommentedVal<List<T>> {
+
+        protected final Predicate<T> validator;
+
+        private ListVal(List<String> comments, List<T> input, Predicate<T> test) {
+            super(comments, input);
+            this.validator = test;
+        }
+    }
+
     public static class Builder {
 
         private List<String> comments;
         private final Map<String, CommentedVal<?>> conf = new LinkedHashMap<>();
         private String path = "";
+        private final Map<String, List<String>> categoryComments = new LinkedHashMap<>();
+        private Runnable reloadHandler = () -> {
+        };
 
         public Builder comment(String... comments) {
             List<String> list = new ArrayList<>();
@@ -137,6 +166,9 @@ public class CommentedJsonConfig {
                 this.path = path;
             else
                 this.path = path + "." + this.path;
+            if (this.comments != null)
+                this.categoryComments.put(this.path, this.comments);
+            this.comments = null;
             return this;
         }
 
@@ -153,8 +185,15 @@ public class CommentedJsonConfig {
             return this;
         }
 
+        @SuppressWarnings("unchecked")
         public <T> CommentedVal<T> define(String name, T value) {
+            if (value instanceof List v)
+                return this.defineList(name, v, s -> true);
             return this.define(name, new CommentedVal<>(this.comments, value));
+        }
+
+        public <T> CommentedVal<List<T>> defineList(String name, List<T> value, Predicate<T> validator) {
+            return this.define(name, new ListVal<>(this.comments, value, validator));
         }
 
         private <C, T extends CommentedVal<C>> T define(String name, T val) {
@@ -187,10 +226,15 @@ public class CommentedJsonConfig {
             return this.define(name, new DoubleVal(comment, value, min, max));
         }
 
+        public Builder registerReloadHandler(Runnable run) {
+            this.reloadHandler = run;
+            return this;
+        }
+
         public static <C> Pair<JsonConfig<CommentedJsonConfig>, C> create(Path file, int version, Function<Builder, C> cons) {
             Builder builder = new Builder();
             C c = cons.apply(builder);
-            return Pair.of(new JsonConfig<>(file, CommentedJsonConfig.class, new CommentedJsonConfig(version, builder.conf)), c);
+            return Pair.of(new JsonConfig<>(file, CommentedJsonConfig.class, new CommentedJsonConfig(version, builder.reloadHandler, builder.conf, ImmutableMap.copyOf(builder.categoryComments))), c);
         }
     }
 }

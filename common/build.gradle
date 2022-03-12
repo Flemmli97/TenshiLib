@@ -12,6 +12,16 @@ loom {
     accessWidenerPath.set project(":fabric").file("src/main/resources/tenshilib.accesswidener")
 }
 
+repositories {
+    maven { url "https://maven.shedaniel.me/" }
+}
+
+dependencies {
+    modCompileOnlyApi("me.shedaniel.cloth:cloth-config-fabric:${cloth_config}") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+}
+
 publishing {
     publications {
         mavenCommon(MavenPublication) {
