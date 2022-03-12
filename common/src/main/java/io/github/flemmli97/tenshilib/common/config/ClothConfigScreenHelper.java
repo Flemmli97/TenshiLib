@@ -163,12 +163,12 @@ public class ClothConfigScreenHelper {
             while (s.length() >= stringLength) {
                 String st = s.substring(0, stringLength);
                 int whiteSpace = st.lastIndexOf(" ");
-                if(whiteSpace < 0)
+                if (whiteSpace < 0)
                     whiteSpace = st.length();
                 wrapped.add(new TextComponent(st.substring(0, whiteSpace)));
                 s = s.substring(stringLength);
-                if(whiteSpace + 1 < st.length())
-                    s = st.substring(whiteSpace+1) + s;
+                if (whiteSpace + 1 < st.length())
+                    s = st.substring(whiteSpace + 1) + s;
             }
             wrapped.add(new TextComponent(s));
         }

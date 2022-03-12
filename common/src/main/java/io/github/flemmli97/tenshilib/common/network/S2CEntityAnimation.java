@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class S2CEntityAnimation implements Packet {
 
-    public static final ResourceLocation ID = new ResourceLocation(TenshiLib.MODID, "S2C_entity_animation");
+    public static final ResourceLocation ID = new ResourceLocation(TenshiLib.MODID, "s2c_entity_animation");
 
     private final int entityID;
     private final int animID;

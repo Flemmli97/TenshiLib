@@ -13,7 +13,7 @@ import net.minecraft.world.phys.EntityHitResult;
 
 public class C2SPacketHit implements Packet {
 
-    public static final ResourceLocation ID = new ResourceLocation(TenshiLib.MODID, "c_2_item_special");
+    public static final ResourceLocation ID = new ResourceLocation(TenshiLib.MODID, "c2s_item_special");
 
     private final HitType type;
 

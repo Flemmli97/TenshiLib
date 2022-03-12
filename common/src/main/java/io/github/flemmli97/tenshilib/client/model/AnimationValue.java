@@ -14,16 +14,16 @@ public class AnimationValue {
         this.zVal = zVal;
     }
 
-    public float getXVal(float tick) {
-        return Mth.DEG_TO_RAD * this.xVal.get(tick * 0.05f);
+    public float getXVal(float time) {
+        return Mth.DEG_TO_RAD * this.xVal.get(time);
     }
 
-    public float getYVal(float tick) {
-        return Mth.DEG_TO_RAD * this.yVal.get(tick * 0.05f);
+    public float getYVal(float time) {
+        return Mth.DEG_TO_RAD * this.yVal.get(time);
     }
 
-    public float getZVal(float tick) {
-        return Mth.DEG_TO_RAD * this.zVal.get(tick * 0.05f);
+    public float getZVal(float time) {
+        return Mth.DEG_TO_RAD * this.zVal.get(time);
     }
 
     @Override
