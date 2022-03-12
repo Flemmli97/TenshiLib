@@ -2,7 +2,7 @@ package io.github.flemmli97.tenshilib.fabric;
 
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import io.github.flemmli97.tenshilib.fabric.events.CommonEvents;
-import io.github.flemmli97.tenshilib.fabric.network.PacketHandler;
+import io.github.flemmli97.tenshilib.fabric.network.ServerPacketHandler;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
@@ -14,7 +14,7 @@ public class TenshiLibFabric implements ModInitializer {
     public void onInitialize() {
         AttackBlockCallback.EVENT.register(CommonEvents::leftClickBlock);
         UseItemCallback.EVENT.register(CommonEvents::disableOffhand);
-        PacketHandler.register();
+        ServerPacketHandler.register();
         for (SpawnEgg egg : SpawnEgg.getEggs())
             DispenserBlock.registerBehavior(egg, egg.dispenser());
     }
