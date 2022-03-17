@@ -10,6 +10,8 @@
     "LivingOverlayMixin",
     "OverlayTextureMixin",
     "ModelPartAccessor",
+    "ScreenAccessor",
+    "HumanoidArmorMixin",
     "dual.LivingEntityMixin",
     "dual.ItemInHandRendererMixin",
     "dual.PlayerMixin"

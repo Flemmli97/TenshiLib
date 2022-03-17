@@ -5,6 +5,8 @@ import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import io.github.flemmli97.tenshilib.forge.client.events.ClientEvents;
 import io.github.flemmli97.tenshilib.forge.events.CommonEvents;
 import io.github.flemmli97.tenshilib.forge.network.PacketHandler;
+import io.github.flemmli97.tenshilib.forge.platform.patreon.PatreonImpl;
+import io.github.flemmli97.tenshilib.patreon.client.PatreonClientPlatform;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -24,9 +26,11 @@ public class TenshiLibForge {
         forgeBus.addListener(CommonEvents::leftClickBlock);
         forgeBus.addListener(CommonEvents::disableOffhand);
         forgeBus.addListener(CommonEvents::disableOffhandBlock);
+        PatreonImpl.initPatreonData();
         if (FMLEnvironment.dist == Dist.CLIENT) {
             modBus.addListener(ClientEvents::reloadListener);
             modBus.addListener(ClientEvents::itemColors);
+            PatreonClientPlatform.INSTANCE.setup();
             forgeBus.addListener(ClientEvents::clickSpecial);
         }
     }

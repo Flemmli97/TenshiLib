@@ -1,6 +1,9 @@
 TenshiLib 1.6.4
 ================
 - Fixes and improvements. Mostly internal
+- Add cloth config screen creation for CommentedJsonConfig system
+- Simple math expressions for animated entities
+- Add patreon benefits
 
 TenshiLib 1.6.3
 ================

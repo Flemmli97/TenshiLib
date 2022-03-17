@@ -1,0 +1,29 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"iddle": {
+			"loop": true,
+			"animation_length": 4,
+			"bones": {
+				"layer3": {
+					"rotation": ["math.cos(time*450)*0.5", 0, 0]
+				},
+				"layer4": {
+					"rotation": ["math.cos(time*450)", 0, 0]
+				},
+				"layer5": {
+					"rotation": [0, "math.cos(time*360)", 0]
+				},
+				"tip1": {
+					"rotation": [0, "math.cos(time*360)", 0]
+				},
+				"tip2": {
+					"rotation": [0, "math.cos(time*360)", 0]
+				},
+				"tip3": {
+					"rotation": [0, "math.cos(time*360)", 0]
+				}
+			}
+		}
+	}
+}

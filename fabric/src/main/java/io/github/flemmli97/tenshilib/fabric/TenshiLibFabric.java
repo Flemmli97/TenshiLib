@@ -3,6 +3,7 @@ package io.github.flemmli97.tenshilib.fabric;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import io.github.flemmli97.tenshilib.fabric.events.CommonEvents;
 import io.github.flemmli97.tenshilib.fabric.network.ServerPacketHandler;
+import io.github.flemmli97.tenshilib.fabric.platform.patreon.PatreonImpl;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
@@ -17,5 +18,6 @@ public class TenshiLibFabric implements ModInitializer {
         ServerPacketHandler.register();
         for (SpawnEgg egg : SpawnEgg.getEggs())
             DispenserBlock.registerBehavior(egg, egg.dispenser());
+        PatreonImpl.initPatreonData();
     }
 }

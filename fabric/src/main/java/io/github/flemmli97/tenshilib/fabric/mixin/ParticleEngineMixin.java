@@ -21,7 +21,7 @@ import java.util.List;
  * mojank hardcoding stuff again
  */
 @Mixin(ParticleEngine.class)
-public class ParticleEngineMixin {
+public abstract class ParticleEngineMixin {
 
     @Mutable
     @Final

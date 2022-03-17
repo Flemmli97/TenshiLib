@@ -1,6 +1,7 @@
 package io.github.flemmli97.tenshilib.client.model;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
+import net.minecraft.util.Mth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +12,10 @@ import java.util.regex.Pattern;
  * Simple molang animation parser cause yes.
  * Made it cause I didn't want to use another library and also as a way of learning.
  * Can parse simple math expressions with sin and cos support and a single variable
- * of name "time" or "query.time"
+ * of name "time" or "query.time".
+ * sin and cos both use deg
  * Example parsable expression:
+ * 1 -> 1
  * 1+2+3+4+5 -> 15
  * 1+2+3*4 -> 15
  * math.sin(time*5)
@@ -99,7 +102,7 @@ public class SimpleAnimationExpression {
                 Value v = null;
                 while (!ops.empty() && ops.peek().priority > type.priority) {
                     Type t = ops.pop();
-                    v = t(t, consts, v);
+                    v = read(t, consts, v);
                 }
                 ops.push(type);
                 consts.push(v);
@@ -109,14 +112,14 @@ public class SimpleAnimationExpression {
         Value v = null;
         while (!ops.empty()) {
             Type t = ops.pop();
-            v = t(t, consts, v);
+            v = read(t, consts, v);
         }
         if (v == null && !consts.empty())
             v = consts.pop();
         return v;
     }
 
-    private static Value t(Type t, Stack<Value> stack, Value prev) {
+    private static Value read(Type t, Stack<Value> stack, Value prev) {
         switch (t) {
             case ADD -> {
                 Value sec = stack.pop();
@@ -124,6 +127,8 @@ public class SimpleAnimationExpression {
                 return new Addition(first, sec);
             }
             case SUB -> {
+                if (stack.empty())
+                    return new NegValue(prev);
                 Value sec = stack.pop();
                 Value first = prev != null ? prev : stack.pop();
                 return new Substraction(first, sec);
@@ -162,6 +167,19 @@ public class SimpleAnimationExpression {
         @Override
         public String toString() {
             return this.constant + "";
+        }
+    }
+
+    record NegValue(Value val) implements Value {
+
+        @Override
+        public float get(float time) {
+            return -this.val.get(time);
+        }
+
+        @Override
+        public String toString() {
+            return "-" + this.val;
         }
     }
 
@@ -242,7 +260,7 @@ public class SimpleAnimationExpression {
 
         @Override
         public float get(float time) {
-            return (float) Math.sin(this.value.get(time));
+            return Mth.sin(Mth.DEG_TO_RAD * this.value.get(time));
         }
 
         @Override
@@ -255,7 +273,7 @@ public class SimpleAnimationExpression {
 
         @Override
         public float get(float time) {
-            return (float) Math.cos(this.value.get(time));
+            return Mth.cos(Mth.DEG_TO_RAD * this.value.get(time));
         }
 
         @Override

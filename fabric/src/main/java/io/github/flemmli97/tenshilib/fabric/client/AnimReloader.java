@@ -1,4 +1,4 @@
-package io.github.flemmli97.tenshilib.fabric;
+package io.github.flemmli97.tenshilib.fabric.client;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.client.AnimationManager;

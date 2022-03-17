@@ -4,11 +4,16 @@
   "package": "io.github.flemmli97.tenshilib.fabric.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "ServerPlayerGameModeMixin"
+    "ServerPlayerGameModeMixin",
+    "PlayerMixin",
+    "ServerPlayerMixin",
+    "TrackingMixin"
   ],
   "client": [
     "MinecraftMixin",
-    "ParticleEngineMixin"
+    "ParticleEngineMixin",
+    "EntityRendererDispatcherMixin",
+    "LivingEntityRendererAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -169,9 +169,9 @@ public class BlockBenchAnimations {
             }
             if (this.rotations != null) {
                 if (this.rotations.length == 1) {
-                    modelPart.xRot += this.rotations[0].getXVal(secTime);
-                    modelPart.yRot += this.rotations[0].getYVal(secTime);
-                    modelPart.zRot += this.rotations[0].getZVal(secTime);
+                    modelPart.xRot += Mth.DEG_TO_RAD * this.rotations[0].getXVal(secTime);
+                    modelPart.yRot += Mth.DEG_TO_RAD * this.rotations[0].getYVal(secTime);
+                    modelPart.zRot += Mth.DEG_TO_RAD * this.rotations[0].getZVal(secTime);
                 } else {
                     int id = 1;
                     AnimationValue rot = this.rotations[id];
@@ -179,9 +179,9 @@ public class BlockBenchAnimations {
                         rot = this.rotations[id];
                     AnimationValue rotPrev = this.rotations[id - 1];
                     float prog = Mth.clamp((actualTick - rotPrev.startTick) / (rot.startTick - rotPrev.startTick), 0F, 1F);
-                    modelPart.xRot += this.interpolate(rotPrev.getXVal(secTime), rot.getXVal(secTime), prog);
-                    modelPart.yRot += this.interpolate(rotPrev.getYVal(secTime), rot.getYVal(secTime), prog);
-                    modelPart.zRot += this.interpolate(rotPrev.getZVal(secTime), rot.getZVal(secTime), prog);
+                    modelPart.xRot += Mth.DEG_TO_RAD * this.interpolate(rotPrev.getXVal(secTime), rot.getXVal(secTime), prog);
+                    modelPart.yRot += Mth.DEG_TO_RAD * this.interpolate(rotPrev.getYVal(secTime), rot.getYVal(secTime), prog);
+                    modelPart.zRot += Mth.DEG_TO_RAD * this.interpolate(rotPrev.getZVal(secTime), rot.getZVal(secTime), prog);
                 }
             }
             if (this.scales != null) {

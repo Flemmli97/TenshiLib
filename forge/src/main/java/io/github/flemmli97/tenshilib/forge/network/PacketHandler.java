@@ -6,8 +6,10 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraftforge.network.ConnectionData;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
@@ -19,7 +21,8 @@ import java.util.function.Supplier;
 
 public class PacketHandler {
 
-    private static final SimpleChannel dispatcher = NetworkRegistry.ChannelBuilder.named(new ResourceLocation(TenshiLib.MODID, "packets"))
+    private static final ResourceLocation channelID = new ResourceLocation(TenshiLib.MODID, "packets");
+    private static final SimpleChannel dispatcher = NetworkRegistry.ChannelBuilder.named(channelID)
             .clientAcceptedVersions(a -> true).serverAcceptedVersions(a -> true).networkProtocolVersion(() -> "1").simpleChannel();
 
     public static void register() {
@@ -41,12 +44,18 @@ public class PacketHandler {
         dispatcher.sendToServer(message);
     }
 
-    public static <T> void sendToClient(T message, ServerPlayer player) {
-        dispatcher.sendTo(message, player.connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
+    public static <T> void sendToClientChecked(T message, ServerPlayer player) {
+        if (hasChannel(player))
+            dispatcher.sendTo(message, player.connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
     }
 
     public static <T> void sendToTracking(T message, Entity e) {
         dispatcher.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> e), message);
+    }
+
+    private static boolean hasChannel(ServerPlayer player) {
+        ConnectionData data = NetworkHooks.getConnectionData(player.connection.connection);
+        return data != null && data.getChannels().containsKey(channelID);
     }
 
     private static <T> BiConsumer<T, Supplier<NetworkEvent.Context>> handlerServer(BiConsumer<T, ServerPlayer> handler) {
