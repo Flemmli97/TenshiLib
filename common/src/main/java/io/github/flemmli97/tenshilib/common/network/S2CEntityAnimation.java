@@ -62,7 +62,9 @@ public class S2CEntityAnimation implements Packet {
         return new S2CEntityAnimation(buf.readInt(), buf.readInt());
     }
 
-    public static void handlePacket(S2CEntityAnimation pkt) {
-        ClientHandlers.updateAnim(pkt.entityID, pkt.animID);
+    public static class Handler {
+        public static void handlePacket(S2CEntityAnimation pkt) {
+            ClientHandlers.updateAnim(pkt.entityID, pkt.animID);
+        }
     }
 }

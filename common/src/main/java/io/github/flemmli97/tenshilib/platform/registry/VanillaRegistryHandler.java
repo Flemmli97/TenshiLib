@@ -28,15 +28,13 @@ public class VanillaRegistryHandler<T> implements PlatformRegistry<T> {
     public <I extends T> RegistryEntrySupplier<I> register(String name, Supplier<? extends I> sup) {
         ResourceLocation id = new ResourceLocation(this.modid, name);
         VanillaEntrySupplier<I> v = new VanillaEntrySupplier<>(id);
-        this.entries.putIfAbsent((VanillaEntrySupplier<T>) v, () -> sup.get());
+        this.entries.putIfAbsent((VanillaEntrySupplier<T>) v, sup);
         return v;
     }
 
     @Override
-    public void finalize(Object r) {
-        Registry<T> registry = this.registryFrom(this.key);
-        if (registry == null)
-            throw new NullPointerException("Registry is null during init " + this.key);
+    public void registerContent() {
+        Registry<T> registry = this.registryFrom();
         this.entries.forEach((v, s) -> {
             Registry.register(registry, v.getID(), s.get());
             v.updateValue(registry);
@@ -44,10 +42,10 @@ public class VanillaRegistryHandler<T> implements PlatformRegistry<T> {
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> Registry<T> registryFrom(ResourceKey<? extends Registry<T>> key) {
-        Registry<?> reg = Registry.REGISTRY.get(key.location());
+    protected Registry<T> registryFrom() {
+        Registry<?> reg = Registry.REGISTRY.get(this.key.location());
         if (reg == null)
-            throw new NullPointerException("Failed to get a corresponding registry for " + key);
+            throw new NullPointerException("Failed to get a corresponding registry for " + this.key);
         return (Registry<T>) reg;
     }
 

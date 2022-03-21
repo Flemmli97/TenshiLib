@@ -19,8 +19,8 @@ public class PacketRegistrar {
     }
 
     public static int registerClientPackets(ClientPacketRegister register, int id) {
-        register.registerMessage(id++, S2CEntityAnimation.ID, S2CEntityAnimation.class, S2CEntityAnimation::write, S2CEntityAnimation::fromBytes, S2CEntityAnimation::handlePacket);
-        register.registerMessage(id++, S2CEffectUpdatePkt.ID, S2CEffectUpdatePkt.class, S2CEffectUpdatePkt::write, S2CEffectUpdatePkt::fromBytes, S2CEffectUpdatePkt::handlePktClient);
+        register.registerMessage(id++, S2CEntityAnimation.ID, S2CEntityAnimation.class, S2CEntityAnimation::write, S2CEntityAnimation::fromBytes, S2CEntityAnimation.Handler::handlePacket);
+        register.registerMessage(id++, S2CEffectUpdatePkt.ID, S2CEffectUpdatePkt.class, S2CEffectUpdatePkt::write, S2CEffectUpdatePkt::fromBytes, S2CEffectUpdatePkt.Handler::handlePktClient);
         return id;
     }
 

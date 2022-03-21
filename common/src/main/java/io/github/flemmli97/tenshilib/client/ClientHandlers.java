@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 
 public class ClientHandlers {
 
@@ -23,5 +24,9 @@ public class ClientHandlers {
         int oV = (int) (f * 15);
         int oU = (entity.hurtTime > 0 || entity.deathTime > 0) ? 3 : 10;
         return OverlayTexture.pack(overlay.overlayU(oV), overlay.overlayV(oU));
+    }
+
+    public static Player clientPlayer() {
+        return Minecraft.getInstance().player;
     }
 }

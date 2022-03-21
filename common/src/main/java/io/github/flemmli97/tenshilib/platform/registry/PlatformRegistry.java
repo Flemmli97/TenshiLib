@@ -8,9 +8,14 @@ public interface PlatformRegistry<T> {
     <I extends T> RegistryEntrySupplier<I> register(String name, Supplier<? extends I> sup);
 
     /**
-     * Register the registry. For fabric passing null is fine. For forge pass in the modbus
+     * Use registerContent
      */
-    void finalize(Object r);
+    @Deprecated
+    default void finalize(Object r) {
+        this.registerContent();
+    }
+
+    void registerContent();
 
     Collection<? extends RegistryEntrySupplier<T>> getEntries();
 }

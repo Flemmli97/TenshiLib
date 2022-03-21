@@ -79,14 +79,14 @@ public abstract class PlatformUtils {
      * Obtains a custom registry.
      * Note on fabric: Since there is no loading order be careful of calling this. The registry might not have been created yet
      */
-    public abstract <T extends CustomRegistryEntry<T>> PlatformRegistry<T> customRegistry(Class<T> clss, ResourceLocation registryID, String modid);
+    public abstract <T extends CustomRegistryEntry<T>> PlatformRegistry<T> customRegistry(Class<T> clss, ResourceKey<? extends Registry<T>> registryKey, String modid);
 
     /**
      * Creates a custom registry.
      * On fabric the registry is created immediately
      * On forge the registry is created on RegistryEvent.NewRegistry
      */
-    public abstract <T extends CustomRegistryEntry<T>> PlatformRegistry<T> customRegistry(Class<T> clss, ResourceLocation res, ResourceLocation defaultVal, boolean saveToDisk, boolean sync);
+    public abstract <T extends CustomRegistryEntry<T>> PlatformRegistry<T> customRegistry(Class<T> clss, ResourceKey<? extends Registry<T>> registryKey, ResourceLocation defaultVal, boolean saveToDisk, boolean sync);
 
     @SuppressWarnings("unchecked")
     protected <T> Registry<T> registryFrom(ResourceKey<? extends Registry<T>> key) {

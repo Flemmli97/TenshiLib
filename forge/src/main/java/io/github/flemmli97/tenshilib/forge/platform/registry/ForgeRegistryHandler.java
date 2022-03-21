@@ -2,7 +2,7 @@ package io.github.flemmli97.tenshilib.forge.platform.registry;
 
 import io.github.flemmli97.tenshilib.platform.registry.PlatformRegistry;
 import io.github.flemmli97.tenshilib.platform.registry.RegistryEntrySupplier;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
@@ -32,9 +32,8 @@ public class ForgeRegistryHandler<T extends IForgeRegistryEntry<T>> implements P
     }
 
     @Override
-    public void finalize(Object r) {
-        if (r instanceof IEventBus bus)
-            this.deferredRegister.register(bus);
+    public void registerContent() {
+        this.deferredRegister.register(FMLJavaModLoadingContext.get().getModEventBus());
     }
 
     @Override

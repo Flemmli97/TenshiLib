@@ -4,7 +4,7 @@ import io.github.flemmli97.tenshilib.api.item.IAOEWeapon;
 import io.github.flemmli97.tenshilib.api.item.IExtendedWeapon;
 import io.github.flemmli97.tenshilib.client.AnimationManager;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
-import io.github.flemmli97.tenshilib.forge.network.C2SPacketHit;
+import io.github.flemmli97.tenshilib.common.network.C2SPacketHit;
 import io.github.flemmli97.tenshilib.forge.network.PacketHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;

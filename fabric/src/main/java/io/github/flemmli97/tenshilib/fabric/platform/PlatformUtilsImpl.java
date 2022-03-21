@@ -90,26 +90,25 @@ public class PlatformUtilsImpl extends PlatformUtils {
         return new VanillaRegistryWrapper<>(Registry.PARTICLE_TYPE);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> SimpleRegistryWrapper<T> registry(ResourceKey<? extends Registry<T>> key) {
         return new VanillaRegistryWrapper<T>(this.registryFrom(key));
     }
 
     @Override
-    public <T extends CustomRegistryEntry<T>> PlatformRegistry<T> customRegistry(Class<T> clss, ResourceLocation registryID, String modid) {
-        return new VanillaRegistryHandler<>(ResourceKey.createRegistryKey(registryID), modid);
+    public <T extends CustomRegistryEntry<T>> PlatformRegistry<T> customRegistry(Class<T> clss, ResourceKey<? extends Registry<T>> registryKey, String modid) {
+        return new VanillaRegistryHandler<>(registryKey, modid);
     }
 
     @Override
-    public <T extends CustomRegistryEntry<T>> PlatformRegistry<T> customRegistry(Class<T> clss, ResourceLocation res, ResourceLocation defaultVal, boolean saveToDisk, boolean sync) {
-        FabricRegistryBuilder<T, DefaultedRegistry<T>> builder = FabricRegistryBuilder.createDefaulted(clss, res, defaultVal);
+    public <T extends CustomRegistryEntry<T>> PlatformRegistry<T> customRegistry(Class<T> clss, ResourceKey<? extends Registry<T>> registryKey, ResourceLocation defaultVal, boolean saveToDisk, boolean sync) {
+        FabricRegistryBuilder<T, DefaultedRegistry<T>> builder = FabricRegistryBuilder.createDefaulted(clss, registryKey.location(), defaultVal);
         if (saveToDisk)
             builder.attribute(RegistryAttribute.SYNCED);
         if (sync)
             builder.attribute(RegistryAttribute.SYNCED);
         builder.buildAndRegister();
-        return new VanillaRegistryHandler<>(ResourceKey.createRegistryKey(res), res.getNamespace());
+        return new VanillaRegistryHandler<>(registryKey, registryKey.location().getNamespace());
     }
 
     @Override
