@@ -1,3 +1,7 @@
+TenshiLib 1.6.6
+================
+- Internal changes and fixes
+
 TenshiLib 1.6.5
 ================
 - Fix crash with packets

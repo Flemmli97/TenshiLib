@@ -58,12 +58,11 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
     }
 
     public void setRotationTo(double x, double y, double z, float accuracyMod) {
-        double dx = x + (this.random.nextGaussian() * accuracyMod) - this.getX();
-        double dy = y + (this.random.nextGaussian() * accuracyMod) - this.getY();
-        double dz = z + (this.random.nextGaussian() * accuracyMod) - this.getZ();
+        double dx = x - this.getX();
+        double dy = y - this.getY();
+        double dz = z - this.getZ();
         this.setRotationToDir(dx, dy, dz, accuracyMod);
     }
-
 
     public void setRotationToDir(double x, double y, double z, float accuracyMod) {
         x += this.random.nextGaussian() * accuracyMod;

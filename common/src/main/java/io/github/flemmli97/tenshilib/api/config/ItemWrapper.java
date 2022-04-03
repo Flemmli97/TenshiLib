@@ -30,6 +30,10 @@ public class ItemWrapper implements IItemConfig<ItemWrapper> {
     @Override
     public Item getItem() {
         if (this.item == null) {
+            if (this.reg == null || this.reg.isEmpty()) {
+                this.item = Items.AIR;
+                return this.item;
+            }
             this.item = PlatformUtils.INSTANCE.items().getFromId(new ResourceLocation(this.reg));
             if (this.item == Items.AIR && (this.reg.isEmpty() || this.reg.equals("minecraft:air")))
                 TenshiLib.logger.error("Faulty item registry name {}", this.reg);

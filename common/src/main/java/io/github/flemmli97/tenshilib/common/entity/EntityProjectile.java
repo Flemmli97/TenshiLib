@@ -130,13 +130,17 @@ public abstract class EntityProjectile extends Projectile {
         this.shoot(dir.x, dir.y, dir.z, velocity, inaccuracy);
     }
 
+    public void shootAtEntity(Entity target, float velocity, float inaccuracy, float yOffsetModifier) {
+        this.shootAtEntity(target, velocity, inaccuracy, yOffsetModifier, 0.33);
+    }
+
     /**
      * Shoot at the given entity. Unlike #shootAtPosition this doesnt shoot directly where the entity is but rather through it (like arrows)
      *
      * @param yOffsetModifier Modifies the offset of the y motion based on distance to target. Vanilla arrows use 0.2
      */
-    public void shootAtEntity(Entity target, float velocity, float inaccuracy, float yOffsetModifier) {
-        Vec3 dir = (new Vec3(target.getX() - this.getX(), target.getY(0.33) - this.getY(), target.getZ() - this.getZ()));
+    public void shootAtEntity(Entity target, float velocity, float inaccuracy, float yOffsetModifier, double heighMod) {
+        Vec3 dir = (new Vec3(target.getX() - this.getX(), target.getY(heighMod) - this.getY(), target.getZ() - this.getZ()));
         double l = Math.sqrt(dir.x * dir.x + dir.z * dir.z);
         this.shoot(dir.x, dir.y + l * yOffsetModifier, dir.z, velocity, inaccuracy);
     }
@@ -207,6 +211,7 @@ public abstract class EntityProjectile extends Projectile {
         if (!this.level.isClientSide)
             this.doCollision();
 
+        motion = this.getDeltaMovement();
         double newX = this.getX() + motion.x;
         double newY = this.getY() + motion.y;
         double newZ = this.getZ() + motion.z;
@@ -215,16 +220,13 @@ public abstract class EntityProjectile extends Projectile {
         this.setYRot(this.updateRotation(this.yRotO, (float) (Mth.atan2(motion.x, motion.z) * (180D / Math.PI))));
         this.setXRot(this.updateRotation(this.xRotO, (float) (Mth.atan2(motion.y, f) * (double) (180F / (float) Math.PI))));
 
-        float friction;
+        boolean water = this.isInWater();
         if (this.isInWater()) {
             for (int i = 0; i < 4; ++i) {
                 this.level.addParticle(ParticleTypes.BUBBLE, this.getX() * 0.25D, this.getY() * 0.25D, this.getZ() * 0.25D, motion.x, motion.y, motion.z);
             }
-            friction = 0.8F;
-        } else {
-            friction = this.motionReduction();
         }
-
+        float friction = this.motionReduction(water);
         this.setDeltaMovement(motion.scale(friction));
         if (!this.isNoGravity()) {
             this.setDeltaMovement(this.getDeltaMovement().subtract(0, this.getGravityVelocity(), 0));
@@ -247,7 +249,6 @@ public abstract class EntityProjectile extends Projectile {
     private void doCollision() {
         Vec3 pos = this.position();
         Vec3 to = pos.add(this.getDeltaMovement());
-        //Vector3d aabbRadius = new Vector3d(this.motionX, this.motionY, this.motionZ).normalize().scale(this.radius());
         BlockHitResult raytraceresult = this.level.clip(new ClipContext(pos, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
         if (raytraceresult.getType() != HitResult.Type.MISS) {
             to = raytraceresult.getLocation();
@@ -298,8 +299,11 @@ public abstract class EntityProjectile extends Projectile {
 
     protected boolean canHit(Entity entity) {
         if (!entity.isSpectator() && entity.isAlive() && entity.isPickable()) {
-            if (this.getOwner() == null || (!this.getOwner().isPassengerOfSameVehicle(entity) && ((this.canHitShooter() && this.tickCount > 5) || entity != this.getOwner())))
-                return !this.checkedEntities.contains(entity.getUUID());
+            if (entity == this.getOwner()) {
+                if (!this.canHitShooter() || this.getOwner().isPassengerOfSameVehicle(entity) || this.tickCount < 5)
+                    return false;
+            }
+            return !this.checkedEntities.contains(entity.getUUID());
         }
         return false;
     }
@@ -309,13 +313,11 @@ public abstract class EntityProjectile extends Projectile {
             return null;
         if (this.isPiercing()) {
             if (this.maxPierceAmount() == -1 || this.attackedEntities.size() < this.maxPierceAmount())
-                return RayTraceUtils.projectileHit(this.level, this, this.getBoundingBox().expandTowards(this.getDeltaMovement()).inflate(1.0D), this::canHit, 0);
-            //return RayTraceUtils.projectileRayTrace(this.world, this, from, to, this.getBoundingBox().expand(this.getMotion()).grow(this.radius() + 1.0D), this::canHit, this.radius());
+                return RayTraceUtils.rayTraceEntities(this, from, to, this::canHit);
             return null;
         }
         if (this.attackedEntities.size() < 1)
-            return RayTraceUtils.projectileHit(this.level, this, this.getBoundingBox().expandTowards(this.getDeltaMovement()).inflate(1.0D), this::canHit, 0);
-        //return RayTraceUtils.projectileRayTrace(this.world, this, from, to, this.getBoundingBox().expand(this.getMotion()).grow(this.radius() + 1.0D), this::canHit,  this.radius());
+            return RayTraceUtils.rayTraceEntities(this, from, to, this::canHit);
         return null;
     }
 
@@ -323,8 +325,8 @@ public abstract class EntityProjectile extends Projectile {
         return 0.03F;
     }
 
-    protected float motionReduction() {
-        return 0.99f;
+    protected float motionReduction(boolean inWater) {
+        return inWater ? 0.8f : 0.99f;
     }
 
     protected abstract boolean entityRayTraceHit(EntityHitResult result);

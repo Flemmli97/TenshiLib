@@ -61,32 +61,8 @@ public class RayTraceUtils {
     public static EntityHitResult calculateEntityFromLook(LivingEntity entity, Vec3 pos, Vec3 dir, float reach,
                                                           @Nullable Predicate<Entity> pred) {
         Vec3 scaledDir = dir.scale(reach);
-        return ProjectileUtil.getEntityHitResult(entity.level, entity, pos, pos.add(scaledDir), entity.getBoundingBox().expandTowards(scaledDir).inflate(1), (t) -> EntitySelector.NO_SPECTATORS.test(t) && t.isPickable()
+        return rayTraceEntities(entity.level, entity, pos, pos.add(scaledDir), entity.getBoundingBox().expandTowards(scaledDir).inflate(1), (t) -> EntitySelector.NO_SPECTATORS.test(t) && t.isPickable()
                 && (pred == null || pred.test(t)));
-        /*RayTraceResult blocks = entity.world.rayTraceBlocks(new RayTraceContext(pos, pos.add(dir.x * reach, dir.y * reach, dir.z * reach), RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, entity));
-        reach = (float) blocks.getHitVec().distanceTo(pos);
-        Vector3d rangeVec = pos.add(dir.x * reach, dir.y * reach, dir.z * reach);
-        Vector3d hitVec;
-        List<Entity> list = entity.world.getEntitiesInAABBexcluding(entity,
-                entity.getBoundingBox().expand(dir.x * reach, dir.y * reach, dir.z * reach).grow(1.0D),
-                (t) -> EntityPredicates.NOT_SPECTATING.test(t) && t.canBeCollidedWith()
-                        && (pred == null || pred.test(t)));
-        for (Entity e : list) {
-            AxisAlignedBB axisalignedbb = e.getBoundingBox().grow(e.getCollisionBorderSize());
-            Optional<Vector3d> raytraceresult = axisalignedbb.rayTrace(pos, rangeVec);
-            if(axisalignedbb.contains(pos)){
-                return new EntityRayTraceResult(e, raytraceresult.orElse(pos));
-            }
-            if (raytraceresult.isPresent()) {
-                double d3 = pos.distanceTo(raytraceresult.get());
-
-                if (d3 < reach) {
-                    hitVec = raytraceresult.get();
-                    return new EntityRayTraceResult(e, hitVec);
-                }
-            }
-        }
-        return null;*/
     }
 
     /**
@@ -141,6 +117,11 @@ public class RayTraceUtils {
         return e.level.clip(new ClipContext(posEye, look, blockMode, fluidMode, e));
     }
 
+    @Nullable
+    public static EntityHitResult rayTraceEntities(Entity e, Vec3 from, Vec3 to, Predicate<Entity> pred) {
+        return rayTraceEntities(e.level, e, from, to, e.getBoundingBox().expandTowards(e.getDeltaMovement()).inflate(1), pred);
+    }
+
     /**
      * Like {@link ProjectileUtil#getEntityHitResult} but also saves the hit vector
      */
@@ -151,8 +132,20 @@ public class RayTraceUtils {
         Vec3 hit = null;
         for (Entity entity1 : world.getEntities(e, aabb, pred)) {
             AABB axisalignedbb = entity1.getBoundingBox().inflate(0.3F);
+            if (axisalignedbb.contains(from)) {
+                entity = entity1;
+                hit = from;
+                if (!axisalignedbb.contains(to))
+                    hit = axisalignedbb.clip(from, to).orElse(from);
+                break;
+            }
             Optional<Vec3> optional = axisalignedbb.clip(from, to);
             if (optional.isPresent()) {
+                if (d0 == 0) {
+                    entity = entity1;
+                    hit = optional.get();
+                    break;
+                }
                 double d1 = from.distanceToSqr(optional.get());
                 if (d1 < d0) {
                     entity = entity1;
@@ -161,31 +154,7 @@ public class RayTraceUtils {
                 }
             }
         }
-
         return entity == null ? null : new EntityHitResult(entity, hit);
-    }
-    /*public static RayTraceResult entityRayTrace(Entity e, float range, boolean stopOnLiquid, boolean ignoreBlockWithoutBoundingBox,
-            boolean returnLastUncollidableBlock) {
-        return entityRayTrace(e, range, returnLastUncollidableBlock, returnLastUncollidableBlock, returnLastUncollidableBlock, false, null);
-    }*/
-
-    /**
-     * Gets the entity the projectile is hitting. Unlike vanilla which uses a raytrace this is a bounding box check.
-     * Vanilla ignores practically the projectiles bounding box making bigger projectile the same as small ones.
-     *
-     * @param entity The projectile entity. Also technically doesnt need to be a projectile can be any Entity
-     * @param check  The AABB to check entitys in.
-     * @param pred   Entity filter
-     */
-    public static EntityHitResult projectileHit(Level world, Entity entity, AABB check, Predicate<Entity> pred, double boundingBoxGrowth) {
-        AABB entityBB = entity.getBoundingBox().inflate(boundingBoxGrowth);
-        for (Entity target : world.getEntities(entity, check, pred)) {
-            AABB axisalignedbb = target.getBoundingBox().inflate(0.3F);
-            if (entityBB.intersects(axisalignedbb)) {
-                return new EntityHitResult(target);
-            }
-        }
-        return null;
     }
 
     /**

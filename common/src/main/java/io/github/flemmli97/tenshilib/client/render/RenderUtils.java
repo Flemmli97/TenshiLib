@@ -78,7 +78,7 @@ public class RenderUtils {
 
     public static void applyYawPitch(PoseStack stack, float yaw, float pitch) {
         stack.mulPose(Vector3f.YP.rotationDegrees(yaw));
-        stack.mulPose(Vector3f.XP.rotationDegrees(pitch));
+        stack.mulPose(Vector3f.ZP.rotationDegrees(pitch));
     }
 
     /**
