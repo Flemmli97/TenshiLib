@@ -4,10 +4,12 @@ import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
 import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.common.utils.MathUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
+import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.EnumSet;
@@ -114,16 +116,17 @@ public abstract class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> ex
         if (this.distanceToTargetSq <= maxDistSq) {
             if (this.attacker.getNavigation().isDone()) {
                 Vec3 rand = DefaultRandomPos.getPos(this.attacker, 5, 4);
-                if (rand != null)
-                    this.attacker.getNavigation().moveTo(rand.x, rand.y, rand.z, 1);
+                if (rand != null) {
+                    this.moveTo(rand.x, rand.y, rand.z, 1);
+                }
             }
         } else
-            this.attacker.getNavigation().moveTo(this.target, 1.5);
+            this.moveTo(this.target, 1.5);
     }
 
     protected void moveToWithDelay(double x, double y, double z, double speed) {
         if (this.pathFindDelay <= 0) {
-            if (!this.attacker.getNavigation().moveTo(x, y, z, speed))
+            if (!this.moveTo(x, y, z, speed))
                 this.pathFindDelay += 15;
             this.pathFindDelay += this.attacker.getRandom().nextInt(10) + 5;
         }
@@ -131,10 +134,20 @@ public abstract class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> ex
 
     protected void moveToWithDelay(double speed) {
         if (this.pathFindDelay <= 0) {
-            if (!this.attacker.getNavigation().moveTo(this.target, speed))
+            if (!this.moveTo(this.target, 1))
                 this.pathFindDelay += 15;
             this.pathFindDelay += this.attacker.getRandom().nextInt(10) + 5;
         }
+    }
+
+    private boolean moveTo(double x, double y, double z, double speed) {
+        Path path = this.attacker.getNavigation().createPath(x, y, z, 0);
+        return path != null && this.attacker.getNavigation().moveTo(path, speed);
+    }
+
+    private boolean moveTo(Entity target, double speed) {
+        Path path = this.attacker.getNavigation().createPath(target, 0);
+        return path != null && this.attacker.getNavigation().moveTo(path, speed);
     }
 
     protected BlockPos randomPosAwayFrom(LivingEntity away, float minDis) {
