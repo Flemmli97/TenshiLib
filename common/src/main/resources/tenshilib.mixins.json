@@ -14,7 +14,8 @@
     "HumanoidArmorMixin",
     "dual.LivingEntityMixin",
     "dual.ItemInHandRendererMixin",
-    "dual.PlayerMixin"
+    "dual.PlayerMixin",
+    "dual.HumanoidModelMixin"
   ],
   "injectors": {
     "defaultRequire": 1

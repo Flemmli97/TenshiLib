@@ -22,6 +22,12 @@ public abstract class PlayerMixin implements OffHandStrength {
         ++this.attackStrengthOffhand;
     }
 
+    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;resetAttackStrengthTicker()V"))
+    private void onSwapItem(CallbackInfo info) {
+        this.attackStrengthOffhand = 0;
+        ((ILastHand) this).setLastSwungHand(InteractionHand.OFF_HAND);
+    }
+
     @Inject(method = "resetAttackStrengthTicker", at = @At(value = "HEAD"), cancellable = true)
     private void resetOffhand(CallbackInfo info) {
         if (((ILastHand) this).lastSwungHand() == InteractionHand.MAIN_HAND) {

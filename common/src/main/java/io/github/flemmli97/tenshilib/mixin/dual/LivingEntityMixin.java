@@ -44,4 +44,9 @@ public abstract class LivingEntityMixin implements ILastHand {
     public InteractionHand lastSwungHand() {
         return this.prevSwungHand;
     }
+
+    @Override
+    public void setLastSwungHand(InteractionHand hand) {
+        this.prevSwungHand = hand;
+    }
 }

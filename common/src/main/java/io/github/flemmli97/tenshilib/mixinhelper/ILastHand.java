@@ -6,4 +6,5 @@ public interface ILastHand {
 
     InteractionHand lastSwungHand();
 
+    void setLastSwungHand(InteractionHand hand);
 }
