@@ -367,7 +367,7 @@ public abstract class EntityProjectile extends Projectile {
         if (this.shooter != null && !this.shooter.isRemoved()) {
             return this.shooter;
         }
-        this.entityData.get(shooterUUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(LivingEntity.class, this.level, uuid));
+        this.entityData.get(shooterUUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(Entity.class, this.level, uuid));
         return this.shooter;
     }
 
