@@ -2,6 +2,8 @@ package io.github.flemmli97.tenshilib.mixinhelper;
 
 import io.github.flemmli97.tenshilib.api.item.IDualWeapon;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.effect.MobEffectUtil;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 
@@ -12,14 +14,26 @@ public class MixinUtils {
     public static InteractionHand get(LivingEntity entity, InteractionHand hand, InteractionHand prevSwungHand, Consumer<InteractionHand> update) {
         if (entity.level.isClientSide && hand == InteractionHand.MAIN_HAND) {
             if (entity.getMainHandItem().getItem() instanceof IDualWeapon) {
-                InteractionHand newHand = prevSwungHand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
-                update.accept(newHand);
-                entity.swinging = false;
-                return newHand;
+                if (!entity.swinging || entity.swingTime >= getCurrentSwingDuration(entity) / 2 || entity.swingTime < 0) {
+                    InteractionHand newHand = prevSwungHand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
+                    update.accept(newHand);
+                    return newHand;
+                }
+                return hand;
             } else
                 update.accept(InteractionHand.OFF_HAND);
         }
         return hand;
+    }
+
+    private static int getCurrentSwingDuration(LivingEntity entity) {
+        if (MobEffectUtil.hasDigSpeed(entity)) {
+            return 6 - (1 + MobEffectUtil.getDigSpeedAmplification(entity));
+        }
+        if (entity.hasEffect(MobEffects.DIG_SLOWDOWN)) {
+            return 6 + (1 + entity.getEffect(MobEffects.DIG_SLOWDOWN).getAmplifier()) * 2;
+        }
+        return 6;
     }
 
     public static float offHandHeight(Player player, float val, float offHandHeight) {
