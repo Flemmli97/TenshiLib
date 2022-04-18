@@ -158,6 +158,8 @@ public class ClothConfigScreenHelper {
     private static final int stringLength = 55;
 
     private static Component[] ofComments(CommentedJsonConfig.CommentedVal<?> val) {
+        if(val.__comments == null)
+            return new Component[0];
         List<Component> wrapped = new ArrayList<>();
         for (String s : val.__comments) {
             while (s.length() >= stringLength) {
