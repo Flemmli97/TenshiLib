@@ -29,4 +29,9 @@ public record ForgeRegistryWrapper<T extends IForgeRegistryEntry<T>>(
     public Collection<T> values() {
         return this.registry.getValues();
     }
+
+    @Override
+    public boolean contains(ResourceLocation id) {
+        return this.registry.containsKey(id);
+    }
 }

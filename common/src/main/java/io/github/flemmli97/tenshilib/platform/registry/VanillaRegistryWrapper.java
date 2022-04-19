@@ -27,4 +27,9 @@ public record VanillaRegistryWrapper<T>(Registry<T> delegate) implements SimpleR
     public Collection<T> values() {
         return this.delegate.stream().collect(Collectors.toUnmodifiableSet());
     }
+
+    @Override
+    public boolean contains(ResourceLocation id) {
+        return this.delegate.containsKey(id);
+    }
 }

@@ -16,4 +16,6 @@ public interface SimpleRegistryWrapper<T> {
     Iterable<T> getIterator();
 
     Collection<T> values();
+
+    boolean contains(ResourceLocation id);
 }
