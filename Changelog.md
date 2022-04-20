@@ -1,3 +1,10 @@
+TenshiLib 1.6.7
+================
+- Fixes for "special" weapons
+- Fix registry name not set for custom registries
+- Fix nested path with json config
+- Change ItemTagWrapper to use tag keys
+
 TenshiLib 1.6.6
 ================
 - Internal changes and fixes
