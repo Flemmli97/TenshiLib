@@ -15,4 +15,5 @@ public interface IItemConfig<T extends IItemConfig<T>> extends IConfigValue<T> {
 
     boolean hasList();
 
+    boolean match(ItemStack stack);
 }

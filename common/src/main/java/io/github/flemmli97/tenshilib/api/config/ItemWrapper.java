@@ -57,6 +57,11 @@ public class ItemWrapper implements IItemConfig<ItemWrapper> {
     }
 
     @Override
+    public boolean match(ItemStack stack) {
+        return stack.getItem() == this.item;
+    }
+
+    @Override
     public ItemWrapper readFromString(String s) {
         this.reg = s;
         this.item = null;

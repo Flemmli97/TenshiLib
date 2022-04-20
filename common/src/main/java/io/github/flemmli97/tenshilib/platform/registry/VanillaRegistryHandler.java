@@ -37,7 +37,7 @@ public class VanillaRegistryHandler<T> implements PlatformRegistry<T> {
         Registry<T> registry = this.registryFrom();
         this.entries.forEach((v, s) -> {
             T val = s.get();
-            if(val instanceof CustomRegistryEntry<?> entry)
+            if (val instanceof CustomRegistryEntry<?> entry)
                 entry.setRegistryName(v.getID());
             Registry.register(registry, v.getID(), val);
             v.updateValue(registry);

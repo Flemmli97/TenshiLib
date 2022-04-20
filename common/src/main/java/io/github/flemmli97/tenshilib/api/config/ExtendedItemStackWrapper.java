@@ -52,6 +52,12 @@ public class ExtendedItemStackWrapper extends SimpleItemStackWrapper {
     }
 
     @Override
+    public boolean match(ItemStack stack) {
+        return super.match(stack) && (this.nbtTagCompound == null && stack.getTag() == null ||
+                this.nbtTagCompound != null && this.nbtTagCompound.equals(stack.getTag()));
+    }
+
+    @Override
     public ExtendedItemStackWrapper readFromString(String s) {
         try {
             CompoundTag nbt = TagParser.parseTag(s);
