@@ -90,7 +90,7 @@ public class ClothConfigScreenHelper {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private static AbstractConfigListEntry<?> ofVal(String key, CommentedJsonConfig.CommentedVal<?> val) {
-        int i = key.indexOf(".");
+        int i = key.lastIndexOf(".");
         if (i >= 0 && i + 1 < key.length())
             key = key.substring(i + 1);
         ConfigEntryBuilder builder = ConfigEntryBuilder.create();
@@ -158,7 +158,7 @@ public class ClothConfigScreenHelper {
     private static final int stringLength = 55;
 
     private static Component[] ofComments(CommentedJsonConfig.CommentedVal<?> val) {
-        if(val.__comments == null)
+        if (val.__comments == null)
             return new Component[0];
         List<Component> wrapped = new ArrayList<>();
         for (String s : val.__comments) {

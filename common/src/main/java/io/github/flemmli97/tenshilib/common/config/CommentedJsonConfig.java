@@ -165,7 +165,7 @@ public class CommentedJsonConfig {
             if (this.path.isEmpty())
                 this.path = path;
             else
-                this.path = path + "." + this.path;
+                this.path = this.path + "." + path;
             if (this.comments != null)
                 this.categoryComments.put(this.path, this.comments);
             this.comments = null;
@@ -177,9 +177,9 @@ public class CommentedJsonConfig {
                 TenshiLib.logger.error("Tried to pop config with empty path!");
                 return this;
             }
-            int i = this.path.indexOf(".");
-            if (i >= 0 && i + 1 < this.path.length())
-                this.path = this.path.substring(i + 1);
+            int i = this.path.lastIndexOf(".");
+            if (i > 0)
+                this.path = this.path.substring(0, i);
             else
                 this.path = "";
             return this;
@@ -209,7 +209,7 @@ public class CommentedJsonConfig {
             if (Integer.MAX_VALUE == max)
                 comment.add("Range: > " + min);
             else if (Integer.MIN_VALUE == min)
-                comment.add("Range: < " + min);
+                comment.add("Range: < " + max);
             else
                 comment.add("Range: " + min + " ~ " + max);
             return this.define(name, new IntVal(comment, value, min, max));
@@ -220,7 +220,7 @@ public class CommentedJsonConfig {
             if (Double.MAX_VALUE == max)
                 comment.add("Range: > " + min);
             else if (Double.MIN_VALUE == min)
-                comment.add("Range: < " + min);
+                comment.add("Range: < " + max);
             else
                 comment.add("Range: " + min + " ~ " + max);
             return this.define(name, new DoubleVal(comment, value, min, max));
