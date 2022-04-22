@@ -79,6 +79,8 @@ public abstract class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> ex
 
     @Override
     public void tick() {
+        if (this.attacker.getTarget() == null)
+            return;
         AnimatedAction anim = this.attacker.getAnimationHandler().getAnimation();
         this.setupValues();
         --this.pathFindDelay;

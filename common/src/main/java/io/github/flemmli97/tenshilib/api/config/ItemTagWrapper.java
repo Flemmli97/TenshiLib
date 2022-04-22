@@ -43,11 +43,11 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
 
     @Override
     public Item getItem() {
-        if(this.item == null) {
-            if(!this.reg.isEmpty()) {
+        if (this.item == null) {
+            if (!this.reg.isEmpty()) {
                 return super.getItem();
             }
-            if(this.tag == null) {
+            if (this.tag == null) {
                 this.item = Items.AIR;
                 return this.item;
             }
@@ -80,7 +80,7 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
     @Override
     public ItemTagWrapper readFromString(String s) {
         String[] parts = s.split(",");
-        if(parts[0].startsWith("#"))
+        if (parts[0].startsWith("#"))
             this.tag = PlatformUtils.INSTANCE.itemTag(new ResourceLocation(parts[0].substring(1)));
         else
             this.reg = parts[0];
@@ -90,8 +90,8 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
 
     @Override
     public String writeToString() {
-        if(this.tag != null)
-         return "#"+this.tag.location() + (this.count != 1 ? "," + this.count : "");
+        if (this.tag != null)
+            return "#" + this.tag.location() + (this.count != 1 ? "," + this.count : "");
         return super.writeToString();
     }
 
@@ -120,7 +120,7 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
         @Override
         public JsonElement serialize(ItemTagWrapper src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject obj = new JsonObject();
-            if(src.tag != null)
+            if (src.tag != null)
                 obj.add("tag", new JsonPrimitive(src.tag.location().toString()));
             else
                 obj.add("item", new JsonPrimitive(src.reg));
@@ -133,7 +133,7 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
         public ItemTagWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonObject obj = json.getAsJsonObject();
             int count = JsonUtils.get(obj, "count", 1);
-            if(obj.has("tag"))
+            if (obj.has("tag"))
                 return new ItemTagWrapper(PlatformUtils.INSTANCE.itemTag(new ResourceLocation(obj.get("tag").getAsString())), count);
             else
                 return new ItemTagWrapper(obj.get("item").getAsString(), count);
