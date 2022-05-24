@@ -63,10 +63,13 @@ public class PatreonImpl implements PatreonPlatform {
 
     public static void playerClone(PlayerEvent.Clone event) {
         if (event.getPlayer() instanceof ServerPlayer serverPlayer) {
-            if (event.isWasDeath())
+            boolean rev = PatreonPlatform.INSTANCE.playerSettings(event.getOriginal()).isPresent();
+            if (!rev)
                 event.getOriginal().reviveCaps();
             PatreonPlatform.INSTANCE.playerSettings(serverPlayer).ifPresent(setting -> setting.read(PatreonPlatform.INSTANCE.playerSettings(event.getOriginal()).orElseThrow(() -> new NullPointerException("Capability of old player is null!")).save(new CompoundTag())));
             PatreonPlatform.INSTANCE.sendToClient(serverPlayer, serverPlayer);
+            if (!rev)
+                event.getOriginal().invalidateCaps();
         }
     }
 

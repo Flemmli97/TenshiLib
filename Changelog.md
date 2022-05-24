@@ -1,3 +1,7 @@
+TenshiLib 1.6.8
+================
+- Forge: Fixing problems with capability loading on player clone
+
 TenshiLib 1.6.7
 ================
 - Fixes for "special" weapons
