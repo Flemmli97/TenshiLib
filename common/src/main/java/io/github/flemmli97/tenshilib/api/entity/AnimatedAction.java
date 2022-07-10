@@ -6,6 +6,7 @@ public class AnimatedAction {
     public static final AnimatedAction[] vanillaAttackOnly = {vanillaAttack};
 
     private final int length, attackTime;
+    private final boolean shouldRunOut;
     private final String id, animationClient;
     private float ticker;
     private float speed = 1;
@@ -27,26 +28,27 @@ public class AnimatedAction {
      *                        where you have multiple attacks with same animation set this
      */
     public AnimatedAction(int length, int attackTime, String id, String animationClient) {
+        this(length, attackTime, id, animationClient, 1, true);
+    }
+
+    public AnimatedAction(int length, int attackTime, String id, String animationClient, float speedMod, boolean shouldRunOut) {
+        this.speed = speedMod;
         this.length = length;
         this.attackTime = Math.max(1, attackTime);
         this.id = id;
         this.animationClient = animationClient;
-    }
-
-    public AnimatedAction(int length, int attackTime, String id, String animationClient, float speedMod) {
-        this(length, attackTime, id, animationClient);
-        this.speed = speedMod;
+        this.shouldRunOut = shouldRunOut;
     }
 
     /**
      * @return Creates a new copy instance of the animation
      */
     public AnimatedAction create() {
-        return new AnimatedAction(this.length, this.attackTime, this.id, this.animationClient, this.speed);
+        return new AnimatedAction(this.length, this.attackTime, this.id, this.animationClient, this.speed, this.shouldRunOut);
     }
 
     public boolean tick() {
-        return (this.ticker += 1 * this.speed) >= this.length;
+        return (this.ticker += 1 * this.speed) >= this.length && this.shouldRunOut;
     }
 
     public boolean canAttack() {
@@ -79,6 +81,13 @@ public class AnimatedAction {
 
     public String getAnimationClient() {
         return this.animationClient;
+    }
+
+    /**
+     * If false animation will only change if set manually. Else if it ticks out it gets set to null
+     */
+    public boolean shouldRunOut() {
+        return this.shouldRunOut;
     }
 
     @Override

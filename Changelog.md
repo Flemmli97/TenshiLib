@@ -1,9 +1,14 @@
+TenshiLib 1.6.9
+================
+- Fix bug with negatives in math expressions
+
 TenshiLib 1.6.8
 ================
 - Forge: Fixing problems with capability loading on player clone
 
 TenshiLib 1.6.7
 ================
+
 - Fixes for "special" weapons
 - Fix registry name not set for custom registries
 - Fix nested path with json config

@@ -122,25 +122,31 @@ public class SimpleAnimationExpression {
     private static Value read(Type t, Stack<Value> stack, Value prev) {
         switch (t) {
             case ADD -> {
-                Value sec = stack.pop();
-                Value first = prev != null ? prev : stack.pop();
+                Value sec = prev == null ? stack.pop() : prev;
+                Value first = stack.pop();
                 return new Addition(first, sec);
             }
             case SUB -> {
-                if (stack.empty())
+                if (stack.empty()) {
+                    if (prev instanceof BiValue bi) {
+                        return bi.negateFirst();
+                    }
+                    if (prev instanceof ConstantValue consts)
+                        return consts.negate();
                     return new NegValue(prev);
-                Value sec = stack.pop();
-                Value first = prev != null ? prev : stack.pop();
+                }
+                Value sec = prev == null ? stack.pop() : prev;
+                Value first = stack.pop();
                 return new Substraction(first, sec);
             }
             case MULT -> {
-                Value sec = stack.pop();
-                Value first = prev != null ? prev : stack.pop();
+                Value sec = prev == null ? stack.pop() : prev;
+                Value first = stack.pop();
                 return new Multiplication(first, sec);
             }
             case DIV -> {
-                Value sec = stack.pop();
-                Value first = prev != null ? prev : stack.pop();
+                Value sec = prev == null ? stack.pop() : prev;
+                Value first = stack.pop();
                 return new Division(first, sec);
             }
             case SIN -> {
@@ -157,11 +163,27 @@ public class SimpleAnimationExpression {
         float get(float time);
     }
 
+    interface BiValue extends Value {
+
+        Value getFirst();
+
+        Value getSecond();
+
+        Value negateFirst();
+
+        Value negateSecond();
+
+    }
+
     record ConstantValue(float constant) implements Value {
 
         @Override
         public float get(float time) {
             return this.constant;
+        }
+
+        public ConstantValue negate() {
+            return new ConstantValue(-this.constant);
         }
 
         @Override
@@ -196,7 +218,7 @@ public class SimpleAnimationExpression {
         }
     }
 
-    record Addition(Value first, Value second) implements Value {
+    record Addition(Value first, Value second) implements BiValue {
 
         @Override
         public float get(float time) {
@@ -204,14 +226,38 @@ public class SimpleAnimationExpression {
         }
 
         @Override
+        public Value getFirst() {
+            return this.first;
+        }
+
+        @Override
+        public Value getSecond() {
+            return this.second;
+        }
+
+        @Override
+        public Value negateFirst() {
+            if (this.first instanceof ConstantValue c)
+                return new Addition(c.negate(), this.second);
+            return new Addition(new NegValue(this.first), this.second);
+        }
+
+        @Override
+        public Value negateSecond() {
+            if (this.second instanceof ConstantValue c)
+                return new Addition(this.first, c.negate());
+            return new Addition(this.first, new NegValue(this.second));
+        }
+
+        @Override
         public String toString() {
-            String f = this.first instanceof ConstantValue ? this.first.toString() : String.format("(%s)", this.first);
-            String s = this.second instanceof ConstantValue ? this.second.toString() : String.format("(%s)", this.second);
+            String f = this.first instanceof ConstantValue || this.first instanceof TickValue ? this.first.toString() : String.format("(%s)", this.first);
+            String s = this.second instanceof ConstantValue || this.second instanceof TickValue ? this.second.toString() : String.format("(%s)", this.second);
             return String.format("%s+%s", f, s);
         }
     }
 
-    record Substraction(Value first, Value second) implements Value {
+    record Substraction(Value first, Value second) implements BiValue {
 
         @Override
         public float get(float time) {
@@ -219,14 +265,38 @@ public class SimpleAnimationExpression {
         }
 
         @Override
+        public Value getFirst() {
+            return this.first;
+        }
+
+        @Override
+        public Value getSecond() {
+            return this.second;
+        }
+
+        @Override
+        public Value negateFirst() {
+            if (this.first instanceof ConstantValue c)
+                return new Substraction(c.negate(), this.second);
+            return new Substraction(new NegValue(this.first), this.second);
+        }
+
+        @Override
+        public Value negateSecond() {
+            if (this.second instanceof ConstantValue c)
+                return new Substraction(this.first, c.negate());
+            return new Substraction(this.first, new NegValue(this.second));
+        }
+
+        @Override
         public String toString() {
-            String f = this.first instanceof ConstantValue ? this.first.toString() : String.format("(%s)", this.first);
-            String s = this.second instanceof ConstantValue ? this.second.toString() : String.format("(%s)", this.second);
+            String f = this.first instanceof ConstantValue || this.first instanceof TickValue ? this.first.toString() : String.format("(%s)", this.first);
+            String s = this.second instanceof ConstantValue || this.second instanceof TickValue ? this.second.toString() : String.format("(%s)", this.second);
             return String.format("%s-%s", f, s);
         }
     }
 
-    record Multiplication(Value first, Value second) implements Value {
+    record Multiplication(Value first, Value second) implements BiValue {
 
         @Override
         public float get(float time) {
@@ -234,14 +304,38 @@ public class SimpleAnimationExpression {
         }
 
         @Override
+        public Value getFirst() {
+            return this.first;
+        }
+
+        @Override
+        public Value getSecond() {
+            return this.second;
+        }
+
+        @Override
+        public Value negateFirst() {
+            if (this.first instanceof ConstantValue c)
+                return new Multiplication(c.negate(), this.second);
+            return new Multiplication(new NegValue(this.first), this.second);
+        }
+
+        @Override
+        public Value negateSecond() {
+            if (this.second instanceof ConstantValue c)
+                return new Multiplication(this.first, c.negate());
+            return new Multiplication(this.first, new NegValue(this.second));
+        }
+
+        @Override
         public String toString() {
-            String f = this.first instanceof ConstantValue ? this.first.toString() : String.format("(%s)", this.first);
-            String s = this.second instanceof ConstantValue ? this.second.toString() : String.format("(%s)", this.second);
+            String f = this.first instanceof ConstantValue || this.first instanceof TickValue ? this.first.toString() : String.format("(%s)", this.first);
+            String s = this.second instanceof ConstantValue || this.second instanceof TickValue ? this.second.toString() : String.format("(%s)", this.second);
             return String.format("%s*%s", f, s);
         }
     }
 
-    record Division(Value first, Value second) implements Value {
+    record Division(Value first, Value second) implements BiValue {
 
         @Override
         public float get(float time) {
@@ -249,9 +343,33 @@ public class SimpleAnimationExpression {
         }
 
         @Override
+        public Value getFirst() {
+            return this.first;
+        }
+
+        @Override
+        public Value getSecond() {
+            return this.second;
+        }
+
+        @Override
+        public Value negateFirst() {
+            if (this.first instanceof ConstantValue c)
+                return new Division(c.negate(), this.second);
+            return new Division(new NegValue(this.first), this.second);
+        }
+
+        @Override
+        public Value negateSecond() {
+            if (this.second instanceof ConstantValue c)
+                return new Division(this.first, c.negate());
+            return new Division(this.first, new NegValue(this.second));
+        }
+
+        @Override
         public String toString() {
-            String f = this.first instanceof ConstantValue ? this.first.toString() : String.format("(%s)", this.first);
-            String s = this.second instanceof ConstantValue ? this.second.toString() : String.format("(%s)", this.second);
+            String f = this.first instanceof ConstantValue || this.first instanceof TickValue ? this.first.toString() : String.format("(%s)", this.first);
+            String s = this.second instanceof ConstantValue || this.second instanceof TickValue ? this.second.toString() : String.format("(%s)", this.second);
             return String.format("%s/%s", f, s);
         }
     }
