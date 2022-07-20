@@ -40,6 +40,6 @@ public class ClientEvents {
 
     public static void itemColors(ColorHandlerEvent.Item event) {
         for (SpawnEgg egg : SpawnEgg.getEggs())
-            event.getItemColors().register((stack, i) -> egg.getColor(i), egg);
+            event.getItemColors().register(egg::getColor, egg);
     }
 }

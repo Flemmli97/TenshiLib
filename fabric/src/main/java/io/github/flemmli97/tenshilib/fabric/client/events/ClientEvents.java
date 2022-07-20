@@ -33,6 +33,6 @@ public class ClientEvents {
 
     public static void itemColors() {
         for (SpawnEgg egg : SpawnEgg.getEggs())
-            ColorProviderRegistry.ITEM.register((stack, i) -> egg.getColor(i), egg);
+            ColorProviderRegistry.ITEM.register(egg::getColor, egg);
     }
 }

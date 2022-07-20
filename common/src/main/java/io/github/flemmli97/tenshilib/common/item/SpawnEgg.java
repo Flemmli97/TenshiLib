@@ -187,7 +187,7 @@ public class SpawnEgg extends Item {
         return e;
     }
 
-    public int getColor(int i) {
+    public int getColor(ItemStack stack, int i) {
         return i == 0 ? this.primaryColor : this.secondaryColor;
     }
 

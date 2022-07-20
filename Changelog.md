@@ -1,6 +1,7 @@
 TenshiLib 1.6.9
 ================
 - Fix bug with negatives in math expressions
+- ItemStack sensitive spawnegg colors
 
 TenshiLib 1.6.8
 ================
