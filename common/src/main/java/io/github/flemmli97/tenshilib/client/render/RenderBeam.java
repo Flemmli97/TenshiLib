@@ -7,6 +7,7 @@ import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import io.github.flemmli97.tenshilib.api.entity.IBeamEntity;
 import io.github.flemmli97.tenshilib.common.utils.MathUtils;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -72,7 +73,7 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
         matrixStack.pushPose();
         matrixStack.mulPose(Vector3f.YN.rotationDegrees(Mth.lerp(partialTicks, entity.yRotO, entity.getYRot()) + 90));
         matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-Mth.lerp(partialTicks, entity.xRotO, entity.getXRot())));
-        boolean playerView = entity.getOwner() == Minecraft.getInstance().player;
+        boolean playerView = entity.getOwner() == Minecraft.getInstance().player && Minecraft.getInstance().options.getCameraType() != CameraType.THIRD_PERSON_BACK;
         if (playerView) {
             matrixStack.mulPose(Vector3f.XP.rotationDegrees(30));
             matrixStack.translate(0, -0.1, 0);

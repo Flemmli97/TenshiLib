@@ -123,7 +123,7 @@ public abstract class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> ex
                 }
             }
         } else
-            this.moveTo(this.target, 1.5);
+            this.moveTo(this.target, 1);
     }
 
     protected void moveToWithDelay(double x, double y, double z, double speed) {
@@ -136,7 +136,7 @@ public abstract class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> ex
 
     protected void moveToWithDelay(double speed) {
         if (this.pathFindDelay <= 0) {
-            if (!this.moveTo(this.target, 1))
+            if (!this.moveTo(this.target, speed))
                 this.pathFindDelay += 15;
             this.pathFindDelay += this.attacker.getRandom().nextInt(10) + 5;
         }
