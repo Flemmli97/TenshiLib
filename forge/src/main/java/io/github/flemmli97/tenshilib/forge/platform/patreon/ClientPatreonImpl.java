@@ -32,7 +32,7 @@ public class ClientPatreonImpl implements PatreonClientPlatform {
         Consumer<EntityRenderersEvent.RegisterLayerDefinitions> ml = event -> PatreonModelProvider.registerModelLayers(event::registerLayerDefinition);
         modBus.addListener(ml);
 
-        Consumer<ScreenEvent.InitScreenEvent.Post> screen = event -> PatreonClientPlatform.addPatreonButton(event.getScreen());
+        Consumer<ScreenEvent.Init.Post> screen = event -> PatreonClientPlatform.addPatreonButton(event.getScreen());
         MinecraftForge.EVENT_BUS.addListener(screen);
     }
 

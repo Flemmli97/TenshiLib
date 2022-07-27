@@ -9,7 +9,7 @@ architectury {
 
 loom {
     forge {
-        mixinConfigs = ["tenshilib.mixins.json", "tenshilib.forge.mixins.json"]
+        mixinConfigs = ["tenshilib.mixins.json"]
     }
 }
 

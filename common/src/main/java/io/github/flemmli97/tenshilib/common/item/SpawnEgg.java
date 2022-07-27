@@ -10,7 +10,6 @@ import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.stats.Stats;
@@ -106,7 +105,7 @@ public class SpawnEgg extends Item {
 
     @Override
     public Component getName(ItemStack stack) {
-        return new TranslatableComponent(this.getDescriptionId(stack), new TranslatableComponent(this.getType(stack.getTag()).getDescriptionId()));
+        return Component.translatable(this.getDescriptionId(stack), Component.translatable(this.getType(stack.getTag()).getDescriptionId()));
     }
 
     @Override

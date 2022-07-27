@@ -7,7 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 public class PatreonButton extends Button {
@@ -15,7 +15,7 @@ public class PatreonButton extends Button {
     private static final ResourceLocation text = new ResourceLocation(TenshiLib.MODID, "textures/misc/tenshilib_patreon.png");
 
     public PatreonButton(int x, int y, Screen parent) {
-        super(x, y, 20, 20, new TextComponent(""), b -> Minecraft.getInstance().setScreen(new PatreonGui(parent)));
+        super(x, y, 20, 20, Component.literal(""), b -> Minecraft.getInstance().setScreen(new PatreonGui(parent)));
     }
 
     @Override

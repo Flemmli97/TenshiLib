@@ -63,12 +63,12 @@ public class PlatformUtilsImpl extends PlatformUtils {
 
     @Override
     public SimpleRegistryWrapper<BlockEntityType<?>> blocksEntities() {
-        return new ForgeRegistryWrapper<>(ForgeRegistries.BLOCK_ENTITIES);
+        return new ForgeRegistryWrapper<>(ForgeRegistries.BLOCK_ENTITY_TYPES);
     }
 
     @Override
     public SimpleRegistryWrapper<EntityType<?>> entities() {
-        return new ForgeRegistryWrapper<>(ForgeRegistries.ENTITIES);
+        return new ForgeRegistryWrapper<>(ForgeRegistries.ENTITY_TYPES);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class PlatformUtilsImpl extends PlatformUtils {
 
     @Override
     public SimpleRegistryWrapper<MenuType<?>> containers() {
-        return new ForgeRegistryWrapper<>(ForgeRegistries.CONTAINERS);
+        return new ForgeRegistryWrapper<>(ForgeRegistries.MENU_TYPES);
     }
 
     @Override
@@ -116,16 +116,14 @@ public class PlatformUtilsImpl extends PlatformUtils {
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public <T extends CustomRegistryEntry<T>> PlatformRegistry<T> customRegistry(Class<T> clss, ResourceKey<? extends Registry<T>> registryKey, String modid) {
-        return new ForgeRegistryHandler<>(DeferredRegister.create((Class) clss, modid));
+    public <T extends CustomRegistryEntry<T>> PlatformRegistry<T> customRegistry(ResourceKey<? extends Registry<T>> registryKey, String modid) {
+        return new ForgeRegistryHandler<>(DeferredRegister.create(registryKey, modid));
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public <T extends CustomRegistryEntry<T>> PlatformRegistry<T> customRegistry(Class<T> clss, ResourceKey<? extends Registry<T>> registryKey, ResourceLocation defaultVal, boolean saveToDisk, boolean sync) {
-        DeferredRegister r = DeferredRegister.create((Class) clss, registryKey.location().getNamespace());
-        r.makeRegistry(registryKey.location().getPath(), () -> new RegistryBuilder<>().setDefaultKey(defaultVal));
+    public <T extends CustomRegistryEntry<T>> PlatformRegistry<T> customRegistry(ResourceKey<? extends Registry<T>> registryKey, ResourceLocation defaultVal, boolean saveToDisk, boolean sync) {
+        DeferredRegister<T> r = DeferredRegister.create(registryKey, registryKey.location().getNamespace());
+        r.makeRegistry(() -> new RegistryBuilder<T>().setDefaultKey(defaultVal));
         return new ForgeRegistryHandler<>(r);
     }
 
@@ -151,7 +149,7 @@ public class PlatformUtilsImpl extends PlatformUtils {
     @Override
     public void registerAOEEventHandler(EventCalls.Func3<Player, ItemStack, List<Entity>, Boolean> func) {
         Consumer<AOEAttackEvent> cons = event -> {
-            if (!func.apply(event.getPlayer(), event.usedItem, event.attackList()))
+            if (!func.apply(event.getEntity(), event.usedItem, event.attackList()))
                 event.setCanceled(true);
         };
         MinecraftForge.EVENT_BUS.addListener(cons);

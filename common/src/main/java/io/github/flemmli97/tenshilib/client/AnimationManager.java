@@ -4,13 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import io.github.flemmli97.tenshilib.client.model.BlockBenchAnimations;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,12 +33,12 @@ public class AnimationManager implements ResourceManagerReloadListener {
 
     @Override
     public void onResourceManagerReload(ResourceManager resourceManager) {
-        Collection<ResourceLocation> anims = resourceManager.listResources("animation/entity", s -> s.endsWith(".json"));
-        for (ResourceLocation res : anims) {
+        Map<ResourceLocation, Resource> anims = resourceManager.listResources("animation/entity", s -> s.getPath().endsWith(".json"));
+        for (Map.Entry<ResourceLocation, Resource> res : anims.entrySet()) {
             try {
-                InputStream input = resourceManager.getResource(res).getInputStream();
+                InputStream input = res.getValue().open();
                 JsonObject obj = gson.getAdapter(JsonObject.class).read(gson.newJsonReader(new InputStreamReader(input)));
-                ResourceLocation animID = new ResourceLocation(res.getNamespace(), res.getPath().replace("animation/entity/", "").replace(".json", ""));
+                ResourceLocation animID = new ResourceLocation(res.getKey().getNamespace(), res.getKey().getPath().replace("animation/entity/", "").replace(".json", ""));
                 BlockBenchAnimations anim = this.getAnimation(animID);
                 anim.reload(obj);
             } catch (IOException e) {

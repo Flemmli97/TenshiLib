@@ -11,20 +11,20 @@ import net.minecraftforge.eventbus.api.Event;
 public class CommonEvents {
 
     public static void leftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
-        ItemStack stack = event.getPlayer().getMainHandItem();
+        ItemStack stack = event.getEntity().getMainHandItem();
         if (stack.getItem() instanceof IAOEWeapon weapon) {
-            AOEWeaponHandler.onAOEWeaponSwing(event.getPlayer(), stack, weapon);
-            event.getPlayer().resetAttackStrengthTicker();
+            AOEWeaponHandler.onAOEWeaponSwing(event.getEntity(), stack, weapon);
+            event.getEntity().resetAttackStrengthTicker();
         }
     }
 
     public static void disableOffhand(PlayerInteractEvent.RightClickItem event) {
-        if (event.getHand() == InteractionHand.OFF_HAND && event.getPlayer().getMainHandItem().getItem() instanceof IDualWeapon weapon && weapon.disableOffhand())
+        if (event.getHand() == InteractionHand.OFF_HAND && event.getEntity().getMainHandItem().getItem() instanceof IDualWeapon weapon && weapon.disableOffhand())
             event.setCanceled(true);
     }
 
     public static void disableOffhandBlock(PlayerInteractEvent.RightClickBlock event) {
-        if (event.getHand() == InteractionHand.OFF_HAND && event.getPlayer().getMainHandItem().getItem() instanceof IDualWeapon weapon && weapon.disableOffhand()) {
+        if (event.getHand() == InteractionHand.OFF_HAND && event.getEntity().getMainHandItem().getItem() instanceof IDualWeapon weapon && weapon.disableOffhand()) {
             event.setUseItem(Event.Result.DENY);
         }
     }

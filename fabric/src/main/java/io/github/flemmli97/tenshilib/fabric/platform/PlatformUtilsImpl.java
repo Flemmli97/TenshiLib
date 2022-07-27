@@ -1,5 +1,6 @@
 package io.github.flemmli97.tenshilib.fabric.platform;
 
+import com.mojang.serialization.Lifecycle;
 import io.github.flemmli97.tenshilib.fabric.events.AOEAttackEvent;
 import io.github.flemmli97.tenshilib.platform.EventCalls;
 import io.github.flemmli97.tenshilib.platform.PlatformUtils;
@@ -96,13 +97,13 @@ public class PlatformUtilsImpl extends PlatformUtils {
     }
 
     @Override
-    public <T extends CustomRegistryEntry<T>> PlatformRegistry<T> customRegistry(Class<T> clss, ResourceKey<? extends Registry<T>> registryKey, String modid) {
+    public <T extends CustomRegistryEntry<T>> PlatformRegistry<T> customRegistry(ResourceKey<? extends Registry<T>> registryKey, String modid) {
         return new VanillaRegistryHandler<>(registryKey, modid);
     }
 
     @Override
-    public <T extends CustomRegistryEntry<T>> PlatformRegistry<T> customRegistry(Class<T> clss, ResourceKey<? extends Registry<T>> registryKey, ResourceLocation defaultVal, boolean saveToDisk, boolean sync) {
-        FabricRegistryBuilder<T, DefaultedRegistry<T>> builder = FabricRegistryBuilder.createDefaulted(clss, registryKey.location(), defaultVal);
+    public <T extends CustomRegistryEntry<T>> PlatformRegistry<T> customRegistry(ResourceKey<? extends Registry<T>> registryKey, ResourceLocation defaultVal, boolean saveToDisk, boolean sync) {
+        FabricRegistryBuilder<T, DefaultedRegistry<T>> builder = FabricRegistryBuilder.from(new DefaultedRegistry<T>(defaultVal.toString(), registryKey, Lifecycle.stable(), null));
         if (saveToDisk)
             builder.attribute(RegistryAttribute.SYNCED);
         if (sync)

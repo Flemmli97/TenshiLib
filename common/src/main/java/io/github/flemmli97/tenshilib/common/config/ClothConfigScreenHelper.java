@@ -12,8 +12,6 @@ import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -31,7 +29,7 @@ public class ClothConfigScreenHelper {
     public static Screen configScreenOf(Screen current, String modid, List<JsonConfig<CommentedJsonConfig>> confs) {
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(current)
-                .setTitle(new TranslatableComponent(String.format("config.title.%s", modid)));
+                .setTitle(Component.translatable(String.format("config.title.%s", modid)));
         if (confs.size() == 1) {
             JsonConfig<CommentedJsonConfig> conf = confs.get(0);
             conf.getElement().getConfigVals().forEach((key, val) -> {
@@ -39,14 +37,14 @@ public class ClothConfigScreenHelper {
                 ConfigCategory cat = builder.getOrCreateCategory(ofKey(key));
                 if (!id.isEmpty() && conf.getElement().categoryComments.containsKey(id)) {
                     cat.setDescription(conf.getElement().categoryComments.get(id).stream()
-                            .map(TextComponent::new).toList().toArray(new FormattedText[0]));
+                            .map(Component::literal).toList().toArray(new FormattedText[0]));
                 }
                 cat.addEntry(ofVal(key, val));
             });
             return builder.build();
         }
         for (JsonConfig<CommentedJsonConfig> conf : confs) {
-            ConfigCategory cat = builder.getOrCreateCategory(new TranslatableComponent(String.format("%s", conf.getName())));
+            ConfigCategory cat = builder.getOrCreateCategory(Component.translatable(String.format("%s", conf.getName())));
             Map<Component, SubCategoryBuilder> subCats = new LinkedHashMap<>();
             conf.getElement().getConfigVals().forEach((key, val) -> {
                 AbstractConfigListEntry<?> entry = ofVal(key, val);
@@ -55,7 +53,7 @@ public class ClothConfigScreenHelper {
                 String id = category(key);
                 if (!id.isEmpty() && conf.getElement().categoryComments.containsKey(id)) {
                     sub.setTooltip(conf.getElement().categoryComments.get(id).stream()
-                            .map(TextComponent::new).toList().toArray(new Component[0]));
+                            .map(Component::literal).toList().toArray(new Component[0]));
                 }
                 if (entry != null)
                     sub.add(entry);
@@ -75,9 +73,9 @@ public class ClothConfigScreenHelper {
     private static Component ofKey(String key) {
         String cat = category(key);
         if (!cat.isEmpty()) {
-            return new TranslatableComponent(String.format("category.%s", cat));
+            return Component.translatable(String.format("category.%s", cat));
         }
-        return new TranslatableComponent("category.general");
+        return Component.translatable("category.general");
     }
 
     private static String category(String key) {
@@ -95,7 +93,7 @@ public class ClothConfigScreenHelper {
             key = key.substring(i + 1);
         ConfigEntryBuilder builder = ConfigEntryBuilder.create();
         if (val instanceof CommentedJsonConfig.IntVal intVal) {
-            IntFieldBuilder intFieldBuilder = builder.startIntField(new TranslatableComponent(String.format("%s", key)), intVal.input)
+            IntFieldBuilder intFieldBuilder = builder.startIntField(Component.translatable(String.format("%s", key)), intVal.input)
                     .setDefaultValue(intVal.defaultVal)
                     .setTooltip(ofComments(val))
                     .setSaveConsumer(intVal::set)
@@ -103,7 +101,7 @@ public class ClothConfigScreenHelper {
                     .setMin(intVal.min);
             return intFieldBuilder.build();
         } else if (val instanceof CommentedJsonConfig.DoubleVal doubleVal) {
-            DoubleFieldBuilder doubleFieldBuilder = builder.startDoubleField(new TranslatableComponent(String.format("%s", key)), doubleVal.input)
+            DoubleFieldBuilder doubleFieldBuilder = builder.startDoubleField(Component.translatable(String.format("%s", key)), doubleVal.input)
                     .setDefaultValue(doubleVal.defaultVal)
                     .setTooltip(ofComments(val))
                     .setSaveConsumer(doubleVal::set)
@@ -112,7 +110,7 @@ public class ClothConfigScreenHelper {
             return doubleFieldBuilder.build();
         } else if (val.input instanceof Enum<?>) {
             CommentedJsonConfig.CommentedVal<Enum<?>> cv = (CommentedJsonConfig.CommentedVal<Enum<?>>) val;
-            EnumSelectorBuilder<?> enumFieldBuilder = builder.startEnumSelector(new TranslatableComponent(String.format("%s", key)), ((Enum) cv.input).getDeclaringClass(), cv.input)
+            EnumSelectorBuilder<?> enumFieldBuilder = builder.startEnumSelector(Component.translatable(String.format("%s", key)), ((Enum) cv.input).getDeclaringClass(), cv.input)
                     .setDefaultValue(() -> cv.defaultVal)
                     .setTooltip(ofComments(val))
                     .setEnumNameProvider(enumProvider());
@@ -120,29 +118,29 @@ public class ClothConfigScreenHelper {
             return enumFieldBuilder.build();
         } else if (val instanceof CommentedJsonConfig.ListVal listVal) {
             if (listVal.validator.test("s")) {
-                return builder.startStrList(new TranslatableComponent(String.format("%s", key)), ((CommentedJsonConfig.ListVal<String>) listVal).input)
+                return builder.startStrList(Component.translatable(String.format("%s", key)), ((CommentedJsonConfig.ListVal<String>) listVal).input)
                         .setDefaultValue(((CommentedJsonConfig.ListVal<String>) listVal).defaultVal).setSaveConsumer(((CommentedJsonConfig.ListVal<String>) listVal)::set)
                         .setTooltip(ofComments(val)).build();
             }
             if (listVal.validator.test(0)) {
-                return builder.startIntList(new TranslatableComponent(String.format("%s", key)), ((CommentedJsonConfig.ListVal<Integer>) listVal).input)
+                return builder.startIntList(Component.translatable(String.format("%s", key)), ((CommentedJsonConfig.ListVal<Integer>) listVal).input)
                         .setDefaultValue(((CommentedJsonConfig.ListVal<Integer>) listVal).defaultVal).setSaveConsumer(((CommentedJsonConfig.ListVal<Integer>) listVal)::set)
                         .setTooltip(ofComments(val)).build();
             }
             if (listVal.validator.test(0.0)) {
-                return builder.startDoubleList(new TranslatableComponent(String.format("%s", key)), ((CommentedJsonConfig.ListVal<Double>) listVal).input)
+                return builder.startDoubleList(Component.translatable(String.format("%s", key)), ((CommentedJsonConfig.ListVal<Double>) listVal).input)
                         .setDefaultValue(((CommentedJsonConfig.ListVal<Double>) listVal).defaultVal).setSaveConsumer(((CommentedJsonConfig.ListVal<Double>) listVal)::set)
                         .setTooltip(ofComments(val)).build();
             }
         } else if (val.input instanceof String) {
             CommentedJsonConfig.CommentedVal<String> sv = (CommentedJsonConfig.CommentedVal<String>) val;
-            return builder.startStrField(new TranslatableComponent(String.format("%s", key)), sv.input)
+            return builder.startStrField(Component.translatable(String.format("%s", key)), sv.input)
                     .setDefaultValue(sv.defaultVal)
                     .setTooltip(ofComments(val))
                     .setSaveConsumer(sv::set).build();
         } else if (val.input instanceof Boolean) {
             CommentedJsonConfig.CommentedVal<Boolean> bv = (CommentedJsonConfig.CommentedVal<Boolean>) val;
-            return builder.startBooleanToggle(new TranslatableComponent(String.format("%s", key)), bv.input)
+            return builder.startBooleanToggle(Component.translatable(String.format("%s", key)), bv.input)
                     .setDefaultValue(bv.defaultVal)
                     .setTooltip(ofComments(val))
                     .setSaveConsumer(bv::set).build();
@@ -152,7 +150,7 @@ public class ClothConfigScreenHelper {
     }
 
     private static <T extends Enum<?>> Function<T, Component> enumProvider() {
-        return v -> new TranslatableComponent(v.name());
+        return v -> Component.translatable(v.name());
     }
 
     private static final int stringLength = 55;
@@ -167,12 +165,12 @@ public class ClothConfigScreenHelper {
                 int whiteSpace = st.lastIndexOf(" ");
                 if (whiteSpace < 0)
                     whiteSpace = st.length();
-                wrapped.add(new TextComponent(st.substring(0, whiteSpace)));
+                wrapped.add(Component.literal(st.substring(0, whiteSpace)));
                 s = s.substring(stringLength);
                 if (whiteSpace + 1 < st.length())
                     s = st.substring(whiteSpace + 1) + s;
             }
-            wrapped.add(new TextComponent(s));
+            wrapped.add(Component.literal(s));
         }
         return wrapped.toArray(new Component[0]);
     }

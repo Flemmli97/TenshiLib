@@ -20,7 +20,7 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -53,7 +53,7 @@ public class PatreonImpl implements PatreonPlatform {
             event.addCapability(capID, new PlayerCap(player));
     }
 
-    public static void onLogin(EntityJoinWorldEvent event) {
+    public static void onLogin(EntityJoinLevelEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             PatreonPlatform.INSTANCE.playerSettings(player)
                     .ifPresent(setting -> setting.setToDefault(false));
@@ -62,7 +62,7 @@ public class PatreonImpl implements PatreonPlatform {
     }
 
     public static void playerClone(PlayerEvent.Clone event) {
-        if (event.getPlayer() instanceof ServerPlayer serverPlayer) {
+        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
             boolean rev = PatreonPlatform.INSTANCE.playerSettings(event.getOriginal()).isPresent();
             if (!rev)
                 event.getOriginal().reviveCaps();
@@ -75,7 +75,7 @@ public class PatreonImpl implements PatreonPlatform {
 
     public static void track(PlayerEvent.StartTracking event) {
         if (event.getTarget() instanceof ServerPlayer targetPlayer)
-            PatreonPlatform.INSTANCE.sendToClient((ServerPlayer) event.getPlayer(), targetPlayer);
+            PatreonPlatform.INSTANCE.sendToClient((ServerPlayer) event.getEntity(), targetPlayer);
     }
 
     @Override
