@@ -10,9 +10,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.HitResult;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
-import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 
 public class ClientEvents {
 
@@ -20,7 +20,7 @@ public class ClientEvents {
         event.registerReloadListener(AnimationManager.getInstance());
     }
 
-    public static void clickSpecial(InputEvent.InteractionKeyMappingTriggered event) {
+    public static void clickSpecial(InputEvent.ClickInputEvent event) {
         if (event.isAttack() && event.getHand() == InteractionHand.MAIN_HAND) {
             Minecraft client = Minecraft.getInstance();
             if (client.hitResult != null && client.hitResult.getType() != HitResult.Type.BLOCK) {
@@ -38,8 +38,8 @@ public class ClientEvents {
         }
     }
 
-    public static void itemColors(RegisterColorHandlersEvent.Item event) {
+    public static void itemColors(ColorHandlerEvent.Item event) {
         for (SpawnEgg egg : SpawnEgg.getEggs())
-            event.register(egg::getColor, egg);
+            event.getItemColors().register(egg::getColor, egg);
     }
 }

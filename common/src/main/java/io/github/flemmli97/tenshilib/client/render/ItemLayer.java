@@ -4,8 +4,8 @@ package io.github.flemmli97.tenshilib.client.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import io.github.flemmli97.tenshilib.client.model.IItemArmModel;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
@@ -19,11 +19,8 @@ import net.minecraft.world.item.ItemStack;
  */
 public class ItemLayer<T extends LivingEntity, M extends EntityModel<T> & IItemArmModel> extends RenderLayer<T, M> {
 
-    private final ItemInHandRenderer itemInHandRenderer;
-
-    public ItemLayer(RenderLayerParent<T, M> renderer, ItemInHandRenderer itemInHandRenderer) {
+    public ItemLayer(RenderLayerParent<T, M> renderer) {
         super(renderer);
-        this.itemInHandRenderer = itemInHandRenderer;
     }
 
     @Override
@@ -57,7 +54,7 @@ public class ItemLayer<T extends LivingEntity, M extends EntityModel<T> & IItemA
             matrixStack.mulPose(Vector3f.YP.rotationDegrees(180.0F));
             boolean flag = hand == HumanoidArm.LEFT;
             this.getParentModel().postTransform(flag, matrixStack);
-            this.itemInHandRenderer.renderItem(entity, stack, transformType, flag, matrixStack, buffer, light);
+            Minecraft.getInstance().getItemInHandRenderer().renderItem(entity, stack, transformType, flag, matrixStack, buffer, light);
             matrixStack.popPose();
         }
     }

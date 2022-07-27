@@ -4,6 +4,7 @@ import io.github.flemmli97.tenshilib.platform.registry.PlatformRegistry;
 import io.github.flemmli97.tenshilib.platform.registry.RegistryEntrySupplier;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -11,7 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public class ForgeRegistryHandler<T> implements PlatformRegistry<T> {
+public class ForgeRegistryHandler<T extends IForgeRegistryEntry<T>> implements PlatformRegistry<T> {
 
     private final DeferredRegister<T> deferredRegister;
 
