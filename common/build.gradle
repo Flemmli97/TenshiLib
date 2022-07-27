@@ -5,7 +5,7 @@ dependencies {
 }
 
 architectury {
-    common(rootProject.enabled_platforms.split(","))
+    common()
 }
 
 loom {
