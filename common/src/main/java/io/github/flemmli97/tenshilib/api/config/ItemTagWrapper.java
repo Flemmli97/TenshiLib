@@ -74,6 +74,8 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
 
     @Override
     public boolean match(ItemStack stack) {
+        if (this.tag == null)
+            return super.match(stack);
         return stack.is(this.tag);
     }
 
