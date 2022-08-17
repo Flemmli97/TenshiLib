@@ -15,5 +15,9 @@ public interface IItemConfig<T extends IItemConfig<T>> extends IConfigValue<T> {
 
     boolean hasList();
 
+    /**
+     * If the given stack matches this item config.
+     * Note that it does not check for empty stack so empty stack + empty config will return true
+     */
     boolean match(ItemStack stack);
 }

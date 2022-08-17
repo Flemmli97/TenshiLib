@@ -1,3 +1,7 @@
+TenshiLib 1.6.10
+================
+- Fix nullpointer with empty item tag config
+
 TenshiLib 1.6.9
 ================
 - Fix bug with negatives in math expressions
