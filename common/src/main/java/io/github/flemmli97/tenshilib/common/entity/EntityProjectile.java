@@ -66,6 +66,7 @@ public abstract class EntityProjectile extends Projectile {
         this.shooter = shooter;
         this.entityData.set(shooterUUID, Optional.of(shooter.getUUID()));
         this.setRot(shooter.getYRot(), shooter.getXRot());
+        this.onUpdateOwner();
     }
 
     public boolean isPiercing() {
@@ -210,8 +211,11 @@ public abstract class EntityProjectile extends Projectile {
 
         if (!this.level.isClientSide)
             this.doCollision();
+        this.moveEntity();
+    }
 
-        motion = this.getDeltaMovement();
+    public void moveEntity() {
+        Vec3 motion = this.getDeltaMovement();
         double newX = this.getX() + motion.x;
         double newY = this.getY() + motion.y;
         double newZ = this.getZ() + motion.z;
@@ -221,7 +225,7 @@ public abstract class EntityProjectile extends Projectile {
         this.setXRot(this.updateRotation(this.xRotO, (float) (Mth.atan2(motion.y, f) * (double) (180F / (float) Math.PI))));
 
         boolean water = this.isInWater();
-        if (this.isInWater()) {
+        if (water) {
             for (int i = 0; i < 4; ++i) {
                 this.level.addParticle(ParticleTypes.BUBBLE, this.getX() * 0.25D, this.getY() * 0.25D, this.getZ() * 0.25D, motion.x, motion.y, motion.z);
             }
@@ -367,8 +371,14 @@ public abstract class EntityProjectile extends Projectile {
         if (this.shooter != null && !this.shooter.isRemoved()) {
             return this.shooter;
         }
-        this.entityData.get(shooterUUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(Entity.class, this.level, uuid));
+        this.entityData.get(shooterUUID).ifPresent(uuid -> {
+            this.shooter = EntityUtil.findFromUUID(Entity.class, this.level, uuid);
+            this.onUpdateOwner();
+        });
         return this.shooter;
+    }
+
+    public void onUpdateOwner() {
     }
 
     public UUID getOwnerUUID() {
@@ -402,5 +412,6 @@ public abstract class EntityProjectile extends Projectile {
             this.shooter = entity;
             this.entityData.set(shooterUUID, Optional.of(entity.getUUID()));
         }
+        this.onUpdateOwner();
     }
 }
