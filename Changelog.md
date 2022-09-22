@@ -1,3 +1,8 @@
+TenshiLib 1.6.11
+================
+- Animation interpolation
+- Internal changes
+
 TenshiLib 1.6.10
 ================
 - Fix nullpointer with empty item tag config
