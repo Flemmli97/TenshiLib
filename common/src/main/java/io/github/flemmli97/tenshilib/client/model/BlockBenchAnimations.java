@@ -31,9 +31,13 @@ public class BlockBenchAnimations {
     }
 
     public void doAnimation(ExtendedModel model, String name, int ticker, float partialTicks) {
+        this.doAnimation(model, name, ticker, partialTicks, 1);
+    }
+
+    public void doAnimation(ExtendedModel model, String name, int ticker, float partialTicks, float interpolation) {
         Animation animation = this.animations.get(name);
         if (animation != null) {
-            animation.animate(model, ticker, partialTicks);
+            animation.animate(model, ticker, partialTicks, interpolation);
         }
     }
 
@@ -63,11 +67,11 @@ public class BlockBenchAnimations {
             components.entrySet().forEach(e -> this.components.add(new AnimationComponent(e.getKey(), e.getValue().getAsJsonObject())));
         }
 
-        public void animate(ExtendedModel model, int ticker, float partialTicks) {
+        public void animate(ExtendedModel model, int ticker, float partialTicks, float interpolation) {
             if (this.loop)
                 ticker = ticker % this.length;
             for (AnimationComponent comp : this.components)
-                comp.animate(model, ticker, partialTicks);
+                comp.animate(model, ticker, partialTicks, interpolation);
         }
 
         @Override
@@ -144,7 +148,7 @@ public class BlockBenchAnimations {
             return null;
         }
 
-        public void animate(ExtendedModel model, int ticker, float partialTicks) {
+        public void animate(ExtendedModel model, int ticker, float partialTicks, float interpolation) {
             ModelPartHandler.ModelPartExtended modelPart = model.getHandler().getPartNullable(this.name);
             if (modelPart == null)
                 return;
@@ -152,9 +156,9 @@ public class BlockBenchAnimations {
             float secTime = actualTick * 0.05f;
             if (this.positions != null) {
                 if (this.positions.length == 1) {
-                    modelPart.x += this.positions[0].getXVal(secTime);
-                    modelPart.y -= this.positions[0].getYVal(secTime);
-                    modelPart.z += this.positions[0].getZVal(secTime);
+                    modelPart.x += this.positions[0].getXVal(secTime) * interpolation;
+                    modelPart.y -= this.positions[0].getYVal(secTime) * interpolation;
+                    modelPart.z += this.positions[0].getZVal(secTime) * interpolation;
                 } else {
                     int id = 1;
                     AnimationValue pos = this.positions[id];
@@ -162,16 +166,16 @@ public class BlockBenchAnimations {
                         pos = this.positions[id];
                     AnimationValue posPrev = this.positions[id - 1];
                     float prog = Mth.clamp((actualTick - posPrev.startTick) / (pos.startTick - posPrev.startTick), 0F, 1F);
-                    modelPart.x += this.interpolate(posPrev.getXVal(secTime), pos.getXVal(secTime), prog);
-                    modelPart.y -= this.interpolate(posPrev.getYVal(secTime), pos.getYVal(secTime), prog);
-                    modelPart.z += this.interpolate(posPrev.getZVal(secTime), pos.getZVal(secTime), prog);
+                    modelPart.x += this.interpolate(posPrev.getXVal(secTime), pos.getXVal(secTime), prog) * interpolation;
+                    modelPart.y -= this.interpolate(posPrev.getYVal(secTime), pos.getYVal(secTime), prog) * interpolation;
+                    modelPart.z += this.interpolate(posPrev.getZVal(secTime), pos.getZVal(secTime), prog) * interpolation;
                 }
             }
             if (this.rotations != null) {
                 if (this.rotations.length == 1) {
-                    modelPart.xRot += Mth.DEG_TO_RAD * this.rotations[0].getXVal(secTime);
-                    modelPart.yRot += Mth.DEG_TO_RAD * this.rotations[0].getYVal(secTime);
-                    modelPart.zRot += Mth.DEG_TO_RAD * this.rotations[0].getZVal(secTime);
+                    modelPart.xRot += Mth.DEG_TO_RAD * this.rotations[0].getXVal(secTime) * interpolation;
+                    modelPart.yRot += Mth.DEG_TO_RAD * this.rotations[0].getYVal(secTime) * interpolation;
+                    modelPart.zRot += Mth.DEG_TO_RAD * this.rotations[0].getZVal(secTime) * interpolation;
                 } else {
                     int id = 1;
                     AnimationValue rot = this.rotations[id];
@@ -179,16 +183,16 @@ public class BlockBenchAnimations {
                         rot = this.rotations[id];
                     AnimationValue rotPrev = this.rotations[id - 1];
                     float prog = Mth.clamp((actualTick - rotPrev.startTick) / (rot.startTick - rotPrev.startTick), 0F, 1F);
-                    modelPart.xRot += Mth.DEG_TO_RAD * this.interpolate(rotPrev.getXVal(secTime), rot.getXVal(secTime), prog);
-                    modelPart.yRot += Mth.DEG_TO_RAD * this.interpolate(rotPrev.getYVal(secTime), rot.getYVal(secTime), prog);
-                    modelPart.zRot += Mth.DEG_TO_RAD * this.interpolate(rotPrev.getZVal(secTime), rot.getZVal(secTime), prog);
+                    modelPart.xRot += Mth.DEG_TO_RAD * this.interpolate(rotPrev.getXVal(secTime), rot.getXVal(secTime), prog) * interpolation;
+                    modelPart.yRot += Mth.DEG_TO_RAD * this.interpolate(rotPrev.getYVal(secTime), rot.getYVal(secTime), prog) * interpolation;
+                    modelPart.zRot += Mth.DEG_TO_RAD * this.interpolate(rotPrev.getZVal(secTime), rot.getZVal(secTime), prog) * interpolation;
                 }
             }
             if (this.scales != null) {
                 if (this.scales.length == 1) {
-                    modelPart.xScale += this.scales[0].getXVal(secTime) - 1;
-                    modelPart.yScale += this.scales[0].getYVal(secTime) - 1;
-                    modelPart.zScale += this.scales[0].getZVal(secTime) - 1;
+                    modelPart.xScale += (this.scales[0].getXVal(secTime) - 1) * interpolation;
+                    modelPart.yScale += (this.scales[0].getYVal(secTime) - 1) * interpolation;
+                    modelPart.zScale += (this.scales[0].getZVal(secTime) - 1) * interpolation;
                 } else {
                     int id = 1;
                     AnimationValue scale = this.scales[id];
@@ -196,9 +200,9 @@ public class BlockBenchAnimations {
                         scale = this.scales[id];
                     AnimationValue scalePrev = this.scales[id - 1];
                     float prog = Mth.clamp((actualTick - scalePrev.startTick) / (scale.startTick - scalePrev.startTick), 0F, 1F);
-                    modelPart.xScale += this.interpolate(scalePrev.getXVal(secTime) - 1, scale.getXVal(secTime) - 1, prog);
-                    modelPart.yScale += this.interpolate(scalePrev.getYVal(secTime) - 1, scale.getYVal(secTime) - 1, prog);
-                    modelPart.zScale += this.interpolate(scalePrev.getZVal(secTime) - 1, scale.getZVal(secTime) - 1, prog);
+                    modelPart.xScale += this.interpolate(scalePrev.getXVal(secTime) - 1, scale.getXVal(secTime) - 1, prog) * interpolation;
+                    modelPart.yScale += this.interpolate(scalePrev.getYVal(secTime) - 1, scale.getYVal(secTime) - 1, prog) * interpolation;
+                    modelPart.zScale += this.interpolate(scalePrev.getZVal(secTime) - 1, scale.getZVal(secTime) - 1, prog) * interpolation;
                 }
             }
         }
