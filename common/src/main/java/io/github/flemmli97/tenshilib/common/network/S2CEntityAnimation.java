@@ -8,6 +8,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 public class S2CEntityAnimation implements Packet {
@@ -40,6 +41,7 @@ public class S2CEntityAnimation implements Packet {
                                 break;
                             i++;
                         }
+                        TenshiLib.logger.error("This animation is not registered for {}. Registered animations are {} but set animation is {}", e, Arrays.toString(entity.getAnimationHandler().getAnimations()), anim);
                         if (i < entity.getAnimationHandler().getAnimations().length)
                             return i;
                         return -2;
