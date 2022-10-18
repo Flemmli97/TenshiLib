@@ -40,6 +40,10 @@ public class AnimatedAction {
         this.shouldRunOut = shouldRunOut;
     }
 
+    public static AnimatedAction copyOf(AnimatedAction animatedAction, String id) {
+        return new AnimatedAction(animatedAction.length, animatedAction.attackTime, id, animatedAction.animationClient, animatedAction.speed, animatedAction.shouldRunOut);
+    }
+
     /**
      * @return Creates a new copy instance of the animation
      */

@@ -58,7 +58,7 @@ public class ItemWrapper implements IItemConfig<ItemWrapper> {
 
     @Override
     public boolean match(ItemStack stack) {
-        return stack.getItem() == this.item;
+        return stack.getItem() == this.getItem();
     }
 
     @Override

@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Json config with comments that is syntax wise simliar to setup to the forge config.
@@ -189,6 +190,12 @@ public class CommentedJsonConfig {
         public <T> CommentedVal<T> define(String name, T value) {
             if (value instanceof List v)
                 return this.defineList(name, v, s -> true);
+            if (value.getClass().isEnum()) {
+                T[] vals = (T[]) value.getClass().getEnumConstants();
+                List<String> comment = this.comments != null ? this.comments : new ArrayList<>();
+                comment.add("Allowed Values: " + Arrays.stream(vals).map(v -> ((Enum<?>) v).name()).collect(Collectors.joining(", ")));
+                return this.define(name, new CommentedVal<>(comment, value));
+            }
             return this.define(name, new CommentedVal<>(this.comments, value));
         }
 
@@ -206,23 +213,27 @@ public class CommentedJsonConfig {
 
         public IntVal defineInRange(String name, int value, int min, int max) {
             List<String> comment = this.comments != null ? this.comments : new ArrayList<>();
-            if (Integer.MAX_VALUE == max)
-                comment.add("Range: > " + min);
-            else if (Integer.MIN_VALUE == min)
-                comment.add("Range: < " + max);
-            else
-                comment.add("Range: " + min + " ~ " + max);
+            if (max != Integer.MAX_VALUE || min != Integer.MIN_VALUE) {
+                if (Integer.MAX_VALUE == max)
+                    comment.add("Range: > " + min);
+                else if (Integer.MIN_VALUE == min)
+                    comment.add("Range: < " + max);
+                else
+                    comment.add("Range: " + min + " ~ " + max);
+            }
             return this.define(name, new IntVal(comment, value, min, max));
         }
 
         public DoubleVal defineInRange(String name, double value, double min, double max) {
             List<String> comment = this.comments != null ? this.comments : new ArrayList<>();
-            if (Double.MAX_VALUE == max)
-                comment.add("Range: > " + min);
-            else if (Double.MIN_VALUE == min)
-                comment.add("Range: < " + max);
-            else
-                comment.add("Range: " + min + " ~ " + max);
+            if (max != Double.MAX_VALUE || min != Double.MIN_VALUE) {
+                if (Double.MAX_VALUE == max)
+                    comment.add("Range: > " + min);
+                else if (Double.MIN_VALUE == min)
+                    comment.add("Range: < " + max);
+                else
+                    comment.add("Range: " + min + " ~ " + max);
+            }
             return this.define(name, new DoubleVal(comment, value, min, max));
         }
 

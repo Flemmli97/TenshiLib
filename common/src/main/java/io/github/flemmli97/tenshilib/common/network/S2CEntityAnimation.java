@@ -4,6 +4,7 @@ import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
 import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.client.ClientHandlers;
+import io.github.flemmli97.tenshilib.common.utils.ArrayUtils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -42,6 +43,7 @@ public class S2CEntityAnimation implements Packet {
                         }
                         if (i < entity.getAnimationHandler().getAnimations().length)
                             return i;
+                        TenshiLib.logger.error("This animation is not registered for {}. Registered animations are {} but set animation is {}", e, ArrayUtils.arrayToString(entity.getAnimationHandler().getAnimations(), AnimatedAction::getID), anim.getID());
                         return -2;
                     }
                 }).orElse(-2);
