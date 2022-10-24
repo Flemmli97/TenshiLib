@@ -37,7 +37,7 @@ public class BlockBenchAnimations {
     public void doAnimation(ExtendedModel model, String name, int ticker, float partialTicks, float interpolation) {
         Animation animation = this.animations.get(name);
         if (animation != null) {
-            animation.animate(model, ticker, partialTicks, interpolation);
+            animation.animate(model, ticker, partialTicks, Mth.clamp(interpolation, 0, 1));
         }
     }
 
