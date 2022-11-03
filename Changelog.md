@@ -2,6 +2,7 @@ TenshiLib 1.6.12
 ================
 - Add back non itemstack sensitive spawnegg color version for backwards compat
 - Other internal stuff
+- Add support for dynamic armor texture on fabric. Forge has it already
 
 TenshiLib 1.6.11
 ================
