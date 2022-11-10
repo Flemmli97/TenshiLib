@@ -1,3 +1,7 @@
+TenshiLib 1.6.13
+================
+- Null check for json config
+
 TenshiLib 1.6.12
 ================
 - Add back non itemstack sensitive spawnegg color version for backwards compat

@@ -116,7 +116,7 @@ public class JsonConfig<T> {
             if (this.element instanceof CommentedJsonConfig conf) {
                 Set<String> faulty = conf.deserialize(this.gson.fromJson(reader, JsonObject.class), this.gson);
                 if (!faulty.isEmpty())
-                    throw new JsonSyntaxException("Faulty keys " + faulty);
+                    throw new JsonSyntaxException("Faulty keys " + faulty + ". They will get corrected to their default values.");
             } else
                 this.element = this.gson.fromJson(reader, this.type);
             reader.close();
