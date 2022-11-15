@@ -63,7 +63,10 @@ public class CommentedJsonConfig {
             if (object.has(e.getKey())) {
                 CommentedVal<Object> val = (CommentedVal<Object>) e.getValue();
                 try {
-                    val.set(gson.fromJson(object.get(e.getKey()).getAsJsonObject().get("input"), val.input.getClass()));
+                    Object v = gson.fromJson(object.get(e.getKey()).getAsJsonObject().get("input"), val.input.getClass());
+                    if (v == null && !val.allowNullValue)
+                        throw new JsonSyntaxException("Value was null for " + e.getKey());
+                    val.set(v);
                 } catch (JsonSyntaxException | IllegalStateException ex) {
                     faulty.add(e.getKey());
                 }
@@ -85,11 +88,13 @@ public class CommentedJsonConfig {
         protected final List<String> __comments;
         protected T input;
         protected final T defaultVal;
+        protected final boolean allowNullValue;
 
-        private CommentedVal(List<String> comments, T input) {
+        private CommentedVal(List<String> comments, T input, boolean allowNullValue) {
             this.__comments = comments;
             this.input = input;
             this.defaultVal = input;
+            this.allowNullValue = allowNullValue;
         }
 
         public T get() {
@@ -106,7 +111,7 @@ public class CommentedJsonConfig {
         protected transient final int min, max;
 
         private IntVal(List<String> comments, int input, int min, int max) {
-            super(comments, input);
+            super(comments, input, false);
             this.min = min;
             this.max = max;
         }
@@ -122,7 +127,7 @@ public class CommentedJsonConfig {
         protected final transient double min, max;
 
         private DoubleVal(List<String> comments, double input, double min, double max) {
-            super(comments, input);
+            super(comments, input, false);
             this.min = min;
             this.max = max;
         }
@@ -138,7 +143,7 @@ public class CommentedJsonConfig {
         protected final Predicate<T> validator;
 
         private ListVal(List<String> comments, List<T> input, Predicate<T> test) {
-            super(comments, input);
+            super(comments, input, false);
             this.validator = test;
         }
     }
@@ -186,17 +191,21 @@ public class CommentedJsonConfig {
             return this;
         }
 
-        @SuppressWarnings("unchecked")
         public <T> CommentedVal<T> define(String name, T value) {
+            return this.define(name, value, value == null);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T> CommentedVal<T> define(String name, T value, boolean allowNullValue) {
             if (value instanceof List v)
                 return this.defineList(name, v, s -> true);
             if (value.getClass().isEnum()) {
                 T[] vals = (T[]) value.getClass().getEnumConstants();
                 List<String> comment = this.comments != null ? this.comments : new ArrayList<>();
                 comment.add("Allowed Values: " + Arrays.stream(vals).map(v -> ((Enum<?>) v).name()).collect(Collectors.joining(", ")));
-                return this.define(name, new CommentedVal<>(comment, value));
+                return this.define(name, new CommentedVal<>(comment, value, allowNullValue));
             }
-            return this.define(name, new CommentedVal<>(this.comments, value));
+            return this.define(name, new CommentedVal<>(this.comments, value, allowNullValue));
         }
 
         public <T> CommentedVal<List<T>> defineList(String name, List<T> value, Predicate<T> validator) {

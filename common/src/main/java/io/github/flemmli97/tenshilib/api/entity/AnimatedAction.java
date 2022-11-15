@@ -52,7 +52,11 @@ public class AnimatedAction {
     }
 
     public boolean tick() {
-        return (this.ticker += 1 * this.speed) >= this.length && this.shouldRunOut;
+        return this.tick(1);
+    }
+
+    public boolean tick(int offSet) {
+        return (this.ticker += 1 * this.speed) >= (this.length + offSet) && this.shouldRunOut;
     }
 
     public boolean canAttack() {

@@ -1,3 +1,9 @@
+TenshiLib 1.6.13
+================
+- Null check for json config
+- Other internal stuff
+- Add support for dynamic armor texture on fabric. Forge has it already
+
 TenshiLib 1.6.11
 ================
 - Animation interpolation

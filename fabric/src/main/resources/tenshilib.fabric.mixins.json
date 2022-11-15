@@ -13,7 +13,8 @@
     "MinecraftMixin",
     "ParticleEngineMixin",
     "EntityRendererDispatcherMixin",
-    "LivingEntityRendererAccessor"
+    "LivingEntityRendererAccessor",
+    "HumanoidArmorLayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

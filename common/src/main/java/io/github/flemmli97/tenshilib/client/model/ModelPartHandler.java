@@ -66,7 +66,7 @@ public class ModelPartHandler {
         private final List<ModelPart.Cube> cubes;
         private final Map<String, ModelPartExtended> children;
 
-        private final PoseExtended defaultPose;
+        public final PoseExtended defaultPose;
 
         public ModelPartExtended(ModelPart orig) {
             this.cubes = ((ModelPartAccessor) (Object) orig).getCubes();
