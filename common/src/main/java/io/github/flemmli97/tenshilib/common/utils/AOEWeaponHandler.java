@@ -30,7 +30,7 @@ public class AOEWeaponHandler {
     public static void onAOEWeaponSwing(Player player, ItemStack stack, IAOEWeapon weapon) {
         if (player.level.isClientSide)
             return;
-        List<Entity> list = RayTraceUtils.getEntities(player, weapon.getRange(), weapon.getFOV());
+        List<Entity> list = RayTraceUtils.getEntities(player, weapon.getRange(player, stack), weapon.getFOV(player, stack));
         if (EventCalls.INSTANCE.aoeAttackCall(player, stack, list) || list.isEmpty())
             return;
         for (int i = 0; i < list.size(); i++)

@@ -1,3 +1,7 @@
+TenshiLib 1.6.15
+================
+- Add itemstack and entity sensitive version to some stuff
+
 TenshiLib 1.6.14
 ================
 - Fix patreon data getter not being async
