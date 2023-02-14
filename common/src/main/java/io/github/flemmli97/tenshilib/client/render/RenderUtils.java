@@ -5,18 +5,19 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
-import io.github.flemmli97.tenshilib.mixin.WorldRenderAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.Random;
 
@@ -41,10 +42,22 @@ public class RenderUtils {
         BlockState state = player.level.getBlockState(pos);
         RenderType renderType = RenderType.lines();
         Vec3 vec = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-        WorldRenderAccessor.drawShapeOutline(matrixStack, buffer.getBuffer(renderType), state.getShape(player.level, pos, CollisionContext.of(player)),
+        renderShape(matrixStack, buffer.getBuffer(renderType), state.getShape(player.level, pos, CollisionContext.of(player)),
                 pos.getX() - vec.x, pos.getY() - vec.y, pos.getZ() - vec.z, red, green, blue, alpha);
         if (drawImmediately && buffer instanceof MultiBufferSource.BufferSource)
             ((MultiBufferSource.BufferSource) buffer).endBatch(renderType);
+    }
+
+    public static void renderShape(PoseStack poseStack, VertexConsumer consumer, VoxelShape shape, double x, double y, double z, float red, float green, float blue, float alpha) {
+        PoseStack.Pose pose = poseStack.last();
+        shape.forAllEdges((k, l, m, n, o, p) -> {
+            float q = (float) (n - k);
+            float r = (float) (o - l);
+            float s = (float) (p - m);
+            float t = Mth.sqrt(q * q + r * r + s * s);
+            consumer.vertex(pose.pose(), (float) (k + x), (float) (l + y), (float) (m + z)).color(red, green, blue, alpha).normal(pose.normal(), q /= t, r /= t, s /= t).endVertex();
+            consumer.vertex(pose.pose(), (float) (n + x), (float) (o + y), (float) (p + z)).color(red, green, blue, alpha).normal(pose.normal(), q, r, s).endVertex();
+        });
     }
 
     public static void renderAreaAround(PoseStack matrixStack, MultiBufferSource buffer, BlockPos pos, float radius, boolean drawImmediately) {
