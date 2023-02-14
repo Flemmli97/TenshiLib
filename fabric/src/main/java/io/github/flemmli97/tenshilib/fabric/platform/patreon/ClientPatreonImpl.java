@@ -1,10 +1,10 @@
 package io.github.flemmli97.tenshilib.fabric.platform.patreon;
 
+import io.github.flemmli97.tenshilib.common.network.Packet;
 import io.github.flemmli97.tenshilib.fabric.mixin.LivingEntityRendererAccessor;
 import io.github.flemmli97.tenshilib.patreon.client.PatreonClientPlatform;
 import io.github.flemmli97.tenshilib.patreon.client.PatreonLayer;
 import io.github.flemmli97.tenshilib.patreon.client.PatreonModelProvider;
-import io.github.flemmli97.tenshilib.patreon.pkts.C2SEffectUpdatePkt;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -33,7 +33,7 @@ public class ClientPatreonImpl implements PatreonClientPlatform {
     }
 
     @Override
-    public void sendToServer(C2SEffectUpdatePkt pkt) {
+    public void sendToServer(Packet pkt) {
         FriendlyByteBuf buf = PacketByteBufs.create();
         pkt.write(buf);
         ClientPlayNetworking.send(pkt.getID(), buf);

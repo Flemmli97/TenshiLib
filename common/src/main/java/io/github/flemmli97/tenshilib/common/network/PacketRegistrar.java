@@ -1,6 +1,7 @@
 package io.github.flemmli97.tenshilib.common.network;
 
 import io.github.flemmli97.tenshilib.patreon.pkts.C2SEffectUpdatePkt;
+import io.github.flemmli97.tenshilib.patreon.pkts.C2SRequestUpdateClientPkt;
 import io.github.flemmli97.tenshilib.patreon.pkts.S2CEffectUpdatePkt;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -15,6 +16,7 @@ public class PacketRegistrar {
     public static int registerServerPackets(ServerPacketRegister register, int id) {
         register.registerMessage(id++, C2SPacketHit.ID, C2SPacketHit.class, C2SPacketHit::write, C2SPacketHit::fromBytes, C2SPacketHit::handlePacket);
         register.registerMessage(id++, C2SEffectUpdatePkt.ID, C2SEffectUpdatePkt.class, C2SEffectUpdatePkt::write, C2SEffectUpdatePkt::fromBytes, C2SEffectUpdatePkt::handlePacketServer);
+        register.registerMessage(id++, C2SRequestUpdateClientPkt.ID, C2SRequestUpdateClientPkt.class, C2SRequestUpdateClientPkt::write, C2SRequestUpdateClientPkt::fromBytes, C2SRequestUpdateClientPkt::handlePacketServer);
         return id;
     }
 

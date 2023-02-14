@@ -92,4 +92,16 @@ public class PatreonPlayerSetting {
         this.render = pkt.render;
         this.color = pkt.color;
     }
+
+    public void update(PatreonEffects.PatreonEffectConfig effect, RenderLocation location, boolean render, int color) {
+        this.conf = effect;
+        if (this.conf != null) {
+            if (this.conf.locationAllowed(location))
+                this.renderLocation = location;
+            else
+                this.renderLocation = this.conf.defaultLoc();
+        }
+        this.render = render;
+        this.color = color;
+    }
 }

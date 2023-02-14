@@ -35,10 +35,10 @@ public class PatreonModelProvider {
             model.setRenderLocation(location);
             model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
             int i = LivingEntityRenderer.getOverlayCoords(entity, 0);
-            model.renderToBuffer(stack, buffer.getBuffer(model.renderType(model.texture(entity))), packedLight, i, red / 255f, green / 255f, blue / 255f, alpha / 255f);
+            model.renderToBuffer(stack, buffer.getBuffer(alpha != 255 ? RenderType.entityTranslucent(model.texture(entity)) : model.renderType(model.texture(entity))), packedLight, i, red / 255f, green / 255f, blue / 255f, alpha / 255f);
             stack.scale(1.15f, 1.15f, 1.15f);
             stack.translate(0, -0.175, 0);
-            model.renderToBuffer(stack, buffer.getBuffer(RenderType.entityTranslucent(model.texture(entity))), packedLight, i, red / 255f, green / 255f, blue / 255f, 35 / 255f);
+            model.renderToBuffer(stack, buffer.getBuffer(RenderType.entityTranslucent(model.texture(entity))), packedLight, i, red / 255f, green / 255f, blue / 255f, (alpha * 0.15f) / 255f);
         }
     });
 
@@ -78,7 +78,7 @@ public class PatreonModelProvider {
             model.setRenderLocation(location);
             model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
             int i = LivingEntityRenderer.getOverlayCoords(entity, 0);
-            model.renderToBuffer(stack, buffer.getBuffer(model.renderType(model.texture(entity))), packedLight, i, red / 255f, green / 255f, blue / 255f, alpha / 255f);
+            model.renderToBuffer(stack, buffer.getBuffer(alpha != 255 ? RenderType.entityTranslucent(model.texture(entity)) : model.renderType(model.texture(entity))), packedLight, i, red / 255f, green / 255f, blue / 255f, alpha / 255f);
         }
     }
 }

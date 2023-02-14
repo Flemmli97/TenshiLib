@@ -1,10 +1,10 @@
 package io.github.flemmli97.tenshilib.forge.platform.patreon;
 
+import io.github.flemmli97.tenshilib.common.network.Packet;
 import io.github.flemmli97.tenshilib.forge.network.PacketHandler;
 import io.github.flemmli97.tenshilib.patreon.client.PatreonClientPlatform;
 import io.github.flemmli97.tenshilib.patreon.client.PatreonLayer;
 import io.github.flemmli97.tenshilib.patreon.client.PatreonModelProvider;
-import io.github.flemmli97.tenshilib.patreon.pkts.C2SEffectUpdatePkt;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.world.entity.player.Player;
@@ -37,7 +37,7 @@ public class ClientPatreonImpl implements PatreonClientPlatform {
     }
 
     @Override
-    public void sendToServer(C2SEffectUpdatePkt pkt) {
+    public void sendToServer(Packet pkt) {
         PacketHandler.sendToServer(pkt);
     }
 }
