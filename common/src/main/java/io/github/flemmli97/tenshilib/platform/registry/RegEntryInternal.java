@@ -24,7 +24,8 @@ class RegEntryInternal<V> {
         return (V) this;
     }
 
-    public @Nullable ResourceLocation getRegistryName() {
+    @Nullable
+    public ResourceLocation getRegistryName() {
         return this.registryName;
     }
 
