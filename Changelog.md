@@ -1,7 +1,11 @@
 TenshiLib 1.6.15
 ================
-- Fix patreon data getter not being async
+- Add itemstack and entity sensitive version to some stuff
 - Add a color slider and alpha support for patreon effects
+
+TenshiLib 1.6.14
+================
+- Fix patreon data getter not being async
 
 TenshiLib 1.6.13
 ================
