@@ -1,4 +1,4 @@
-TenshiLib 1.6.14
+TenshiLib 1.6.15
 ================
 - Fix patreon data getter not being async
 - Add a color slider and alpha support for patreon effects
