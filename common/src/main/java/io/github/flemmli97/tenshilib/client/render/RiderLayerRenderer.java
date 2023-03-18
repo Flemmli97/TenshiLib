@@ -24,10 +24,14 @@ import net.minecraft.world.entity.LivingEntity;
  */
 public class RiderLayerRenderer<T extends LivingEntity, M extends EntityModel<T> & RideableModel<T>> extends RenderLayer<T, M> {
 
+    private final EntityRenderDispatcher dispatcher;
+
     public RiderLayerRenderer(RenderLayerParent<T, M> renderer) {
         super(renderer);
+        this.dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public void render(PoseStack stack, MultiBufferSource buffer, int light, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         for (int i = 0; i < entity.getPassengers().size(); i++) {
@@ -36,8 +40,9 @@ public class RiderLayerRenderer<T extends LivingEntity, M extends EntityModel<T>
                 continue;
             ClientHandlers.RIDING_RENDER_BLACKLIST.add(rider.getUUID());
             stack.pushPose();
-            this.getParentModel().transform(entity, rider, stack, i);
-            this.renderPassenger(entity, rider, partialTicks, stack, buffer, light);
+            EntityRenderer<?> entityRenderer = this.dispatcher.getRenderer(rider);
+            this.getParentModel().transform(entity, rider, entityRenderer, stack, i);
+            this.renderPassenger(entity, (EntityRenderer) entityRenderer, rider, partialTicks, stack, buffer, light);
             stack.popPose();
             ClientHandlers.RIDING_RENDER_BLACKLIST.remove(rider.getUUID());
         }
@@ -46,16 +51,14 @@ public class RiderLayerRenderer<T extends LivingEntity, M extends EntityModel<T>
     /**
      * Undo transforms of things in the given EntityRenderer so its not applied twice
      */
-    protected <E extends Entity> void undoLivingRendererTransform(EntityRenderer<E> entityRenderer, PoseStack stack, T entity, E rider, float partialTicks) {
+    protected void undoLivingRendererTransform(EntityRenderer<?> entityRenderer, PoseStack stack, T entity, Entity rider, float partialTicks) {
         float riderRot = Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
+        stack.translate(0.0, 3 / 16f, 0.0);
         stack.scale(-1.0f, -1.0f, 1.0f);
         stack.mulPose(Vector3f.YP.rotationDegrees(riderRot + 180));
     }
 
-    @SuppressWarnings("unchecked")
-    public <E extends Entity> void renderPassenger(T vehicle, E entity, float partialTicks, PoseStack stack, MultiBufferSource buffer, int packedLight) {
-        EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
-        EntityRenderer<E> entityRenderer = (EntityRenderer<E>) dispatcher.getRenderer(entity);
+    public <E extends Entity> void renderPassenger(T vehicle, EntityRenderer<E> entityRenderer, E entity, float partialTicks, PoseStack stack, MultiBufferSource buffer, int packedLight) {
         try {
             this.undoLivingRendererTransform(entityRenderer, stack, vehicle, entity, partialTicks);
             entityRenderer.render(entity, 0, partialTicks, stack, buffer, packedLight);
