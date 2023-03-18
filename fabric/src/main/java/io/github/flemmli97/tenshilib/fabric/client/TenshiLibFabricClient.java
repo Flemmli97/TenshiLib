@@ -13,6 +13,7 @@ public class TenshiLibFabricClient implements ClientModInitializer {
         ClientPacketHandler.register();
         ClientEvents.itemColors();
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new AnimReloader());
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new RiderLayerReloader());
         PatreonClientPlatform.INSTANCE.setup();
     }
 }

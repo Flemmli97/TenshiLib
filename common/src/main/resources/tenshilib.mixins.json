@@ -6,11 +6,14 @@
   "mixins": [
   ],
   "client": [
-    "LivingOverlayMixin",
-    "OverlayTextureMixin",
-    "ModelPartAccessor",
-    "ScreenAccessor",
+    "EntityRenderDispatcherAccessor",
     "HumanoidArmorMixin",
+    "LivingEntityRendererAccessor",
+    "LivingOverlayMixin",
+    "ModelPartAccessor",
+    "OverlayTextureMixin",
+    "PoseStackMixin",
+    "ScreenAccessor",
     "dual.LivingEntityMixin",
     "dual.ItemInHandRendererMixin",
     "dual.PlayerMixin",
