@@ -3,7 +3,6 @@ package io.github.flemmli97.tenshilib.client;
 import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
 import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.api.entity.IOverlayEntityRender;
-import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.entity.Entity;
@@ -41,7 +40,7 @@ public class ClientHandlers {
         if (entity.getVehicle() instanceof LivingEntity vehicle && CustomRiderRendererManager.getInstance().hasRiderLayerRenderer(vehicle.getType())) {
             if (ClientHandlers.RIDING_RENDER_BLACKLIST.contains(entity.getUUID()))
                 return false;
-            return entity != Minecraft.getInstance().player || Minecraft.getInstance().options.getCameraType() != CameraType.FIRST_PERSON;
+            return entity != Minecraft.getInstance().player || !Minecraft.getInstance().options.getCameraType().isFirstPerson();
         }
         return false;
     }

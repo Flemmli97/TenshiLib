@@ -13,11 +13,12 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Add to any entity renderer where the rider should adjust according to the entities model
@@ -26,8 +27,11 @@ public class RiderLayerRenderer<T extends LivingEntity, M extends EntityModel<T>
 
     private final EntityRenderDispatcher dispatcher;
 
-    public RiderLayerRenderer(RenderLayerParent<T, M> renderer) {
+    private final LivingEntityRenderer<T, M> renderer;
+
+    public RiderLayerRenderer(LivingEntityRenderer<T, M> renderer) {
         super(renderer);
+        this.renderer = renderer;
         this.dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
     }
 
@@ -41,26 +45,46 @@ public class RiderLayerRenderer<T extends LivingEntity, M extends EntityModel<T>
             ClientHandlers.RIDING_RENDER_BLACKLIST.add(rider.getUUID());
             stack.pushPose();
             EntityRenderer<?> entityRenderer = this.dispatcher.getRenderer(rider);
-            this.getParentModel().transform(entity, rider, entityRenderer, stack, i);
-            this.renderPassenger(entity, (EntityRenderer) entityRenderer, rider, partialTicks, stack, buffer, light);
+            boolean transformed = this.getParentModel().transform(entity, this.renderer, rider, entityRenderer, stack, i);
+            this.renderPassenger(entity, (EntityRenderer) entityRenderer, rider, partialTicks, stack, buffer, light, transformed);
             stack.popPose();
             ClientHandlers.RIDING_RENDER_BLACKLIST.remove(rider.getUUID());
         }
     }
 
     /**
-     * Undo transforms of things in the given EntityRenderer so its not applied twice
+     * Undo transforms of the stacks from {@link LivingEntityRenderer} for the entity T
+     * For renderer with different transforms than vanilla this also needs to be adjusted
      */
-    protected void undoLivingRendererTransform(EntityRenderer<?> entityRenderer, PoseStack stack, T entity, Entity rider, float partialTicks) {
-        float riderRot = Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
-        stack.translate(0.0, 3 / 16f, 0.0);
-        stack.scale(-1.0f, -1.0f, 1.0f);
-        stack.mulPose(Vector3f.YP.rotationDegrees(riderRot + 180));
+    protected void undoLivingRendererTransform(EntityRenderer<?> entityRenderer, PoseStack stack, T entity, Entity rider, float partialTicks, boolean transformed) {
+        float yaw = Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
+        if (rider instanceof LivingEntity livingRider) {
+            float headRot = Mth.rotLerp(partialTicks, livingRider.yHeadRotO, livingRider.yHeadRot);
+            float diff = Mth.wrapDegrees(headRot - yaw);
+            if (diff < -85.0f) {
+                diff = -85.0f;
+            }
+            if (diff >= 85.0f) {
+                diff = 85.0f;
+            }
+            yaw = headRot - diff;
+            if (diff * diff > 2500.0f) {
+                yaw += diff * 0.2f;
+            }
+        }
+        if (!transformed)
+            stack.translate(0.0D, 1.501f, 0.0D);
+        stack.scale(-1.0F, -1.0F, 1.0F);
+        stack.mulPose(Vector3f.YP.rotationDegrees(yaw + 180.0F));
     }
 
-    public <E extends Entity> void renderPassenger(T vehicle, EntityRenderer<E> entityRenderer, E entity, float partialTicks, PoseStack stack, MultiBufferSource buffer, int packedLight) {
+    public <E extends Entity> void renderPassenger(T vehicle, EntityRenderer<E> entityRenderer, E entity, float partialTicks, PoseStack stack, MultiBufferSource buffer, int packedLight, boolean transformed) {
         try {
-            this.undoLivingRendererTransform(entityRenderer, stack, vehicle, entity, partialTicks);
+            this.undoLivingRendererTransform(entityRenderer, stack, vehicle, entity, partialTicks, transformed);
+            if (!transformed) {
+                Vec3 diff = entity.position().subtract(vehicle.position());
+                stack.translate(diff.x, diff.y, diff.z);
+            }
             entityRenderer.render(entity, 0, partialTicks, stack, buffer, packedLight);
         } catch (Throwable throwable) {
             CrashReport crashReport = CrashReport.forThrowable(throwable, "Rendering entity in world from " + this.getClass());
