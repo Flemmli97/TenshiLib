@@ -1,3 +1,8 @@
+TenshiLib 1.6.16
+================
+- Expanding upon animation system to allow interpolation in between
+- Add system to allow entity to customize riding entities
+
 TenshiLib 1.6.15
 ================
 - Add itemstack and entity sensitive version to some stuff
