@@ -46,7 +46,7 @@ public class PacketHandler {
 
     public static <T> void sendToClientChecked(T message, ServerPlayer player) {
         if (hasChannel(player))
-            dispatcher.sendTo(message, player.connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
+            dispatcher.sendTo(message, player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
     }
 
     public static <T> void sendToTracking(T message, Entity e) {

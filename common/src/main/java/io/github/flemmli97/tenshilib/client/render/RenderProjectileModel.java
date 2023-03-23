@@ -2,7 +2,7 @@ package io.github.flemmli97.tenshilib.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -39,8 +39,8 @@ public abstract class RenderProjectileModel<T extends Entity> extends EntityRend
     }
 
     public void translate(T entity, PoseStack stack, float pitch, float yaw, float partialTicks) {
-        stack.mulPose(Vector3f.YP.rotationDegrees(180 + yaw));
-        stack.mulPose(Vector3f.XP.rotationDegrees(pitch));
+        stack.mulPose(Axis.YP.rotationDegrees(180 + yaw));
+        stack.mulPose(Axis.XP.rotationDegrees(pitch));
     }
 
     public float yawOffset() {

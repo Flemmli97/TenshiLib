@@ -2,9 +2,7 @@ package io.github.flemmli97.tenshilib.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Matrix3f;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -18,6 +16,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 
 import java.util.Random;
 
@@ -90,8 +90,8 @@ public class RenderUtils {
     }
 
     public static void applyYawPitch(PoseStack stack, float yaw, float pitch) {
-        stack.mulPose(Vector3f.YP.rotationDegrees(yaw));
-        stack.mulPose(Vector3f.ZP.rotationDegrees(pitch));
+        stack.mulPose(Axis.YP.rotationDegrees(yaw));
+        stack.mulPose(Axis.ZP.rotationDegrees(pitch));
     }
 
     /**
@@ -115,9 +115,9 @@ public class RenderUtils {
         random.setSeed(432L);
         for (int i = 0; i < amount; i++) {
             float ticker = ticks + partialTicks;
-            stack.mulPose(Vector3f.XP.rotationDegrees(random.nextFloat() * 360.0F));
-            stack.mulPose(Vector3f.YP.rotationDegrees(random.nextFloat() * 360.0F));
-            stack.mulPose(Vector3f.ZP.rotationDegrees(random.nextFloat() * 360.0F + ticker * rotationPerTick));
+            stack.mulPose(Axis.XP.rotationDegrees(random.nextFloat() * 360.0F));
+            stack.mulPose(Axis.YP.rotationDegrees(random.nextFloat() * 360.0F));
+            stack.mulPose(Axis.ZP.rotationDegrees(random.nextFloat() * 360.0F + ticker * rotationPerTick));
             renderGradientBeam3d(stack, renderTypeBuffer, length, width, builder);
         }
         stack.popPose();
@@ -154,9 +154,9 @@ public class RenderUtils {
         random.setSeed(432L);
         for (int i = 0; i < amount; i++) {
             float ticker = ticks + partialTicks;
-            matrixStack.mulPose(Vector3f.XP.rotationDegrees(random.nextFloat() * 360.0F));
-            matrixStack.mulPose(Vector3f.YP.rotationDegrees(random.nextFloat() * 360.0F));
-            matrixStack.mulPose(Vector3f.ZP.rotationDegrees(random.nextFloat() * 360.0F + ticker * rotationPerTick));
+            matrixStack.mulPose(Axis.XP.rotationDegrees(random.nextFloat() * 360.0F));
+            matrixStack.mulPose(Axis.YP.rotationDegrees(random.nextFloat() * 360.0F));
+            matrixStack.mulPose(Axis.ZP.rotationDegrees(random.nextFloat() * 360.0F + ticker * rotationPerTick));
             renderGradientBeam(matrixStack, renderTypeBuffer, length, width, builder);
         }
         matrixStack.popPose();

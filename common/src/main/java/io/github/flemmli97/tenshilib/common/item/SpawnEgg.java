@@ -25,7 +25,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.BaseSpawner;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
@@ -122,10 +121,9 @@ public class SpawnEgg extends Item {
             InteractionResult onBlock = this.onBlockUse(stack, blockpos, blockstate, tile);
             if (onBlock != InteractionResult.PASS)
                 return onBlock;
-            if (tile instanceof SpawnerBlockEntity) {
-                BaseSpawner abstractspawner = ((SpawnerBlockEntity) tile).getSpawner();
+            if (tile instanceof SpawnerBlockEntity spawnerBlock) {
                 EntityType<?> entitytype1 = this.getType(stack.getTag());
-                abstractspawner.setEntityId(entitytype1);
+                spawnerBlock.setEntityId(entitytype1, ctx.getLevel().getRandom());
                 tile.setChanged();
                 world.sendBlockUpdated(blockpos, blockstate, blockstate, 3);
                 stack.shrink(1);
@@ -177,7 +175,7 @@ public class SpawnEgg extends Item {
         if (!(stack.getItem() instanceof SpawnEgg item))
             return null;
         EntityType<?> type = item.getType(stack.getTag());
-        Entity e = type.create(world, stack.getTag(), item.getEntityName(stack), player, pos, reason, updateLocation, doCollisionOffset);
+        Entity e = type.create(world, stack.getTag(), EntityType.createDefaultStackConfig(world, stack, player), pos, reason, updateLocation, doCollisionOffset);
         if (e != null) {
             if (!item.onEntitySpawned(e, stack, player) || (forgeCheck && e instanceof Mob && EventCalls.INSTANCE.specialSpawnCall((Mob) e, world, pos.getX(), pos.getY(), pos.getZ(), null, reason)))
                 return null;
@@ -191,8 +189,8 @@ public class SpawnEgg extends Item {
     }
 
     public EntityType<?> getType(@Nullable CompoundTag nbt) {
-        if (nbt != null && nbt.contains("EntityTag", Tag.TAG_COMPOUND)) {
-            CompoundTag compoundnbt = nbt.getCompound("EntityTag");
+        if (nbt != null && nbt.contains(EntityType.ENTITY_TAG, Tag.TAG_COMPOUND)) {
+            CompoundTag compoundnbt = nbt.getCompound(EntityType.ENTITY_TAG);
             if (compoundnbt.contains("id", Tag.TAG_STRING)) {
                 EntityType<?> type = PlatformUtils.INSTANCE.entities().getFromId(new ResourceLocation(compoundnbt.getString("id")));
                 return type != null ? type : this.typeIn.get();

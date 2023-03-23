@@ -10,7 +10,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -83,7 +82,7 @@ public class AOEWeaponHandler {
                         }
                     }
                     Vec3 vector3d = target.getDeltaMovement();
-                    boolean attackSuccess = target.hurt(DamageSource.playerAttack(player), baseDmg);
+                    boolean attackSuccess = target.hurt(player.damageSources().playerAttack(player), baseDmg);
                     if (attackSuccess) {
                         if (knocback > 0) {
                             if (target instanceof LivingEntity) {

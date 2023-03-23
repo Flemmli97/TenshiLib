@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.patreon.client;
 
 import io.github.flemmli97.tenshilib.common.network.Packet;
-import io.github.flemmli97.tenshilib.mixinhelper.ScreenWidgetAdder;
+import io.github.flemmli97.tenshilib.mixin.ScreenAccessor;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlatform;
 import io.github.flemmli97.tenshilib.patreon.RenderLocation;
 import io.github.flemmli97.tenshilib.platform.InitUtil;
@@ -19,7 +19,7 @@ public interface PatreonClientPlatform {
 
     static void addPatreonButton(Screen screen) {
         if (screen instanceof SkinCustomizationScreen skin) {
-            ((ScreenWidgetAdder) screen).widgetAdder(new PatreonButton(screen.width - 32, screen.height - 32, skin));
+            ((ScreenAccessor) screen).addRenderableWidgetTo(new PatreonButton(screen.width - 32, screen.height - 32, skin));
         }
     }
 

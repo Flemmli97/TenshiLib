@@ -1,6 +1,7 @@
 package io.github.flemmli97.tenshilib.platform.registry;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
@@ -46,7 +47,7 @@ public class VanillaRegistryHandler<T> implements PlatformRegistry<T> {
 
     @SuppressWarnings("unchecked")
     protected Registry<T> registryFrom() {
-        Registry<?> reg = Registry.REGISTRY.get(this.key.location());
+        Registry<?> reg = BuiltInRegistries.REGISTRY.get(this.key.location());
         if (reg == null)
             throw new NullPointerException("Failed to get a corresponding registry for " + this.key);
         return (Registry<T>) reg;

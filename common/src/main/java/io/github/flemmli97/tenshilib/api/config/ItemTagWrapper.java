@@ -11,7 +11,7 @@ import com.google.gson.JsonSerializer;
 import io.github.flemmli97.tenshilib.common.utils.JsonUtils;
 import io.github.flemmli97.tenshilib.platform.PlatformUtils;
 import net.minecraft.core.HolderSet;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -51,7 +51,7 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
                 this.item = Items.AIR;
                 return this.item;
             }
-            Optional<HolderSet.Named<Item>> t = Registry.ITEM.getTag(this.tag);
+            Optional<HolderSet.Named<Item>> t = BuiltInRegistries.ITEM.getTag(this.tag);
             t.ifPresent(set -> set.forEach(holder -> this.list.add(holder.value())));
             if (!this.list.isEmpty())
                 this.item = this.list.get(0);

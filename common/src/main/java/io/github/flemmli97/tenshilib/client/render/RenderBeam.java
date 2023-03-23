@@ -2,9 +2,7 @@ package io.github.flemmli97.tenshilib.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Matrix3f;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import io.github.flemmli97.tenshilib.api.entity.IBeamEntity;
 import io.github.flemmli97.tenshilib.common.utils.MathUtils;
 import net.minecraft.client.CameraType;
@@ -17,6 +15,8 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 
 public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityRenderer<T> {
 
@@ -71,13 +71,13 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
         float dist = (float) entity.hitVec().distanceTo(entity.startVec());
         float width = this.widthFunc(entity);
         matrixStack.pushPose();
-        matrixStack.mulPose(Vector3f.YN.rotationDegrees(Mth.lerp(partialTicks, entity.yRotO, entity.getYRot()) + 90));
-        matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-Mth.lerp(partialTicks, entity.xRotO, entity.getXRot())));
+        matrixStack.mulPose(Axis.YN.rotationDegrees(Mth.lerp(partialTicks, entity.yRotO, entity.getYRot()) + 90));
+        matrixStack.mulPose(Axis.ZP.rotationDegrees(-Mth.lerp(partialTicks, entity.xRotO, entity.getXRot())));
         boolean playerView = entity.getOwner() == Minecraft.getInstance().player && Minecraft.getInstance().options.getCameraType() != CameraType.THIRD_PERSON_BACK;
         if (playerView) {
-            matrixStack.mulPose(Vector3f.XP.rotationDegrees(30));
+            matrixStack.mulPose(Axis.XP.rotationDegrees(30));
             matrixStack.translate(0, -0.1, 0);
-            matrixStack.mulPose(Vector3f.XP.rotationDegrees(60));
+            matrixStack.mulPose(Axis.XP.rotationDegrees(60));
         } else
             matrixStack.scale(1, width, width);
         this.renderBeam(entity, dist, width, matrixStack, buffer, packedLight, playerView);

@@ -4,6 +4,7 @@ import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
 import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.common.utils.MathUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
@@ -157,7 +158,7 @@ public abstract class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> ex
         double x = Math.cos(angle) * minDis;
         double z = Math.sin(angle) * minDis;
         float min = minDis * minDis;
-        BlockPos pos = this.attacker.blockPosition().offset(x, 0.0, z);
+        BlockPos pos = this.attacker.blockPosition().offset(Mth.floor(x), 0, Mth.floor(z));
         if (away.distanceToSqr(Vec3.atCenterOf(pos)) > min && this.attacker.isWithinRestriction(pos)) {
             return pos;
         }

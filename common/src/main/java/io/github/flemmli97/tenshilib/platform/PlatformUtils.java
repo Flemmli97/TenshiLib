@@ -7,6 +7,7 @@ import io.github.flemmli97.tenshilib.platform.registry.VanillaRegistryHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -16,7 +17,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -28,7 +28,6 @@ import net.minecraft.world.level.material.Fluid;
 
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 public abstract class PlatformUtils {
 
@@ -90,26 +89,24 @@ public abstract class PlatformUtils {
 
     @SuppressWarnings("unchecked")
     protected <T> Registry<T> registryFrom(ResourceKey<? extends Registry<T>> key) {
-        Registry<?> reg = Registry.REGISTRY.get(key.location());
+        Registry<?> reg = BuiltInRegistries.REGISTRY.get(key.location());
         if (reg == null)
             throw new NullPointerException("Failed to get a corresponding registry for " + key);
         return (Registry<T>) reg;
     }
 
-    public abstract CreativeModeTab tab(ResourceLocation label, Supplier<ItemStack> icon);
-
     public abstract <T extends BlockEntity> BlockEntityType<T> blockEntityType(BiFunction<BlockPos, BlockState, T> func, Block... blocks);
 
     public TagKey<Item> itemTag(ResourceLocation res) {
-        return TagKey.create(Registry.ITEM_REGISTRY, res);
+        return TagKey.create(BuiltInRegistries.ITEM.key(), res);
     }
 
     public TagKey<Block> blockTag(ResourceLocation res) {
-        return TagKey.create(Registry.BLOCK_REGISTRY, res);
+        return TagKey.create(BuiltInRegistries.BLOCK.key(), res);
     }
 
     public TagKey<EntityType<?>> entityTag(ResourceLocation res) {
-        return TagKey.create(Registry.ENTITY_TYPE_REGISTRY, res);
+        return TagKey.create(BuiltInRegistries.ENTITY_TYPE.key(), res);
     }
 
     public <T> TagKey<T> tag(ResourceKey<Registry<T>> key, ResourceLocation res) {

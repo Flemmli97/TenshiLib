@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -43,7 +43,7 @@ public abstract class RenderTexture<T extends Entity> extends EntityRenderer<T> 
         float pitch = entity.xRotO + (entity.getXRot() - entity.xRotO) * partialTicks;
         if (this.facePlayer()) {
             stack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-            stack.mulPose(Vector3f.YP.rotationDegrees(180));
+            stack.mulPose(Axis.YP.rotationDegrees(180));
         } else {
             RenderUtils.applyYawPitch(stack, yaw + this.yawOffset(), pitch + this.pitchOffset());
         }

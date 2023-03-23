@@ -20,7 +20,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -40,7 +39,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class PlatformUtilsImpl extends PlatformUtils {
 
@@ -125,16 +123,6 @@ public class PlatformUtilsImpl extends PlatformUtils {
         DeferredRegister<T> r = DeferredRegister.create(registryKey, registryKey.location().getNamespace());
         r.makeRegistry(() -> new RegistryBuilder<T>().setDefaultKey(defaultVal));
         return new ForgeRegistryHandler<>(r);
-    }
-
-    @Override
-    public CreativeModeTab tab(ResourceLocation label, Supplier<ItemStack> icon) {
-        return new CreativeModeTab(String.format("%s.%s", label.getNamespace(), label.getPath())) {
-            @Override
-            public ItemStack makeIcon() {
-                return icon.get();
-            }
-        };
     }
 
     @Override

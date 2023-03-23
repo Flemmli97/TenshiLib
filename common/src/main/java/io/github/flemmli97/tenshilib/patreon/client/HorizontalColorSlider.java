@@ -6,13 +6,13 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.math.Matrix4f;
 import io.github.flemmli97.tenshilib.client.Color;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import org.joml.Matrix4f;
 
 import java.util.function.Consumer;
 
@@ -53,15 +53,15 @@ public class HorizontalColorSlider extends AbstractWidget {
     }
 
     @Override
-    public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        fill(poseStack, this.x - 1, this.y - 1, this.x + this.width + 1, this.y + this.height + 1, -1);
-        fill(poseStack, this.x, this.y, this.x + this.width, this.y + this.height, PatreonGui.BLACK);
-        fillHorizontalGradient(poseStack, this.x, this.y, this.x + this.width, this.y + this.height, this.firstColor.hex(), this.secondColor.hex());
+    public void renderWidget(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        fill(poseStack, this.getX() - 1, this.getY() - 1, this.getX() + this.width + 1, this.getY() + this.height + 1, -1);
+        fill(poseStack, this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, PatreonGui.BLACK);
+        fillHorizontalGradient(poseStack, this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, this.firstColor.hex(), this.secondColor.hex());
     }
 
     @Override
     public void onClick(double mouseX, double mouseY) {
-        double percent = Mth.clamp((mouseX - this.x) / this.width, 0, 1);
+        double percent = Mth.clamp((mouseX - this.getX()) / this.width, 0, 1);
         this.setColor((int) ((this.secondColor.getRed() - this.firstColor.getRed()) * percent),
                 (int) ((this.secondColor.getGreen() - this.firstColor.getGreen()) * percent),
                 (int) ((this.secondColor.getBlue() - this.firstColor.getBlue()) * percent),
@@ -80,7 +80,7 @@ public class HorizontalColorSlider extends AbstractWidget {
 
     @Override
     protected void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
-        double percent = Mth.clamp((mouseX - this.x) / this.width, 0, 1);
+        double percent = Mth.clamp((mouseX - this.getX()) / this.width, 0, 1);
         this.setColor((int) ((this.secondColor.getRed() - this.firstColor.getRed()) * percent),
                 (int) ((this.secondColor.getGreen() - this.firstColor.getGreen()) * percent),
                 (int) ((this.secondColor.getBlue() - this.firstColor.getBlue()) * percent),
@@ -89,14 +89,12 @@ public class HorizontalColorSlider extends AbstractWidget {
     }
 
     @Override
-    public void updateNarration(NarrationElementOutput narrationElementOutput) {
+    public void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
         this.defaultButtonNarrationText(narrationElementOutput);
     }
 
     protected static void fillHorizontalGradient(PoseStack poseStack, int x1, int y1, int x2, int y2, int colorFrom, int colorTo) {
-        RenderSystem.disableTexture();
         RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder bufferBuilder = tesselator.getBuilder();
@@ -104,7 +102,6 @@ public class HorizontalColorSlider extends AbstractWidget {
         fillHorizontalGradient(poseStack.last().pose(), bufferBuilder, x1, y1, x2, y2, colorFrom, colorTo);
         tesselator.end();
         RenderSystem.disableBlend();
-        RenderSystem.enableTexture();
     }
 
     protected static void fillHorizontalGradient(Matrix4f matrix, BufferBuilder builder, int x1, int y1, int x2, int y2, int colorA, int colorB) {

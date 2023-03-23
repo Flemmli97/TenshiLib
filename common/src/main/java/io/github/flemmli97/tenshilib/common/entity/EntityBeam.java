@@ -6,6 +6,7 @@ import io.github.flemmli97.tenshilib.common.utils.RayTraceUtils;
 import io.github.flemmli97.tenshilib.platform.EventCalls;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -21,7 +22,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +30,7 @@ import java.util.function.Predicate;
 
 public abstract class EntityBeam extends Entity implements IBeamEntity {
 
-    private Entity shooter;
+    private LivingEntity shooter;
     protected int livingTicks;
     protected int coolDown;
     protected HitResult hit;
@@ -175,7 +175,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
             return false;
         AABB aabb = e.getBoundingBox().inflate(this.radius() + 0.3);
         Optional<Vec3> ray = aabb.clip(from, to);
-        if (!ray.isPresent() && !aabb.contains(this.position()))
+        if (ray.isEmpty() && !aabb.contains(this.position()))
             return false;
         if (this.radius() == 0)
             return true;
@@ -215,17 +215,16 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
     }
 
     @Override
-    @Nullable
-    public Entity getOwner() {
+    public LivingEntity getOwner() {
         if (this.shooter != null && !this.shooter.isRemoved()) {
             return this.shooter;
         }
-        this.entityData.get(shooterUUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(Entity.class, this.level, uuid));
+        this.entityData.get(shooterUUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(LivingEntity.class, this.level, uuid));
         return this.shooter;
     }
 
     @Override
-    public Packet<?> getAddEntityPacket() {
+    public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return new ClientboundAddEntityPacket(this);
     }
 }

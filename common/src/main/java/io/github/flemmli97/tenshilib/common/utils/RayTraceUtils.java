@@ -1,9 +1,8 @@
 package io.github.flemmli97.tenshilib.common.utils;
 
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
@@ -16,6 +15,9 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
+import org.joml.AxisAngle4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -198,8 +200,8 @@ public class RayTraceUtils {
      */
     public static List<Vector3f> rotatedVecs(Vec3 dir, Vec3 axis, float minDeg, float maxDeg, float step) {
         List<Vector3f> list = new ArrayList<>();
-        Vector3f axisf = new Vector3f(axis);
-        list.add(new Vector3f(dir));
+        Vector3f axisf = new Vector3f((float) axis.x, (float) axis.y, (float) axis.z);
+        list.add(new Vector3f((float) dir.x, (float) dir.y, (float) dir.z));
         for (float y = step; y <= maxDeg; y += step) {
             list.add(rotatedAround(dir, axisf, y));
         }
@@ -210,9 +212,9 @@ public class RayTraceUtils {
     }
 
     public static Vector3f rotatedAround(Vec3 dir, Vector3f axis, float deg) {
-        Quaternion quaternion = new Quaternion(axis, deg, true);
-        Vector3f newDir = new Vector3f(dir);
-        newDir.transform(quaternion);
+        Quaternionf quaternion = new Quaternionf(new AxisAngle4f(Mth.DEG_TO_RAD * deg, axis));
+        Vector3f newDir = new Vector3f((float) dir.x, (float) dir.y, (float) dir.z);
+        newDir.rotate(quaternion);
         return newDir;
     }
 }

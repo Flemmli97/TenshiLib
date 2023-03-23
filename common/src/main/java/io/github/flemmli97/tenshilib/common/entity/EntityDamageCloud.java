@@ -2,6 +2,7 @@ package io.github.flemmli97.tenshilib.common.entity;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -12,7 +13,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +20,7 @@ import java.util.UUID;
 
 public abstract class EntityDamageCloud extends Entity implements OwnableEntity {
 
-    private Entity shooter;
+    private LivingEntity shooter;
 
     protected int livingTicks;
     private int attackedEntities = 0;
@@ -157,12 +157,11 @@ public abstract class EntityDamageCloud extends Entity implements OwnableEntity 
     }
 
     @Override
-    @Nullable
-    public Entity getOwner() {
+    public LivingEntity getOwner() {
         if (this.shooter != null && !this.shooter.isRemoved()) {
             return this.shooter;
         }
-        this.entityData.get(shooterUUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(Entity.class, this.level, uuid));
+        this.entityData.get(shooterUUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(LivingEntity.class, this.level, uuid));
         return this.shooter;
     }
 
@@ -172,7 +171,7 @@ public abstract class EntityDamageCloud extends Entity implements OwnableEntity 
     }
 
     @Override
-    public Packet<?> getAddEntityPacket() {
+    public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return new ClientboundAddEntityPacket(this);
     }
 }

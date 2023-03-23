@@ -49,7 +49,7 @@ public class MoveControllerPlus extends MoveControl {
                 BlockPathTypes node = nodeprocessor != null ? nodeprocessor.getBlockPathType(this.mob.level, x, y, z) : BlockPathTypes.OPEN;
                 if (node == BlockPathTypes.BLOCKED) {
                     int yAdd = 0;
-                    while (yAdd < this.mob.maxUpStep) {
+                    while (yAdd < this.mob.maxUpStep()) {
                         yAdd++;
                         node = nodeprocessor.getBlockPathType(this.mob.level, x, y + yAdd, z);
                         if (node == BlockPathTypes.WALKABLE) {

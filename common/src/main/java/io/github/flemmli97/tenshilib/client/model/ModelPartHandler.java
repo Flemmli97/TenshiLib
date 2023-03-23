@@ -2,7 +2,7 @@ package io.github.flemmli97.tenshilib.client.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import io.github.flemmli97.tenshilib.mixin.ModelPartAccessor;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -169,11 +169,11 @@ public class ModelPartHandler {
             poseStack.translate(this.x / 16.0F, this.y / 16.0F, this.z / 16.0F);
 
             if (this.zRot != 0.0F)
-                poseStack.mulPose(Vector3f.ZP.rotation(this.zRot));
+                poseStack.mulPose(Axis.ZP.rotation(this.zRot));
             if (this.yRot != 0.0F)
-                poseStack.mulPose(Vector3f.YP.rotation(this.yRot));
+                poseStack.mulPose(Axis.YP.rotation(this.yRot));
             if (this.xRot != 0.0F)
-                poseStack.mulPose(Vector3f.XP.rotation(this.xRot));
+                poseStack.mulPose(Axis.XP.rotation(this.xRot));
 
             if (this.xScale != 1 || this.yScale != 1 || this.zScale != 1)
                 poseStack.scale(this.xScale, this.yScale, this.zScale);

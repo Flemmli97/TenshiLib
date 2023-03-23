@@ -9,14 +9,15 @@ import io.github.flemmli97.tenshilib.platform.registry.PlatformRegistry;
 import io.github.flemmli97.tenshilib.platform.registry.SimpleRegistryWrapper;
 import io.github.flemmli97.tenshilib.platform.registry.VanillaRegistryHandler;
 import io.github.flemmli97.tenshilib.platform.registry.VanillaRegistryWrapper;
-import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.DefaultedRegistry;
+import net.minecraft.core.DefaultedMappedRegistry;
 import net.minecraft.core.Registry;
+import net.minecraft.core.WritableRegistry;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
@@ -25,7 +26,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -37,58 +37,57 @@ import net.minecraft.world.level.material.Fluid;
 
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 public class PlatformUtilsImpl extends PlatformUtils {
 
     @Override
     public SimpleRegistryWrapper<Item> items() {
-        return new VanillaRegistryWrapper<>(Registry.ITEM);
+        return new VanillaRegistryWrapper<>(BuiltInRegistries.ITEM);
     }
 
     @Override
     public SimpleRegistryWrapper<Block> blocks() {
-        return new VanillaRegistryWrapper<>(Registry.BLOCK);
+        return new VanillaRegistryWrapper<>(BuiltInRegistries.BLOCK);
     }
 
     @Override
     public SimpleRegistryWrapper<BlockEntityType<?>> blocksEntities() {
-        return new VanillaRegistryWrapper<>(Registry.BLOCK_ENTITY_TYPE);
+        return new VanillaRegistryWrapper<>(BuiltInRegistries.BLOCK_ENTITY_TYPE);
     }
 
     @Override
     public SimpleRegistryWrapper<EntityType<?>> entities() {
-        return new VanillaRegistryWrapper<>(Registry.ENTITY_TYPE);
+        return new VanillaRegistryWrapper<>(BuiltInRegistries.ENTITY_TYPE);
     }
 
     @Override
     public SimpleRegistryWrapper<Fluid> fluids() {
-        return new VanillaRegistryWrapper<>(Registry.FLUID);
+        return new VanillaRegistryWrapper<>(BuiltInRegistries.FLUID);
     }
 
     @Override
     public SimpleRegistryWrapper<MobEffect> effects() {
-        return new VanillaRegistryWrapper<>(Registry.MOB_EFFECT);
+        return new VanillaRegistryWrapper<>(BuiltInRegistries.MOB_EFFECT);
     }
 
     @Override
     public SimpleRegistryWrapper<Enchantment> enchantments() {
-        return new VanillaRegistryWrapper<>(Registry.ENCHANTMENT);
+        return new VanillaRegistryWrapper<>(BuiltInRegistries.ENCHANTMENT);
     }
 
     @Override
     public SimpleRegistryWrapper<MenuType<?>> containers() {
-        return new VanillaRegistryWrapper<>(Registry.MENU);
+        return new VanillaRegistryWrapper<>(BuiltInRegistries.MENU);
     }
 
     @Override
     public SimpleRegistryWrapper<Attribute> attributes() {
-        return new VanillaRegistryWrapper<>(Registry.ATTRIBUTE);
+        return new VanillaRegistryWrapper<>(BuiltInRegistries.ATTRIBUTE);
     }
 
     @Override
     public SimpleRegistryWrapper<ParticleType<?>> particles() {
-        return new VanillaRegistryWrapper<>(Registry.PARTICLE_TYPE);
+        return new VanillaRegistryWrapper<>(BuiltInRegistries.PARTICLE_TYPE);
     }
 
     @Override
@@ -103,18 +102,13 @@ public class PlatformUtilsImpl extends PlatformUtils {
 
     @Override
     public <T extends CustomRegistryEntry<T>> PlatformRegistry<T> customRegistry(ResourceKey<? extends Registry<T>> registryKey, ResourceLocation defaultVal, boolean saveToDisk, boolean sync) {
-        FabricRegistryBuilder<T, DefaultedRegistry<T>> builder = FabricRegistryBuilder.from(new DefaultedRegistry<T>(defaultVal.toString(), registryKey, Lifecycle.stable(), null));
+        FabricRegistryBuilder<T, WritableRegistry<T>> builder = FabricRegistryBuilder.from(new DefaultedMappedRegistry<T>(defaultVal.toString(), registryKey, Lifecycle.stable(), false));
         if (saveToDisk)
             builder.attribute(RegistryAttribute.SYNCED);
         if (sync)
             builder.attribute(RegistryAttribute.SYNCED);
         builder.buildAndRegister();
         return new VanillaRegistryHandler<>(registryKey, registryKey.location().getNamespace());
-    }
-
-    @Override
-    public CreativeModeTab tab(ResourceLocation label, Supplier<ItemStack> icon) {
-        return FabricItemGroupBuilder.build(label, icon);
     }
 
     @Override

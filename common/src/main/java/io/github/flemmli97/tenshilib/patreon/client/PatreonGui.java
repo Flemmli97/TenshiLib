@@ -11,6 +11,7 @@ import io.github.flemmli97.tenshilib.patreon.RenderLocation;
 import io.github.flemmli97.tenshilib.patreon.pkts.C2SEffectUpdatePkt;
 import io.github.flemmli97.tenshilib.patreon.pkts.C2SRequestUpdateClientPkt;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
@@ -65,9 +66,11 @@ public class PatreonGui extends Screen {
                 name = Component.translatable("tenshilib.patreon.back");
         } else {
             name = CommonComponents.GUI_DONE;
-            this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 8 + 24 * 7, 200, 20, Component.translatable("tenshilib.patreon.save"), button -> PatreonClientPlatform.INSTANCE.sendToServer(new C2SEffectUpdatePkt(this.effect.id(), this.render, this.renderLocation, this.color))));
+            this.addRenderableWidget(Button.builder(Component.translatable("tenshilib.patreon.save"), button -> PatreonClientPlatform.INSTANCE.sendToServer(new C2SEffectUpdatePkt(this.effect.id(), this.render, this.renderLocation, this.color)))
+                    .pos(this.width / 2 - 100, this.height / 8 + 24 * 7).size(200, 20).build());
         }
-        this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 8 + 24 * 8, 200, 20, name, button -> this.minecraft.setScreen(this.parent)));
+        this.addRenderableWidget(Button.builder(name, button -> this.minecraft.setScreen(this.parent))
+                .pos(this.width / 2 - 100, this.height / 8 + 24 * 8).size(200, 20).build());
         if (this.tier < 1)
             return;
         this.setting = PatreonPlatform.INSTANCE.playerSettings(this.minecraft.player).orElse(null);
@@ -178,7 +181,7 @@ public class PatreonGui extends Screen {
         if (this.tier > 0) {
             int ex = this.width / 2 - 180;
             int ey = this.height / 8 + 24 * 7;
-            InventoryScreen.renderEntityInInventory(ex, ey, 65, ex - mouseX, ey - 83 - mouseY, this.minecraft.player);
+            InventoryScreen.renderEntityInInventoryFollowsMouse(poseStack, ex, ey, 65, ex - mouseX, ey - 83 - mouseY, this.minecraft.player);
             GuiComponent.drawCenteredString(poseStack, this.font, Component.translatable("tenshilib.patreon.color"), this.width / 2 - 55, this.height / 8 + 24 * 6 + 8, 0xFFFFFF);
         }
 
@@ -188,6 +191,7 @@ public class PatreonGui extends Screen {
     @Override
     public void removed() {
         super.removed();
-        PatreonClientPlatform.INSTANCE.sendToServer(new C2SRequestUpdateClientPkt());
+        if (Minecraft.getInstance().getConnection() != null)
+            PatreonClientPlatform.INSTANCE.sendToServer(new C2SRequestUpdateClientPkt());
     }
 }
