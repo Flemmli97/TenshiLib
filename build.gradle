@@ -70,6 +70,7 @@ task cleanAll {
 }
 
 task publishAll {
+    dependsOn(":common:publish")
     dependsOn(":fabric:publish")
     dependsOn(":forge:publish")
 }
@@ -227,7 +228,7 @@ afterEvaluate {
 }
 
 task buildToLocal(group: "publishing") {
-    dependsOn cleanAll, buildAll, ":fabric:publishToMavenLocal", ":forge:publishToMavenLocal"
+    dependsOn cleanAll, buildAll, ":common:publishToMavenLocal", ":fabric:publishToMavenLocal", ":forge:publishToMavenLocal"
     buildAll.mustRunAfter cleanAll
 }
 
