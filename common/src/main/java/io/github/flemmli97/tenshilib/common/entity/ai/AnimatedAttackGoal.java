@@ -69,7 +69,7 @@ public abstract class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> ex
     public abstract int coolDown(AnimatedAction anim);
 
     public boolean canChooseAttack(AnimatedAction anim) {
-        return true;
+        return anim != null;
     }
 
     public void setupValues() {
