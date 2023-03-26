@@ -2,10 +2,10 @@ package io.github.flemmli97.tenshilib.client.model;
 
 public class AnimationValue {
 
-    public final int startTick;
+    public final float startTick;
     private final SimpleAnimationExpression.Value xVal, yVal, zVal;
 
-    public AnimationValue(int startTick, SimpleAnimationExpression.Value xVal, SimpleAnimationExpression.Value yVal, SimpleAnimationExpression.Value zVal) {
+    public AnimationValue(float startTick, SimpleAnimationExpression.Value xVal, SimpleAnimationExpression.Value yVal, SimpleAnimationExpression.Value zVal) {
         this.startTick = startTick;
         this.xVal = xVal;
         this.yVal = yVal;
