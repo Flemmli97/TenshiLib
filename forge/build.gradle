@@ -10,6 +10,11 @@ architectury {
 loom {
     forge {
         mixinConfigs = ["tenshilib.mixins.json"]
+        runs {
+            client {
+                vmArgs "-Dmixin.debug.export=true"
+            }
+        }
     }
 }
 

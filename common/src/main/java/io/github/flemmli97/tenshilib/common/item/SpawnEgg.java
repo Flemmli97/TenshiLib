@@ -2,7 +2,6 @@ package io.github.flemmli97.tenshilib.common.item;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
-import io.github.flemmli97.tenshilib.platform.EventCalls;
 import io.github.flemmli97.tenshilib.platform.PlatformUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -177,7 +176,7 @@ public class SpawnEgg extends Item {
         EntityType<?> type = item.getType(stack.getTag());
         Entity e = type.create(world, stack.getTag(), EntityType.createDefaultStackConfig(world, stack, player), pos, reason, updateLocation, doCollisionOffset);
         if (e != null) {
-            if (!item.onEntitySpawned(e, stack, player) || (forgeCheck && e instanceof Mob && EventCalls.INSTANCE.specialSpawnCall((Mob) e, world, pos.getX(), pos.getY(), pos.getZ(), null, reason)))
+            if (!item.onEntitySpawned(e, stack, player))
                 return null;
             world.addFreshEntityWithPassengers(e);
         }
