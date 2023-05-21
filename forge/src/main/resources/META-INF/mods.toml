@@ -1,24 +1,24 @@
 modLoader="javafml"
-loaderVersion="[45,)"
+loaderVersion="[${loader_version},)"
 license="All rights reserved"
 issueTrackerURL="https://github.com/Flemmli97/TenshiLib/issues"
 [[mods]]
 modId="tenshilib"
 version="${version}"
 displayName="TenshiLib"
-displayURL="https://www.curseforge.com/minecraft/mc-mods/tenshilib"
+displayURL="${homepage}"
 logoFile="icon.png"
 authors="Flemmli97"
 description='''Core and library mod for most of my mods. Contains useful hooks and functions'''
 [[dependencies.tenshilib]]
 modId="minecraft"
 mandatory=true
-versionRange="[1.19.4,)"
+versionRange="[${mcversion},)"
 ordering="NONE"
 side="BOTH"
 [[dependencies.tenshilib]]
 modId="forge"
 mandatory=true
-versionRange="[45.0.22,)"
+versionRange="[${forge_version},)"
 ordering="NONE"
 side="BOTH"
