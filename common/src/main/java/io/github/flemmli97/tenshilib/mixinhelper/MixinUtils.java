@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 public class MixinUtils {
 
     public static InteractionHand get(LivingEntity entity, InteractionHand hand, InteractionHand prevSwungHand, Consumer<InteractionHand> update) {
-        if (entity.level.isClientSide && hand == InteractionHand.MAIN_HAND) {
+        if (entity.level().isClientSide && hand == InteractionHand.MAIN_HAND) {
             if (entity.getMainHandItem().getItem() instanceof IDualWeapon) {
                 if (!entity.swinging || entity.swingTime >= getCurrentSwingDuration(entity) / 2 || entity.swingTime < 0) {
                     InteractionHand newHand = prevSwungHand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;

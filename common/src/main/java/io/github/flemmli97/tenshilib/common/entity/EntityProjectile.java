@@ -120,7 +120,7 @@ public abstract class EntityProjectile extends Projectile {
         float f2 = Mth.cos(rotationYawIn * 0.017453292F) * Mth.cos(rotationPitchIn * 0.017453292F);
         this.shoot(f, f1, f2, velocity, inaccuracy);
         Vec3 throwerMotion = entityThrower.getDeltaMovement();
-        this.setDeltaMovement(this.getDeltaMovement().add(throwerMotion.x, entityThrower.isOnGround() ? 0.0D : throwerMotion.y, throwerMotion.z));
+        this.setDeltaMovement(this.getDeltaMovement().add(throwerMotion.x, entityThrower.onGround() ? 0.0D : throwerMotion.y, throwerMotion.z));
         this.getDeltaMovement().add(throwerMotion.x, 0, throwerMotion.z);
     }
 
@@ -173,8 +173,8 @@ public abstract class EntityProjectile extends Projectile {
     }
 
     public void setInGround(BlockPos pos) {
-        BlockState state = this.level.getBlockState(pos);
-        if (!state.getMaterial().isSolid()) {
+        BlockState state = this.level().getBlockState(pos);
+        if (this.level().noCollision((new AABB(this.position(), this.position())).inflate(0.06D))) {
             this.inGround = false;
             return;
         }
@@ -198,11 +198,11 @@ public abstract class EntityProjectile extends Projectile {
             this.yRotO = this.getYRot();
         }
 
-        BlockState inState = this.level.getBlockState(this.blockPosition());
+        BlockState inState = this.level().getBlockState(this.blockPosition());
         if (this.inGround) {
             if (inState != this.ground && this.noGround())
                 this.resetInGround();
-            else if (!this.level.isClientSide) {
+            else if (!this.level().isClientSide) {
                 ++this.ticksInGround;
                 if (this.ticksInGround == 1200)
                     this.remove(RemovalReason.KILLED);
@@ -210,7 +210,7 @@ public abstract class EntityProjectile extends Projectile {
             return;
         }
 
-        if (!this.level.isClientSide)
+        if (!this.level().isClientSide)
             this.doCollision();
         this.moveEntity();
     }
@@ -228,7 +228,7 @@ public abstract class EntityProjectile extends Projectile {
         boolean water = this.isInWater();
         if (water) {
             for (int i = 0; i < 4; ++i) {
-                this.level.addParticle(ParticleTypes.BUBBLE, this.getX() * 0.25D, this.getY() * 0.25D, this.getZ() * 0.25D, motion.x, motion.y, motion.z);
+                this.level().addParticle(ParticleTypes.BUBBLE, this.getX() * 0.25D, this.getY() * 0.25D, this.getZ() * 0.25D, motion.x, motion.y, motion.z);
             }
         }
         float friction = this.motionReduction(water);
@@ -254,20 +254,20 @@ public abstract class EntityProjectile extends Projectile {
     private void doCollision() {
         Vec3 pos = this.position();
         Vec3 to = pos.add(this.getDeltaMovement());
-        BlockHitResult raytraceresult = this.level.clip(new ClipContext(pos, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+        BlockHitResult raytraceresult = this.level().clip(new ClipContext(pos, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
         if (raytraceresult.getType() != HitResult.Type.MISS) {
             to = raytraceresult.getLocation();
         }
 
         if (raytraceresult.getType() == HitResult.Type.BLOCK) {
             BlockPos blockpos = raytraceresult.getBlockPos();
-            BlockState blockstate = this.level.getBlockState(blockpos);
+            BlockState blockstate = this.level().getBlockState(blockpos);
             if (blockstate.is(Blocks.NETHER_PORTAL)) {
                 this.handleInsidePortal(blockpos);
             } else if (blockstate.is(Blocks.END_GATEWAY)) {
-                BlockEntity tileentity = this.level.getBlockEntity(blockpos);
+                BlockEntity tileentity = this.level().getBlockEntity(blockpos);
                 if (tileentity instanceof TheEndGatewayBlockEntity && TheEndGatewayBlockEntity.canEntityTeleport(this)) {
-                    TheEndGatewayBlockEntity.teleportEntity(this.level, blockpos, blockstate, this, (TheEndGatewayBlockEntity) tileentity);
+                    TheEndGatewayBlockEntity.teleportEntity(this.level(), blockpos, blockstate, this, (TheEndGatewayBlockEntity) tileentity);
                 }
             } else if (!EventCalls.INSTANCE.projectileHitCall(this, raytraceresult))
                 this.onBlockHit(raytraceresult);
@@ -285,7 +285,7 @@ public abstract class EntityProjectile extends Projectile {
     }
 
     private boolean noGround() {
-        return this.inGround && this.level.noCollision((new AABB(this.position(), this.position())).inflate(0.06D));
+        return this.inGround && this.level().noCollision((new AABB(this.position(), this.position())).inflate(0.06D));
     }
 
     private void resetInGround() {
@@ -373,7 +373,7 @@ public abstract class EntityProjectile extends Projectile {
             return this.shooter;
         }
         this.entityData.get(shooterUUID).ifPresent(uuid -> {
-            this.shooter = EntityUtil.findFromUUID(Entity.class, this.level, uuid);
+            this.shooter = EntityUtil.findFromUUID(Entity.class, this.level(), uuid);
             this.onUpdateOwner();
         });
         return this.shooter;

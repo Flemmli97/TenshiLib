@@ -147,8 +147,8 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         this.livingTicks++;
         if (this.livingTicks >= this.livingTickMax())
             this.remove(RemovalReason.KILLED);
-        if (!this.level.isClientSide && this.hit != null && --this.coolDown <= 0 && this.isAlive()) {
-            List<Entity> list = this.level.getEntities(this,
+        if (!this.level().isClientSide && this.hit != null && --this.coolDown <= 0 && this.isAlive()) {
+            List<Entity> list = this.level().getEntities(this,
                     new AABB(this.getX(), this.getY(), this.getZ(), this.hitVec.x, this.hitVec.y, this.hitVec.z).inflate(1 + this.radius()));
             Vec3 pos = this.position();
             for (Entity entity : list) {
@@ -219,7 +219,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         if (this.shooter != null && !this.shooter.isRemoved()) {
             return this.shooter;
         }
-        this.entityData.get(shooterUUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(LivingEntity.class, this.level, uuid));
+        this.entityData.get(shooterUUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(LivingEntity.class, this.level(), uuid));
         return this.shooter;
     }
 

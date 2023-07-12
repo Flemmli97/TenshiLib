@@ -27,7 +27,7 @@ public class EventCallsImpl implements EventCalls {
 
     @Override
     public boolean playerAttackCall(Player player, Entity target) {
-        return AttackEntityCallback.EVENT.invoker().interact(player, player.getLevel(), InteractionHand.MAIN_HAND, target, null) != InteractionResult.PASS;
+        return AttackEntityCallback.EVENT.invoker().interact(player, player.level(), InteractionHand.MAIN_HAND, target, null) != InteractionResult.PASS;
     }
 
     @Override

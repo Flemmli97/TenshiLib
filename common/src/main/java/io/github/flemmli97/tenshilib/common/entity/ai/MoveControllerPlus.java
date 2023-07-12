@@ -46,12 +46,12 @@ public class MoveControllerPlus extends MoveControl {
                 int x = Mth.floor(this.mob.getX() + (double) f7 / len);
                 int y = Mth.floor(this.mob.getY());
                 int z = Mth.floor(this.mob.getZ() + (double) f8 / len);
-                BlockPathTypes node = nodeprocessor != null ? nodeprocessor.getBlockPathType(this.mob.level, x, y, z) : BlockPathTypes.OPEN;
+                BlockPathTypes node = nodeprocessor != null ? nodeprocessor.getBlockPathType(this.mob.level(), x, y, z) : BlockPathTypes.OPEN;
                 if (node == BlockPathTypes.BLOCKED) {
                     int yAdd = 0;
                     while (yAdd < this.mob.maxUpStep()) {
                         yAdd++;
-                        node = nodeprocessor.getBlockPathType(this.mob.level, x, y + yAdd, z);
+                        node = nodeprocessor.getBlockPathType(this.mob.level(), x, y + yAdd, z);
                         if (node == BlockPathTypes.WALKABLE) {
                             this.mob.getJumpControl().jump();
                             break;

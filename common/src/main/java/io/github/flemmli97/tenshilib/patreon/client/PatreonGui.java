@@ -1,6 +1,5 @@
 package io.github.flemmli97.tenshilib.patreon.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.flemmli97.tenshilib.client.Color;
 import io.github.flemmli97.tenshilib.client.render.RenderUtils;
 import io.github.flemmli97.tenshilib.patreon.PatreonDataManager;
@@ -12,7 +11,7 @@ import io.github.flemmli97.tenshilib.patreon.pkts.C2SEffectUpdatePkt;
 import io.github.flemmli97.tenshilib.patreon.pkts.C2SRequestUpdateClientPkt;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
@@ -171,21 +170,19 @@ public class PatreonGui extends Screen {
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(poseStack);
-        GuiComponent.drawCenteredString(poseStack, this.font, this.title, this.width / 2, 12, 0xFFFFFF);
-
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        this.renderBackground(guiGraphics);
+        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 12, 0xFFFFFF);
         if (this.tier == 0) {
-            GuiComponent.drawCenteredString(poseStack, this.font, Component.translatable("tenshilib.patreon.not").withStyle(ChatFormatting.DARK_RED), this.width / 2, 46, 0xFFFFFF);
+            guiGraphics.drawCenteredString(this.font, Component.translatable("tenshilib.patreon.not").withStyle(ChatFormatting.DARK_RED), this.width / 2, 46, 0xFFFFFF);
         }
         if (this.tier > 0) {
             int ex = this.width / 2 - 180;
             int ey = this.height / 8 + 24 * 7;
-            InventoryScreen.renderEntityInInventoryFollowsMouse(poseStack, ex, ey, 65, ex - mouseX, ey - 83 - mouseY, this.minecraft.player);
-            GuiComponent.drawCenteredString(poseStack, this.font, Component.translatable("tenshilib.patreon.color"), this.width / 2 - 55, this.height / 8 + 24 * 6 + 8, 0xFFFFFF);
+            InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, ex, ey, 65, ex - mouseX, ey - 83 - mouseY, this.minecraft.player);
+            guiGraphics.drawCenteredString(this.font, Component.translatable("tenshilib.patreon.color"), this.width / 2 - 55, this.height / 8 + 24 * 6 + 8, 0xFFFFFF);
         }
-
-        super.render(poseStack, mouseX, mouseY, partialTick);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Override

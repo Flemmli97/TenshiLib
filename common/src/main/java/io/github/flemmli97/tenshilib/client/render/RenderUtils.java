@@ -39,10 +39,10 @@ public class RenderUtils {
      */
     public static void renderBlockOutline(PoseStack matrixStack, MultiBufferSource buffer, Player player, BlockPos pos, float partialTicks, float red, float green, float blue, float alpha,
                                           boolean drawImmediately) {
-        BlockState state = player.level.getBlockState(pos);
+        BlockState state = player.level().getBlockState(pos);
         RenderType renderType = RenderType.lines();
         Vec3 vec = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-        renderShape(matrixStack, buffer.getBuffer(renderType), state.getShape(player.level, pos, CollisionContext.of(player)),
+        renderShape(matrixStack, buffer.getBuffer(renderType), state.getShape(player.level(), pos, CollisionContext.of(player)),
                 pos.getX() - vec.x, pos.getY() - vec.y, pos.getZ() - vec.z, red, green, blue, alpha);
         if (drawImmediately && buffer instanceof MultiBufferSource.BufferSource)
             ((MultiBufferSource.BufferSource) buffer).endBatch(renderType);

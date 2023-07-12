@@ -51,9 +51,9 @@ public class RayTraceUtils {
     public static List<Entity> getEntitiesIn(LivingEntity entity, Vec3 pos, Vec3 look, float reach,
                                              float aoe, Predicate<Entity> pred) {
         CircleSector circ = new CircleSector(pos, look, reach, aoe, entity);
-        return entity.level.getEntities(entity, entity.getBoundingBox().inflate(reach + 1),
+        return entity.level().getEntities(entity, entity.getBoundingBox().inflate(reach + 1),
                 t -> t != entity && (pred == null || pred.test(t)) && !t.isAlliedTo(entity) && t.isPickable()
-                        && circ.intersects(t.level, t.getBoundingBox().inflate(0.15, t.getBbHeight() <= 0.3 ? t.getBbHeight() : 0.15, 0.15)));
+                        && circ.intersects(t.level(), t.getBoundingBox().inflate(0.15, t.getBbHeight() <= 0.3 ? t.getBbHeight() : 0.15, 0.15)));
     }
 
     public static EntityHitResult calculateEntityFromLook(LivingEntity entity, float reach) {
@@ -63,7 +63,7 @@ public class RayTraceUtils {
     public static EntityHitResult calculateEntityFromLook(LivingEntity entity, Vec3 pos, Vec3 dir, float reach,
                                                           @Nullable Predicate<Entity> pred) {
         Vec3 scaledDir = dir.scale(reach);
-        return rayTraceEntities(entity.level, entity, pos, pos.add(scaledDir), entity.getBoundingBox().expandTowards(scaledDir).inflate(1), (t) -> EntitySelector.NO_SPECTATORS.test(t) && t.isPickable()
+        return rayTraceEntities(entity.level(), entity, pos, pos.add(scaledDir), entity.getBoundingBox().expandTowards(scaledDir).inflate(1), (t) -> EntitySelector.NO_SPECTATORS.test(t) && t.isPickable()
                 && (pred == null || pred.test(t)));
     }
 
@@ -101,27 +101,27 @@ public class RayTraceUtils {
         Vec3 posEye = e.getEyePosition(1);
         Vec3 look = posEye.add(e.getLookAngle().scale(range));
         if (includeEntities) {
-            HitResult raytraceresult = e.level.clip(new ClipContext(posEye, look, blockMode, fluidMode, e));
+            HitResult raytraceresult = e.level().clip(new ClipContext(posEye, look, blockMode, fluidMode, e));
             if (raytraceresult.getType() != HitResult.Type.MISS) {
                 look = raytraceresult.getLocation();
             }
             EntityHitResult raytraceresult1;
             if (getEntityHitVec)
-                raytraceresult1 = rayTraceEntities(e.level, e, posEye, look, e.getBoundingBox().expandTowards(look).inflate(1.0D), pred);
+                raytraceresult1 = rayTraceEntities(e.level(), e, posEye, look, e.getBoundingBox().expandTowards(look).inflate(1.0D), pred);
             else
-                raytraceresult1 = ProjectileUtil.getEntityHitResult(e.level, e, posEye, look, e.getBoundingBox().expandTowards(look).inflate(1.0D), pred);
+                raytraceresult1 = ProjectileUtil.getEntityHitResult(e.level(), e, posEye, look, e.getBoundingBox().expandTowards(look).inflate(1.0D), pred);
 
             if (raytraceresult1 != null) {
                 raytraceresult = raytraceresult1;
             }
             return raytraceresult;
         }
-        return e.level.clip(new ClipContext(posEye, look, blockMode, fluidMode, e));
+        return e.level().clip(new ClipContext(posEye, look, blockMode, fluidMode, e));
     }
 
     @Nullable
     public static EntityHitResult rayTraceEntities(Entity e, Vec3 from, Vec3 to, Predicate<Entity> pred) {
-        return rayTraceEntities(e.level, e, from, to, e.getBoundingBox().expandTowards(e.getDeltaMovement()).inflate(1), pred);
+        return rayTraceEntities(e.level(), e, from, to, e.getBoundingBox().expandTowards(e.getDeltaMovement()).inflate(1), pred);
     }
 
     /**

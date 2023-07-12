@@ -26,7 +26,7 @@ public class ServerPacketHandler {
     }
 
     public static <T extends Entity & IAnimated> void updateAnimationPkt(T entity) {
-        if (entity.getLevel().isClientSide)
+        if (entity.level().isClientSide)
             return;
         S2CEntityAnimation pkt = S2CEntityAnimation.create(entity);
         FriendlyByteBuf buf = PacketByteBufs.create();

@@ -100,7 +100,7 @@ public abstract class EntityDamageCloud extends Entity implements OwnableEntity 
     public void tick() {
         super.tick();
         this.livingTicks++;
-        if (!this.level.isClientSide) {
+        if (!this.level().isClientSide) {
             if (this.livingTicks > this.livingTickMax())
                 this.remove(RemovalReason.KILLED);
             float radius = this.getRadius();
@@ -108,7 +108,7 @@ public abstract class EntityDamageCloud extends Entity implements OwnableEntity 
                 this.setRadius(radius + this.radiusIncrease());
             }
             if (this.canStartDamage() && this.isAlive()) {
-                List<LivingEntity> targets = this.level.getEntitiesOfClass(LivingEntity.class, this.damageBoundingBox(), this::canHit);
+                List<LivingEntity> targets = this.level().getEntitiesOfClass(LivingEntity.class, this.damageBoundingBox(), this::canHit);
                 for (LivingEntity living : targets) {
                     if (this.maxHitCount() == -1 || this.attackedEntities < this.maxHitCount()) {
                         if (this.damageEntity(living))
@@ -161,7 +161,7 @@ public abstract class EntityDamageCloud extends Entity implements OwnableEntity 
         if (this.shooter != null && !this.shooter.isRemoved()) {
             return this.shooter;
         }
-        this.entityData.get(shooterUUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(LivingEntity.class, this.level, uuid));
+        this.entityData.get(shooterUUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(LivingEntity.class, this.level(), uuid));
         return this.shooter;
     }
 

@@ -37,7 +37,7 @@ public abstract class RenderProjectileItem<T extends Entity> extends EntityRende
                 stack.mulPose(Axis.ZP.rotationDegrees(135 - Mth.lerp(partialTicks, entity.xRotO, entity.getXRot())));
             }
         }
-        Minecraft.getInstance().getItemRenderer().renderStatic(this.getRenderItemStack(entity), ItemDisplayContext.GROUND, packedLight, OverlayTexture.NO_OVERLAY, stack, buffer, entity.level, entity.getId());
+        Minecraft.getInstance().getItemRenderer().renderStatic(this.getRenderItemStack(entity), ItemDisplayContext.GROUND, packedLight, OverlayTexture.NO_OVERLAY, stack, buffer, entity.level(), entity.getId());
         stack.popPose();
         super.render(entity, rotation, partialTicks, stack, buffer, packedLight);
     }

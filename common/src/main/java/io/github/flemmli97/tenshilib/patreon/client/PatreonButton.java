@@ -1,9 +1,8 @@
 package io.github.flemmli97.tenshilib.patreon.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.flemmli97.tenshilib.TenshiLib;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -18,12 +17,8 @@ public class PatreonButton extends Button {
     }
 
     @Override
-    public void renderWidget(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        RenderSystem.setShaderTexture(0, text);
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, this.alpha);
-        RenderSystem.enableBlend();
-        RenderSystem.enableDepthTest();
+    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         int i = this.isHoveredOrFocused() ? 1 : 0;
-        blit(poseStack, this.getX(), this.getY(), 0, i * 20, this.width, this.height);
+        guiGraphics.blit(text, this.getX(), this.getY(), 0, i * 20, this.width, this.height);
     }
 }

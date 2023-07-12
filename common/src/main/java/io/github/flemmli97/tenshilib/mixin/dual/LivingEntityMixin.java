@@ -21,7 +21,7 @@ public abstract class LivingEntityMixin implements ILastHand {
 
     @Inject(method = "getOffhandItem", at = @At(value = "HEAD"), cancellable = true)
     private void offhandItem(CallbackInfoReturnable<ItemStack> info) {
-        if (((LivingEntity) (Object) this).level.isClientSide && ((LivingEntity) (Object) this).getMainHandItem().getItem() instanceof IDualWeapon dual) {
+        if (((LivingEntity) (Object) this).level().isClientSide && ((LivingEntity) (Object) this).getMainHandItem().getItem() instanceof IDualWeapon dual) {
             info.setReturnValue(dual.offHandStack(((LivingEntity) (Object) this)));
             info.cancel();
         }
@@ -29,7 +29,7 @@ public abstract class LivingEntityMixin implements ILastHand {
 
     @Inject(method = "getItemInHand", at = @At(value = "HEAD"), cancellable = true)
     private void offhandItemGeneric(InteractionHand hand, CallbackInfoReturnable<ItemStack> info) {
-        if (hand == InteractionHand.OFF_HAND && ((LivingEntity) (Object) this).level.isClientSide && ((LivingEntity) (Object) this).getMainHandItem().getItem() instanceof IDualWeapon dual) {
+        if (hand == InteractionHand.OFF_HAND && ((LivingEntity) (Object) this).level().isClientSide && ((LivingEntity) (Object) this).getMainHandItem().getItem() instanceof IDualWeapon dual) {
             info.setReturnValue(dual.offHandStack(((LivingEntity) (Object) this)));
             info.cancel();
         }

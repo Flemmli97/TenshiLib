@@ -1,15 +1,11 @@
 package io.github.flemmli97.tenshilib.patreon.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.flemmli97.tenshilib.client.Color;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
@@ -53,10 +49,10 @@ public class HorizontalColorSlider extends AbstractWidget {
     }
 
     @Override
-    public void renderWidget(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        fill(poseStack, this.getX() - 1, this.getY() - 1, this.getX() + this.width + 1, this.getY() + this.height + 1, -1);
-        fill(poseStack, this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, PatreonGui.BLACK);
-        fillHorizontalGradient(poseStack, this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, this.firstColor.hex(), this.secondColor.hex());
+    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        guiGraphics.fill(this.getX() - 1, this.getY() - 1, this.getX() + this.width + 1, this.getY() + this.height + 1, -1);
+        guiGraphics.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, PatreonGui.BLACK);
+        fillHorizontalGradient(guiGraphics, this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, this.firstColor.hex(), this.secondColor.hex());
     }
 
     @Override
@@ -93,18 +89,11 @@ public class HorizontalColorSlider extends AbstractWidget {
         this.defaultButtonNarrationText(narrationElementOutput);
     }
 
-    protected static void fillHorizontalGradient(PoseStack poseStack, int x1, int y1, int x2, int y2, int colorFrom, int colorTo) {
-        RenderSystem.enableBlend();
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        Tesselator tesselator = Tesselator.getInstance();
-        BufferBuilder bufferBuilder = tesselator.getBuilder();
-        bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        fillHorizontalGradient(poseStack.last().pose(), bufferBuilder, x1, y1, x2, y2, colorFrom, colorTo);
-        tesselator.end();
-        RenderSystem.disableBlend();
+    protected static void fillHorizontalGradient(GuiGraphics poseStack, int x1, int y1, int x2, int y2, int colorFrom, int colorTo) {
+        fillHorizontalGradient(poseStack.pose().last().pose(), poseStack.bufferSource().getBuffer(RenderType.gui()), x1, y1, x2, y2, colorFrom, colorTo);
     }
 
-    protected static void fillHorizontalGradient(Matrix4f matrix, BufferBuilder builder, int x1, int y1, int x2, int y2, int colorA, int colorB) {
+    protected static void fillHorizontalGradient(Matrix4f matrix, VertexConsumer builder, int x1, int y1, int x2, int y2, int colorA, int colorB) {
         float f = (float) (colorA >> 24 & 0xFF) / 255.0f;
         float g = (float) (colorA >> 16 & 0xFF) / 255.0f;
         float h = (float) (colorA >> 8 & 0xFF) / 255.0f;

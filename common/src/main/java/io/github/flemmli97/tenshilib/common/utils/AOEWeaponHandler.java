@@ -27,7 +27,7 @@ import java.util.List;
 public class AOEWeaponHandler {
 
     public static void onAOEWeaponSwing(Player player, ItemStack stack, IAOEWeapon weapon) {
-        if (player.level.isClientSide)
+        if (player.level().isClientSide)
             return;
         List<Entity> list = RayTraceUtils.getEntities(player, weapon.getRange(), weapon.getFOV());
         if (EventCalls.INSTANCE.aoeAttackCall(player, stack, list) || list.isEmpty())
@@ -60,11 +60,11 @@ public class AOEWeaponHandler {
                     boolean flag = cooldown > 0.9F;
                     int knocback = EnchantmentHelper.getKnockbackBonus(player);
                     if (player.isSprinting() && flag) {
-                        player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_KNOCKBACK, player.getSoundSource(), 1.0F, 1.0F);
+                        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_KNOCKBACK, player.getSoundSource(), 1.0F, 1.0F);
                         ++knocback;
                     }
 
-                    boolean crit = flag && player.fallDistance > 0.0F && !player.isOnGround() && !player.onClimbable() && !player.isInWater() && !player.hasEffect(MobEffects.BLINDNESS) && !player.isPassenger() && target instanceof LivingEntity && !player.isSprinting();
+                    boolean crit = flag && player.fallDistance > 0.0F && !player.onGround() && !player.onClimbable() && !player.isInWater() && !player.hasEffect(MobEffects.BLINDNESS) && !player.isPassenger() && target instanceof LivingEntity && !player.isSprinting();
                     Pair<Boolean, Float> critCall = EventCalls.INSTANCE.criticalAttackCall(player, target, crit, crit ? 1.5F : 1.0F);
                     crit = critCall.getKey();
                     if (crit) {
@@ -96,7 +96,7 @@ public class AOEWeaponHandler {
                         }
 
                         if (cooldown > 0.9f && resetCooldown && canDoSweep) {
-                            player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, player.getSoundSource(), 1.0F, 1.0F);
+                            player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, player.getSoundSource(), 1.0F, 1.0F);
                             player.sweepAttack();
                         }
 
@@ -107,15 +107,15 @@ public class AOEWeaponHandler {
                         }
 
                         if (crit) {
-                            player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_CRIT, player.getSoundSource(), 1.0F, 1.0F);
+                            player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_CRIT, player.getSoundSource(), 1.0F, 1.0F);
                             player.crit(target);
                         }
 
                         if (!crit) {
                             if (flag) {
-                                player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_STRONG, player.getSoundSource(), 1.0F, 1.0F);
+                                player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_STRONG, player.getSoundSource(), 1.0F, 1.0F);
                             } else {
-                                player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_WEAK, player.getSoundSource(), 1.0F, 1.0F);
+                                player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_WEAK, player.getSoundSource(), 1.0F, 1.0F);
                             }
                         }
 
@@ -135,7 +135,7 @@ public class AOEWeaponHandler {
                             entity = ((EnderDragonPart) target).parentMob;
                         }
 
-                        if (!player.level.isClientSide && !itemstack1.isEmpty() && entity instanceof LivingEntity) {
+                        if (!player.level().isClientSide && !itemstack1.isEmpty() && entity instanceof LivingEntity) {
                             ItemStack copy = itemstack1.copy();
                             itemstack1.hurtEnemy((LivingEntity) entity, player);
                             if (itemstack1.isEmpty()) {
@@ -151,15 +151,15 @@ public class AOEWeaponHandler {
                                 target.setSecondsOnFire(j * 4);
                             }
 
-                            if (player.level instanceof ServerLevel && damage > 2.0F) {
+                            if (player.level() instanceof ServerLevel && damage > 2.0F) {
                                 int k = (int) (damage * 0.5D);
-                                ((ServerLevel) player.level).sendParticles(ParticleTypes.DAMAGE_INDICATOR, target.getX(), target.getY(0.5D), target.getZ(), k, 0.1D, 0.0D, 0.1D, 0.2D);
+                                ((ServerLevel) player.level()).sendParticles(ParticleTypes.DAMAGE_INDICATOR, target.getX(), target.getY(0.5D), target.getZ(), k, 0.1D, 0.0D, 0.1D, 0.2D);
                             }
                         }
 
                         player.causeFoodExhaustion(0.1F);
                     } else {
-                        player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_NODAMAGE, player.getSoundSource(), 1.0F, 1.0F);
+                        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_NODAMAGE, player.getSoundSource(), 1.0F, 1.0F);
                         if (burn) {
                             target.clearFire();
                         }

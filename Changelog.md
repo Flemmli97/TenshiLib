@@ -1,7 +1,10 @@
 TenshiLib 1.6.16
 ================
-- Update forge version to 45.0.59. Removes some (common) now unneeded stuff
-
+- Update to 1.20.1
+<i>
+  - ~~Update forge version to 45.0.59. Removes some (common) now unneeded stuff~~
+  </i>
+ 
 TenshiLib 1.6.15
 ================
 - Update to 1.19.4
