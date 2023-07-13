@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.1.0"
+    id "com.github.johnrengelman.shadow" version "8.0.0+"
 }
 
 architectury {
@@ -9,6 +9,11 @@ architectury {
 
 loom {
     accessWidenerPath.set file("src/main/resources/tenshilib.accesswidener")
+    runs {
+        client {
+            vmArgs "-Dmixin.debug.export=true"
+        }
+    }
 }
 
 configurations {
@@ -38,24 +43,24 @@ processResources {
 
 shadowJar {
     configurations = [project.configurations.shadowCommon]
-    classifier "dev-shadow"
+    archiveClassifier.set("dev-shadow")
 }
 
 remapJar {
     input.set shadowJar.archiveFile
     dependsOn shadowJar
-    classifier "fabric"
+    archiveClassifier.set("fabric")
 }
 
 jar {
-    classifier "dev"
+    archiveClassifier.set("dev")
 }
 
 sourcesJar {
     def commonSources = project(":common").sourcesJar
     dependsOn commonSources
     from commonSources.archiveFile.map { zipTree(it) }
-    classifier "fabric-sources"
+    archiveClassifier.set("fabric-sources")
 }
 
 components.java {
