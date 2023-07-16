@@ -15,11 +15,29 @@ public class AnimatedAction {
     private float ticker;
 
     /**
+     * @param length Length of the animation in seconds
+     * @param id     Unique id for the animation
+     */
+    public AnimatedAction(double length, String id) {
+        this((int) Math.ceil(length * 20), id);
+    }
+
+    /**
      * @param length Length of the animation
      * @param id     Unique id for the animation
      */
     public AnimatedAction(int length, String id) {
         this(length, 1, id, id, 1, true, 0);
+    }
+
+    /**
+     * @param length     Length of the animation in seconds
+     * @param id         Unique id for the animation
+     * @param attackTime A flag for various things e.g. when the entity should actually do damage
+     *                   Example in a sword slash do the damage mid swing and not at the beginning.
+     */
+    public AnimatedAction(double length, double attackTime, String id) {
+        this((int) Math.ceil(length * 20), (int) Math.ceil(attackTime * 20), id, id, 1, true, 0);
     }
 
     /**
