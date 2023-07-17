@@ -57,17 +57,22 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         this.setRot(shooter.yHeadRot, shooter.getXRot());
     }
 
-    public void setRotationTo(double x, double y, double z, float accuracyMod) {
+    public void setRotationTo(Entity target, float inaccuracy) {
+        Vec3 targetPos = EntityUtil.getStraightProjectileTarget(this.position(), target);
+        this.setRotationTo(targetPos.x(), targetPos.y(), targetPos.z(), inaccuracy);
+    }
+
+    public void setRotationTo(double x, double y, double z, float inaccuracy) {
         double dx = x - this.getX();
         double dy = y - this.getY();
         double dz = z - this.getZ();
-        this.setRotationToDir(dx, dy, dz, accuracyMod);
+        this.setRotationToDir(dx, dy, dz, inaccuracy);
     }
 
-    public void setRotationToDir(double x, double y, double z, float accuracyMod) {
-        x += this.random.nextGaussian() * accuracyMod;
-        y += this.random.nextGaussian() * accuracyMod;
-        z += this.random.nextGaussian() * accuracyMod;
+    public void setRotationToDir(double x, double y, double z, float inaccuracy) {
+        x += this.random.nextGaussian() * inaccuracy;
+        y += this.random.nextGaussian() * inaccuracy;
+        z += this.random.nextGaussian() * inaccuracy;
         double dis = Math.sqrt(x * x + y * y + z * z);
         this.setYRot((float) (Mth.atan2(z, x) * 180.0 / Math.PI) - 90);
         this.setXRot((float) (Math.acos(y / dis) * 180.0 / Math.PI) - 90);
