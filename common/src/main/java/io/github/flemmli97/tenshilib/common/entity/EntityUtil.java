@@ -1,7 +1,6 @@
 package io.github.flemmli97.tenshilib.common.entity;
 
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;

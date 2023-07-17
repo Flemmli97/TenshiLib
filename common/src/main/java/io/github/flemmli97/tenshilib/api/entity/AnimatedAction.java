@@ -110,8 +110,11 @@ public class AnimatedAction {
         return this.id;
     }
 
-    public boolean is(AnimatedAction other) {
-        return other != null && this.id.equals(other.id);
+    public boolean is(AnimatedAction... others) {
+        for (AnimatedAction other : others)
+            if (other != null && this.id.equals(other.id))
+                return true;
+        return false;
     }
 
     public String getAnimationClient() {
