@@ -8,15 +8,7 @@ import net.minecraft.world.item.ItemStack;
  */
 public interface IExtendedWeapon {
 
-    /**
-     * Use ItemStack sensitive version
-     */
-    @Deprecated(forRemoval = true, since = "1.6.15")
-    default float getRange() {
-        return 3;
-    }
-
     default float getRange(LivingEntity entity, ItemStack stack) {
-        return this.getRange();
+        return 3;
     }
 }

@@ -110,11 +110,6 @@ public class AnimatedAction {
         return this.id;
     }
 
-    @Deprecated
-    public boolean checkID(AnimatedAction other) {
-        return this.is(other);
-    }
-
     public boolean is(AnimatedAction other) {
         return other != null && this.id.equals(other.id);
     }

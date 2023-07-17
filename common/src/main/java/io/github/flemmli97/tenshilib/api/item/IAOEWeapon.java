@@ -8,31 +8,15 @@ import net.minecraft.world.item.ItemStack;
  */
 public interface IAOEWeapon {
 
-    /**
-     * Use ItemStack sensitive version
-     */
-    @Deprecated(forRemoval = true, since = "1.6.15")
-    default float getRange() {
-        return 3;
-    }
-
     default float getRange(LivingEntity entity, ItemStack stack) {
-        return this.getRange();
-    }
-
-    /**
-     * Use ItemStack sensitive version
-     */
-    @Deprecated(forRemoval = true, since = "1.6.15")
-    default float getFOV() {
-        return 0;
+        return 3;
     }
 
     /**
      * @return FOV of the weapons aoe area in degree. E.g. getFOV()==10 would mean all entities at the crosshair position +- 10 degrees left and right. Max 180
      */
     default float getFOV(LivingEntity entity, ItemStack stack) {
-        return this.getFOV();
+        return 0;
     }
 
     default boolean doSweepingAttack() {
