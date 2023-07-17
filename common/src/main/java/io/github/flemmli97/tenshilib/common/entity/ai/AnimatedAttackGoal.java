@@ -20,7 +20,7 @@ public abstract class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> ex
     protected LivingEntity target;
     protected AnimatedAction next;
     protected String prevAnim = "";
-    protected int iddleTime, pathFindDelay;
+    protected int idleTime, pathFindDelay;
     protected double distanceToTargetSq;
     protected boolean movementDone;
 
@@ -44,7 +44,7 @@ public abstract class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> ex
     public void stop() {
         this.next = null;
         this.target = null;
-        this.iddleTime = 0;
+        this.idleTime = 0;
         this.movementDone = false;
         this.attacker.getNavigation().stop();
         this.attacker.setZza(0);
@@ -64,7 +64,7 @@ public abstract class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> ex
 
     public abstract void handleAttack(AnimatedAction anim);
 
-    public abstract void handleIddle();
+    public abstract void handleIdle();
 
     public abstract int coolDown(AnimatedAction anim);
 
@@ -90,13 +90,13 @@ public abstract class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> ex
         }
         if (this.next == null && anim == null) {
             AnimatedAction choose;
-            if (this.iddleTime <= 0 && this.canChooseAttack(choose = this.randomAttack())) {
+            if (this.idleTime <= 0 && this.canChooseAttack(choose = this.randomAttack())) {
                 this.next = choose;
-                this.iddleTime = this.coolDown(this.next);
+                this.idleTime = this.coolDown(this.next);
                 this.movementDone = false;
             } else {
-                this.handleIddle();
-                this.iddleTime--;
+                this.handleIdle();
+                this.idleTime--;
             }
         }
         if (this.next != null) {

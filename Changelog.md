@@ -1,7 +1,8 @@
-TenshiLib 1.6.17
+TenshiLib 1.7.0
 ================
 - Expanding upon animation system to allow interpolation in between
 - Add system to allow entity to customize riding entities
+- Internal breaking changes
 
 TenshiLib 1.6.15
 ================
