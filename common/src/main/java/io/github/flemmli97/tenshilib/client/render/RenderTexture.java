@@ -45,8 +45,12 @@ public abstract class RenderTexture<T extends Entity> extends EntityRenderer<T> 
         float[] uvOffset = this.uvOffset(entity.tickCount);
         this.textureBuilder.setUV(uvOffset[0], uvOffset[1]);
         this.textureBuilder.setLight(packedLight);
-        RenderUtils.renderTexture(stack, buffer.getBuffer(this.getRenderType(entity, this.getTextureLocation(entity))), this.xSize, this.ySize, this.textureBuilder);
+        this.doRender(entity, partialTicks, stack, buffer);
         super.render(entity, rotation, partialTicks, stack, buffer, packedLight);
+    }
+
+    public void doRender(T entity, float partialTicks, PoseStack stack, MultiBufferSource buffer) {
+        RenderUtils.renderTexture(stack, buffer.getBuffer(this.getRenderType(entity, this.getTextureLocation(entity))), this.xSize, this.ySize, this.textureBuilder);
     }
 
     public void adjustYawPitch(PoseStack stack, T entity, float partialTicks, float yaw, float pitch) {
