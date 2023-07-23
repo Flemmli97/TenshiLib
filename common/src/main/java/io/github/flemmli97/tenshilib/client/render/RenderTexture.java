@@ -49,7 +49,7 @@ public abstract class RenderTexture<T extends Entity> extends EntityRenderer<T> 
         super.render(entity, rotation, partialTicks, stack, buffer, packedLight);
     }
 
-    public void adjustYawPitch(PoseStack stack, T entity, float partialTicks , float yaw, float pitch) {
+    public void adjustYawPitch(PoseStack stack, T entity, float partialTicks, float yaw, float pitch) {
         if (this.facePlayer()) {
             stack.mulPose(this.entityRenderDispatcher.cameraOrientation());
             stack.mulPose(Vector3f.YP.rotationDegrees(180));
