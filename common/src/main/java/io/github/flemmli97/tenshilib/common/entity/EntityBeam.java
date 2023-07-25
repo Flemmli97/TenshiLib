@@ -158,7 +158,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
                         new AABB(this.getX(), this.getY(), this.getZ(), this.hitVec.x, this.hitVec.y, this.hitVec.z).inflate(1 + this.radius()));
                 Vec3 pos = this.position();
                 for (Entity entity : list) {
-                    if (entity != this.getOwner() && this.check(entity, pos, this.hitVec)) {
+                    if (!entity.equals(this.getOwner()) && !EntityUtil.isSameMultipart(entity, this.getOwner()) && this.check(entity, pos, this.hitVec)) {
                         EntityHitResult raytraceresult = new EntityHitResult(entity);
                         if (!EventCalls.INSTANCE.beamHitCall(this, raytraceresult)) {
                             this.onImpact(raytraceresult);

@@ -124,7 +124,7 @@ public abstract class EntityDamageCloud extends Entity implements OwnableEntity 
     }
 
     protected boolean canHit(LivingEntity entity) {
-        return this.getOwner() == null || (!this.getOwner().isPassengerOfSameVehicle(entity) && ((this.canHitShooter() && this.tickCount > 2) || entity != this.getOwner()));
+        return this.getOwner() == null || (!this.getOwner().isPassengerOfSameVehicle(entity) && ((this.canHitShooter() && this.tickCount > 2) || !entity.equals(this.getOwner())));
     }
 
     protected abstract boolean damageEntity(LivingEntity target);
