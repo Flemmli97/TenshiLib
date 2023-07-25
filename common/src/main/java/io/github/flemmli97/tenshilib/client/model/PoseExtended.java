@@ -4,6 +4,8 @@ import net.minecraft.client.model.geom.PartPose;
 
 public class PoseExtended {
 
+    public static final PoseExtended ZERO = new PoseExtended(0, 0, 0, 0, 0, 0, 0, 0, 0);
+
     public final float x;
     public final float y;
     public final float z;

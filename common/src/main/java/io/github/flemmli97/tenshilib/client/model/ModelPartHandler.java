@@ -90,6 +90,13 @@ public class ModelPartHandler {
             this.setScale(pose.xScale, pose.yScale, pose.zScale);
         }
 
+        public void loadPoseRecursive(PoseExtended pose) {
+            this.setPos(pose.x, pose.y, pose.z);
+            this.setRotation(pose.xRot, pose.yRot, pose.zRot);
+            this.setScale(pose.xScale, pose.yScale, pose.zScale);
+            this.children.values().forEach(m -> m.loadPoseRecursive(pose));
+        }
+
         public ModelPartExtended getChild(String string) {
             ModelPartExtended modelPart = this.children.get(string);
             if (modelPart == null) {
@@ -124,6 +131,11 @@ public class ModelPartHandler {
         public void resetAll() {
             this.reset();
             this.children.values().forEach(ModelPartExtended::resetAll);
+        }
+
+        public void setAllVisible(boolean visible) {
+            this.visible = visible;
+            this.children.values().forEach(m -> m.setAllVisible(visible));
         }
 
         public void render(PoseStack poseStack, VertexConsumer vertexConsumer, int i, int j) {

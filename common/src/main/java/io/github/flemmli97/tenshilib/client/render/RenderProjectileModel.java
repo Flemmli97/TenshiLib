@@ -14,6 +14,10 @@ import net.minecraft.world.entity.Entity;
 public abstract class RenderProjectileModel<T extends Entity> extends EntityRenderer<T> {
 
     protected final EntityModel<T> model;
+    protected float red = 1;
+    protected float green = 1;
+    protected float blue = 1;
+    protected float alpha = 1;
 
     public RenderProjectileModel(EntityRendererProvider.Context ctx, EntityModel<T> model) {
         super(ctx);
@@ -33,7 +37,8 @@ public abstract class RenderProjectileModel<T extends Entity> extends EntityRend
         this.model.setupAnim(entity, 0, 0, partialLivingTicks, yaw, pitch);
 
         VertexConsumer ivertexbuilder = buffer.getBuffer(this.model.renderType(this.getTextureLocation(entity)));
-        this.model.renderToBuffer(stack, ivertexbuilder, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        this.model.renderToBuffer(stack, ivertexbuilder, packedLight, OverlayTexture.NO_OVERLAY, this.red, this.green, this.blue, this.alpha);
+        this.afterModelRender(entity, rotation, partialTicks, stack, buffer, packedLight);
         stack.popPose();
         super.render(entity, rotation, partialTicks, stack, buffer, packedLight);
     }
@@ -49,5 +54,9 @@ public abstract class RenderProjectileModel<T extends Entity> extends EntityRend
 
     public float pitchOffset() {
         return 0;
+    }
+
+    public void afterModelRender(T entity, float rotation, float partialTicks, PoseStack stack, MultiBufferSource buffer, int packedLight) {
+
     }
 }
