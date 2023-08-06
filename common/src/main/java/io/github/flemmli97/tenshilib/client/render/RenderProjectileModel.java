@@ -46,6 +46,8 @@ public abstract class RenderProjectileModel<T extends Entity> extends EntityRend
     public void translate(T entity, PoseStack stack, float pitch, float yaw, float partialTicks) {
         stack.mulPose(Vector3f.YP.rotationDegrees(180 + yaw));
         stack.mulPose(Vector3f.XP.rotationDegrees(pitch));
+        stack.scale(-1.0f, -1.0f, 1.0f);
+        stack.translate(0.0, -1.501f, 0.0);
     }
 
     public float yawOffset() {
