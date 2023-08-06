@@ -100,17 +100,18 @@ public class RayTraceUtils {
         Vec3 look = posEye.add(e.getLookAngle().scale(range));
         if (includeEntities) {
             HitResult raytraceresult = e.level.clip(new ClipContext(posEye, look, blockMode, fluidMode, e));
+            Vec3 target = look;
             if (raytraceresult.getType() != HitResult.Type.MISS) {
-                look = raytraceresult.getLocation();
+                target = raytraceresult.getLocation();
             }
-            EntityHitResult raytraceresult1;
+            EntityHitResult entityHitResult;
             if (getEntityHitVec)
-                raytraceresult1 = rayTraceEntities(e.level, e, posEye, look, e.getBoundingBox().expandTowards(look).inflate(1.0D), pred);
+                entityHitResult = rayTraceEntities(e.level, e, posEye, target, e.getBoundingBox().expandTowards(look).inflate(1.0D), pred);
             else
-                raytraceresult1 = ProjectileUtil.getEntityHitResult(e.level, e, posEye, look, e.getBoundingBox().expandTowards(look).inflate(1.0D), pred);
+                entityHitResult = ProjectileUtil.getEntityHitResult(e.level, e, posEye, target, e.getBoundingBox().expandTowards(look).inflate(1.0D), pred == null ? entity -> true : pred);
 
-            if (raytraceresult1 != null) {
-                raytraceresult = raytraceresult1;
+            if (entityHitResult != null) {
+                raytraceresult = entityHitResult;
             }
             return raytraceresult;
         }
