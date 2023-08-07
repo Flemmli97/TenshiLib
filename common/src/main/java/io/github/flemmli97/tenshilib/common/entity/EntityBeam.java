@@ -145,20 +145,22 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         }
         super.tick();
         this.livingTicks++;
-        if (this.livingTicks >= this.livingTickMax())
-            this.remove(RemovalReason.KILLED);
-        if (!this.level.isClientSide && this.hit != null && --this.coolDown <= 0 && this.isAlive()) {
-            List<Entity> list = this.level.getEntities(this,
-                    new AABB(this.getX(), this.getY(), this.getZ(), this.hitVec.x, this.hitVec.y, this.hitVec.z).inflate(1 + this.radius()));
-            Vec3 pos = this.position();
-            for (Entity entity : list) {
-                if (entity != this.getOwner() && this.check(entity, pos, this.hitVec)) {
-                    EntityHitResult raytraceresult = new EntityHitResult(entity);
-                    if (!EventCalls.INSTANCE.beamHitCall(this, raytraceresult)) {
-                        this.onImpact(raytraceresult);
-                        this.coolDown = this.attackCooldown();
-                        if (!this.piercing())
-                            return;
+        if (!this.level.isClientSide) {
+            if (this.livingTicks >= this.livingTickMax())
+                this.remove(RemovalReason.KILLED);
+            if (this.hit != null && --this.coolDown <= 0 && this.isAlive()) {
+                List<Entity> list = this.level.getEntities(this,
+                        new AABB(this.getX(), this.getY(), this.getZ(), this.hitVec.x, this.hitVec.y, this.hitVec.z).inflate(1 + this.radius()));
+                Vec3 pos = this.position();
+                for (Entity entity : list) {
+                    if (entity != this.getOwner() && this.check(entity, pos, this.hitVec)) {
+                        EntityHitResult raytraceresult = new EntityHitResult(entity);
+                        if (!EventCalls.INSTANCE.beamHitCall(this, raytraceresult)) {
+                            this.onImpact(raytraceresult);
+                            this.coolDown = this.attackCooldown();
+                            if (!this.piercing())
+                                return;
+                        }
                     }
                 }
             }
