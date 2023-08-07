@@ -187,7 +187,7 @@ public abstract class EntityProjectile extends Projectile {
     public void tick() {
         super.tick();
         this.livingTicks++;
-        if (this.livingTicks > this.livingTickMax())
+        if (!this.level().isClientSide && this.livingTicks > this.livingTickMax())
             this.remove(RemovalReason.KILLED);
         Vec3 motion = this.getDeltaMovement();
         if (this.xRotO == 0.0F && this.yRotO == 0.0F) {
