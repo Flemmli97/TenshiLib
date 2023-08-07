@@ -4,6 +4,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public record VanillaRegistryWrapper<T>(Registry<T> delegate) implements SimpleRegistryWrapper<T> {
@@ -11,6 +12,11 @@ public record VanillaRegistryWrapper<T>(Registry<T> delegate) implements SimpleR
     @Override
     public T getFromId(ResourceLocation id) {
         return this.delegate.get(id);
+    }
+
+    @Override
+    public Optional<T> getOptionalFromId(ResourceLocation id) {
+        return this.delegate.getOptional(id);
     }
 
     @Override

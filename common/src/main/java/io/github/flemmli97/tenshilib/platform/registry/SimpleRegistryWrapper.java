@@ -3,6 +3,7 @@ package io.github.flemmli97.tenshilib.platform.registry;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Simple structure to get stuff from registries
@@ -10,6 +11,8 @@ import java.util.Collection;
 public interface SimpleRegistryWrapper<T> {
 
     T getFromId(ResourceLocation id);
+
+    Optional<T> getOptionalFromId(ResourceLocation id);
 
     ResourceLocation getIDFrom(T entry);
 

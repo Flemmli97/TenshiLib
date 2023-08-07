@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public record ForgeRegistryWrapper<T>(
         IForgeRegistry<T> registry) implements SimpleRegistryWrapper<T> {
@@ -12,6 +13,11 @@ public record ForgeRegistryWrapper<T>(
     @Override
     public T getFromId(ResourceLocation id) {
         return this.registry.getValue(id);
+    }
+
+    @Override
+    public Optional<T> getOptionalFromId(ResourceLocation id) {
+        return this.registry.containsKey(id) ? Optional.ofNullable(this.registry.getValue(id)) : Optional.empty();
     }
 
     @Override
