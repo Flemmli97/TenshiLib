@@ -1,6 +1,7 @@
 package io.github.flemmli97.tenshilib.forge;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
+import io.github.flemmli97.tenshilib.common.entity.CustomDataSerializers;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import io.github.flemmli97.tenshilib.forge.client.events.ClientEvents;
 import io.github.flemmli97.tenshilib.forge.events.CommonEvents;
@@ -22,6 +23,7 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 public class TenshiLibForge {
 
     public TenshiLibForge() {
+        CustomDataSerializers.register();
         ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> "*", (s1, s2) -> true));
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         IEventBus forgeBus = MinecraftForge.EVENT_BUS;

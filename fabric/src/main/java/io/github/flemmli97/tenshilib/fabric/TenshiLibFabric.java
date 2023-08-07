@@ -1,5 +1,6 @@
 package io.github.flemmli97.tenshilib.fabric;
 
+import io.github.flemmli97.tenshilib.common.entity.CustomDataSerializers;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import io.github.flemmli97.tenshilib.fabric.events.CommonEvents;
 import io.github.flemmli97.tenshilib.fabric.network.ServerPacketHandler;
@@ -13,6 +14,7 @@ public class TenshiLibFabric implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        CustomDataSerializers.register();
         AttackBlockCallback.EVENT.register(CommonEvents::leftClickBlock);
         UseItemCallback.EVENT.register(CommonEvents::disableOffhand);
         ServerPacketHandler.register();
