@@ -14,6 +14,7 @@
     "ParticleEngineMixin",
     "EntityRendererDispatcherMixin",
     "LivingEntityRendererAccessor",
+    "LivingRendererMixin",
     "HumanoidArmorLayerMixin"
   ],
   "injectors": {
