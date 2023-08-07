@@ -1,3 +1,11 @@
+TenshiLib 1.7.0
+================
+- Expanding upon animation system to allow interpolation in between
+- Add system to allow entity to customize riding entities
+- Internal breaking changes
+- Fix various rendering things
+- Fix some entity raytracing issues
+
 TenshiLib 1.6.16
 ================
 - Update to 1.20.1  
