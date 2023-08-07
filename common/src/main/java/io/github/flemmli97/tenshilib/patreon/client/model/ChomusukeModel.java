@@ -74,7 +74,7 @@ public class ChomusukeModel extends EntityModel<Player> implements ExtendedModel
         if (RenderLocation.isHead(this.location))
             this.anim.doAnimation(this, "head", entity.tickCount, Minecraft.getInstance().getFrameTime());
         else
-            this.anim.doAnimation(this, "iddle", entity.tickCount, Minecraft.getInstance().getFrameTime());
+            this.anim.doAnimation(this, "idle", entity.tickCount, Minecraft.getInstance().getFrameTime());
     }
 
     @Override

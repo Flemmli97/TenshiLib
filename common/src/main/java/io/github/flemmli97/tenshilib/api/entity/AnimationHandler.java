@@ -54,7 +54,7 @@ public class AnimationHandler<T extends Entity & IAnimated> {
     }
 
     public void runIfAnimation(String id, Consumer<AnimatedAction> anim) {
-        if (this.isCurrentAnim(id)) {
+        if (this.isCurrent(id)) {
             anim.accept(this.getAnimation());
         }
     }
@@ -95,11 +95,14 @@ public class AnimationHandler<T extends Entity & IAnimated> {
         return this.anims;
     }
 
-    public boolean isCurrentAnim(String id) {
-        return this.hasAnimation() && this.getAnimation().getID().equals(id);
+    public boolean isCurrent(AnimatedAction... anims) {
+        for (AnimatedAction action : anims)
+            if (action.is(this.getAnimation()))
+                return true;
+        return false;
     }
 
-    public boolean isCurrentAnim(String... ids) {
+    public boolean isCurrent(String... ids) {
         if (!this.hasAnimation())
             return false;
         for (String id : ids)
