@@ -41,17 +41,25 @@ public abstract class RenderTexture<T extends Entity> extends EntityRenderer<T> 
     public void render(T entity, float rotation, float partialTicks, PoseStack stack, MultiBufferSource buffer, int packedLight) {
         float yaw = entity.yRotO + (entity.getYRot() - entity.yRotO) * partialTicks + 180;
         float pitch = entity.xRotO + (entity.getXRot() - entity.xRotO) * partialTicks;
+        this.adjustYawPitch(stack, entity, partialTicks, yaw, pitch);
+        float[] uvOffset = this.uvOffset(entity.tickCount);
+        this.textureBuilder.setUV(uvOffset[0], uvOffset[1]);
+        this.textureBuilder.setLight(packedLight);
+        this.doRender(entity, partialTicks, stack, buffer);
+        super.render(entity, rotation, partialTicks, stack, buffer, packedLight);
+    }
+
+    public void doRender(T entity, float partialTicks, PoseStack stack, MultiBufferSource buffer) {
+        RenderUtils.renderTexture(stack, buffer.getBuffer(this.getRenderType(entity, this.getTextureLocation(entity))), this.xSize, this.ySize, this.textureBuilder);
+    }
+
+    public void adjustYawPitch(PoseStack stack, T entity, float partialTicks, float yaw, float pitch) {
         if (this.facePlayer()) {
             stack.mulPose(this.entityRenderDispatcher.cameraOrientation());
             stack.mulPose(Axis.YP.rotationDegrees(180));
         } else {
             RenderUtils.applyYawPitch(stack, yaw + this.yawOffset(), -pitch + this.pitchOffset());
         }
-        float[] uvOffset = this.uvOffset(entity.tickCount);
-        this.textureBuilder.setUV(uvOffset[0], uvOffset[1]);
-        this.textureBuilder.setLight(packedLight);
-        RenderUtils.renderTexture(stack, buffer.getBuffer(this.getRenderType(entity, this.getTextureLocation(entity))), this.xSize, this.ySize, this.textureBuilder);
-        super.render(entity, rotation, partialTicks, stack, buffer, packedLight);
     }
 
     protected RenderType getRenderType(T entity, ResourceLocation loc) {
