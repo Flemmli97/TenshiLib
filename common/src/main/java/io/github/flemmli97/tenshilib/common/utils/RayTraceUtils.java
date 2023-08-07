@@ -99,24 +99,25 @@ public class RayTraceUtils {
     public static HitResult entityRayTrace(Entity e, float range, ClipContext.Block blockMode, ClipContext.Fluid fluidMode,
                                            boolean includeEntities, boolean getEntityHitVec, @Nullable Predicate<Entity> pred) {
         Vec3 posEye = e.getEyePosition(1);
-        Vec3 look = posEye.add(e.getLookAngle().scale(range));
+        Vec3 dir = e.getLookAngle().scale(range);
+        Vec3 lookPos = posEye.add(dir);
         if (includeEntities) {
-            HitResult raytraceresult = e.level().clip(new ClipContext(posEye, look, blockMode, fluidMode, e));
+            HitResult raytraceresult = e.level().clip(new ClipContext(posEye, lookPos, blockMode, fluidMode, e));
             if (raytraceresult.getType() != HitResult.Type.MISS) {
-                look = raytraceresult.getLocation();
+                lookPos = raytraceresult.getLocation();
             }
-            EntityHitResult raytraceresult1;
+            EntityHitResult entityHitResult;
             if (getEntityHitVec)
-                raytraceresult1 = rayTraceEntities(e.level(), e, posEye, look, e.getBoundingBox().expandTowards(look).inflate(1.0D), pred);
+                entityHitResult = rayTraceEntities(e.level(), e, posEye, lookPos, e.getBoundingBox().expandTowards(dir).inflate(1.0D), pred);
             else
-                raytraceresult1 = ProjectileUtil.getEntityHitResult(e.level(), e, posEye, look, e.getBoundingBox().expandTowards(look).inflate(1.0D), pred);
+                entityHitResult = ProjectileUtil.getEntityHitResult(e.level(), e, posEye, lookPos, e.getBoundingBox().expandTowards(dir).inflate(1.0D), pred == null ? entity -> true : pred);
 
-            if (raytraceresult1 != null) {
-                raytraceresult = raytraceresult1;
+            if (entityHitResult != null) {
+                raytraceresult = entityHitResult;
             }
             return raytraceresult;
         }
-        return e.level().clip(new ClipContext(posEye, look, blockMode, fluidMode, e));
+        return e.level().clip(new ClipContext(posEye, lookPos, blockMode, fluidMode, e));
     }
 
     @Nullable

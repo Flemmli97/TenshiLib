@@ -145,7 +145,7 @@ public abstract class EntityProjectile extends Projectile {
         Vec3 targetPos = new Vec3(target.getX(), target.getY(heightMod), target.getZ());
         if (this.getGravityVelocity() == 0)
             targetPos = EntityUtil.getStraightProjectileTarget(this.position(), target);
-        Vec3 dir = new Vec3(targetPos.x() - this.getX(), targetPos.y(), targetPos.z() - this.getZ());
+        Vec3 dir = new Vec3(targetPos.x() - this.getX(), targetPos.y() - this.getY(), targetPos.z() - this.getZ());
         double l = Math.sqrt(dir.x * dir.x + dir.z * dir.z);
         this.shoot(dir.x, dir.y + l * yOffsetModifier, dir.z, velocity, inaccuracy);
     }
@@ -307,7 +307,7 @@ public abstract class EntityProjectile extends Projectile {
 
     protected boolean canHit(Entity entity) {
         if (!entity.isSpectator() && entity.isAlive() && entity.isPickable()) {
-            if (entity == this.getOwner()) {
+            if (entity.equals(this.getOwner()) || EntityUtil.isSameMultipart(entity, this.getOwner())) {
                 if (!this.canHitShooter() || this.getOwner().isPassengerOfSameVehicle(entity) || this.tickCount < 5)
                     return false;
             }

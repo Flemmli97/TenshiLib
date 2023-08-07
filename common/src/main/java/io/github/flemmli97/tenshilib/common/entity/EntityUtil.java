@@ -1,10 +1,12 @@
 package io.github.flemmli97.tenshilib.common.entity;
 
+import io.github.flemmli97.tenshilib.TenshiLib;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -53,9 +55,22 @@ public class EntityUtil {
         return ItemStack.EMPTY;
     }
 
+    /**
+     * Returns true if the given entity is a multipart entity with the matching parent
+     */
+    public static boolean isSameMultipart(Entity entity, Entity parent) {
+        if (parent == null)
+            return false;
+        if (entity instanceof OwnableEntity ownable && entity.getType().is(TenshiLib.MULTIPART_ENTITY))
+            return parent.getUUID().equals(ownable.getOwnerUUID());
+        if (entity instanceof EnderDragonPart part)
+            return part.parentMob == parent;
+        return false;
+    }
+
     public static Vec3 getStraightProjectileTarget(Vec3 from, Entity target) {
-        AABB aabb = target.getBoundingBox().inflate(target.getBbHeight() * 0.1);
-        return getStraightProjectileTarget(from, target.position(), aabb.minY, aabb.maxY);
+        AABB aabb = target.getBoundingBox();
+        return getStraightProjectileTarget(from, target.position(), aabb.minY + target.getBbHeight() * 0.15, aabb.maxY - target.getBbHeight() * 0.15);
     }
 
     public static Vec3 getStraightProjectileTarget(Vec3 from, Vec3 target, double minY, double maxY) {
