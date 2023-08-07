@@ -9,7 +9,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
 public class ClientHandlers {
+
+    public static final Set<UUID> RIDING_RENDER_BLACKLIST = new HashSet<>();
 
     public static void updateAnim(int entityID, int animID) {
         Minecraft mc = Minecraft.getInstance();
@@ -28,5 +34,14 @@ public class ClientHandlers {
 
     public static Player clientPlayer() {
         return Minecraft.getInstance().player;
+    }
+
+    public static boolean shouldDisableRender(Entity entity) {
+        if (entity.getVehicle() instanceof LivingEntity vehicle && CustomRiderRendererManager.getInstance().hasRiderLayerRenderer(vehicle.getType())) {
+            if (ClientHandlers.RIDING_RENDER_BLACKLIST.contains(entity.getUUID()))
+                return false;
+            return entity != Minecraft.getInstance().player || !Minecraft.getInstance().options.getCameraType().isFirstPerson();
+        }
+        return false;
     }
 }

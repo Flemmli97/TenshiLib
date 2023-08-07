@@ -35,6 +35,7 @@ public class TenshiLibForge {
             modBus.addListener(ClientEvents::itemColors);
             PatreonClientPlatform.INSTANCE.setup();
             forgeBus.addListener(ClientEvents::clickSpecial);
+            forgeBus.addListener(ClientEvents::onEntityRender);
         }
     }
 
