@@ -45,7 +45,7 @@ public abstract class RenderTexture<T extends Entity> extends EntityRenderer<T> 
             stack.mulPose(this.entityRenderDispatcher.cameraOrientation());
             stack.mulPose(Axis.YP.rotationDegrees(180));
         } else {
-            RenderUtils.applyYawPitch(stack, yaw + this.yawOffset(), pitch + this.pitchOffset());
+            RenderUtils.applyYawPitch(stack, yaw + this.yawOffset(), -pitch + this.pitchOffset());
         }
         float[] uvOffset = this.uvOffset(entity.tickCount);
         this.textureBuilder.setUV(uvOffset[0], uvOffset[1]);
