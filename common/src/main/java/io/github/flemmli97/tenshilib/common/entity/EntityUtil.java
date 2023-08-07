@@ -1,11 +1,15 @@
 package io.github.flemmli97.tenshilib.common.entity;
 
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -47,5 +51,14 @@ public class EntityUtil {
                 if (pred.test(stack))
                     return stack;
         return ItemStack.EMPTY;
+    }
+
+    public static Vec3 getStraightProjectileTarget(Vec3 from, Entity target) {
+        AABB aabb = target.getBoundingBox().inflate(target.getBbHeight() * 0.1);
+        return getStraightProjectileTarget(from, target.position(), aabb.minY, aabb.maxY);
+    }
+
+    public static Vec3 getStraightProjectileTarget(Vec3 from, Vec3 target, double minY, double maxY) {
+        return new Vec3(target.x(), Mth.clamp(from.y(), minY, maxY), target.z());
     }
 }

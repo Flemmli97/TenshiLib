@@ -141,8 +141,11 @@ public abstract class EntityProjectile extends Projectile {
      *
      * @param yOffsetModifier Modifies the offset of the y motion based on distance to target. Vanilla arrows use 0.2
      */
-    public void shootAtEntity(Entity target, float velocity, float inaccuracy, float yOffsetModifier, double heighMod) {
-        Vec3 dir = (new Vec3(target.getX() - this.getX(), target.getY(heighMod) - this.getY(), target.getZ() - this.getZ()));
+    public void shootAtEntity(Entity target, float velocity, float inaccuracy, float yOffsetModifier, double heightMod) {
+        Vec3 targetPos = new Vec3(target.getX(), target.getY(heightMod), target.getZ());
+        if (this.getGravityVelocity() == 0)
+            targetPos = EntityUtil.getStraightProjectileTarget(this.position(), target);
+        Vec3 dir = new Vec3(targetPos.x() - this.getX(), targetPos.y(), targetPos.z() - this.getZ());
         double l = Math.sqrt(dir.x * dir.x + dir.z * dir.z);
         this.shoot(dir.x, dir.y + l * yOffsetModifier, dir.z, velocity, inaccuracy);
     }
