@@ -77,7 +77,7 @@ public class AnimationHandler<T extends Entity & IAnimated> {
         if (this.currentAnim != null && this.currentAnim.getFadeTick() > 0) {
             this.delayedAction = () -> {
                 this.currentAnim = anim == null ? null : anim.create();
-                if (!this.entity.level.isClientSide) {
+                if (!this.entity.level().isClientSide) {
                     EventCalls.INSTANCE.sendEntityAnimationPacket(this.entity);
                 }
             };
@@ -85,7 +85,7 @@ public class AnimationHandler<T extends Entity & IAnimated> {
             this.delayedCounterMax = this.delayedCounter;
         } else {
             this.currentAnim = anim == null ? null : anim.create();
-            if (!this.entity.level.isClientSide) {
+            if (!this.entity.level().isClientSide) {
                 EventCalls.INSTANCE.sendEntityAnimationPacket(this.entity);
             }
         }

@@ -92,7 +92,7 @@ public class RiderLayerRenderer<T extends LivingEntity, M extends EntityModel<T>
             entity.fillCrashReportCategory(crashReportCategory);
             CrashReportCategory crashReportCategory2 = crashReport.addCategory("Renderer details");
             crashReportCategory2.setDetail("Assigned renderer", entityRenderer);
-            crashReportCategory2.setDetail("Location", CrashReportCategory.formatLocation(entity.level, entity.position().x, entity.position().y, entity.position().z));
+            crashReportCategory2.setDetail("Location", CrashReportCategory.formatLocation(entity.level(), entity.position().x, entity.position().y, entity.position().z));
             crashReportCategory2.setDetail("Delta", partialTicks);
             throw new ReportedException(crashReport);
         }
