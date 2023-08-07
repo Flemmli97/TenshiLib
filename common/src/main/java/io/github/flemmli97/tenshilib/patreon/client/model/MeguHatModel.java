@@ -68,7 +68,7 @@ public class MeguHatModel extends EntityModel<Player> implements ExtendedModel, 
     @Override
     public void setupAnim(Player entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.model.resetPoses();
-        this.anim.doAnimation(this, "iddle", entity.tickCount, Minecraft.getInstance().getFrameTime());
+        this.anim.doAnimation(this, "idle", entity.tickCount, Minecraft.getInstance().getFrameTime());
     }
 
     @Override
