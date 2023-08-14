@@ -1,3 +1,7 @@
+TenshiLib 1.7.1
+================
+- Fix nullpointer crash in gui
+
 TenshiLib 1.7.0
 ================
 - Expanding upon animation system to allow interpolation in between

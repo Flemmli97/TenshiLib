@@ -11,6 +11,7 @@ import io.github.flemmli97.tenshilib.patreon.RenderLocation;
 import io.github.flemmli97.tenshilib.patreon.pkts.C2SEffectUpdatePkt;
 import io.github.flemmli97.tenshilib.patreon.pkts.C2SRequestUpdateClientPkt;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
@@ -189,6 +190,7 @@ public class PatreonGui extends Screen {
     @Override
     public void removed() {
         super.removed();
-        PatreonClientPlatform.INSTANCE.sendToServer(new C2SRequestUpdateClientPkt());
+        if (Minecraft.getInstance().getConnection() != null && Minecraft.getInstance().getConnection().getConnection() != null)
+            PatreonClientPlatform.INSTANCE.sendToServer(new C2SRequestUpdateClientPkt());
     }
 }
