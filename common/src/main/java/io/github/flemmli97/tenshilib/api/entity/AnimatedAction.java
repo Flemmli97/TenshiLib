@@ -86,6 +86,10 @@ public class AnimatedAction {
         return (this.ticker += 1 * this.speed) >= (this.length + offSet) && this.shouldRunOut;
     }
 
+    public float getSpeed() {
+        return this.speed;
+    }
+
     public boolean canAttack() {
         return this.ticker == this.attackTime;
     }
