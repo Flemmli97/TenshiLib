@@ -91,11 +91,37 @@ public class AnimatedAction {
     }
 
     public boolean canAttack() {
-        return this.ticker == this.attackTime;
+        return this.isAtTick(this.attackTime);
     }
 
     public int getTick() {
         return (int) this.ticker;
+    }
+
+    public boolean isAtTick(double tick) {
+        return this.isAtTick((int) Math.ceil(tick * 20));
+    }
+
+    /**
+     * @return True if the current animation is at the given tick. Use this instead of #getTick() == tick since this respects animation speed
+     */
+    public boolean isAtTick(int tick) {
+        return this.speedAdjustedTick() == tick;
+    }
+
+    public boolean isPastTick(double tick) {
+        return this.isPastTick((int) Math.ceil(tick * 20));
+    }
+
+    /**
+     * @return True if the current animation is past the given tick. Use this instead of #getTick() >= tick since this respects animation speed
+     */
+    public boolean isPastTick(int tick) {
+        return this.speedAdjustedTick() >= tick;
+    }
+
+    public int speedAdjustedTick() {
+        return (int) (this.ticker / this.speed);
     }
 
     public int getLength() {
