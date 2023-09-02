@@ -165,6 +165,14 @@ public class BlockBenchAnimations {
                 JsonObject val = new JsonObject();
                 val.add("0", el);
                 return val;
+            } else if (el.isJsonPrimitive()) {
+                JsonObject val = new JsonObject();
+                JsonArray arr = new JsonArray();
+                arr.add(el.getAsDouble());
+                arr.add(el.getAsDouble());
+                arr.add(el.getAsDouble());
+                val.add("0", arr);
+                return val;
             }
             return null;
         }
