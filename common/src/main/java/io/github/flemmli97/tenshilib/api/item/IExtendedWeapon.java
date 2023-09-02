@@ -21,6 +21,10 @@ public interface IExtendedWeapon {
         return true;
     }
 
+    default boolean onServerSwing(LivingEntity entity, ItemStack stack) {
+        return true;
+    }
+
     default boolean onHit(LivingEntity entity, ItemStack stack, Entity target) {
         return true;
     }
