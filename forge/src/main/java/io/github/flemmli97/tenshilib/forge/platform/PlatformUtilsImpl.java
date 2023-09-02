@@ -116,13 +116,13 @@ public class PlatformUtilsImpl extends PlatformUtils {
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({"unchecked", "rawtypes", "removal"})
     public <T extends CustomRegistryEntry<T>> PlatformRegistry<T> customRegistry(Class<T> clss, ResourceKey<? extends Registry<T>> registryKey, String modid) {
         return new ForgeRegistryHandler<>(DeferredRegister.create((Class) clss, modid));
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({"unchecked", "rawtypes", "removal"})
     public <T extends CustomRegistryEntry<T>> PlatformRegistry<T> customRegistry(Class<T> clss, ResourceKey<? extends Registry<T>> registryKey, ResourceLocation defaultVal, boolean saveToDisk, boolean sync) {
         DeferredRegister r = DeferredRegister.create((Class) clss, registryKey.location().getNamespace());
         r.makeRegistry(registryKey.location().getPath(), () -> new RegistryBuilder<>().setDefaultKey(defaultVal));

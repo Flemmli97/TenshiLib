@@ -21,8 +21,11 @@ public class ClientEvents {
 
     public static void clickSpecial(InputEvent.ClickInputEvent event) {
         if (event.isAttack() && event.getHand() == InteractionHand.MAIN_HAND) {
-            event.setSwingHand(false);
-            event.setCanceled(ClientHandlers.emptyClick(aoe -> PacketHandler.sendToServer(new C2SPacketHit(aoe ? C2SPacketHit.HitType.AOE : C2SPacketHit.HitType.EXT))));
+            boolean canceled = ClientHandlers.emptyClick(aoe -> PacketHandler.sendToServer(new C2SPacketHit(aoe ? C2SPacketHit.HitType.AOE : C2SPacketHit.HitType.EXT)));
+            if (canceled) {
+                event.setSwingHand(false);
+                event.setCanceled(true);
+            }
         }
     }
 
