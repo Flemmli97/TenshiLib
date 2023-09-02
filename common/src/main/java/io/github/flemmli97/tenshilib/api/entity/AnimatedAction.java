@@ -121,7 +121,9 @@ public class AnimatedAction {
     }
 
     public int speedAdjustedTick() {
-        return (int) (this.ticker / this.speed);
+        float adjusted = this.ticker / this.speed;
+        int ceil = Mth.ceil(adjusted);
+        return (ceil - adjusted) < 0.001 && (ceil - adjusted) > 0 ? ceil : (int) adjusted;
     }
 
     public int getLength() {
