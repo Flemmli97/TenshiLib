@@ -208,9 +208,9 @@ public class BlockBenchAnimations {
             }
             if (this.rotations != null) {
                 if (this.rotations.length == 1) {
-                    modelPart.xRot += Mth.DEG_TO_RAD * this.rotations[0].getXVal(secTime) * interpolation;
-                    modelPart.yRot += Mth.DEG_TO_RAD * this.rotations[0].getYVal(secTime) * interpolation * mirrorMult;
-                    modelPart.zRot += Mth.DEG_TO_RAD * this.rotations[0].getZVal(secTime) * interpolation * mirrorMult;
+                    modelPart.xRot += Mth.DEG_TO_RAD * (this.rotations[0].getXVal(secTime) % 360) * interpolation;
+                    modelPart.yRot += Mth.DEG_TO_RAD * (this.rotations[0].getYVal(secTime) % 360) * interpolation * mirrorMult;
+                    modelPart.zRot += Mth.DEG_TO_RAD * (this.rotations[0].getZVal(secTime) % 360) * interpolation * mirrorMult;
                 } else {
                     int id = 1;
                     AnimationValue rot = this.rotations[id];
@@ -218,9 +218,9 @@ public class BlockBenchAnimations {
                         rot = this.rotations[id];
                     AnimationValue rotPrev = this.rotations[id - 1];
                     float prog = Mth.clamp((actualTick - rotPrev.startTick) / (rot.startTick - rotPrev.startTick), 0F, 1F);
-                    modelPart.xRot += Mth.DEG_TO_RAD * this.interpolate(rotPrev.getXVal(secTime), rot.getXVal(secTime), prog) * interpolation;
-                    modelPart.yRot += Mth.DEG_TO_RAD * this.interpolate(rotPrev.getYVal(secTime), rot.getYVal(secTime), prog) * interpolation * mirrorMult;
-                    modelPart.zRot += Mth.DEG_TO_RAD * this.interpolate(rotPrev.getZVal(secTime), rot.getZVal(secTime), prog) * interpolation * mirrorMult;
+                    modelPart.xRot += Mth.DEG_TO_RAD * (this.interpolate(rotPrev.getXVal(secTime), rot.getXVal(secTime), prog) % 360) * interpolation;
+                    modelPart.yRot += Mth.DEG_TO_RAD * (this.interpolate(rotPrev.getYVal(secTime), rot.getYVal(secTime), prog) % 360) * interpolation * mirrorMult;
+                    modelPart.zRot += Mth.DEG_TO_RAD * (this.interpolate(rotPrev.getZVal(secTime), rot.getZVal(secTime), prog) % 360) * interpolation * mirrorMult;
                 }
             }
             if (this.scales != null) {
