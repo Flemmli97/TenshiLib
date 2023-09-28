@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.common.utils;
 
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.ToIntFunction;
 
 public class SearchUtils {
 
@@ -11,8 +11,8 @@ public class SearchUtils {
      * @param l      The sorted list
      * @param search A function that should return 0,1,-1 indicating equals, greater or lesser
      */
-    public static <T> T searchInfFunc(List<T> l, Function<T, Integer> search, T defaultVal) {
-        if (l.isEmpty() || search.apply(l.get(0)) > 0)
+    public static <T> T searchInfFunc(List<T> l, ToIntFunction<T> search, T defaultVal) {
+        if (l.isEmpty() || search.applyAsInt(l.get(0)) > 0)
             return defaultVal;
         return get(l, 0, l.size(), search);
     }
@@ -41,13 +41,13 @@ public class SearchUtils {
         return get(arr, 0, arr.length, search);
     }
 
-    private static <T> T get(List<T> l, int min, int max, Function<T, Integer> search) {
+    private static <T> T get(List<T> l, int min, int max, ToIntFunction<T> search) {
         int id = ((max - min) / 2) + min;
         T val = l.get(id);
-        if (search.apply(val) == 0)
+        if (search.applyAsInt(val) == 0)
             return val;
-        if (search.apply(val) < 0) {
-            if (id + 1 >= l.size() || search.apply(l.get(id + 1)) > 0)
+        if (search.applyAsInt(val) < 0) {
+            if (id + 1 >= l.size() || search.applyAsInt(l.get(id + 1)) > 0)
                 return val;
             return get(l, id, max, search);
         }

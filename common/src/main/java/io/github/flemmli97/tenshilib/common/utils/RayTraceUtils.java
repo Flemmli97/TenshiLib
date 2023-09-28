@@ -4,6 +4,7 @@ import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.ToFloatFunction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 
@@ -135,7 +135,7 @@ public class RayTraceUtils {
      * Like {@link ProjectileUtil#getEntityHitResult} but also saves the hit vector
      */
     @Nullable
-    public static EntityHitResult rayTraceEntities(Level world, Entity e, Vec3 from, Vec3 to, AABB aabb, Predicate<Entity> pred, Function<Entity, Float> inflateRadius) {
+    public static EntityHitResult rayTraceEntities(Level world, Entity e, Vec3 from, Vec3 to, AABB aabb, Predicate<Entity> pred, ToFloatFunction<Entity> inflateRadius) {
         double d0 = Double.MAX_VALUE;
         Entity entity = null;
         Vec3 hit = null;

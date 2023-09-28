@@ -75,7 +75,14 @@ public class AnimatedAction {
      * @return Creates a new copy instance of the animation
      */
     public AnimatedAction create() {
-        return new AnimatedAction(this.length, this.attackTime, this.id, this.animationClient, this.speed, this.shouldRunOut, this.fadeTick);
+        return this.create(this.speed);
+    }
+
+    /**
+     * @return Creates a new copy instance of the animation with the given speed modifier
+     */
+    public AnimatedAction create(float speed) {
+        return new AnimatedAction(this.length, this.attackTime, this.id, this.animationClient, speed, this.shouldRunOut, this.fadeTick);
     }
 
     public boolean tick() {
