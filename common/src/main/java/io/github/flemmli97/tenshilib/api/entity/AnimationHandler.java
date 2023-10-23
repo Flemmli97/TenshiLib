@@ -2,7 +2,8 @@ package io.github.flemmli97.tenshilib.api.entity;
 
 import io.github.flemmli97.tenshilib.platform.EventCalls;
 import net.minecraft.util.Mth;
-import net.minecraft.util.ToFloatFunction;
+import java.util.function.Function;
+
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +21,7 @@ public class AnimationHandler<T extends Entity & IAnimated> {
     private Predicate<AnimatedAction> onAnimationSetFunc;
     private Consumer<AnimatedAction> onAnimationSetCons;
     private Consumer<AnimatedAction> onRunAnimation;
-    private ToFloatFunction<AnimatedAction> animationSpeedHandler;
+    private Function<AnimatedAction, Float> animationSpeedHandler;
     private int timeSinceLastChange;
     private int delayedCounterMax;
     private int delayedCounter = -1;
@@ -50,7 +51,7 @@ public class AnimationHandler<T extends Entity & IAnimated> {
         return this;
     }
 
-    public AnimationHandler<T> setAnimationSpeedHandler(ToFloatFunction<AnimatedAction> animationSpeedHandler) {
+    public AnimationHandler<T> setAnimationSpeedHandler(Function<AnimatedAction, Float> animationSpeedHandler) {
         this.animationSpeedHandler = animationSpeedHandler;
         return this;
     }
