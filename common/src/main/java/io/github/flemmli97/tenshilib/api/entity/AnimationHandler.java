@@ -2,12 +2,14 @@ package io.github.flemmli97.tenshilib.api.entity;
 
 import io.github.flemmli97.tenshilib.platform.EventCalls;
 import net.minecraft.util.Mth;
+import java.util.function.Function;
+
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class AnimationHandler<T extends Entity & IAnimated> {
 
@@ -16,9 +18,10 @@ public class AnimationHandler<T extends Entity & IAnimated> {
     private AnimatedAction currentAnim;
     private final T entity;
     private final AnimatedAction[] anims;
-    private Function<AnimatedAction, Boolean> onAnimationSetFunc;
+    private Predicate<AnimatedAction> onAnimationSetFunc;
     private Consumer<AnimatedAction> onAnimationSetCons;
     private Consumer<AnimatedAction> onRunAnimation;
+    private Function<AnimatedAction, Float> animationSpeedHandler;
     private int timeSinceLastChange;
     private int delayedCounterMax;
     private int delayedCounter = -1;
@@ -30,7 +33,7 @@ public class AnimationHandler<T extends Entity & IAnimated> {
         this.anims = anims;
     }
 
-    public AnimationHandler<T> setAnimationChangeFunc(Function<AnimatedAction, Boolean> onAnimationSet) {
+    public AnimationHandler<T> setAnimationChangeFunc(Predicate<AnimatedAction> onAnimationSet) {
         this.onAnimationSetFunc = onAnimationSet;
         return this;
     }
@@ -45,6 +48,11 @@ public class AnimationHandler<T extends Entity & IAnimated> {
      */
     public AnimationHandler<T> addActionHandle(Consumer<AnimatedAction> handleAction) {
         this.onRunAnimation = handleAction;
+        return this;
+    }
+
+    public AnimationHandler<T> setAnimationSpeedHandler(Function<AnimatedAction, Float> animationSpeedHandler) {
+        this.animationSpeedHandler = animationSpeedHandler;
         return this;
     }
 
@@ -71,12 +79,12 @@ public class AnimationHandler<T extends Entity & IAnimated> {
     public void setAnimation(AnimatedAction anim) {
         if (this.onAnimationSetCons != null)
             this.onAnimationSetCons.accept(anim);
-        if (this.onAnimationSetFunc != null && this.onAnimationSetFunc.apply(anim))
+        if (this.onAnimationSetFunc != null && this.onAnimationSetFunc.test(anim))
             return;
         this.timeSinceLastChange = 0;
         if (this.currentAnim != null && this.currentAnim.getFadeTick() > 0) {
             this.delayedAction = () -> {
-                this.currentAnim = anim == null ? null : anim.create();
+                this.currentAnim = anim == null ? null : anim.create(this.animationSpeedHandler == null ? anim.getSpeed() : this.animationSpeedHandler.apply(anim));
                 if (!this.entity.level().isClientSide) {
                     EventCalls.INSTANCE.sendEntityAnimationPacket(this.entity);
                 }
@@ -84,7 +92,7 @@ public class AnimationHandler<T extends Entity & IAnimated> {
             this.delayedCounter = this.currentAnim.getFadeTick();
             this.delayedCounterMax = this.delayedCounter;
         } else {
-            this.currentAnim = anim == null ? null : anim.create();
+            this.currentAnim = anim == null ? null : anim.create(this.animationSpeedHandler == null ? anim.getSpeed() : this.animationSpeedHandler.apply(anim));
             if (!this.entity.level().isClientSide) {
                 EventCalls.INSTANCE.sendEntityAnimationPacket(this.entity);
             }
