@@ -1,11 +1,14 @@
 package io.github.flemmli97.tenshilib.mixinhelper;
 
+import io.github.flemmli97.tenshilib.api.item.IAOEWeapon;
 import io.github.flemmli97.tenshilib.api.item.IDualWeapon;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.function.Consumer;
 
@@ -41,5 +44,11 @@ public class MixinUtils {
             return val;
         float strength = ((OffHandStrength) player).getOffhandStrengthScale(1);
         return strength * strength * strength - offHandHeight;
+    }
+
+    public static boolean disableContinueAttack() {
+        Minecraft client = Minecraft.getInstance();
+        ItemStack main = client.player.getMainHandItem();
+        return (main.getItem() instanceof IAOEWeapon aoe && !aoe.allowBlockAttack(client.player, main));
     }
 }

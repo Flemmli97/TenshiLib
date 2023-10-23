@@ -22,4 +22,31 @@ public interface IAOEWeapon {
     default boolean doSweepingAttack() {
         return true;
     }
+
+    default boolean resetAttackStrength(LivingEntity entity, ItemStack stack) {
+        return true;
+    }
+
+    /**
+     * @return If false disables swing animation
+     */
+    default boolean swingWeapon(LivingEntity entity, ItemStack stack) {
+        return true;
+    }
+
+    /**
+     * @return If false will disable the normal attack that runs when left clicking with this item
+     */
+    default boolean onServerSwing(LivingEntity entity, ItemStack stack) {
+        return true;
+    }
+
+    /**
+     * If false does 2 things
+     * 1. When clicking on a block will attack using that item
+     * 2. Disables mining blocks with this item
+     */
+    default boolean allowBlockAttack(LivingEntity entity, ItemStack stack) {
+        return false;
+    }
 }
