@@ -1,3 +1,10 @@
+TenshiLib 1.7.1
+================
+- Fix nullpointer crash in gui
+- Add some more hooks for extended weapons and aoe weapons
+- Lots of fixed and changes for animations
+- Various internal changes
+
 TenshiLib 1.7.0
 ================
 - Expanding upon animation system to allow interpolation in between
