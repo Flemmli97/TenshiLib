@@ -11,7 +11,7 @@ public class SearchUtils {
      * @param l      The sorted list
      * @param search A function that should return 0,1,-1 indicating equals, greater or lesser
      */
-    public static <T extends Comparable<T>> T searchInfFunc(List<T> l, Function<T, Integer> search, T defaultVal) {
+    public static <T> T searchInfFunc(List<T> l, Function<T, Integer> search, T defaultVal) {
         if (l.isEmpty() || search.apply(l.get(0)) > 0)
             return defaultVal;
         return get(l, 0, l.size(), search);
@@ -41,7 +41,7 @@ public class SearchUtils {
         return get(arr, 0, arr.length, search);
     }
 
-    private static <T extends Comparable<T>> T get(List<T> l, int min, int max, Function<T, Integer> search) {
+    private static <T> T get(List<T> l, int min, int max, Function<T, Integer> search) {
         int id = ((max - min) / 2) + min;
         T val = l.get(id);
         if (search.apply(val) == 0)

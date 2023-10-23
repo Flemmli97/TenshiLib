@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 
@@ -63,8 +64,15 @@ public class RayTraceUtils {
     public static EntityHitResult calculateEntityFromLook(LivingEntity entity, Vec3 pos, Vec3 dir, float reach,
                                                           @Nullable Predicate<Entity> pred) {
         Vec3 scaledDir = dir.scale(reach);
-        return rayTraceEntities(entity.level(), entity, pos, pos.add(scaledDir), entity.getBoundingBox().expandTowards(scaledDir).inflate(1), (t) -> EntitySelector.NO_SPECTATORS.test(t) && t.isPickable()
-                && (pred == null || pred.test(t)));
+        EntityHitResult result = rayTraceEntities(entity.level(), entity, pos, pos.add(scaledDir), entity.getBoundingBox().expandTowards(scaledDir).inflate(1), (t) -> EntitySelector.NO_SPECTATORS.test(t) && t.isPickable()
+                && (pred == null || pred.test(t)), Entity::getPickRadius);
+        if (result != null) {
+            Vec3 loc = result.getLocation();
+            double dist = pos.distanceToSqr(loc);
+            if (dist <= reach * reach)
+                return result;
+        }
+        return null;
     }
 
     /**
@@ -108,7 +116,7 @@ public class RayTraceUtils {
             }
             EntityHitResult entityHitResult;
             if (getEntityHitVec)
-                entityHitResult = rayTraceEntities(e.level(), e, posEye, lookPos, e.getBoundingBox().expandTowards(dir).inflate(1.0D), pred);
+                entityHitResult = rayTraceEntities(e.level(), e, posEye, lookPos, e.getBoundingBox().expandTowards(dir).inflate(1.0D), pred, ent -> 0.3f);
             else
                 entityHitResult = ProjectileUtil.getEntityHitResult(e.level(), e, posEye, lookPos, e.getBoundingBox().expandTowards(dir).inflate(1.0D), pred == null ? entity -> true : pred);
 
@@ -122,19 +130,19 @@ public class RayTraceUtils {
 
     @Nullable
     public static EntityHitResult rayTraceEntities(Entity e, Vec3 from, Vec3 to, Predicate<Entity> pred) {
-        return rayTraceEntities(e.level(), e, from, to, e.getBoundingBox().expandTowards(e.getDeltaMovement()).inflate(1), pred);
+        return rayTraceEntities(e.level(), e, from, to, e.getBoundingBox().expandTowards(e.getDeltaMovement()).inflate(1), pred, ent -> 0.3f);
     }
 
     /**
      * Like {@link ProjectileUtil#getEntityHitResult} but also saves the hit vector
      */
     @Nullable
-    public static EntityHitResult rayTraceEntities(Level world, Entity e, Vec3 from, Vec3 to, AABB aabb, Predicate<Entity> pred) {
+    public static EntityHitResult rayTraceEntities(Level world, Entity e, Vec3 from, Vec3 to, AABB aabb, Predicate<Entity> pred, Function<Entity, Float> inflateRadius) {
         double d0 = Double.MAX_VALUE;
         Entity entity = null;
         Vec3 hit = null;
         for (Entity entity1 : world.getEntities(e, aabb, pred)) {
-            AABB axisalignedbb = entity1.getBoundingBox().inflate(0.3F);
+            AABB axisalignedbb = entity1.getBoundingBox().inflate(inflateRadius.apply(entity1));
             if (axisalignedbb.contains(from)) {
                 entity = entity1;
                 hit = from;
