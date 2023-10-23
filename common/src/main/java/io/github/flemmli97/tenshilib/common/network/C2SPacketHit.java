@@ -37,12 +37,12 @@ public class C2SPacketHit implements Packet {
 
     public static void handlePacket(C2SPacketHit pkt, ServerPlayer player) {
         ItemStack stack = player.getMainHandItem();
-        if (pkt.type == HitType.EXT && stack.getItem() instanceof IExtendedWeapon item) {
+        if (pkt.type == HitType.EXT && stack.getItem() instanceof IExtendedWeapon item && item.onServerSwing(player, stack)) {
             EntityHitResult res = RayTraceUtils.calculateEntityFromLook(player, item.getRange(player, stack));
-            if (res != null && res.getEntity() != null)
+            if (res != null && res.getEntity() != null && item.onHit(player, stack, res.getEntity()))
                 player.attack(res.getEntity());
         }
-        if (pkt.type == HitType.AOE && stack.getItem() instanceof IAOEWeapon weapon) {
+        if (pkt.type == HitType.AOE && stack.getItem() instanceof IAOEWeapon weapon && weapon.onServerSwing(player, stack)) {
             AOEWeaponHandler.onAOEWeaponSwing(player, stack, weapon);
         }
     }

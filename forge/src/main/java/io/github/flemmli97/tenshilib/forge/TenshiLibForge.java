@@ -28,7 +28,6 @@ public class TenshiLibForge {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         IEventBus forgeBus = MinecraftForge.EVENT_BUS;
         modBus.addListener(TenshiLibForge::preInit);
-        forgeBus.addListener(CommonEvents::leftClickBlock);
         forgeBus.addListener(CommonEvents::disableOffhand);
         forgeBus.addListener(CommonEvents::disableOffhandBlock);
         PatreonImpl.initPatreonData();
