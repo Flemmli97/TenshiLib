@@ -63,7 +63,7 @@ public class CommentedJsonConfig {
             if (object.has(e.getKey())) {
                 CommentedVal<Object> val = (CommentedVal<Object>) e.getValue();
                 try {
-                    Object v = gson.fromJson(object.get(e.getKey()).getAsJsonObject().get("input"), val.input.getClass());
+                    Object v = gson.fromJson(object.get(e.getKey()).getAsJsonObject().get("input"), val.getInputClass());
                     if (v == null && !val.allowNullValue)
                         throw new JsonSyntaxException("Value was null for " + e.getKey());
                     val.set(v);
@@ -103,6 +103,10 @@ public class CommentedJsonConfig {
 
         public void set(T value) {
             this.input = value;
+        }
+
+        public Class<?> getInputClass() {
+            return this.input.getClass();
         }
     }
 
@@ -145,6 +149,11 @@ public class CommentedJsonConfig {
         private ListVal(List<String> comments, List<T> input, Predicate<T> test) {
             super(comments, input, false);
             this.validator = test;
+        }
+
+        @Override
+        public Class<?> getInputClass() {
+            return List.class;
         }
     }
 

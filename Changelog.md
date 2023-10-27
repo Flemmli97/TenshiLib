@@ -1,3 +1,7 @@
+TenshiLib 1.7.2
+================
+- Use generic list class for list config
+
 TenshiLib 1.7.1
 ================
 - Fix nullpointer crash in gui
