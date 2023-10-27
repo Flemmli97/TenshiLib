@@ -1,6 +1,6 @@
 TenshiLib 1.7.2
 ================
-- Use generic list class for list config
+- Use generic list class for list config. Fixes some config crashes
 
 TenshiLib 1.7.1
 ================
