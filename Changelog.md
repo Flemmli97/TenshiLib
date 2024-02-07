@@ -1,3 +1,7 @@
+TenshiLib 1.7.3
+================
+- Rewrote how animations are interpolated in between
+
 TenshiLib 1.7.2
 ================
 - Use generic list class for list config. Fixes some config crashes
