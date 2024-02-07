@@ -7,7 +7,7 @@ public class AnimatedAction {
     public static final AnimatedAction vanillaAttack = new AnimatedAction(20, 1, "vanilla");
     public static final AnimatedAction[] vanillaAttackOnly = {vanillaAttack};
 
-    private final int length, attackTime, fadeTick;
+    private final int length, attackTime;
     private final boolean shouldRunOut;
     private final String id, animationClient;
     private final float speed;
@@ -27,7 +27,7 @@ public class AnimatedAction {
      * @param id     Unique id for the animation
      */
     public AnimatedAction(int length, String id) {
-        this(length, 1, id, id, 1, true, 0);
+        this(length, 1, id, id, 1, true);
     }
 
     /**
@@ -37,7 +37,7 @@ public class AnimatedAction {
      *                   Example in a sword slash do the damage mid swing and not at the beginning.
      */
     public AnimatedAction(double length, double attackTime, String id) {
-        this((int) Math.ceil(length * 20), (int) Math.ceil(attackTime * 20), id, id, 1, true, 0);
+        this((int) Math.ceil(length * 20), (int) Math.ceil(attackTime * 20), id, id, 1, true);
     }
 
     /**
@@ -47,24 +47,23 @@ public class AnimatedAction {
      *                   Example in a sword slash do the damage mid swing and not at the beginning.
      */
     public AnimatedAction(int length, int attackTime, String id) {
-        this(length, attackTime, id, id, 1, true, 0);
+        this(length, attackTime, id, id, 1, true);
     }
 
     /**
      * Use the builder {@link #builder}
      */
-    private AnimatedAction(int length, int attackTime, String id, String animationClient, float speedMod, boolean shouldRunOut, int fadeTick) {
+    private AnimatedAction(int length, int attackTime, String id, String animationClient, float speedMod, boolean shouldRunOut) {
         this.speed = speedMod;
         this.length = Math.max(1, length);
         this.attackTime = Mth.clamp(attackTime, 1, this.length);
         this.id = id;
         this.animationClient = animationClient;
         this.shouldRunOut = shouldRunOut;
-        this.fadeTick = fadeTick;
     }
 
     public static AnimatedAction copyOf(AnimatedAction animatedAction, String id) {
-        return new AnimatedAction(animatedAction.length, animatedAction.attackTime, id, animatedAction.animationClient, animatedAction.speed, animatedAction.shouldRunOut, animatedAction.fadeTick);
+        return new AnimatedAction(animatedAction.length, animatedAction.attackTime, id, animatedAction.animationClient, animatedAction.speed, animatedAction.shouldRunOut);
     }
 
     public static AnimatedAction.Builder builder(int length, String id) {
@@ -82,7 +81,7 @@ public class AnimatedAction {
      * @return Creates a new copy instance of the animation with the given speed modifier
      */
     public AnimatedAction create(float speed) {
-        return new AnimatedAction(this.length, this.attackTime, this.id, this.animationClient, speed, this.shouldRunOut, this.fadeTick);
+        return new AnimatedAction(this.length, this.attackTime, this.id, this.animationClient, speed, this.shouldRunOut);
     }
 
     public boolean tick() {
@@ -90,7 +89,7 @@ public class AnimatedAction {
     }
 
     public boolean tick(int offSet) {
-        return (this.ticker += 1 * this.speed) >= (this.length + offSet) && this.shouldRunOut;
+        return (this.ticker += this.speed) >= (this.length + offSet) && this.shouldRunOut;
     }
 
     public float getSpeed() {
@@ -101,8 +100,18 @@ public class AnimatedAction {
         return this.isAtTick(this.attackTime);
     }
 
+    /**
+     * @return In most cases this should be used. E.g. animations only take an int
+     */
     public int getTick() {
         return (int) this.ticker;
+    }
+
+    /**
+     * @return The under the hood float ticker
+     */
+    public float getTickRaw() {
+        return this.ticker;
     }
 
     public boolean isAtTick(double tick) {
@@ -113,7 +122,14 @@ public class AnimatedAction {
      * @return True if the current animation is at the given tick. Use this instead of #getTick() == tick since this respects animation speed
      */
     public boolean isAtTick(int tick) {
-        return this.speedAdjustedTick() == tick;
+        if (this.speed == 1)
+            return this.getTick() == tick;
+        if (this.speed < 1) {
+            int lower = (int) (this.ticker - this.speed);
+            return lower != tick && this.getTick() == tick;
+        }
+        float next = this.ticker + this.speed;
+        return this.ticker <= tick && tick < next;
     }
 
     public boolean isPastTick(double tick) {
@@ -121,16 +137,10 @@ public class AnimatedAction {
     }
 
     /**
-     * @return True if the current animation is past the given tick. Use this instead of #getTick() >= tick since this respects animation speed
+     * @return True if the current animation is past the given tick
      */
     public boolean isPastTick(int tick) {
-        return this.speedAdjustedTick() >= tick;
-    }
-
-    public int speedAdjustedTick() {
-        float adjusted = this.ticker / this.speed;
-        int ceil = Mth.ceil(adjusted);
-        return (ceil - adjusted) < 0.001 && (ceil - adjusted) > 0 ? ceil : (int) adjusted;
+        return this.getTick() >= tick;
     }
 
     public int getLength() {
@@ -167,10 +177,6 @@ public class AnimatedAction {
         return this.shouldRunOut;
     }
 
-    public int getFadeTick() {
-        return this.fadeTick;
-    }
-
     @Override
     public String toString() {
         return "ID: " + this.id + "; length: " + this.length + "; attackTime: " + this.attackTime + "; speed: " + this.speed;
@@ -192,7 +198,6 @@ public class AnimatedAction {
 
         private final int length;
         private int attackTime = 1;
-        private int fadeTick;
         private boolean shouldRunOut = true;
         private final String id;
         private String animationClient;
@@ -243,16 +248,8 @@ public class AnimatedAction {
             return this;
         }
 
-        /**
-         * A delay used for when the animation changes. For interpolation stuff
-         */
-        public Builder changeDelay(int delay) {
-            this.fadeTick = delay;
-            return this;
-        }
-
         public AnimatedAction build() {
-            return new AnimatedAction(this.length, this.attackTime, this.id, this.animationClient, this.speed, this.shouldRunOut, this.fadeTick);
+            return new AnimatedAction(this.length, this.attackTime, this.id, this.animationClient, this.speed, this.shouldRunOut);
         }
     }
 }

@@ -15,7 +15,7 @@ public class AnimationHandler<T extends Entity & IAnimated> {
 
     public static final int DEFAULT_ADJUST_TIME = 3;
 
-    private AnimatedAction currentAnim;
+    private AnimatedAction currentAnim, lastAnim;
     private final T entity;
     private final AnimatedAction[] anims;
     private Predicate<AnimatedAction> onAnimationSetFunc;
@@ -23,9 +23,6 @@ public class AnimationHandler<T extends Entity & IAnimated> {
     private Consumer<AnimatedAction> onRunAnimation;
     private Function<AnimatedAction, Float> animationSpeedHandler;
     private int timeSinceLastChange;
-    private int delayedCounterMax;
-    private int delayedCounter = -1;
-    private Runnable delayedAction;
 
     public AnimationHandler(T entity, AnimatedAction[] anims) {
         this.entity = entity;
@@ -81,21 +78,11 @@ public class AnimationHandler<T extends Entity & IAnimated> {
             this.onAnimationSetCons.accept(anim);
         if (this.onAnimationSetFunc != null && this.onAnimationSetFunc.test(anim))
             return;
+        this.lastAnim = this.currentAnim;
         this.timeSinceLastChange = 0;
-        if (this.currentAnim != null && this.currentAnim.getFadeTick() > 0) {
-            this.delayedAction = () -> {
-                this.currentAnim = anim == null ? null : anim.create(this.animationSpeedHandler == null ? anim.getSpeed() : this.animationSpeedHandler.apply(anim));
-                if (!this.entity.level().isClientSide) {
-                    EventCalls.INSTANCE.sendEntityAnimationPacket(this.entity);
-                }
-            };
-            this.delayedCounter = this.currentAnim.getFadeTick();
-            this.delayedCounterMax = this.delayedCounter;
-        } else {
-            this.currentAnim = anim == null ? null : anim.create(this.animationSpeedHandler == null ? anim.getSpeed() : this.animationSpeedHandler.apply(anim));
-            if (!this.entity.level().isClientSide) {
-                EventCalls.INSTANCE.sendEntityAnimationPacket(this.entity);
-            }
+        this.currentAnim = anim == null ? null : anim.create(this.animationSpeedHandler == null ? anim.getSpeed() : this.animationSpeedHandler.apply(anim));
+        if (!this.entity.level().isClientSide) {
+            EventCalls.INSTANCE.sendEntityAnimationPacket(this.entity);
         }
     }
 
@@ -127,20 +114,16 @@ public class AnimationHandler<T extends Entity & IAnimated> {
         return this.timeSinceLastChange;
     }
 
+    public AnimatedAction getLastAnim() {
+        return this.lastAnim;
+    }
+
     public void tick() {
         if (this.hasAnimation()) {
             if (this.getAnimation().tick())
                 this.setAnimation(null);
             else if (this.onRunAnimation != null)
                 this.onRunAnimation.accept(this.getAnimation());
-            if (this.delayedAction != null) {
-                --this.delayedCounter;
-                if (this.delayedCounter < 0) {
-                    this.delayedAction.run();
-                    this.delayedAction = null;
-                    this.delayedCounterMax = 0;
-                }
-            }
         }
         this.timeSinceLastChange++;
     }
@@ -169,8 +152,6 @@ public class AnimationHandler<T extends Entity & IAnimated> {
     }
 
     public float getInterpolatedAnimationVal(float partialTicks, float adjustTime) {
-        if (this.delayedCounter >= 0)
-            return Mth.clamp((this.delayedCounter - partialTicks) / (float) this.delayedCounterMax, 0, 1);
         return Mth.clamp((this.getTimeSinceLastChange() + partialTicks) / adjustTime, 0, 1);
     }
 }
