@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 /**
  * Simple molang animation parser cause yes.
- * Made it cause I didn't want to use another library and also as a way of learning.
+ * Made it because I didn't want to use another library and also as a way of learning.
  * Can parse simple math expressions with sin and cos support and a single variable
  * of name "time" or "query.time".
  * sin and cos both use deg
@@ -75,8 +75,8 @@ public class SimpleAnimationExpression {
         List<String> bracketSS = new ArrayList<>();
 
         int bracket = 0;
-        for (int i = 0; i < sub.length; i++) {
-            Type type = type(sub[i]);
+        for (String s : sub) {
+            Type type = type(s);
             if (type == Type.BRACKETOPEN) {
                 bracket++;
             }
@@ -91,11 +91,11 @@ public class SimpleAnimationExpression {
                 }
             }
             if (bracket > 0) {
-                bracketSS.add(sub[i]);
+                bracketSS.add(s);
                 continue;
             }
             if (type == Type.NUMBER)
-                consts.push(new ConstantValue(Float.parseFloat(sub[i])));
+                consts.push(new ConstantValue(Float.parseFloat(s)));
             else if (type == Type.VAR)
                 consts.push(new TickValue());
             else if (!ops.isEmpty() && ops.peek().priority > type.priority) {
@@ -137,7 +137,8 @@ public class SimpleAnimationExpression {
                 }
                 Value sec = prev == null ? stack.pop() : prev;
                 Value first = stack.pop();
-                return new Substraction(first, sec);
+                // Cause our whole thing is right assosiative we need to inverse the 2. part for sub
+                return new Substraction(first, sec instanceof BiValue b ? b.negateSecond() : sec);
             }
             case MULT -> {
                 Value sec = prev == null ? stack.pop() : prev;

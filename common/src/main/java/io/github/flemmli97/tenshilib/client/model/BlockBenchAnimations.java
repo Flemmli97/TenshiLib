@@ -52,41 +52,43 @@ public class BlockBenchAnimations {
         float interpolationRev = 1 - interpolation;
         boolean changed = false;
         if (last != null && interpolationRev > 0) {
-            changed = this.doAnimation(model, last.getAnimationClient(), last.getTick(), partialTicks, interpolationRev, mirror, InterpolationCheck.END);
+            changed = this.doAnimation(model, last.getAnimationClient(), last.getTick(), partialTicks, current != null ? 1 : interpolationRev, mirror, InterpolationCheck.END, false);
         }
         if (current != null) {
-            changed = this.doAnimation(model, current.getAnimationClient(), current.getTick(), partialTicks, interpolation, mirror, InterpolationCheck.START);
+            changed = this.doAnimation(model, current.getAnimationClient(), current.getTick(), partialTicks, interpolation, mirror, InterpolationCheck.START, changed);
         }
         return changed;
     }
 
     public boolean doAnimation(ExtendedModel model, String name, int ticker, float partialTicks, float interpolation, boolean mirror) {
-        return this.doAnimation(model, name, ticker, partialTicks, interpolation, mirror, InterpolationCheck.NONE);
+        return this.doAnimation(model, name, ticker, partialTicks, interpolation, mirror, InterpolationCheck.NONE, false);
     }
 
     /**
      * Run the given animation
      *
-     * @param model         The model to run the animation on
-     * @param name          The name of the animation
-     * @param ticker        Animation ticker
-     * @param partialTicks  Partial tick for lerping
-     * @param interpolation An interpolation value between 0-1 indicating
-     * @param mirror        If true mirrors the animation. Components with "left"/"right" in their names will be swapped
-     * @param check         What to do with interpolating the animation:
-     *                      NONE: interpolation value is always applied
-     *                      START: interpolation value is only applied if the animation starts in a non default pose
-     *                      END: interpolation value is only applied if the animation ends in a non default pose
+     * @param model                  The model to run the animation on
+     * @param name                   The name of the animation
+     * @param ticker                 Animation ticker
+     * @param partialTicks           Partial tick for lerping
+     * @param interpolation          An interpolation value between 0-1 indicating
+     * @param mirror                 If true mirrors the animation. Components with "left"/"right" in their names will be swapped
+     * @param check                  What to do with interpolating the animation:
+     *                               NONE: interpolation value is always applied
+     *                               START: interpolation value is only applied if the animation starts in a non default pose
+     *                               END: interpolation value is only applied if the animation ends in a non default pose
+     * @param interpolateFromCurrent If difference between this animation and the current model values should be used as interpolation
      * @return True if the animation is being played
      */
-    public boolean doAnimation(ExtendedModel model, String name, int ticker, float partialTicks, float interpolation, boolean mirror, InterpolationCheck check) {
+    public boolean doAnimation(ExtendedModel model, String name, int ticker, float partialTicks, float interpolation, boolean mirror, InterpolationCheck check,
+                               boolean interpolateFromCurrent) {
         Animation animation = this.animations.get(name);
         if (animation != null && interpolation != 0) {
             if (check == InterpolationCheck.END && animation.endsDefault)
                 return false;
             if (check == InterpolationCheck.START && animation.startsDefault)
                 interpolation = 1;
-            animation.animate(model, ticker, partialTicks, Mth.clamp(interpolation, 0, 1), mirror);
+            animation.animate(model, ticker, partialTicks, Mth.clamp(interpolation, 0, 1), mirror, interpolateFromCurrent);
             return true;
         }
         return false;
@@ -132,12 +134,12 @@ public class BlockBenchAnimations {
             });
         }
 
-        public void animate(ExtendedModel model, int ticker, float partialTicks, float interpolation, boolean mirror) {
+        public void animate(ExtendedModel model, int ticker, float partialTicks, float interpolation, boolean mirror, boolean interpolateFromCurrent) {
             float actualTick = Math.max(ticker - 1 + partialTicks, 0);
             if (this.loop)
                 actualTick = actualTick % this.length;
             for (AnimationComponent comp : this.components)
-                comp.animate(model, actualTick, interpolation, mirror);
+                comp.animate(model, actualTick, interpolation, mirror, interpolateFromCurrent);
         }
 
         @Override
@@ -238,7 +240,7 @@ public class BlockBenchAnimations {
             return null;
         }
 
-        public void animate(ExtendedModel model, float actualTick, float interpolation, boolean mirror) {
+        public void animate(ExtendedModel model, float actualTick, float interpolation, boolean mirror, boolean interpolateFromCurrent) {
             ModelPartHandler.ModelPartExtended modelPart = model.getHandler().getPartNullable(this.name);
             if (mirror) {
                 //Try getting the mirrored modelpart
@@ -279,16 +281,34 @@ public class BlockBenchAnimations {
                         rot = this.rotations[id];
                     AnimationValue rotPrev = this.rotations[id - 1];
                     float prog = Mth.clamp((actualTick - rotPrev.startTick) / (rot.startTick - rotPrev.startTick), 0F, 1F);
-                    modelPart.xRot += Mth.DEG_TO_RAD * (this.interpolate(rotPrev.getXVal(secTime), rot.getXVal(secTime), prog) % 360) * interpolation;
-                    modelPart.yRot += Mth.DEG_TO_RAD * (this.interpolate(rotPrev.getYVal(secTime), rot.getYVal(secTime), prog) % 360) * interpolation * mirrorMult;
-                    modelPart.zRot += Mth.DEG_TO_RAD * (this.interpolate(rotPrev.getZVal(secTime), rot.getZVal(secTime), prog) % 360) * interpolation * mirrorMult;
+                    float x = (this.interpolate(rotPrev.getXVal(secTime), rot.getXVal(secTime), prog) % 360) * mirrorMult;
+                    float y = (this.interpolate(rotPrev.getYVal(secTime), rot.getYVal(secTime), prog) % 360);
+                    float z = (this.interpolate(rotPrev.getZVal(secTime), rot.getZVal(secTime), prog) % 360);
+                    if (interpolateFromCurrent) {
+                        modelPart.xRot += Mth.DEG_TO_RAD * this.smallestDegDiff(x, modelPart.xRot) * interpolation;
+                        modelPart.yRot += Mth.DEG_TO_RAD * this.smallestDegDiff(y, modelPart.yRot) * interpolation;
+                        modelPart.zRot += Mth.DEG_TO_RAD * this.smallestDegDiff(z, modelPart.zRot) * interpolation;
+                    } else {
+                        modelPart.xRot += Mth.DEG_TO_RAD * x * interpolation;
+                        modelPart.yRot += Mth.DEG_TO_RAD * y * interpolation;
+                        modelPart.zRot += Mth.DEG_TO_RAD * z * interpolation;
+                    }
                 }
             }
             if (this.scales != null) {
                 if (this.scales.length == 1) {
-                    modelPart.xScale += (this.scales[0].getXVal(secTime) - 1) * interpolation;
-                    modelPart.yScale += (this.scales[0].getYVal(secTime) - 1) * interpolation;
-                    modelPart.zScale += (this.scales[0].getZVal(secTime) - 1) * interpolation;
+                    float x = (this.scales[0].getXVal(secTime) - 1);
+                    float y = (this.scales[0].getYVal(secTime) - 1);
+                    float z = (this.scales[0].getZVal(secTime) - 1);
+                    if (interpolateFromCurrent) {
+                        modelPart.xScale += (x - modelPart.xScale) * interpolation;
+                        modelPart.yScale += (y - modelPart.yScale) * interpolation;
+                        modelPart.zScale += (z - modelPart.zScale) * interpolation;
+                    } else {
+                        modelPart.xScale += x * interpolation;
+                        modelPart.yScale += y * interpolation;
+                        modelPart.zScale += z * interpolation;
+                    }
                 } else {
                     int id = 1;
                     AnimationValue scale = this.scales[id];
@@ -296,11 +316,27 @@ public class BlockBenchAnimations {
                         scale = this.scales[id];
                     AnimationValue scalePrev = this.scales[id - 1];
                     float prog = Mth.clamp((actualTick - scalePrev.startTick) / (scale.startTick - scalePrev.startTick), 0F, 1F);
-                    modelPart.xScale += this.interpolate(scalePrev.getXVal(secTime) - 1, scale.getXVal(secTime) - 1, prog) * interpolation;
-                    modelPart.yScale += this.interpolate(scalePrev.getYVal(secTime) - 1, scale.getYVal(secTime) - 1, prog) * interpolation;
-                    modelPart.zScale += this.interpolate(scalePrev.getZVal(secTime) - 1, scale.getZVal(secTime) - 1, prog) * interpolation;
+                    float x = this.interpolate(scalePrev.getXVal(secTime) - 1, scale.getXVal(secTime) - 1, prog);
+                    float y = this.interpolate(scalePrev.getYVal(secTime) - 1, scale.getYVal(secTime) - 1, prog);
+                    float z = this.interpolate(scalePrev.getZVal(secTime) - 1, scale.getZVal(secTime) - 1, prog);
+                    if (interpolateFromCurrent) {
+                        modelPart.xScale += (x - modelPart.xScale) * interpolation;
+                        modelPart.yScale += (y - modelPart.yScale) * interpolation;
+                        modelPart.zScale += (z - modelPart.zScale) * interpolation;
+                    } else {
+                        modelPart.xScale += x * interpolation;
+                        modelPart.yScale += y * interpolation;
+                        modelPart.zScale += z * interpolation;
+                    }
                 }
             }
+        }
+
+        private float smallestDegDiff(float first, float sec) {
+            sec = (Mth.RAD_TO_DEG * sec) % 360;
+            float diff1 = first - sec;
+            float diff2 = sec - first;
+            return Math.abs(diff1) > Math.abs(diff2) ? diff2 : diff1;
         }
 
         private float interpolate(float start, float end, float progress) {
