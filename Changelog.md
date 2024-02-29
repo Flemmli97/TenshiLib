@@ -1,3 +1,8 @@
+TenshiLib 1.7.4
+================
+- Change interpolation between animations 
+- Fix math evaluator for animation
+
 TenshiLib 1.7.3
 ================
 - Rewrote how animations are interpolated in between
