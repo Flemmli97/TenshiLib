@@ -22,13 +22,13 @@ public class InitUtil {
             i++;
         }
         if (clss == null)
-            TenshiLib.logger.fatal("No Implementation of " + abstractClss + " found with given paths " + Arrays.toString(impls));
+            TenshiLib.LOGGER.fatal("No Implementation of " + abstractClss + " found with given paths " + Arrays.toString(impls));
         else if (abstractClss.isAssignableFrom(clss)) {
             try {
                 Constructor<T> constructor = (Constructor<T>) clss.getDeclaredConstructor();
                 return constructor.newInstance();
             } catch (NoSuchMethodException e) {
-                TenshiLib.logger.fatal("Implementation of " + clss + " needs to provide an no arg constructor");
+                TenshiLib.LOGGER.fatal("Implementation of " + clss + " needs to provide an no arg constructor");
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }

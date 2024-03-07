@@ -24,8 +24,8 @@ import java.util.Random;
 public class RenderUtils {
 
     public static final int defaultColor = 0xFFFFFFFF;
-    private static final float triangleMult = (float) (Math.sqrt(3.0D) / 2.0D);
-    private static final Random random = new Random(432L);
+    private static final float TRIANGLE_MULT = (float) (Math.sqrt(3.0D) / 2.0D);
+    private static final Random RANDOM = new Random(432L);
 
     public static void renderBlockOutline(PoseStack matrixStack, MultiBufferSource buffer, Player player, BlockPos pos, float partialTicks, boolean drawImmediately) {
         renderBlockOutline(matrixStack, buffer, player, pos, partialTicks, 0, 0, 0, 1, drawImmediately);
@@ -112,12 +112,12 @@ public class RenderUtils {
 
     public static void renderGradientBeams3d(PoseStack stack, MultiBufferSource renderTypeBuffer, float length, float width, int ticks, float partialTicks, float rotationPerTick, int amount, BeamBuilder builder) {
         stack.pushPose();
-        random.setSeed(432L);
+        RANDOM.setSeed(432L);
         for (int i = 0; i < amount; i++) {
             float ticker = ticks + partialTicks;
-            stack.mulPose(Axis.XP.rotationDegrees(random.nextFloat() * 360.0F));
-            stack.mulPose(Axis.YP.rotationDegrees(random.nextFloat() * 360.0F));
-            stack.mulPose(Axis.ZP.rotationDegrees(random.nextFloat() * 360.0F + ticker * rotationPerTick));
+            stack.mulPose(Axis.XP.rotationDegrees(RANDOM.nextFloat() * 360.0F));
+            stack.mulPose(Axis.YP.rotationDegrees(RANDOM.nextFloat() * 360.0F));
+            stack.mulPose(Axis.ZP.rotationDegrees(RANDOM.nextFloat() * 360.0F + ticker * rotationPerTick));
             renderGradientBeam3d(stack, renderTypeBuffer, length, width, builder);
         }
         stack.popPose();
@@ -129,7 +129,7 @@ public class RenderUtils {
      * @param builder Structure containing rendering info like color etc. Is mutable so cache an instance of it.
      */
     public static void renderGradientBeam3d(PoseStack stack, MultiBufferSource renderTypeBuffer, float length, float width, BeamBuilder builder) {
-        float heightHalf = triangleMult * width * 0.5f;
+        float heightHalf = TRIANGLE_MULT * width * 0.5f;
         float widthHalf = width * 0.5f;
         Matrix4f matrix4f = stack.last().pose();
         VertexConsumer buffer = renderTypeBuffer.getBuffer(builder.renderType);
@@ -151,12 +151,12 @@ public class RenderUtils {
 
     public static void renderGradientBeams(PoseStack matrixStack, MultiBufferSource renderTypeBuffer, float length, float width, int ticks, float partialTicks, float rotationPerTick, int amount, BeamBuilder builder) {
         matrixStack.pushPose();
-        random.setSeed(432L);
+        RANDOM.setSeed(432L);
         for (int i = 0; i < amount; i++) {
             float ticker = ticks + partialTicks;
-            matrixStack.mulPose(Axis.XP.rotationDegrees(random.nextFloat() * 360.0F));
-            matrixStack.mulPose(Axis.YP.rotationDegrees(random.nextFloat() * 360.0F));
-            matrixStack.mulPose(Axis.ZP.rotationDegrees(random.nextFloat() * 360.0F + ticker * rotationPerTick));
+            matrixStack.mulPose(Axis.XP.rotationDegrees(RANDOM.nextFloat() * 360.0F));
+            matrixStack.mulPose(Axis.YP.rotationDegrees(RANDOM.nextFloat() * 360.0F));
+            matrixStack.mulPose(Axis.ZP.rotationDegrees(RANDOM.nextFloat() * 360.0F + ticker * rotationPerTick));
             renderGradientBeam(matrixStack, renderTypeBuffer, length, width, builder);
         }
         matrixStack.popPose();

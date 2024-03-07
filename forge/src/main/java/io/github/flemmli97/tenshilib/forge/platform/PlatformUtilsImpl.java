@@ -103,7 +103,7 @@ public class PlatformUtilsImpl extends PlatformUtils {
     @Override
     public <T> SimpleRegistryWrapper<T> registry(ResourceKey<? extends Registry<T>> key) {
         return this.forgeRegistryFrom(key).map(reg -> ((SimpleRegistryWrapper<T>) new ForgeRegistryWrapper<>(reg)))
-                .orElseGet(() -> new VanillaRegistryWrapper<T>(this.registryFrom(key)));
+                .orElseGet(() -> new VanillaRegistryWrapper<>(this.registryFrom(key)));
     }
 
     @SuppressWarnings("unchecked")

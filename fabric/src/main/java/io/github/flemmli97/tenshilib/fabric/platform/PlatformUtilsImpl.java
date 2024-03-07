@@ -92,7 +92,7 @@ public class PlatformUtilsImpl extends PlatformUtils {
 
     @Override
     public <T> SimpleRegistryWrapper<T> registry(ResourceKey<? extends Registry<T>> key) {
-        return new VanillaRegistryWrapper<T>(this.registryFrom(key));
+        return new VanillaRegistryWrapper<>(this.registryFrom(key));
     }
 
     @Override
@@ -102,7 +102,7 @@ public class PlatformUtilsImpl extends PlatformUtils {
 
     @Override
     public <T extends CustomRegistryEntry<T>> PlatformRegistry<T> customRegistry(ResourceKey<? extends Registry<T>> registryKey, ResourceLocation defaultVal, boolean saveToDisk, boolean sync) {
-        FabricRegistryBuilder<T, WritableRegistry<T>> builder = FabricRegistryBuilder.from(new DefaultedMappedRegistry<T>(defaultVal.toString(), registryKey, Lifecycle.stable(), false));
+        FabricRegistryBuilder<T, WritableRegistry<T>> builder = FabricRegistryBuilder.from(new DefaultedMappedRegistry<>(defaultVal.toString(), registryKey, Lifecycle.stable(), false));
         if (saveToDisk)
             builder.attribute(RegistryAttribute.SYNCED);
         if (sync)

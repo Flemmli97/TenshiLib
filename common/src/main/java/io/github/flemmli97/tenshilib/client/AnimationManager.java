@@ -21,12 +21,12 @@ import java.util.Map;
  */
 public class AnimationManager implements ResourceManagerReloadListener {
 
-    private static final Gson gson = new Gson();
+    private static final Gson GSON = new Gson();
 
-    private static final AnimationManager instance = new AnimationManager();
+    private static final AnimationManager INSTANCE = new AnimationManager();
 
     public static AnimationManager getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     private final Map<ResourceLocation, BlockBenchAnimations> animations = new HashMap<>();
@@ -37,7 +37,7 @@ public class AnimationManager implements ResourceManagerReloadListener {
         for (Map.Entry<ResourceLocation, Resource> res : anims.entrySet()) {
             try {
                 InputStream input = res.getValue().open();
-                JsonObject obj = gson.getAdapter(JsonObject.class).read(gson.newJsonReader(new InputStreamReader(input)));
+                JsonObject obj = GSON.getAdapter(JsonObject.class).read(GSON.newJsonReader(new InputStreamReader(input)));
                 ResourceLocation animID = new ResourceLocation(res.getKey().getNamespace(), res.getKey().getPath().replace("animation/entity/", "").replace(".json", ""));
                 BlockBenchAnimations anim = this.getAnimation(animID);
                 anim.reload(obj);

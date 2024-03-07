@@ -9,9 +9,9 @@ import java.util.Optional;
 
 public class CustomDataSerializers {
 
-    private static boolean registered = false;
+    private static boolean REGISTERED = false;
 
-    public static final EntityDataSerializer<Vec3> VEC = new EntityDataSerializer<Vec3>() {
+    public static final EntityDataSerializer<Vec3> VEC = new EntityDataSerializer<>() {
 
         @Override
         public void write(FriendlyByteBuf buffer, Vec3 value) {
@@ -31,7 +31,7 @@ public class CustomDataSerializers {
         }
     };
 
-    public static final EntityDataSerializer<Optional<Vec3>> OPTIONAL_VEC = new EntityDataSerializer<Optional<Vec3>>() {
+    public static final EntityDataSerializer<Optional<Vec3>> OPTIONAL_VEC = new EntityDataSerializer<>() {
 
         @Override
         public void write(FriendlyByteBuf buffer, Optional<Vec3> value) {
@@ -58,9 +58,9 @@ public class CustomDataSerializers {
     };
 
     public static void register() {
-        if (registered)
+        if (REGISTERED)
             return;
-        registered = true;
+        REGISTERED = true;
         EntityDataSerializers.registerSerializer(VEC);
         EntityDataSerializers.registerSerializer(OPTIONAL_VEC);
     }

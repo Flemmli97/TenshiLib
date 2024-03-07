@@ -19,8 +19,6 @@ public class JsonConfig<T> {
 
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-    private static final Gson GSONCommentSaver = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-
     private final Path file;
     private T element;
     private final Class<T> type;
@@ -122,7 +120,7 @@ public class JsonConfig<T> {
             reader.close();
         } catch (IllegalStateException | JsonSyntaxException e) {
             try {
-                TenshiLib.logger.error("Json config doesn't match expected config. Creating a backup. This is probably caused either by a config update or malformed json.");
+                TenshiLib.LOGGER.error("Json config doesn't match expected config. Creating a backup. This is probably caused either by a config update or malformed json.");
                 e.printStackTrace();
                 int back = 0;
                 String file = this.file.getFileName().toString() + "_back";

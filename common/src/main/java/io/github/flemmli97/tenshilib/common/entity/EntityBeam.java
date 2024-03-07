@@ -18,6 +18,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -36,12 +37,13 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
     protected HitResult hit;
     protected Vec3 hitVec;
 
-    protected static final EntityDataAccessor<Optional<UUID>> shooterUUID = SynchedEntityData.defineId(EntityBeam.class, EntityDataSerializers.OPTIONAL_UUID);
+    protected static final EntityDataAccessor<Optional<UUID>> SHOOTER_UUID = SynchedEntityData.defineId(EntityBeam.class, EntityDataSerializers.OPTIONAL_UUID);
 
     protected final Predicate<Entity> notShooter = (entity) -> entity != EntityBeam.this.getOwner() && EntitySelector.NO_SPECTATORS.test(entity) && entity.isPickable();
 
     public EntityBeam(EntityType<? extends EntityBeam> type, Level world) {
         super(type, world);
+        Block.UPDATE_ALL
         this.noCulling = true;
     }
 
@@ -53,7 +55,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
     public EntityBeam(EntityType<? extends EntityBeam> type, Level world, LivingEntity shooter) {
         this(type, world, shooter.getX(), shooter.getY() + shooter.getEyeHeight() - 0.1, shooter.getZ());
         this.shooter = shooter;
-        this.entityData.set(shooterUUID, Optional.of(shooter.getUUID()));
+        this.entityData.set(SHOOTER_UUID, Optional.of(shooter.getUUID()));
         this.setRot(shooter.yHeadRot, shooter.getXRot());
     }
 
@@ -134,7 +136,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
 
     @Override
     protected void defineSynchedData() {
-        this.entityData.define(shooterUUID, Optional.empty());
+        this.entityData.define(SHOOTER_UUID, Optional.empty());
     }
 
     @Override
@@ -205,20 +207,20 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
     @Override
     public void readAdditionalSaveData(CompoundTag compound) {
         if (compound.hasUUID("Shooter"))
-            this.entityData.set(shooterUUID, Optional.of(compound.getUUID("Shooter")));
+            this.entityData.set(SHOOTER_UUID, Optional.of(compound.getUUID("Shooter")));
         this.shooter = this.getOwner();
         this.livingTicks = compound.getInt("LivingTicks");
     }
 
     @Override
     public void addAdditionalSaveData(CompoundTag compound) {
-        this.entityData.get(shooterUUID).ifPresent(uuid -> compound.putUUID("Shooter", uuid));
+        this.entityData.get(SHOOTER_UUID).ifPresent(uuid -> compound.putUUID("Shooter", uuid));
         compound.putInt("LivingTicks", this.livingTicks);
     }
 
     @Override
     public UUID getOwnerUUID() {
-        return this.entityData.get(shooterUUID).orElse(null);
+        return this.entityData.get(SHOOTER_UUID).orElse(null);
     }
 
     @Override
@@ -226,7 +228,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         if (this.shooter != null && !this.shooter.isRemoved()) {
             return this.shooter;
         }
-        this.entityData.get(shooterUUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(LivingEntity.class, this.level(), uuid));
+        this.entityData.get(SHOOTER_UUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(LivingEntity.class, this.level(), uuid));
         return this.shooter;
     }
 

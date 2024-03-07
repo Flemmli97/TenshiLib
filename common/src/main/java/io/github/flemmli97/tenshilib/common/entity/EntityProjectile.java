@@ -51,7 +51,7 @@ public abstract class EntityProjectile extends Projectile {
     private BlockState ground;
     private BlockPos groundPos;
 
-    protected static final EntityDataAccessor<Optional<UUID>> shooterUUID = SynchedEntityData.defineId(EntityProjectile.class, EntityDataSerializers.OPTIONAL_UUID);
+    protected static final EntityDataAccessor<Optional<UUID>> SHOOTER_UUID = SynchedEntityData.defineId(EntityProjectile.class, EntityDataSerializers.OPTIONAL_UUID);
 
     public EntityProjectile(EntityType<? extends EntityProjectile> type, Level world) {
         super(type, world);
@@ -65,7 +65,7 @@ public abstract class EntityProjectile extends Projectile {
     public EntityProjectile(EntityType<? extends EntityProjectile> type, Level world, LivingEntity shooter) {
         this(type, world, shooter.getX(), shooter.getY() + shooter.getEyeHeight() - 0.1, shooter.getZ());
         this.shooter = shooter;
-        this.entityData.set(shooterUUID, Optional.of(shooter.getUUID()));
+        this.entityData.set(SHOOTER_UUID, Optional.of(shooter.getUUID()));
         this.setRot(shooter.getYRot(), shooter.getXRot());
         this.onUpdateOwner();
     }
@@ -99,7 +99,7 @@ public abstract class EntityProjectile extends Projectile {
 
     @Override
     protected void defineSynchedData() {
-        this.entityData.define(shooterUUID, Optional.empty());
+        this.entityData.define(SHOOTER_UUID, Optional.empty());
     }
 
     @Override
@@ -350,7 +350,7 @@ public abstract class EntityProjectile extends Projectile {
         if (this.inGround)
             this.setInGround(NbtUtils.readBlockPos(compound.getCompound("GroundPos")));
         if (compound.hasUUID("Shooter"))
-            this.entityData.set(shooterUUID, Optional.of(compound.getUUID("Shooter")));
+            this.entityData.set(SHOOTER_UUID, Optional.of(compound.getUUID("Shooter")));
         this.shooter = this.getOwner();
         this.livingTicks = compound.getInt("LivingTicks");
         ListTag list = compound.getList("AttackedEntities", Tag.TAG_STRING);
@@ -362,7 +362,7 @@ public abstract class EntityProjectile extends Projectile {
         if (this.inGround)
             compound.put("GroundPos", NbtUtils.writeBlockPos(this.groundPos));
         compound.putBoolean("InGround", this.inGround);
-        this.entityData.get(shooterUUID).ifPresent(uuid -> compound.putUUID("Shooter", uuid));
+        this.entityData.get(SHOOTER_UUID).ifPresent(uuid -> compound.putUUID("Shooter", uuid));
         compound.putInt("LivingTicks", this.livingTicks);
         ListTag list = new ListTag();
         this.attackedEntities.forEach(uuid -> list.add(StringTag.valueOf(uuid.toString())));
@@ -375,7 +375,7 @@ public abstract class EntityProjectile extends Projectile {
         if (this.shooter != null && !this.shooter.isRemoved()) {
             return this.shooter;
         }
-        this.entityData.get(shooterUUID).ifPresent(uuid -> {
+        this.entityData.get(SHOOTER_UUID).ifPresent(uuid -> {
             this.shooter = EntityUtil.findFromUUID(Entity.class, this.level(), uuid);
             this.onUpdateOwner();
         });
@@ -386,7 +386,7 @@ public abstract class EntityProjectile extends Projectile {
     }
 
     public UUID getOwnerUUID() {
-        return this.entityData.get(shooterUUID).orElse(null);
+        return this.entityData.get(SHOOTER_UUID).orElse(null);
     }
 
     @Override
@@ -411,10 +411,10 @@ public abstract class EntityProjectile extends Projectile {
     public final void setOwner(@Nullable Entity entity) {
         if (entity == null) {
             this.shooter = null;
-            this.entityData.set(shooterUUID, Optional.empty());
+            this.entityData.set(SHOOTER_UUID, Optional.empty());
         } else {
             this.shooter = entity;
-            this.entityData.set(shooterUUID, Optional.of(entity.getUUID()));
+            this.entityData.set(SHOOTER_UUID, Optional.of(entity.getUUID()));
         }
         this.onUpdateOwner();
     }

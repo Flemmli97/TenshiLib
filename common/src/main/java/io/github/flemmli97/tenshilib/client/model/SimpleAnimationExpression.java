@@ -26,7 +26,7 @@ public class SimpleAnimationExpression {
 
     private static final String DELIMITER = "[+\\-\\*/()]";
 
-    private static final String[] delims = {
+    private static final String[] DELIMS = {
             "[+\\-\\*/()]",
             "(math\\.sin)",
             "(math\\.cos)",
@@ -49,9 +49,7 @@ public class SimpleAnimationExpression {
         };
     }
 
-    private static final String delComp = String.join("|", delims);
-
-    private static final Pattern regex = Pattern.compile(String.format(REGEX_SPLIT, delComp));
+    private static final String DEL_COMP = String.join("|", DELIMS);
 
     public static Value of(String exp) {
         exp = exp.replace(" ", "");
@@ -60,11 +58,11 @@ public class SimpleAnimationExpression {
             return new ConstantValue(f);
         } catch (NumberFormatException e) {
             try {
-                return ofSplit(exp.split(String.format(REGEX_SPLIT, delComp)));
+                return ofSplit(exp.split(String.format(REGEX_SPLIT, DEL_COMP)));
             } catch (NumberFormatException ignored) {
             }
         }
-        TenshiLib.logger.error("Couldn't parse expression " + exp);
+        TenshiLib.LOGGER.error("Couldn't parse expression " + exp);
         return new ConstantValue(0);
     }
 

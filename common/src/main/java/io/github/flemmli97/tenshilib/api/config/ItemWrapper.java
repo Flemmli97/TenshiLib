@@ -36,7 +36,7 @@ public class ItemWrapper implements IItemConfig<ItemWrapper> {
             }
             this.item = PlatformUtils.INSTANCE.items().getFromId(new ResourceLocation(this.reg));
             if (this.item == Items.AIR && (this.reg.isEmpty() || !this.reg.equals("minecraft:air")))
-                TenshiLib.logger.error("Faulty item registry name {}", this.reg);
+                TenshiLib.LOGGER.error("Faulty item registry name {}", this.reg);
         }
         return this.item;
     }

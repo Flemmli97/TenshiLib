@@ -48,7 +48,7 @@ public class SpawnEgg extends Item {
 
     private static final Map<Supplier<? extends EntityType<?>>, SpawnEgg> EGGSSUP = Maps.newIdentityHashMap();
 
-    protected static final DispenseItemBehavior def = (blockSource, stack) -> {
+    protected static final DispenseItemBehavior DEF = (blockSource, stack) -> {
         Direction direction = blockSource.getBlockState().getValue(DispenserBlock.FACING);
         spawnEntity(blockSource.getLevel(), null, stack, blockSource.getPos().relative(direction), MobSpawnType.DISPENSER, false, direction != Direction.UP, false);
         stack.shrink(1);
@@ -98,7 +98,7 @@ public class SpawnEgg extends Item {
     }
 
     public DispenseItemBehavior dispenser() {
-        return def;
+        return DEF;
     }
 
     @Override

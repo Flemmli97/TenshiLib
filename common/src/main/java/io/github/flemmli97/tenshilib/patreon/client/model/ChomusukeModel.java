@@ -23,8 +23,8 @@ import net.minecraft.world.entity.player.Player;
 public class ChomusukeModel extends EntityModel<Player> implements ExtendedModel, PatreonModelData<Player> {
 
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(TenshiLib.MODID, "chomusuke"), "main");
-    public static ResourceLocation texture = new ResourceLocation(TenshiLib.MODID, "textures/model/chomusuke.png");
-    public static ResourceLocation textureSleepy = new ResourceLocation(TenshiLib.MODID, "textures/model/chomusuke_sleepy.png");
+    public static final ResourceLocation TEXTURE = new ResourceLocation(TenshiLib.MODID, "textures/model/chomusuke.png");
+    public static final ResourceLocation TEXTURE_SLEEPY = new ResourceLocation(TenshiLib.MODID, "textures/model/chomusuke_sleepy.png");
 
     protected final ModelPartHandler model;
     protected final BlockBenchAnimations anim;
@@ -96,6 +96,6 @@ public class ChomusukeModel extends EntityModel<Player> implements ExtendedModel
 
     @Override
     public ResourceLocation texture(Player entity) {
-        return RenderLocation.isHead(this.location) ? textureSleepy : texture;
+        return RenderLocation.isHead(this.location) ? TEXTURE_SLEEPY : TEXTURE;
     }
 }

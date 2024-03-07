@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class PatreonButton extends Button {
 
-    private static final ResourceLocation text = new ResourceLocation(TenshiLib.MODID, "textures/misc/tenshilib_patreon.png");
+    private static final ResourceLocation TEXT = new ResourceLocation(TenshiLib.MODID, "textures/misc/tenshilib_patreon.png");
 
     public PatreonButton(int x, int y, Screen parent) {
         super(x, y, 20, 20, Component.literal(""), b -> Minecraft.getInstance().setScreen(new PatreonGui(parent)), DEFAULT_NARRATION);
@@ -19,6 +19,6 @@ public class PatreonButton extends Button {
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         int i = this.isHoveredOrFocused() ? 1 : 0;
-        guiGraphics.blit(text, this.getX(), this.getY(), 0, i * 20, this.width, this.height);
+        guiGraphics.blit(TEXT, this.getX(), this.getY(), 0, i * 20, this.width, this.height);
     }
 }
