@@ -31,9 +31,6 @@ public class CommonEvents {
     }
 
     public static boolean disableOffhandBlock(Player player, Level level, InteractionHand hand) {
-        if (hand == InteractionHand.OFF_HAND && player.getMainHandItem().getItem() instanceof IDualWeapon weapon && weapon.disableOffhand()) {
-            return true;
-        }
-        return false;
+        return hand == InteractionHand.OFF_HAND && player.getMainHandItem().getItem() instanceof IDualWeapon weapon && weapon.disableOffhand();
     }
 }

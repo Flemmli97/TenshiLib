@@ -8,9 +8,9 @@ import java.util.Map;
 
 public class PatreonEffects {
 
-    private static final Map<String, PatreonEffectConfig> configs = new HashMap<>();
+    private static final Map<String, PatreonEffectConfig> CONFIGS = new HashMap<>();
 
-    public static final PatreonEffectConfig meguHat = register(new PatreonEffectConfig("megu_hat") {
+    public static final PatreonEffectConfig MEGU_HAT = register(new PatreonEffectConfig("megu_hat") {
         @Override
         public boolean locationAllowed(RenderLocation loc) {
             return RenderLocation.isHead(loc) || RenderLocation.isCircling(loc);
@@ -22,7 +22,7 @@ public class PatreonEffects {
         }
     });
 
-    public static final PatreonEffectConfig chomusuke = register(new PatreonEffectConfig("chomusuke", 2) {
+    public static final PatreonEffectConfig CHOMUSUKE = register(new PatreonEffectConfig("chomusuke", 2) {
         @Override
         public boolean locationAllowed(RenderLocation loc) {
             return loc != RenderLocation.BACK;
@@ -34,7 +34,7 @@ public class PatreonEffects {
         }
     });
 
-    public static final PatreonEffectConfig cat = register(new PatreonEffectConfig("cat") {
+    public static final PatreonEffectConfig CAT = register(new PatreonEffectConfig("cat") {
         @Override
         public boolean locationAllowed(RenderLocation loc) {
             return loc != RenderLocation.BACK;
@@ -46,7 +46,7 @@ public class PatreonEffects {
         }
     });
 
-    public static final PatreonEffectConfig halo = register(new PatreonEffectConfig("halo") {
+    public static final PatreonEffectConfig HALO = register(new PatreonEffectConfig("halo") {
         @Override
         public boolean locationAllowed(RenderLocation loc) {
             return RenderLocation.isHead(loc);
@@ -59,16 +59,16 @@ public class PatreonEffects {
     });
 
     private static <T extends PatreonEffectConfig> T register(T conf) {
-        configs.put(conf.id(), conf);
+        CONFIGS.put(conf.id(), conf);
         return conf;
     }
 
     public static PatreonEffectConfig get(String id) {
-        return configs.get(id);
+        return CONFIGS.get(id);
     }
 
     public static List<PatreonEffectConfig> allEffects() {
-        return ImmutableList.copyOf(configs.values());
+        return ImmutableList.copyOf(CONFIGS.values());
     }
 
     public static abstract class PatreonEffectConfig {

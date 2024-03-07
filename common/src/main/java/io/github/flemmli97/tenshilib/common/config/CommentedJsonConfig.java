@@ -189,7 +189,7 @@ public class CommentedJsonConfig {
 
         public Builder pop() {
             if (this.path.isEmpty()) {
-                TenshiLib.logger.error("Tried to pop config with empty path!");
+                TenshiLib.LOGGER.error("Tried to pop config with empty path!");
                 return this;
             }
             int i = this.path.lastIndexOf(".");

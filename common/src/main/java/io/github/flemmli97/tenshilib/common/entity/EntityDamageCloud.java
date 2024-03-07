@@ -25,8 +25,8 @@ public abstract class EntityDamageCloud extends Entity implements OwnableEntity 
     protected int livingTicks;
     private int attackedEntities = 0;
 
-    protected static final EntityDataAccessor<Optional<UUID>> shooterUUID = SynchedEntityData.defineId(EntityDamageCloud.class, EntityDataSerializers.OPTIONAL_UUID);
-    private static final EntityDataAccessor<Float> radius = SynchedEntityData.defineId(EntityDamageCloud.class, EntityDataSerializers.FLOAT);
+    protected static final EntityDataAccessor<Optional<UUID>> SHOOTER_UUID = SynchedEntityData.defineId(EntityDamageCloud.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<Float> RADIUS = SynchedEntityData.defineId(EntityDamageCloud.class, EntityDataSerializers.FLOAT);
 
     public EntityDamageCloud(EntityType<? extends EntityDamageCloud> type, Level world) {
         super(type, world);
@@ -40,7 +40,7 @@ public abstract class EntityDamageCloud extends Entity implements OwnableEntity 
     public EntityDamageCloud(EntityType<? extends EntityDamageCloud> type, Level world, LivingEntity shooter) {
         this(type, world, shooter.getX(), shooter.getY(), shooter.getZ());
         this.shooter = shooter;
-        this.entityData.set(shooterUUID, Optional.of(shooter.getUUID()));
+        this.entityData.set(SHOOTER_UUID, Optional.of(shooter.getUUID()));
         this.setRot(shooter.getYRot(), shooter.getXRot());
     }
 
@@ -74,16 +74,16 @@ public abstract class EntityDamageCloud extends Entity implements OwnableEntity 
 
     @Override
     protected void defineSynchedData() {
-        this.entityData.define(shooterUUID, Optional.empty());
-        this.entityData.define(radius, 0f);
+        this.entityData.define(SHOOTER_UUID, Optional.empty());
+        this.entityData.define(RADIUS, 0f);
     }
 
     public float getRadius() {
-        return this.entityData.get(radius);
+        return this.entityData.get(RADIUS);
     }
 
     public void setRadius(float val) {
-        this.entityData.set(radius, val);
+        this.entityData.set(RADIUS, val);
     }
 
     @Override
@@ -141,16 +141,16 @@ public abstract class EntityDamageCloud extends Entity implements OwnableEntity 
     @Override
     protected void readAdditionalSaveData(CompoundTag compound) {
         if (compound.hasUUID("Shooter"))
-            this.entityData.set(shooterUUID, Optional.of(compound.getUUID("Shooter")));
+            this.entityData.set(SHOOTER_UUID, Optional.of(compound.getUUID("Shooter")));
         this.shooter = this.getOwner();
         this.livingTicks = compound.getInt("LivingTicks");
         this.attackedEntities = compound.getInt("AttackedEntities");
-        this.entityData.set(radius, compound.getFloat("Radius"));
+        this.entityData.set(RADIUS, compound.getFloat("Radius"));
     }
 
     @Override
     protected void addAdditionalSaveData(CompoundTag compound) {
-        this.entityData.get(shooterUUID).ifPresent(uuid -> compound.putUUID("Shooter", uuid));
+        this.entityData.get(SHOOTER_UUID).ifPresent(uuid -> compound.putUUID("Shooter", uuid));
         compound.putInt("LivingTicks", this.livingTicks);
         compound.putInt("AttackedEntities", this.attackedEntities);
         compound.putFloat("Radius", this.getRadius());
@@ -162,13 +162,13 @@ public abstract class EntityDamageCloud extends Entity implements OwnableEntity 
         if (this.shooter != null && !this.shooter.isRemoved()) {
             return this.shooter;
         }
-        this.entityData.get(shooterUUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(Entity.class, this.level, uuid));
+        this.entityData.get(SHOOTER_UUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(Entity.class, this.level, uuid));
         return this.shooter;
     }
 
     @Override
     public UUID getOwnerUUID() {
-        return this.entityData.get(shooterUUID).orElse(null);
+        return this.entityData.get(SHOOTER_UUID).orElse(null);
     }
 
     @Override

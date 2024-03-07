@@ -14,20 +14,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class PlayerMixin implements PlayerPatreonData {
 
     @Unique
-    private PatreonPlayerSetting setting = new PatreonPlayerSetting((Player) (Object) this);
+    private final PatreonPlayerSetting tenshilib_patreon_setting = new PatreonPlayerSetting((Player) (Object) this);
 
     @Inject(method = "readAdditionalSaveData", at = @At("RETURN"))
     private void loadData(CompoundTag compound, CallbackInfo info) {
-        this.setting.read(compound.getCompound("TenshiLib:Patreon"));
+        this.tenshilib_patreon_setting.read(compound.getCompound("TenshiLib:Patreon"));
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("RETURN"))
     private void saveData(CompoundTag compound, CallbackInfo info) {
-        compound.put("TenshiLib:Patreon", this.setting.save(new CompoundTag()));
+        compound.put("TenshiLib:Patreon", this.tenshilib_patreon_setting.save(new CompoundTag()));
     }
 
     @Override
     public PatreonPlayerSetting settings() {
-        return this.setting;
+        return this.tenshilib_patreon_setting;
     }
 }

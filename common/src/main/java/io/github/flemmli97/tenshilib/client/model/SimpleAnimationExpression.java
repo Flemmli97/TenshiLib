@@ -6,7 +6,6 @@ import net.minecraft.util.Mth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-import java.util.regex.Pattern;
 
 /**
  * Simple molang animation parser cause yes.
@@ -26,7 +25,7 @@ public class SimpleAnimationExpression {
 
     private static final String DELIMITER = "[+\\-\\*/()]";
 
-    private static final String[] delims = {
+    private static final String[] DELIMS = {
             "[+\\-\\*/()]",
             "(math\\.sin)",
             "(math\\.cos)",
@@ -49,9 +48,7 @@ public class SimpleAnimationExpression {
         };
     }
 
-    private static final String delComp = String.join("|", delims);
-
-    private static final Pattern regex = Pattern.compile(String.format(REGEX_SPLIT, delComp));
+    private static final String DEL_COMP = String.join("|", DELIMS);
 
     public static Value of(String exp) {
         exp = exp.replace(" ", "");
@@ -60,11 +57,11 @@ public class SimpleAnimationExpression {
             return new ConstantValue(f);
         } catch (NumberFormatException e) {
             try {
-                return ofSplit(exp.split(String.format(REGEX_SPLIT, delComp)));
+                return ofSplit(exp.split(String.format(REGEX_SPLIT, DEL_COMP)));
             } catch (NumberFormatException ignored) {
             }
         }
-        TenshiLib.logger.error("Couldn't parse expression " + exp);
+        TenshiLib.LOGGER.error("Couldn't parse expression " + exp);
         return new ConstantValue(0);
     }
 
@@ -413,7 +410,7 @@ public class SimpleAnimationExpression {
         BRACKETCLOSE(2),
         VAR(0);
 
-        int priority;
+        final int priority;
 
         Type(int priority) {
             this.priority = priority;

@@ -10,10 +10,7 @@ import org.apache.logging.log4j.Logger;
 public class TenshiLib {
 
     public static final String MODID = "tenshilib";
-    public static final Logger logger = LogManager.getLogger("TenshiLib");
-
-    public static boolean isFateLoaded;
-    public static boolean isRunecraftoryLoaded;
+    public static final Logger LOGGER = LogManager.getLogger("TenshiLib");
 
     public static final TagKey<EntityType<?>> MULTIPART_ENTITY = TagKey.create(Registry.ENTITY_TYPE_REGISTRY, new ResourceLocation("c", "multipart_entity"));
 }

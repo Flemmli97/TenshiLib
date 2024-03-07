@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public class CustomDataSerializers {
 
-    private static boolean registered = false;
+    private static boolean REGISTERED = false;
 
     public static final EntityDataSerializer<Vec3> VEC = new EntityDataSerializer<Vec3>() {
 
@@ -58,9 +58,9 @@ public class CustomDataSerializers {
     };
 
     public static void register() {
-        if (registered)
+        if (REGISTERED)
             return;
-        registered = true;
+        REGISTERED = true;
         EntityDataSerializers.registerSerializer(VEC);
         EntityDataSerializers.registerSerializer(OPTIONAL_VEC);
     }

@@ -147,7 +147,7 @@ public class ClothConfigScreenHelper {
                     .setTooltip(ofComments(val))
                     .setSaveConsumer(bv::set).build();
         }
-        TenshiLib.logger.error("Unsupported config value type for " + key + " val " + val.input);
+        TenshiLib.LOGGER.error("Unsupported config value type for " + key + " val " + val.input);
         return null;
     }
 
@@ -155,20 +155,20 @@ public class ClothConfigScreenHelper {
         return v -> new TranslatableComponent(v.name());
     }
 
-    private static final int stringLength = 55;
+    private static final int STRING_LENGTH = 55;
 
     private static Component[] ofComments(CommentedJsonConfig.CommentedVal<?> val) {
         if (val.__comments == null)
             return new Component[0];
         List<Component> wrapped = new ArrayList<>();
         for (String s : val.__comments) {
-            while (s.length() >= stringLength) {
-                String st = s.substring(0, stringLength);
+            while (s.length() >= STRING_LENGTH) {
+                String st = s.substring(0, STRING_LENGTH);
                 int whiteSpace = st.lastIndexOf(" ");
                 if (whiteSpace < 0)
                     whiteSpace = st.length();
                 wrapped.add(new TextComponent(st.substring(0, whiteSpace)));
-                s = s.substring(stringLength);
+                s = s.substring(STRING_LENGTH);
                 if (whiteSpace + 1 < st.length())
                     s = st.substring(whiteSpace + 1) + s;
             }

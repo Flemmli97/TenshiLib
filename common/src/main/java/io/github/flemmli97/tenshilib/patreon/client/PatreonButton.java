@@ -12,7 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class PatreonButton extends Button {
 
-    private static final ResourceLocation text = new ResourceLocation(TenshiLib.MODID, "textures/misc/tenshilib_patreon.png");
+    private static final ResourceLocation TEXT = new ResourceLocation(TenshiLib.MODID, "textures/misc/tenshilib_patreon.png");
 
     public PatreonButton(int x, int y, Screen parent) {
         super(x, y, 20, 20, new TextComponent(""), b -> Minecraft.getInstance().setScreen(new PatreonGui(parent)));
@@ -22,7 +22,7 @@ public class PatreonButton extends Button {
     public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         Minecraft minecraft = Minecraft.getInstance();
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderTexture(0, text);
+        RenderSystem.setShaderTexture(0, TEXT);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, this.alpha);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();

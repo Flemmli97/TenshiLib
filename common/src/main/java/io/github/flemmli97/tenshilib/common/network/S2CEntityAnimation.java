@@ -43,7 +43,7 @@ public class S2CEntityAnimation implements Packet {
                         }
                         if (i < entity.getAnimationHandler().getAnimations().length)
                             return i;
-                        TenshiLib.logger.error("This animation is not registered for {}. Registered animations are {} but set animation is {}", e, ArrayUtils.arrayToString(entity.getAnimationHandler().getAnimations(), AnimatedAction::getID), anim.getID());
+                        TenshiLib.LOGGER.error("This animation is not registered for {}. Registered animations are {} but set animation is {}", e, ArrayUtils.arrayToString(entity.getAnimationHandler().getAnimations(), AnimatedAction::getID), anim.getID());
                         return -2;
                     }
                 }).orElse(-2);

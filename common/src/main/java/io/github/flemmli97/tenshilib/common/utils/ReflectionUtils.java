@@ -1,5 +1,6 @@
 package io.github.flemmli97.tenshilib.common.utils;
 
+import java.io.Serial;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -56,6 +57,7 @@ public class ReflectionUtils {
 
     private static class ReflectionException extends RuntimeException {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         public ReflectionException(Exception e) {

@@ -92,7 +92,7 @@ public class PlatformUtilsImpl extends PlatformUtils {
 
     @Override
     public <T> SimpleRegistryWrapper<T> registry(ResourceKey<? extends Registry<T>> key) {
-        return new VanillaRegistryWrapper<T>(this.registryFrom(key));
+        return new VanillaRegistryWrapper<>(this.registryFrom(key));
     }
 
     @Override

@@ -12,7 +12,7 @@ public class ResourceStream {
         InputStream input = ResourceStream.class.getResourceAsStream("/assets/" + modid + "/" + dir + "/" + fileName);
         if (input != null)
             return input;
-        TenshiLib.logger.error("Error reading file {}", fileName);
+        TenshiLib.LOGGER.error("Error reading file {}", fileName);
         throw new FileNotFoundException();
     }
 
@@ -20,7 +20,7 @@ public class ResourceStream {
         InputStream input = ResourceStream.class.getResourceAsStream("/data/" + modid + "/" + dir + "/" + fileName);
         if (input != null)
             return input;
-        TenshiLib.logger.error("Error reading file {}", fileName);
+        TenshiLib.LOGGER.error("Error reading file {}", fileName);
         throw new FileNotFoundException();
     }
 }

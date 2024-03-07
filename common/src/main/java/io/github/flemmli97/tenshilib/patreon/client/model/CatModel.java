@@ -23,7 +23,7 @@ import net.minecraft.world.entity.player.Player;
 public class CatModel extends EntityModel<Player> implements ExtendedModel, PatreonModelData<Player> {
 
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(TenshiLib.MODID, "cat"), "main");
-    public static ResourceLocation texture = new ResourceLocation(TenshiLib.MODID, "textures/model/cat.png");
+    public static final ResourceLocation TEXTURE = new ResourceLocation(TenshiLib.MODID, "textures/model/cat.png");
 
     protected final ModelPartHandler model;
     protected final BlockBenchAnimations anim;
@@ -91,6 +91,6 @@ public class CatModel extends EntityModel<Player> implements ExtendedModel, Patr
 
     @Override
     public ResourceLocation texture(Player entity) {
-        return texture;
+        return TEXTURE;
     }
 }

@@ -23,12 +23,12 @@ import java.util.function.Supplier;
 
 public class PatreonModelProvider {
 
-    private static final Map<PatreonEffects.PatreonEffectConfig, EffectRenderer<?>> data = new HashMap<>();
+    private static final Map<PatreonEffects.PatreonEffectConfig, EffectRenderer<?>> DATA = new HashMap<>();
 
-    private static final EffectRenderer<MeguHatModel> megumin = register(PatreonEffects.meguHat, new EffectRenderer<>(MeguHatModel::new));
-    private static final EffectRenderer<ChomusukeModel> chomusuke = register(PatreonEffects.chomusuke, new EffectRenderer<>(ChomusukeModel::new));
-    private static final EffectRenderer<CatModel> cat = register(PatreonEffects.cat, new EffectRenderer<>(CatModel::new));
-    private static final EffectRenderer<HaloModel> halo = register(PatreonEffects.halo, new EffectRenderer<>(HaloModel::new) {
+    private static final EffectRenderer<MeguHatModel> MEGUMIN = register(PatreonEffects.MEGU_HAT, new EffectRenderer<>(MeguHatModel::new));
+    private static final EffectRenderer<ChomusukeModel> CHOMUSUKE = register(PatreonEffects.CHOMUSUKE, new EffectRenderer<>(ChomusukeModel::new));
+    private static final EffectRenderer<CatModel> CAT = register(PatreonEffects.CAT, new EffectRenderer<>(CatModel::new));
+    private static final EffectRenderer<HaloModel> HALO = register(PatreonEffects.HALO, new EffectRenderer<>(HaloModel::new) {
         @Override
         public void render(PoseStack stack, MultiBufferSource buffer, int packedLight, Player entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, int red, int green, int blue, int alpha, RenderLocation location) {
             HaloModel model = this.get();
@@ -43,7 +43,7 @@ public class PatreonModelProvider {
     });
 
     public static EffectRenderer<?> get(PatreonEffects.PatreonEffectConfig conf) {
-        return data.get(conf);
+        return DATA.get(conf);
     }
 
     public static void registerModelLayers(BiConsumer<ModelLayerLocation, Supplier<LayerDefinition>> cons) {
@@ -54,7 +54,7 @@ public class PatreonModelProvider {
     }
 
     private static <T extends EntityModel<Player> & PatreonModelData<Player>, M extends EffectRenderer<T>> M register(PatreonEffects.PatreonEffectConfig conf, M val) {
-        data.put(conf, val);
+        DATA.put(conf, val);
         return val;
     }
 

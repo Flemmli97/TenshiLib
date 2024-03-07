@@ -21,41 +21,41 @@ import java.util.function.Supplier;
 
 public class PacketHandler {
 
-    private static final ResourceLocation channelID = new ResourceLocation(TenshiLib.MODID, "packets");
-    private static final SimpleChannel dispatcher = NetworkRegistry.ChannelBuilder.named(channelID)
+    private static final ResourceLocation CHANNEL_ID = new ResourceLocation(TenshiLib.MODID, "packets");
+    private static final SimpleChannel DISPATCHER = NetworkRegistry.ChannelBuilder.named(CHANNEL_ID)
             .clientAcceptedVersions(a -> true).serverAcceptedVersions(a -> true).networkProtocolVersion(() -> "1").simpleChannel();
 
     public static void register() {
         int server = PacketRegistrar.registerServerPackets(new PacketRegistrar.ServerPacketRegister() {
             @Override
             public <P> void registerMessage(int index, ResourceLocation id, Class<P> clss, BiConsumer<P, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, P> decoder, BiConsumer<P, ServerPlayer> handler) {
-                dispatcher.registerMessage(index, clss, encoder, decoder, handlerServer(handler));
+                DISPATCHER.registerMessage(index, clss, encoder, decoder, handlerServer(handler));
             }
         }, 0);
         PacketRegistrar.registerClientPackets(new PacketRegistrar.ClientPacketRegister() {
             @Override
             public <P> void registerMessage(int index, ResourceLocation id, Class<P> clss, BiConsumer<P, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, P> decoder, Consumer<P> handler) {
-                dispatcher.registerMessage(index, clss, encoder, decoder, handlerClient(handler));
+                DISPATCHER.registerMessage(index, clss, encoder, decoder, handlerClient(handler));
             }
         }, server);
     }
 
     public static <T> void sendToServer(T message) {
-        dispatcher.sendToServer(message);
+        DISPATCHER.sendToServer(message);
     }
 
     public static <T> void sendToClientChecked(T message, ServerPlayer player) {
         if (hasChannel(player))
-            dispatcher.sendTo(message, player.connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
+            DISPATCHER.sendTo(message, player.connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
     }
 
     public static <T> void sendToTracking(T message, Entity e) {
-        dispatcher.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> e), message);
+        DISPATCHER.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> e), message);
     }
 
     private static boolean hasChannel(ServerPlayer player) {
         ConnectionData data = NetworkHooks.getConnectionData(player.connection.connection);
-        return data != null && data.getChannels().containsKey(channelID);
+        return data != null && data.getChannels().containsKey(CHANNEL_ID);
     }
 
     private static <T> BiConsumer<T, Supplier<NetworkEvent.Context>> handlerServer(BiConsumer<T, ServerPlayer> handler) {

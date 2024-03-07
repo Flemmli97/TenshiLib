@@ -23,7 +23,7 @@ import net.minecraft.world.entity.player.Player;
 public class MeguHatModel extends EntityModel<Player> implements ExtendedModel, PatreonModelData<Player> {
 
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(TenshiLib.MODID, "megu_hat"), "main");
-    public static ResourceLocation meguTexture = new ResourceLocation(TenshiLib.MODID, "textures/model/megu_hat.png");
+    public static final ResourceLocation MEGU_TEXTURE = new ResourceLocation(TenshiLib.MODID, "textures/model/megu_hat.png");
 
     protected final ModelPartHandler model;
     protected final BlockBenchAnimations anim;
@@ -90,6 +90,6 @@ public class MeguHatModel extends EntityModel<Player> implements ExtendedModel, 
 
     @Override
     public ResourceLocation texture(Player entity) {
-        return meguTexture;
+        return MEGU_TEXTURE;
     }
 }

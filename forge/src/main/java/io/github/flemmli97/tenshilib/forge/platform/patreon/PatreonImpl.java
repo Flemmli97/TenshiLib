@@ -29,7 +29,7 @@ import java.util.Optional;
 
 public class PatreonImpl implements PatreonPlatform {
 
-    private static final ResourceLocation capID = new ResourceLocation(TenshiLib.MODID, "patreon");
+    private static final ResourceLocation CAP_ID = new ResourceLocation(TenshiLib.MODID, "patreon");
 
     private static final Capability<PatreonPlayerSetting> PATREONPLAYER = CapabilityManager.get(new CapabilityToken<>() {
     });
@@ -50,7 +50,7 @@ public class PatreonImpl implements PatreonPlatform {
 
     public static void cap(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof Player player)
-            event.addCapability(capID, new PlayerCap(player));
+            event.addCapability(CAP_ID, new PlayerCap(player));
     }
 
     public static void onLogin(EntityJoinWorldEvent event) {

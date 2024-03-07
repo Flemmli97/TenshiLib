@@ -33,7 +33,7 @@ public class PatreonDataManager {
                     arr = GSON.fromJson(reader, JsonArray.class);
                     reader.close();
                 } catch (IOException e) {
-                    TenshiLib.logger.error("Couldn't get patreon file");
+                    TenshiLib.LOGGER.error("Couldn't get patreon file");
                     e.printStackTrace();
                 }
                 if (arr != null) {
