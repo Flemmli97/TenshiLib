@@ -64,7 +64,6 @@ public class HaloModel extends EntityModel<Player> implements ExtendedModel, Pat
 
     @Override
     public void setRenderLocation(RenderLocation loc) {
-        this.location = loc;
     }
 
     @Override

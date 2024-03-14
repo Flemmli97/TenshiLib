@@ -43,7 +43,6 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
 
     public EntityBeam(EntityType<? extends EntityBeam> type, Level world) {
         super(type, world);
-        Block.UPDATE_ALL
         this.noCulling = true;
     }
 
