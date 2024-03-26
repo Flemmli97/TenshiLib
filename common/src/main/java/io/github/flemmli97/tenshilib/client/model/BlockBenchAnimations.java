@@ -281,9 +281,9 @@ public class BlockBenchAnimations {
                         rot = this.rotations[id];
                     AnimationValue rotPrev = this.rotations[id - 1];
                     float prog = Mth.clamp((actualTick - rotPrev.startTick) / (rot.startTick - rotPrev.startTick), 0F, 1F);
-                    float x = (this.interpolate(rotPrev.getXVal(secTime), rot.getXVal(secTime), prog) % 360) * mirrorMult;
-                    float y = (this.interpolate(rotPrev.getYVal(secTime), rot.getYVal(secTime), prog) % 360);
-                    float z = (this.interpolate(rotPrev.getZVal(secTime), rot.getZVal(secTime), prog) % 360);
+                    float x = (this.interpolate(rotPrev.getXVal(secTime), rot.getXVal(secTime), prog) % 360);
+                    float y = (this.interpolate(rotPrev.getYVal(secTime), rot.getYVal(secTime), prog) % 360) * mirrorMult;
+                    float z = (this.interpolate(rotPrev.getZVal(secTime), rot.getZVal(secTime), prog) % 360) * mirrorMult;
                     if (interpolateFromCurrent) {
                         modelPart.xRot += Mth.DEG_TO_RAD * this.smallestDegDiff(x, modelPart.xRot) * interpolation;
                         modelPart.yRot += Mth.DEG_TO_RAD * this.smallestDegDiff(y, modelPart.yRot) * interpolation;

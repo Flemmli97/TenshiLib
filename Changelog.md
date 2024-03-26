@@ -1,3 +1,7 @@
+TenshiLib 1.7.5
+================
+- Fix mirrored animation
+
 TenshiLib 1.7.4
 ================
 - Change interpolation between animations 
