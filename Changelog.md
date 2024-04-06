@@ -1,3 +1,7 @@
+TenshiLib 1.7.6
+================
+- Allow keyset access for registry wrapper
+
 TenshiLib 1.7.5
 ================
 - Fix mirrored animation

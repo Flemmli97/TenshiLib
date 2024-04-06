@@ -21,4 +21,6 @@ public interface SimpleRegistryWrapper<T> {
     Collection<T> values();
 
     boolean contains(ResourceLocation id);
+
+    Collection<ResourceLocation> keys();
 }
