@@ -38,4 +38,9 @@ public record VanillaRegistryWrapper<T>(Registry<T> delegate) implements SimpleR
     public boolean contains(ResourceLocation id) {
         return this.delegate.containsKey(id);
     }
+
+    @Override
+    public Collection<ResourceLocation> keys() {
+        return this.delegate.keySet();
+    }
 }

@@ -39,4 +39,9 @@ public record ForgeRegistryWrapper<T>(
     public boolean contains(ResourceLocation id) {
         return this.registry.containsKey(id);
     }
+
+    @Override
+    public Collection<ResourceLocation> keys() {
+        return this.registry.getKeys();
+    }
 }
