@@ -30,6 +30,7 @@ public class TenshiLibForge {
         modBus.addListener(TenshiLibForge::preInit);
         forgeBus.addListener(CommonEvents::disableOffhand);
         forgeBus.addListener(CommonEvents::disableOffhandBlock);
+        forgeBus.addListener(CommonEvents::onTracking);
         PatreonImpl.initPatreonData();
         if (FMLEnvironment.dist == Dist.CLIENT) {
             modBus.addListener(ClientEvents::reloadListener);

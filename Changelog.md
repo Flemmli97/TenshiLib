@@ -1,3 +1,7 @@
+TenshiLib 1.7.7
+================
+- Send animation data on tracking
+
 TenshiLib 1.7.6
 ================
 - Allow keyset access for registry wrapper
