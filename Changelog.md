@@ -1,6 +1,8 @@
 TenshiLib 1.7.7
 ================
 - Send animation data on tracking
+- Add some particle effects for patreon
+- Rewrite spawneggs to extend vanilla spawneggs
 
 TenshiLib 1.7.6
 ================
