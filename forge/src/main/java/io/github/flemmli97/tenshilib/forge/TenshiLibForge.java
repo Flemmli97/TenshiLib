@@ -46,6 +46,7 @@ public class TenshiLibForge {
         e.enqueueWork(() -> {
             for (SpawnEgg egg : SpawnEgg.getEggs())
                 DispenserBlock.registerBehavior(egg, egg.dispenser());
+            SpawnEgg.resolveEggs();
         });
     }
 }
