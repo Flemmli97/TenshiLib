@@ -20,6 +20,7 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -41,6 +42,7 @@ public class PatreonImpl implements PatreonPlatform {
         MinecraftForge.EVENT_BUS.addListener(PatreonImpl::onLogin);
         MinecraftForge.EVENT_BUS.addListener(PatreonImpl::playerClone);
         MinecraftForge.EVENT_BUS.addListener(PatreonImpl::track);
+        MinecraftForge.EVENT_BUS.addListener(PatreonImpl::tick);
         PatreonDataManager.init();
     }
 
@@ -70,6 +72,12 @@ public class PatreonImpl implements PatreonPlatform {
             PatreonPlatform.INSTANCE.sendToClient(serverPlayer, serverPlayer);
             if (!rev)
                 event.getOriginal().invalidateCaps();
+        }
+    }
+
+    public static void tick(TickEvent.PlayerTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            PatreonPlatform.INSTANCE.playerSettings(event.player).ifPresent(s -> s.tick(event.player));
         }
     }
 

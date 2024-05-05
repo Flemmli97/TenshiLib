@@ -14,7 +14,7 @@ import org.lwjgl.opengl.GL11;
 public class ParticleRenderTypes {
 
     /**
-     * From botanias particle types (vazkii.botania.client.fx.FXWisp)
+     * From botanias container types (vazkii.botania.client.fx.FXWisp)
      */
     public static final ParticleRenderType TRANSLUCENTADD = new ParticleRenderType() {
         @Override

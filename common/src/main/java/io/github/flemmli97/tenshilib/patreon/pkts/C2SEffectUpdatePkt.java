@@ -3,9 +3,10 @@ package io.github.flemmli97.tenshilib.patreon.pkts;
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.common.network.Packet;
 import io.github.flemmli97.tenshilib.patreon.PatreonDataManager;
-import io.github.flemmli97.tenshilib.patreon.PatreonEffects;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlatform;
 import io.github.flemmli97.tenshilib.patreon.RenderLocation;
+import io.github.flemmli97.tenshilib.patreon.effects.PatreonEffectConfig;
+import io.github.flemmli97.tenshilib.patreon.effects.PatreonEffects;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -46,7 +47,7 @@ public class C2SEffectUpdatePkt implements Packet {
     public static void handlePacketServer(C2SEffectUpdatePkt pkt, ServerPlayer player) {
         PatreonPlatform.INSTANCE.playerSettings(player).ifPresent(settings -> {
             int tier = PatreonDataManager.get(player.getUUID().toString()).tier();
-            PatreonEffects.PatreonEffectConfig eff;
+            PatreonEffectConfig eff;
             if (tier < 1 || (eff = PatreonEffects.get(pkt.id)) == null || eff.tier > tier) {
                 settings.setEffect(null);
             } else {

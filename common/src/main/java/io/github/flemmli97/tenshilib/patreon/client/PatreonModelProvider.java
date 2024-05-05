@@ -1,13 +1,14 @@
 package io.github.flemmli97.tenshilib.patreon.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import io.github.flemmli97.tenshilib.patreon.PatreonEffects;
 import io.github.flemmli97.tenshilib.patreon.RenderLocation;
 import io.github.flemmli97.tenshilib.patreon.client.model.CatModel;
 import io.github.flemmli97.tenshilib.patreon.client.model.ChomusukeModel;
 import io.github.flemmli97.tenshilib.patreon.client.model.HaloModel;
 import io.github.flemmli97.tenshilib.patreon.client.model.MeguHatModel;
 import io.github.flemmli97.tenshilib.patreon.client.model.PatreonModelData;
+import io.github.flemmli97.tenshilib.patreon.effects.PatreonEffectConfig;
+import io.github.flemmli97.tenshilib.patreon.effects.PatreonEffects;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
@@ -23,7 +24,7 @@ import java.util.function.Supplier;
 
 public class PatreonModelProvider {
 
-    private static final Map<PatreonEffects.PatreonEffectConfig, EffectRenderer<?>> DATA = new HashMap<>();
+    private static final Map<PatreonEffectConfig, EffectRenderer<?>> DATA = new HashMap<>();
 
     private static final EffectRenderer<MeguHatModel> MEGUMIN = register(PatreonEffects.MEGU_HAT, new EffectRenderer<>(MeguHatModel::new));
     private static final EffectRenderer<ChomusukeModel> CHOMUSUKE = register(PatreonEffects.CHOMUSUKE, new EffectRenderer<>(ChomusukeModel::new));
@@ -42,7 +43,7 @@ public class PatreonModelProvider {
         }
     });
 
-    public static EffectRenderer<?> get(PatreonEffects.PatreonEffectConfig conf) {
+    public static EffectRenderer<?> get(PatreonEffectConfig conf) {
         return DATA.get(conf);
     }
 
@@ -53,7 +54,7 @@ public class PatreonModelProvider {
         cons.accept(HaloModel.LAYER_LOCATION, HaloModel::createBodyLayer);
     }
 
-    private static <T extends EntityModel<Player> & PatreonModelData<Player>, M extends EffectRenderer<T>> M register(PatreonEffects.PatreonEffectConfig conf, M val) {
+    private static <T extends EntityModel<Player> & PatreonModelData<Player>, M extends EffectRenderer<T>> M register(PatreonEffectConfig conf, M val) {
         DATA.put(conf, val);
         return val;
     }

@@ -4,10 +4,12 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.flemmli97.tenshilib.client.Color;
 import io.github.flemmli97.tenshilib.client.render.RenderUtils;
 import io.github.flemmli97.tenshilib.patreon.PatreonDataManager;
-import io.github.flemmli97.tenshilib.patreon.PatreonEffects;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlatform;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlayerSetting;
 import io.github.flemmli97.tenshilib.patreon.RenderLocation;
+import io.github.flemmli97.tenshilib.patreon.effects.GuiElement;
+import io.github.flemmli97.tenshilib.patreon.effects.PatreonEffectConfig;
+import io.github.flemmli97.tenshilib.patreon.effects.PatreonEffects;
 import io.github.flemmli97.tenshilib.patreon.pkts.C2SEffectUpdatePkt;
 import io.github.flemmli97.tenshilib.patreon.pkts.C2SRequestUpdateClientPkt;
 import net.minecraft.ChatFormatting;
@@ -33,7 +35,7 @@ public class PatreonGui extends Screen {
 
     private final Screen parent;
 
-    private PatreonEffects.PatreonEffectConfig effect;
+    private PatreonEffectConfig effect;
     private RenderLocation renderLocation;
     private boolean render = true;
     private int color = RenderUtils.defaultColor;
@@ -58,6 +60,7 @@ public class PatreonGui extends Screen {
 
     @Override
     protected void init() {
+        this.clearWidgets();
         Component name;
         this.tier = this.minecraft.level == null ? -1 : PatreonDataManager.get(this.minecraft.player.getUUID().toString()).tier();
         if (this.tier < 1) {
@@ -65,16 +68,17 @@ public class PatreonGui extends Screen {
                 name = new TranslatableComponent("tenshilib.patreon.level.no");
             else
                 name = new TranslatableComponent("tenshilib.patreon.back");
-        } else {
-            name = CommonComponents.GUI_DONE;
-            this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 8 + 24 * 7, 200, 20, new TranslatableComponent("tenshilib.patreon.save"), button -> PatreonClientPlatform.INSTANCE.sendToServer(new C2SEffectUpdatePkt(this.effect.id(), this.render, this.renderLocation, this.color))));
+            this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 8 + 24 * 8, 200, 20, name, button -> this.minecraft.setScreen(this.parent)));
+            return;
         }
-        this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 8 + 24 * 8, 200, 20, name, button -> this.minecraft.setScreen(this.parent)));
-        if (this.tier < 1)
-            return;
+        name = CommonComponents.GUI_DONE;
         this.setting = PatreonPlatform.INSTANCE.playerSettings(this.minecraft.player).orElse(null);
-        if (this.setting == null)
+        if (this.setting == null) {
+            this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 8 + 24 * 7, 200, 20, new TranslatableComponent("tenshilib.patreon.save"), button -> PatreonClientPlatform.INSTANCE.sendToServer(new C2SEffectUpdatePkt(this.effect.id(), this.render, this.renderLocation, this.color))));
+            this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 8 + 24 * 8, 200, 20, name, button -> this.minecraft.setScreen(this.parent)));
             return;
+        }
+        int yOffset = 0;
         this.effect = this.setting.effect();
         if (this.effect == null)
             this.effect = PatreonEffects.get(PatreonDataManager.get(this.minecraft.player.getUUID().toString()).defaultEffect());
@@ -84,9 +88,9 @@ public class PatreonGui extends Screen {
         this.render = this.setting.shouldRender();
         this.color = this.setting.getColor();
 
-        Function<PatreonEffects.PatreonEffectConfig, Component> idF = eff -> new TranslatableComponent("tenshilib.patreon.id." + eff.id());
-        List<PatreonEffects.PatreonEffectConfig> effects = new ArrayList<>();
-        for (PatreonEffects.PatreonEffectConfig eff : PatreonEffects.allEffects())
+        Function<PatreonEffectConfig, Component> idF = eff -> new TranslatableComponent("tenshilib.patreon.id." + eff.id());
+        List<PatreonEffectConfig> effects = new ArrayList<>();
+        for (PatreonEffectConfig eff : PatreonEffects.allEffects())
             if (eff.tier <= this.tier)
                 effects.add(eff);
         this.addRenderableWidget(CycleButton.builder(idF).withValues(effects)
@@ -98,48 +102,63 @@ public class PatreonGui extends Screen {
                                 this.renderLocation = this.effect.defaultLoc();
                             }
                             this.update();
-                            this.setLocationButton();
+                            this.init();
                         }));
-        this.addRenderableWidget(CycleButton.onOffBuilder(this.render).create(this.width / 2 - 125, this.height / 8 + 24, 250, 20,
+        yOffset += 24;
+        this.addRenderableWidget(CycleButton.onOffBuilder(this.render).create(this.width / 2 - 125, this.height / 8 + yOffset, 250, 20,
                 new TranslatableComponent("tenshilib.patreon.render"), (cycleButton, boolean_) -> {
                     this.render = boolean_;
                     this.update();
                 }));
-        this.setLocationButton();
+        yOffset += 24;
+        yOffset += this.setLocationButton();
 
-        this.addRenderableWidget(this.red = new HorizontalColorSlider(this.width / 2 - 125, this.height / 8 + 24 * 3, 250, 14,
-                new Color(0, true), new Color(255, 0, 0), slider -> this.updateColorString(),
-                new TranslatableComponent("tenshilib.patreon.slider.red")));
-        this.red.with(this.color);
-        this.addRenderableWidget(this.green = new HorizontalColorSlider(this.width / 2 - 125, this.height / 8 + 24 * 3 + 18, 250, 14,
-                new Color(0, true), new Color(0, 255, 0), slider -> this.updateColorString(),
-                new TranslatableComponent("tenshilib.patreon.slider.green")));
-        this.green.with(this.color);
-        this.addRenderableWidget(this.blue = new HorizontalColorSlider(this.width / 2 - 125, this.height / 8 + 24 * 3 + 18 * 2, 250, 14,
-                new Color(0, true), new Color(0, 0, 255), slider -> this.updateColorString(),
-                new TranslatableComponent("tenshilib.patreon.slider.blue")));
-        this.blue.with(this.color);
-        this.addRenderableWidget(this.alpha = new HorizontalColorSlider(this.width / 2 - 125, this.height / 8 + 24 * 3 + 18 * 3, 250, 14,
-                new Color(0, false), new Color(255, 255, 255), slider -> this.updateColorString(),
-                new TranslatableComponent("tenshilib.patreon.slider.alpha")));
-        this.alpha.with(this.color);
-        this.txtField = new EditBox(this.minecraft.font, this.width / 2 - 155 + 160, this.height / 8 + 24 * 6, 150, 20, new TranslatableComponent("tenshilib.patreon.color")) {
-            @Override
-            public boolean charTyped(char codePoint, int modifiers) {
-                if (this.getValue().length() > 8)
-                    return false;
-                return HexFormat.isHexDigit(codePoint) && super.charTyped(codePoint, modifiers);
-            }
-        };
-        this.txtField.setValue(HexFormat.of().toHexDigits(this.color));
-        this.txtField.setResponder(s -> {
-            if (s.isEmpty())
-                this.color = RenderUtils.defaultColor;
-            else
-                this.color = HexFormat.fromHexDigits(s);
-            this.update();
-        });
-        this.addRenderableWidget(this.txtField);
+        if (this.effect != null && this.effect.guiElements().contains(GuiElement.COLOR)) {
+            this.addRenderableWidget(this.red = new HorizontalColorSlider(this.width / 2 - 125, this.height / 8 + yOffset, 250, 14,
+                    new Color(0, true), new Color(255, 0, 0), slider -> this.updateColorString(),
+                    new TranslatableComponent("tenshilib.patreon.slider.red")));
+            this.red.with(this.color);
+            yOffset += 18;
+            this.addRenderableWidget(this.green = new HorizontalColorSlider(this.width / 2 - 125, this.height / 8 + yOffset, 250, 14,
+                    new Color(0, true), new Color(0, 255, 0), slider -> this.updateColorString(),
+                    new TranslatableComponent("tenshilib.patreon.slider.green")));
+            this.green.with(this.color);
+            yOffset += 18;
+            this.addRenderableWidget(this.blue = new HorizontalColorSlider(this.width / 2 - 125, this.height / 8 + yOffset, 250, 14,
+                    new Color(0, true), new Color(0, 0, 255), slider -> this.updateColorString(),
+                    new TranslatableComponent("tenshilib.patreon.slider.blue")));
+            this.blue.with(this.color);
+            yOffset += 18;
+            this.addRenderableWidget(this.alpha = new HorizontalColorSlider(this.width / 2 - 125, this.height / 8 + yOffset, 250, 14,
+                    new Color(0, false), new Color(255, 255, 255), slider -> this.updateColorString(),
+                    new TranslatableComponent("tenshilib.patreon.slider.alpha")));
+            this.alpha.with(this.color);
+            yOffset += 24;
+            this.txtField = new EditBox(this.minecraft.font, this.width / 2 - 155 + 160, this.height / 8 + 24 * 6, 150, 20, new TranslatableComponent("tenshilib.patreon.color")) {
+                @Override
+                public boolean charTyped(char codePoint, int modifiers) {
+                    if (this.getValue().length() > 8)
+                        return false;
+                    return HexFormat.isHexDigit(codePoint) && super.charTyped(codePoint, modifiers);
+                }
+            };
+            this.txtField.setValue(HexFormat.of().toHexDigits(this.color));
+            this.txtField.setResponder(s -> {
+                if (s.isEmpty())
+                    this.color = RenderUtils.defaultColor;
+                else
+                    this.color = HexFormat.fromHexDigits(s);
+                this.update();
+            });
+            this.addRenderableWidget(this.txtField);
+            yOffset += 18;
+        }
+        this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 8 + yOffset, 200, 20, new TranslatableComponent("tenshilib.patreon.save"), button -> {
+            if (this.effect != null)
+                PatreonClientPlatform.INSTANCE.sendToServer(new C2SEffectUpdatePkt(this.effect.id(), this.render, this.renderLocation, this.color));
+        }));
+        yOffset += 24;
+        this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 8 + yOffset, 200, 20, name, button -> this.minecraft.setScreen(this.parent)));
     }
 
     private void updateColorString() {
@@ -152,13 +171,15 @@ public class PatreonGui extends Screen {
         this.setting.update(this.effect, this.renderLocation, this.render, this.color);
     }
 
-    private void setLocationButton() {
-        if (this.locationButton != null)
-            this.removeWidget(this.locationButton);
+    private int setLocationButton() {
+        if (this.effect == null || !this.effect.guiElements().contains(GuiElement.LOCATION))
+            return 0;
         List<RenderLocation> allowed = new ArrayList<>();
         for (RenderLocation l : RenderLocation.values())
             if (this.effect == null || this.effect.locationAllowed(l))
                 allowed.add(l);
+        if (allowed.isEmpty())
+            return 0;
         Function<RenderLocation, Component> f = loc -> new TranslatableComponent("tenshilib.patreon.location." + loc.toString());
         this.addRenderableWidget(this.locationButton = CycleButton.builder(f).withValues(allowed)
                 .withInitialValue(this.renderLocation)
@@ -167,6 +188,7 @@ public class PatreonGui extends Screen {
                             this.renderLocation = loc;
                             this.update();
                         }));
+        return 24;
     }
 
     @Override
@@ -181,7 +203,8 @@ public class PatreonGui extends Screen {
             int ex = this.width / 2 - 180;
             int ey = this.height / 8 + 24 * 7;
             InventoryScreen.renderEntityInInventory(ex, ey, 65, ex - mouseX, ey - 83 - mouseY, this.minecraft.player);
-            GuiComponent.drawCenteredString(poseStack, this.font, new TranslatableComponent("tenshilib.patreon.color"), this.width / 2 - 55, this.height / 8 + 24 * 6 + 8, 0xFFFFFF);
+            if (this.effect != null && this.effect.guiElements().contains(GuiElement.COLOR))
+                GuiComponent.drawCenteredString(poseStack, this.font, new TranslatableComponent("tenshilib.patreon.color"), this.width / 2 - 55, this.height / 8 + 24 * 6 + 8, 0xFFFFFF);
         }
 
         super.render(poseStack, mouseX, mouseY, partialTick);

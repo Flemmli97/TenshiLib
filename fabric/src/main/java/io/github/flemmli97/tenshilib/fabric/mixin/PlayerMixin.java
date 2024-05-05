@@ -26,6 +26,11 @@ public abstract class PlayerMixin implements PlayerPatreonData {
         compound.put("TenshiLib:Patreon", this.tenshilib_patreon_setting.save(new CompoundTag()));
     }
 
+    @Inject(method = "tick", at = @At("RETURN"))
+    private void onTick(CallbackInfo info) {
+        this.tenshilib_patreon_setting.tick((Player) (Object) this);
+    }
+
     @Override
     public PatreonPlayerSetting settings() {
         return this.tenshilib_patreon_setting;
