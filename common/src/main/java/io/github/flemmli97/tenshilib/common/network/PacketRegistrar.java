@@ -3,34 +3,32 @@ package io.github.flemmli97.tenshilib.common.network;
 import io.github.flemmli97.tenshilib.patreon.pkts.C2SEffectUpdatePkt;
 import io.github.flemmli97.tenshilib.patreon.pkts.C2SRequestUpdateClientPkt;
 import io.github.flemmli97.tenshilib.patreon.pkts.S2CEffectUpdatePkt;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class PacketRegistrar {
 
-    public static int registerServerPackets(ServerPacketRegister register, int id) {
-        register.registerMessage(id++, C2SPacketHit.ID, C2SPacketHit.class, C2SPacketHit::write, C2SPacketHit::fromBytes, C2SPacketHit::handlePacket);
-        register.registerMessage(id++, C2SEffectUpdatePkt.ID, C2SEffectUpdatePkt.class, C2SEffectUpdatePkt::write, C2SEffectUpdatePkt::fromBytes, C2SEffectUpdatePkt::handlePacketServer);
-        register.registerMessage(id++, C2SRequestUpdateClientPkt.ID, C2SRequestUpdateClientPkt.class, C2SRequestUpdateClientPkt::write, C2SRequestUpdateClientPkt::fromBytes, C2SRequestUpdateClientPkt::handlePacketServer);
-        return id;
+    public static void registerServerPackets(ServerPacketRegister register) {
+        register.register(C2SPacketHit.TYPE, C2SPacketHit.STREAM_CODEC, C2SPacketHit::handlePacket);
+        register.register(C2SEffectUpdatePkt.TYPE, C2SEffectUpdatePkt.STREAM_CODEC, C2SEffectUpdatePkt::handlePacket);
+        register.register(C2SRequestUpdateClientPkt.TYPE, C2SRequestUpdateClientPkt.STREAM_CODEC, C2SRequestUpdateClientPkt::handlePacket);
     }
 
-    public static int registerClientPackets(ClientPacketRegister register, int id) {
-        register.registerMessage(id++, S2CEntityAnimation.ID, S2CEntityAnimation.class, S2CEntityAnimation::write, S2CEntityAnimation::fromBytes, S2CEntityAnimation.Handler::handlePacket);
-        register.registerMessage(id++, S2CEffectUpdatePkt.ID, S2CEffectUpdatePkt.class, S2CEffectUpdatePkt::write, S2CEffectUpdatePkt::fromBytes, S2CEffectUpdatePkt.Handler::handlePktClient);
-        return id;
+    public static void registerClientPackets(ClientPacketRegister register) {
+        register.register(S2CEntityAnimation.TYPE, S2CEntityAnimation.STREAM_CODEC, S2CEntityAnimation.Handler::handlePacket);
+        register.register(S2CEffectUpdatePkt.TYPE, S2CEffectUpdatePkt.STREAM_CODEC, S2CEffectUpdatePkt.Handler::handlePacket);
     }
 
     public interface ServerPacketRegister {
-        <P> void registerMessage(int index, ResourceLocation id, Class<P> clss, BiConsumer<P, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, P> decoder, BiConsumer<P, ServerPlayer> handler);
+        <P extends CustomPacketPayload> void register(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf, P> codec, BiConsumer<P, ServerPlayer> handler);
     }
 
     public interface ClientPacketRegister {
-        <P> void registerMessage(int index, ResourceLocation id, Class<P> clss, BiConsumer<P, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, P> decoder, Consumer<P> handler);
+        <P extends CustomPacketPayload> void register(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf, P> codec, BiConsumer<P, Player> handler);
     }
 }

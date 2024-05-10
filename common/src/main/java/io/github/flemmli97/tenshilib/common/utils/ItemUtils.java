@@ -1,17 +1,17 @@
 package io.github.flemmli97.tenshilib.common.utils;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
-
-import java.util.Collection;
 
 public class ItemUtils {
 
@@ -19,21 +19,21 @@ public class ItemUtils {
         if (stack.getItem() instanceof ArmorItem) {
             if (!(currentEquipped.getItem() instanceof ArmorItem) || EnchantmentHelper.hasBindingCurse(currentEquipped))
                 return true;
-            else if (currentEquipped.getItem() instanceof ArmorItem itemarmor1) {
-                ArmorItem itemarmor = (ArmorItem) stack.getItem();
+            else if (currentEquipped.getItem() instanceof ArmorItem armorItem1) {
+                ArmorItem armorItem = (ArmorItem) stack.getItem();
 
-                if (itemarmor.getDefense() == itemarmor1.getDefense()) {
-                    return stack.getDamageValue() > currentEquipped.getDamageValue() || stack.hasTag() && !currentEquipped.hasTag();
+                if (armorItem.getDefense() == armorItem1.getDefense()) {
+                    return stack.getDamageValue() > currentEquipped.getDamageValue() || stack.getComponentsPatch().isEmpty() && !currentEquipped.getComponentsPatch().isEmpty();
                 } else {
-                    return itemarmor.getDefense() > itemarmor1.getDefense();
+                    return armorItem.getDefense() > armorItem1.getDefense();
                 }
             }
         } else if (stack.getItem() instanceof BowItem) {
             if (currentEquipped.isEmpty())
                 return true;
             if (currentEquipped.getItem() instanceof BowItem) {
-                int power = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
-                int power2 = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, currentEquipped);
+                int power = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER, stack);
+                int power2 = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER, currentEquipped);
                 return power > power2;
             }
         } else {
@@ -45,26 +45,19 @@ public class ItemUtils {
     }
 
     public static double damage(ItemStack stack) {
-        double dmg = 0;
-        Collection<AttributeModifier> atts = stack.getAttributeModifiers(EquipmentSlot.MAINHAND)
-                .get(Attributes.ATTACK_DAMAGE);
-        for (AttributeModifier mod : atts) {
-            if (mod.getOperation() == AttributeModifier.Operation.ADDITION)
-                dmg += mod.getAmount();
-        }
-        double value = dmg;
-        for (AttributeModifier mod : atts) {
-            if (mod.getOperation() == AttributeModifier.Operation.MULTIPLY_BASE)
-                value += dmg * mod.getAmount();
-        }
-        for (AttributeModifier mod : atts) {
-            if (mod.getOperation() == AttributeModifier.Operation.MULTIPLY_TOTAL)
-                value *= 1 + mod.getAmount();
-        }
+        AttributeInstance m = new AttributeInstance(Attributes.ATTACK_DAMAGE, (inst) -> {
+        });
+        ItemAttributeModifiers stackMod = stack.get(DataComponents.ATTRIBUTE_MODIFIERS);
+        if (stackMod != null)
+            stackMod.forEach(EquipmentSlot.MAINHAND, (attr, mod) -> {
+                if (attr.equals(Attributes.ATTACK_DAMAGE))
+                    m.addTransientModifier(mod);
+            });
+        double dmg = m.getValue();
         int sharp = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SHARPNESS, stack);
         if (sharp > 0)
-            value += sharp * 0.5 + 0.5;
-        return Attributes.ATTACK_DAMAGE.sanitizeValue(value);
+            dmg += sharp * 0.5 + 0.5;
+        return Attributes.ATTACK_DAMAGE.value().sanitizeValue(dmg);
     }
 
     /**

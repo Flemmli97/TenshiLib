@@ -37,7 +37,7 @@ public abstract class OverlayTextureMixin {
 
     @ModifyConstant(method = "<init>", constant = @Constant(intValue = -1308622593, ordinal = 0))
     private int red(int orig) {
-        return this.tenshilib_getred(orig);
+        return this.tenshilib_getRed(orig);
     }
 
     @ModifyConstant(method = "<init>", constant = @Constant(intValue = 16777215, ordinal = 0))
@@ -47,23 +47,23 @@ public abstract class OverlayTextureMixin {
             this.initCounter = 0;
             this.initLoops++;
         }
-        return this.tenshilib_getcolor();
+        return this.tenshilib_getColor();
     }
 
-    private int tenshilib_getred(int orig) {
+    private int tenshilib_getRed(int orig) {
         this.initCounter++;
         if (this.initCounter == 16) {
             this.initCounter = 0;
             this.initLoops++;
         }
         int k = (int) ((1.0F - (float) this.initCounter / 15.0F * 0.75F) * 255);
-        return this.initLoops == 3 ? orig : k << 24 | this.tenshilib_getcolor();
+        return this.initLoops == 3 ? orig : k << 24 | this.tenshilib_getColor();
     }
 
     /**
      * r and b are swapped
      */
-    private int tenshilib_getcolor() {
+    private int tenshilib_getColor() {
         return switch (this.initLoops) {
             case 1 -> 0x00ff00;
             case 2 -> 0xff0000;

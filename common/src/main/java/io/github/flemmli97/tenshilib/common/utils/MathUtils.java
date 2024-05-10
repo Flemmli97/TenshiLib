@@ -11,9 +11,9 @@ import java.util.List;
 
 public class MathUtils {
 
-    public static final Vec3 normalX = new Vec3(1, 0, 0);
-    public static final Vec3 normalY = new Vec3(0, 1, 0);
-    public static final Vec3 normalZ = new Vec3(0, 0, 1);
+    public static final Vec3 NORMAL_X = new Vec3(1, 0, 0);
+    public static final Vec3 NORMAL_Y = new Vec3(0, 1, 0);
+    public static final Vec3 NORMAL_Z = new Vec3(0, 0, 1);
 
     public static float degToRad(float degree) {
         return degree * ((float) Math.PI / 180F);

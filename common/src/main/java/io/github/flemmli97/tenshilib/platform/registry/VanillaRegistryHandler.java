@@ -16,20 +16,19 @@ public class VanillaRegistryHandler<T> implements PlatformRegistry<T> {
 
     private final ResourceKey<? extends Registry<T>> key;
     private final String modid;
-    private final Map<VanillaEntrySupplier<T>, Supplier<? extends T>> entries = new LinkedHashMap<>();
-    private final Set<VanillaEntrySupplier<T>> entriesView = Collections.unmodifiableSet(this.entries.keySet());
+    private final Map<VanillaEntrySupplier<T, ? extends T>, Supplier<? extends T>> entries = new LinkedHashMap<>();
+    private final Set<VanillaEntrySupplier<T, ? extends T>> entriesView = Collections.unmodifiableSet(this.entries.keySet());
 
     public VanillaRegistryHandler(ResourceKey<? extends Registry<T>> key, String modid) {
         this.key = key;
         this.modid = modid;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <I extends T> RegistryEntrySupplier<I> register(String name, Supplier<? extends I> sup) {
+    public <I extends T> RegistryEntrySupplier<T, I> register(String name, Supplier<I> sup) {
         ResourceLocation id = new ResourceLocation(this.modid, name);
-        VanillaEntrySupplier<I> v = new VanillaEntrySupplier<>(id);
-        this.entries.putIfAbsent((VanillaEntrySupplier<T>) v, sup);
+        VanillaEntrySupplier<T, I> v = new VanillaEntrySupplier<>(id);
+        this.entries.putIfAbsent(v, sup);
         return v;
     }
 
@@ -37,10 +36,7 @@ public class VanillaRegistryHandler<T> implements PlatformRegistry<T> {
     public void registerContent() {
         Registry<T> registry = this.registryFrom();
         this.entries.forEach((v, s) -> {
-            T val = s.get();
-            if (val instanceof CustomRegistryEntry<?> entry)
-                entry.setRegistryName(v.getID());
-            Registry.register(registry, v.getID(), val);
+            Registry.register(registry, v.getID(), s.get());
             v.updateValue(registry);
         });
     }
@@ -54,7 +50,7 @@ public class VanillaRegistryHandler<T> implements PlatformRegistry<T> {
     }
 
     @Override
-    public Collection<? extends RegistryEntrySupplier<T>> getEntries() {
+    public Collection<? extends RegistryEntrySupplier<T, ? extends T>> getEntries() {
         return this.entriesView;
     }
 }

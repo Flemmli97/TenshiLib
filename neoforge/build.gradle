@@ -1,0 +1,1 @@
+apply from: "https://raw.githubusercontent.com/Flemmli97/GradleScripts/mc-architectury-fabric-neoforge/neoforge.gradle"

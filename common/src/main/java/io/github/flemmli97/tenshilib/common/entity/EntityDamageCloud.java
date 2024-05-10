@@ -73,9 +73,9 @@ public abstract class EntityDamageCloud extends Entity implements OwnableEntity 
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(SHOOTER_UUID, Optional.empty());
-        this.entityData.define(RADIUS, 0f);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(SHOOTER_UUID, Optional.empty());
+        builder.define(RADIUS, 0f);
     }
 
     public float getRadius() {

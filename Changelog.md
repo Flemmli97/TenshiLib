@@ -1,3 +1,13 @@
+TenshiLib 1.8.0
+================
+- Update to 1.20.6. Refactoring lots of things too
+
+TenshiLib 1.7.7
+================
+- Send animation data on tracking
+- Add some particle effects for patreon
+- Rewrite spawneggs to extend vanilla spawneggs
+
 TenshiLib 1.7.6
 ================
 - Allow keyset access for registry wrapper

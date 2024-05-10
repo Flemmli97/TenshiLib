@@ -2,13 +2,12 @@ package io.github.flemmli97.tenshilib.api.entity;
 
 import io.github.flemmli97.tenshilib.platform.EventCalls;
 import net.minecraft.util.Mth;
-import java.util.function.Function;
-
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class AnimationHandler<T extends Entity & IAnimated> {
@@ -17,7 +16,7 @@ public class AnimationHandler<T extends Entity & IAnimated> {
 
     private AnimatedAction currentAnim, lastAnim;
     private final T entity;
-    private final AnimatedAction[] anims;
+    private final AnimatedAction[] animations;
     private Predicate<AnimatedAction> onAnimationSetFunc;
     private Consumer<AnimatedAction> onAnimationSetCons;
     private Consumer<AnimatedAction> onRunAnimation;
@@ -27,7 +26,7 @@ public class AnimationHandler<T extends Entity & IAnimated> {
     public AnimationHandler(T entity, AnimatedAction[] anims) {
         this.entity = entity;
         Objects.requireNonNull(anims);
-        this.anims = anims;
+        this.animations = anims;
     }
 
     public AnimationHandler<T> setAnimationChangeFunc(Predicate<AnimatedAction> onAnimationSet) {
@@ -87,11 +86,11 @@ public class AnimationHandler<T extends Entity & IAnimated> {
     }
 
     public AnimatedAction[] getAnimations() {
-        return this.anims;
+        return this.animations;
     }
 
-    public boolean isCurrent(AnimatedAction... anims) {
-        for (AnimatedAction action : anims)
+    public boolean isCurrent(AnimatedAction... animations) {
+        for (AnimatedAction action : animations)
             if (action.is(this.getAnimation()))
                 return true;
         return false;

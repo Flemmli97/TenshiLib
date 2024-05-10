@@ -5,15 +5,30 @@ import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
 import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.client.ClientHandlers;
 import io.github.flemmli97.tenshilib.common.utils.ArrayUtils;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.Optional;
 
-public class S2CEntityAnimation implements Packet {
+public class S2CEntityAnimation implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = new ResourceLocation(TenshiLib.MODID, "s2c_entity_animation");
+    public static final Type<S2CEntityAnimation> TYPE = new Type<>(new ResourceLocation(TenshiLib.MODID, "s2c_entity_animation"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, S2CEntityAnimation> STREAM_CODEC = new StreamCodec<>() {
+        @Override
+        public S2CEntityAnimation decode(RegistryFriendlyByteBuf buf) {
+            return new S2CEntityAnimation(buf.readInt(), buf.readInt());
+        }
+
+        @Override
+        public void encode(RegistryFriendlyByteBuf buf, S2CEntityAnimation pkt) {
+            buf.writeInt(pkt.entityID);
+            buf.writeInt(pkt.animID);
+        }
+    };
 
     private final int entityID;
     private final int animID;
@@ -32,7 +47,7 @@ public class S2CEntityAnimation implements Packet {
         IAnimated entity = (IAnimated) e;
         this.animID = Optional.ofNullable(entity.getAnimationHandler().getAnimation())
                 .map(anim -> {
-                    if (anim == AnimatedAction.vanillaAttack)
+                    if (anim == AnimatedAction.VANILLA_ATTACK)
                         return -1;
                     else {
                         int i = 0;
@@ -50,22 +65,12 @@ public class S2CEntityAnimation implements Packet {
     }
 
     @Override
-    public void write(FriendlyByteBuf buf) {
-        buf.writeInt(this.entityID);
-        buf.writeInt(this.animID);
-    }
-
-    @Override
-    public ResourceLocation getID() {
-        return ID;
-    }
-
-    public static S2CEntityAnimation fromBytes(FriendlyByteBuf buf) {
-        return new S2CEntityAnimation(buf.readInt(), buf.readInt());
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
     public static class Handler {
-        public static void handlePacket(S2CEntityAnimation pkt) {
+        public static void handlePacket(S2CEntityAnimation pkt, Player player) {
             ClientHandlers.updateAnim(pkt.entityID, pkt.animID);
         }
     }

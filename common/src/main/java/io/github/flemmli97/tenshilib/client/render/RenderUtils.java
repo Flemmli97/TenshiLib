@@ -16,14 +16,13 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
 import java.util.Random;
 
 public class RenderUtils {
 
-    public static final int defaultColor = 0xFFFFFFFF;
+    public static final int DEFAULT_COLOR = 0xFFFFFFFF;
     private static final float TRIANGLE_MULT = (float) (Math.sqrt(3.0D) / 2.0D);
     private static final Random RANDOM = new Random(432L);
 
@@ -55,8 +54,8 @@ public class RenderUtils {
             float r = (float) (o - l);
             float s = (float) (p - m);
             float t = Mth.sqrt(q * q + r * r + s * s);
-            consumer.vertex(pose.pose(), (float) (k + x), (float) (l + y), (float) (m + z)).color(red, green, blue, alpha).normal(pose.normal(), q /= t, r /= t, s /= t).endVertex();
-            consumer.vertex(pose.pose(), (float) (n + x), (float) (o + y), (float) (p + z)).color(red, green, blue, alpha).normal(pose.normal(), q, r, s).endVertex();
+            consumer.vertex(pose.pose(), (float) (k + x), (float) (l + y), (float) (m + z)).color(red, green, blue, alpha).normal(pose, q /= t, r /= t, s /= t).endVertex();
+            consumer.vertex(pose.pose(), (float) (n + x), (float) (o + y), (float) (p + z)).color(red, green, blue, alpha).normal(pose, q, r, s).endVertex();
         });
     }
 
@@ -103,11 +102,11 @@ public class RenderUtils {
         xSize = xSize / 2f;
         ySize = ySize / 2f;
         Matrix4f matrix4f = stack.last().pose();
-        Matrix3f mat3f = stack.last().normal();
-        builder.vertex(matrix4f, -xSize, ySize, 0).color(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).uv(textureBuilder.u, textureBuilder.v).overlayCoords(textureBuilder.overlay).uv2(textureBuilder.light).normal(mat3f, 0, 0, 1).endVertex();
-        builder.vertex(matrix4f, xSize, ySize, 0).color(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).uv(textureBuilder.u + textureBuilder.uLength, textureBuilder.v).overlayCoords(textureBuilder.overlay).uv2(textureBuilder.light).normal(mat3f, 0, 0, 1).endVertex();
-        builder.vertex(matrix4f, xSize, -ySize, 0).color(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).uv(textureBuilder.u + textureBuilder.uLength, textureBuilder.v + textureBuilder.vLength).overlayCoords(textureBuilder.overlay).uv2(textureBuilder.light).normal(mat3f, 0, 0, 1).endVertex();
-        builder.vertex(matrix4f, -xSize, -ySize, 0).color(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).uv(textureBuilder.u, textureBuilder.v + textureBuilder.vLength).overlayCoords(textureBuilder.overlay).uv2(textureBuilder.light).normal(mat3f, 0, 0, 1).endVertex();
+        PoseStack.Pose pose = stack.last();
+        builder.vertex(matrix4f, -xSize, ySize, 0).color(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).uv(textureBuilder.u, textureBuilder.v).overlayCoords(textureBuilder.overlay).uv2(textureBuilder.light).normal(pose, 0, 0, 1).endVertex();
+        builder.vertex(matrix4f, xSize, ySize, 0).color(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).uv(textureBuilder.u + textureBuilder.uLength, textureBuilder.v).overlayCoords(textureBuilder.overlay).uv2(textureBuilder.light).normal(pose, 0, 0, 1).endVertex();
+        builder.vertex(matrix4f, xSize, -ySize, 0).color(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).uv(textureBuilder.u + textureBuilder.uLength, textureBuilder.v + textureBuilder.vLength).overlayCoords(textureBuilder.overlay).uv2(textureBuilder.light).normal(pose, 0, 0, 1).endVertex();
+        builder.vertex(matrix4f, -xSize, -ySize, 0).color(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).uv(textureBuilder.u, textureBuilder.v + textureBuilder.vLength).overlayCoords(textureBuilder.overlay).uv2(textureBuilder.light).normal(pose, 0, 0, 1).endVertex();
     }
 
     public static void renderGradientBeams3d(PoseStack stack, MultiBufferSource renderTypeBuffer, float length, float width, int ticks, float partialTicks, float rotationPerTick, int amount, BeamBuilder builder) {

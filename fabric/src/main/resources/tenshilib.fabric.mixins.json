@@ -7,6 +7,7 @@
     "ServerPlayerGameModeMixin",
     "PlayerMixin",
     "ServerPlayerMixin",
+    "SpawnEggMixin",
     "TrackingMixin"
   ],
   "client": [
@@ -14,8 +15,7 @@
     "ParticleEngineMixin",
     "EntityRendererDispatcherMixin",
     "LivingEntityRendererAccessor",
-    "LivingRendererMixin",
-    "HumanoidArmorLayerMixin"
+    "LivingRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

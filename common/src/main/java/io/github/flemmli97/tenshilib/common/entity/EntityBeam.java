@@ -18,7 +18,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -134,8 +133,8 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(SHOOTER_UUID, Optional.empty());
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(SHOOTER_UUID, Optional.empty());
     }
 
     @Override

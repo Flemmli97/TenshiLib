@@ -1,0 +1,26 @@
+modLoader="javafml"
+loaderVersion="[${loader_version},)"
+license="All rights reserved"
+issueTrackerURL="https://github.com/Flemmli97/TenshiLib/issues"
+[[mixins]]
+config = "tenshilib.mixins.json"
+[[mods]]
+modId="tenshilib"
+version="${version}"
+displayName="TenshiLib"
+displayURL="${homepage}"
+logoFile="icon.png"
+authors="Flemmli97"
+description='''Core and library mod for most of my mods. Contains useful hooks and functions'''
+[[dependencies.tenshilib]]
+modId="minecraft"
+type="required"
+versionRange="[${mcversion},)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.tenshilib]]
+modId="neoforge"
+type="required"
+versionRange="[${forge_version},)"
+ordering="NONE"
+side="BOTH"

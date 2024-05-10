@@ -1,18 +1,17 @@
 package io.github.flemmli97.tenshilib.common.particle;
 
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.flemmli97.tenshilib.platform.PlatformUtils;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 
 public class ColoredParticleData implements ParticleOptions {
 
-    public static Codec<ColoredParticleData> codec(ParticleType<ColoredParticleData> type) {
-        return RecordCodecBuilder.create((builder) -> builder.group(
+    public static MapCodec<ColoredParticleData> codec(ParticleType<ColoredParticleData> type) {
+        return RecordCodecBuilder.mapCodec((builder) -> builder.group(
                         Codec.FLOAT.fieldOf("r").forGetter(ColoredParticleData::getRed),
                         Codec.FLOAT.fieldOf("g").forGetter(ColoredParticleData::getGreen),
                         Codec.FLOAT.fieldOf("b").forGetter(ColoredParticleData::getBlue),
@@ -21,27 +20,23 @@ public class ColoredParticleData implements ParticleOptions {
                 .apply(builder, (r, g, b, a, scale) -> new ColoredParticleData(type, r, g, b, a, scale)));
     }
 
-    public static final Deserializer<ColoredParticleData> DESERIALIZER = new Deserializer<>() {
-        @Override
-        public ColoredParticleData fromCommand(ParticleType<ColoredParticleData> type, StringReader reader) throws CommandSyntaxException {
-            reader.expect(' ');
-            float r = reader.readFloat();
-            reader.expect(' ');
-            float g = reader.readFloat();
-            reader.expect(' ');
-            float b = reader.readFloat();
-            reader.expect(' ');
-            float a = reader.readFloat();
-            reader.expect(' ');
-            float scale = reader.readFloat();
-            return new ColoredParticleData(type, r, g, b, a, scale);
-        }
+    public static StreamCodec<RegistryFriendlyByteBuf, ColoredParticleData> streamCodec(ParticleType<ColoredParticleData> type) {
+        return new StreamCodec<>() {
+            @Override
+            public void encode(RegistryFriendlyByteBuf buffer, ColoredParticleData data) {
+                buffer.writeFloat(data.red);
+                buffer.writeFloat(data.green);
+                buffer.writeFloat(data.blue);
+                buffer.writeFloat(data.alpha);
+                buffer.writeFloat(data.scale);
+            }
 
-        @Override
-        public ColoredParticleData fromNetwork(ParticleType<ColoredParticleData> type, FriendlyByteBuf buffer) {
-            return new ColoredParticleData(type, buffer.readFloat(), buffer.readFloat(), buffer.readFloat(), buffer.readFloat(), buffer.readFloat());
-        }
-    };
+            @Override
+            public ColoredParticleData decode(RegistryFriendlyByteBuf buffer) {
+                return new ColoredParticleData(type, buffer.readFloat(), buffer.readFloat(), buffer.readFloat(), buffer.readFloat(), buffer.readFloat());
+            }
+        };
+    }
 
 
     private final ParticleType<? extends ColoredParticleData> type;
@@ -67,20 +62,6 @@ public class ColoredParticleData implements ParticleOptions {
     @Override
     public ParticleType<?> getType() {
         return this.type;
-    }
-
-    @Override
-    public void writeToNetwork(FriendlyByteBuf buffer) {
-        buffer.writeFloat(this.red);
-        buffer.writeFloat(this.green);
-        buffer.writeFloat(this.blue);
-        buffer.writeFloat(this.alpha);
-        buffer.writeFloat(this.scale);
-    }
-
-    @Override
-    public String writeToString() {
-        return PlatformUtils.INSTANCE.particles().getIDFrom(this.getType()).toString();
     }
 
     public float getRed() {

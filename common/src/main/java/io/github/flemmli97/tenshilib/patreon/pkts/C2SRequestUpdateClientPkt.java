@@ -1,31 +1,29 @@
 package io.github.flemmli97.tenshilib.patreon.pkts;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
-import io.github.flemmli97.tenshilib.common.network.Packet;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlatform;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
-public class C2SRequestUpdateClientPkt implements Packet {
+public class C2SRequestUpdateClientPkt implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = new ResourceLocation(TenshiLib.MODID, "c2s_update_effect_pkt");
+    public static final CustomPacketPayload.Type<C2SRequestUpdateClientPkt> TYPE = new CustomPacketPayload.Type<>(new ResourceLocation(TenshiLib.MODID, "c2s_update_effect_pkt"));
+    public static final C2SRequestUpdateClientPkt INSTANCE = new C2SRequestUpdateClientPkt();
+    public static final StreamCodec<RegistryFriendlyByteBuf, C2SRequestUpdateClientPkt> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
-    @Override
-    public void write(FriendlyByteBuf buf) {
+    private C2SRequestUpdateClientPkt() {
     }
 
-    @Override
-    public ResourceLocation getID() {
-        return ID;
-    }
-
-    public static C2SRequestUpdateClientPkt fromBytes(FriendlyByteBuf buf) {
-        return new C2SRequestUpdateClientPkt();
-    }
-
-    public static void handlePacketServer(C2SRequestUpdateClientPkt pkt, ServerPlayer player) {
+    public static void handlePacket(C2SRequestUpdateClientPkt pkt, ServerPlayer player) {
         PatreonPlatform.INSTANCE.sendToClient(player, player);
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }
 

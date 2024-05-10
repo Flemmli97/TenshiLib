@@ -5,17 +5,18 @@ import java.util.function.Supplier;
 
 public interface PlatformRegistry<T> {
 
-    <I extends T> RegistryEntrySupplier<I> register(String name, Supplier<? extends I> sup);
+    <I extends T> RegistryEntrySupplier<T, I> register(String name, Supplier<I> sup);
 
     /**
-     * Use registerContent
+     * Impl only for neoforge
+     *
+     * @param r The ModEventbus to pass
      */
-    @Deprecated
-    default void finalize(Object r) {
+    default void registerContent(Object r) {
         this.registerContent();
     }
 
     void registerContent();
 
-    Collection<? extends RegistryEntrySupplier<T>> getEntries();
+    Collection<? extends RegistryEntrySupplier<T, ? extends T>> getEntries();
 }

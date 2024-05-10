@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import java.util.Deque;
 
 @Mixin(PoseStack.class)
-public class PoseStackMixin implements PoseStackExt {
+public abstract class PoseStackMixin implements PoseStackExt {
 
     @Shadow
     private Deque<PoseStack.Pose> poseStack;

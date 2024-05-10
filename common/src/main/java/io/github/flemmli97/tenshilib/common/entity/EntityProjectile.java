@@ -98,8 +98,8 @@ public abstract class EntityProjectile extends Projectile {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(SHOOTER_UUID, Optional.empty());
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(SHOOTER_UUID, Optional.empty());
     }
 
     @Override
@@ -348,7 +348,7 @@ public abstract class EntityProjectile extends Projectile {
     protected void readAdditionalSaveData(CompoundTag compound) {
         this.inGround = compound.getBoolean("InGround");
         if (this.inGround)
-            this.setInGround(NbtUtils.readBlockPos(compound.getCompound("GroundPos")));
+            NbtUtils.readBlockPos(compound, "GroundPos").ifPresent(this::setInGround);
         if (compound.hasUUID("Shooter"))
             this.entityData.set(SHOOTER_UUID, Optional.of(compound.getUUID("Shooter")));
         this.shooter = this.getOwner();

@@ -15,7 +15,6 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
 public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityRenderer<T> {
@@ -139,7 +138,6 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
 
     protected void render3dBeam(PoseStack stack, VertexConsumer build, float[][] corners, float minX, float length, int animationFrame, float maxFrames, int light) {
         Matrix4f matrix4f = stack.last().pose();
-        Matrix3f mat3f = stack.last().normal();
         float vMin = (animationFrame - 1) / maxFrames;
         float vMax = animationFrame / maxFrames;
         for (int i = 0; i < corners.length; i++) {
@@ -149,32 +147,31 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
                 next = corners[i + 1];
             else
                 next = corners[0];
-            this.buildQuad(matrix4f, mat3f, build, minX, length, point[0], next[0], point[1], next[1], vMin, vMax, light, true);
+            this.buildQuad(matrix4f, stack.last(), build, minX, length, point[0], next[0], point[1], next[1], vMin, vMax, light, true);
         }
     }
 
     protected void renderBeam(PoseStack stack, VertexConsumer build, float minX, float length, float minY, float maxY, int animationFrame, float maxFrames, int light, boolean bothSided) {
         Matrix4f matrix4f = stack.last().pose();
-        Matrix3f mat3f = stack.last().normal();
-        this.buildQuad(matrix4f, mat3f, build, minX, length, minY, maxY, 0, 0, (animationFrame - 1) / maxFrames, animationFrame / maxFrames, light, bothSided);
+        this.buildQuad(matrix4f, stack.last(), build, minX, length, minY, maxY, 0, 0, (animationFrame - 1) / maxFrames, animationFrame / maxFrames, light, bothSided);
     }
 
-    protected void buildQuad(Matrix4f matrix4f, Matrix3f mat3f, VertexConsumer build, float minX, float length, float minY, float maxY, float minZ, float maxZ, float vMin, float vMax, int light, boolean bothSided) {
-        this.buildVertex(matrix4f, mat3f, build, minX, minY, minZ, 0, Math.max(0, vMin), 0, 0, 1, light);
-        this.buildVertex(matrix4f, mat3f, build, minX + length, minY, minZ, 1, Math.max(0, vMin), 0, 0, 1, light);
-        this.buildVertex(matrix4f, mat3f, build, minX + length, maxY, maxZ, 1, Math.min(1, vMax), 0, 0, 1, light);
-        this.buildVertex(matrix4f, mat3f, build, minX, maxY, maxZ, 0, Math.min(1, vMax), 0, 0, 1, light);
+    protected void buildQuad(Matrix4f matrix4f, PoseStack.Pose pose, VertexConsumer build, float minX, float length, float minY, float maxY, float minZ, float maxZ, float vMin, float vMax, int light, boolean bothSided) {
+        this.buildVertex(matrix4f, pose, build, minX, minY, minZ, 0, Math.max(0, vMin), 0, 0, 1, light);
+        this.buildVertex(matrix4f, pose, build, minX + length, minY, minZ, 1, Math.max(0, vMin), 0, 0, 1, light);
+        this.buildVertex(matrix4f, pose, build, minX + length, maxY, maxZ, 1, Math.min(1, vMax), 0, 0, 1, light);
+        this.buildVertex(matrix4f, pose, build, minX, maxY, maxZ, 0, Math.min(1, vMax), 0, 0, 1, light);
         if (bothSided) {
-            this.buildVertex(matrix4f, mat3f, build, minX, maxY, maxZ, 0, Math.min(1, vMax), 0, 0, 1, light);
-            this.buildVertex(matrix4f, mat3f, build, minX + length, maxY, maxZ, 1, Math.min(1, vMax), 0, 0, 1, light);
-            this.buildVertex(matrix4f, mat3f, build, minX + length, minY, minZ, 1, Math.max(0, vMin), 0, 0, 1, light);
-            this.buildVertex(matrix4f, mat3f, build, minX, minY, minZ, 0, Math.max(0, vMin), 0, 0, 1, light);
+            this.buildVertex(matrix4f, pose, build, minX, maxY, maxZ, 0, Math.min(1, vMax), 0, 0, 1, light);
+            this.buildVertex(matrix4f, pose, build, minX + length, maxY, maxZ, 1, Math.min(1, vMax), 0, 0, 1, light);
+            this.buildVertex(matrix4f, pose, build, minX + length, minY, minZ, 1, Math.max(0, vMin), 0, 0, 1, light);
+            this.buildVertex(matrix4f, pose, build, minX, minY, minZ, 0, Math.max(0, vMin), 0, 0, 1, light);
         }
     }
 
-    protected void buildVertex(Matrix4f matrix4f, Matrix3f matrix3f, VertexConsumer builder, float x, float y, float z, float u, float v, float nX, float nY, float nZ, int light) {
+    protected void buildVertex(Matrix4f matrix4f, PoseStack.Pose pose, VertexConsumer builder, float x, float y, float z, float u, float v, float nX, float nY, float nZ, int light) {
         builder.vertex(matrix4f, x, y, z).color(this.red, this.green, this.blue, this.alpha)
-                .uv(u, v).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(matrix3f, nX, nY, nZ).endVertex();
+                .uv(u, v).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(pose, nX, nY, nZ).endVertex();
     }
 
     /**

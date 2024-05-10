@@ -13,7 +13,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.player.Player;
@@ -44,12 +43,7 @@ public class AOEWeaponHandler {
         if (target.isAttackable()) {
             if (!target.skipAttackInteraction(player)) {
                 float baseDmg = (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE);
-                float enchantBonus;
-                if (target instanceof LivingEntity) {
-                    enchantBonus = EnchantmentHelper.getDamageBonus(player.getMainHandItem(), ((LivingEntity) target).getMobType());
-                } else {
-                    enchantBonus = EnchantmentHelper.getDamageBonus(player.getMainHandItem(), MobType.UNDEFINED);
-                }
+                float enchantBonus = EnchantmentHelper.getDamageBonus(player.getMainHandItem(), target.getType());
 
                 float cooldown = player.getAttackStrengthScale(0.5F);
                 baseDmg = baseDmg * (0.2F + cooldown * cooldown * 0.8F);
@@ -78,7 +72,7 @@ public class AOEWeaponHandler {
                         targetHealth = ((LivingEntity) target).getHealth();
                         if (j > 0 && !target.isOnFire()) {
                             burn = true;
-                            target.setSecondsOnFire(1);
+                            target.setRemainingFireTicks(1);
                         }
                     }
                     Vec3 vector3d = target.getDeltaMovement();
@@ -148,7 +142,7 @@ public class AOEWeaponHandler {
                             float damage = targetHealth - ((LivingEntity) target).getHealth();
                             player.awardStat(Stats.DAMAGE_DEALT, Math.round(damage * 10.0F));
                             if (j > 0) {
-                                target.setSecondsOnFire(j * 4);
+                                target.setRemainingFireTicks(j * 4);
                             }
 
                             if (player.level() instanceof ServerLevel && damage > 2.0F) {

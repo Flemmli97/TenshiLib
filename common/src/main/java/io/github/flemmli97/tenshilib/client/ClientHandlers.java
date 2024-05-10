@@ -27,7 +27,7 @@ public class ClientHandlers {
         Minecraft mc = Minecraft.getInstance();
         Entity e = mc.level.getEntity(entityID);
         if (e instanceof IAnimated anim) {
-            anim.getAnimationHandler().setAnimation(animID == -2 ? null : animID == -1 ? AnimatedAction.vanillaAttack : anim.getAnimationHandler().getAnimations()[animID]);
+            anim.getAnimationHandler().setAnimation(animID == -2 ? null : animID == -1 ? AnimatedAction.VANILLA_ATTACK : anim.getAnimationHandler().getAnimations()[animID]);
         }
     }
 

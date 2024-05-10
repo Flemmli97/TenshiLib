@@ -1,12 +1,14 @@
 package io.github.flemmli97.tenshilib.patreon;
 
+import io.github.flemmli97.tenshilib.patreon.effects.PatreonEffectConfig;
+import io.github.flemmli97.tenshilib.patreon.effects.PatreonEffects;
 import io.github.flemmli97.tenshilib.patreon.pkts.C2SEffectUpdatePkt;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 
 public class PatreonPlayerSetting {
 
-    private PatreonEffects.PatreonEffectConfig conf;
+    private PatreonEffectConfig conf;
     private RenderLocation renderLocation = RenderLocation.HAT;
     private boolean render = true;
     private int color;
@@ -32,7 +34,7 @@ public class PatreonPlayerSetting {
         }
     }
 
-    public void setEffect(PatreonEffects.PatreonEffectConfig conf) {
+    public void setEffect(PatreonEffectConfig conf) {
         this.conf = conf;
         if (this.conf != null) {
             this.renderLocation = this.conf.defaultLoc();
@@ -40,7 +42,7 @@ public class PatreonPlayerSetting {
         }
     }
 
-    public PatreonEffects.PatreonEffectConfig effect() {
+    public PatreonEffectConfig effect() {
         return this.conf;
     }
 
@@ -54,6 +56,11 @@ public class PatreonPlayerSetting {
 
     public int getColor() {
         return this.color;
+    }
+
+    public void tick(Player player) {
+        if (this.effect() != null && this.render)
+            this.effect().tick(player);
     }
 
     public CompoundTag save(CompoundTag tag) {
@@ -93,7 +100,7 @@ public class PatreonPlayerSetting {
         this.color = pkt.color;
     }
 
-    public void update(PatreonEffects.PatreonEffectConfig effect, RenderLocation location, boolean render, int color) {
+    public void update(PatreonEffectConfig effect, RenderLocation location, boolean render, int color) {
         this.conf = effect;
         if (this.conf != null) {
             if (this.conf.locationAllowed(location))
