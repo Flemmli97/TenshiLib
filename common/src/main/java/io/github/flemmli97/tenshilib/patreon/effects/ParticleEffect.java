@@ -32,14 +32,17 @@ public class ParticleEffect extends PatreonEffectConfig {
     public void tick(Player player) {
         if (!(player instanceof ServerPlayer serverPlayer))
             return;
-        for (Particle particle : this.particles) {
+        for (int i = 0; i < this.particles.length; i++) {
+            Particle particle = this.particles[i];
             if (particle.chance < 1 && player.getRandom().nextFloat() < particle.chance)
                 continue;
             Vector3f off = RayTraceUtils.rotatedAround(particle.position, Vector3f.YP, -player.getYHeadRot());
             Vec3 pos = player.position().add(off.x(), off.y(), off.z());
-            if (particle.playerApply != null)
-                pos = pos.add(particle.playerApply.apply(player));
-            Vec3 delta = particle.container.delta.map(d -> d.apply(player)).orElse(Vec3.ZERO);
+            if (particle.container.positionMod.isPresent())
+                pos = pos.add(particle.container.positionMod.get().apply(player, i));
+            Vec3 delta = Vec3.ZERO;
+            if (particle.container.delta.isPresent())
+                delta = particle.container.delta.get().apply(player, i);
             serverPlayer.getLevel().sendParticles(particle.container.particle, pos.x(), pos.y(), pos.z(), 0, delta.x, delta.y, delta.z, 1);
         }
     }
@@ -59,8 +62,7 @@ public class ParticleEffect extends PatreonEffectConfig {
         return NONE;
     }
 
-    public record Particle(Vec3 position, Function<Player, Vec3> playerApply, float chance,
-                           ParticleContainer container) {
+    public record Particle(Vec3 position, float chance, ParticleContainer container) {
     }
 
     public static class Builder {
@@ -106,12 +108,19 @@ public class ParticleEffect extends PatreonEffectConfig {
         }
 
         public Pattern addParticle(char key, ParticleOptions particle) {
-            this.particles.put(key, new ParticleContainer(particle, Optional.empty()));
-            return this;
+            return this.addParticle(key, particle, null, null);
         }
 
-        public Pattern addParticle(char key, ParticleOptions particle, Function<Player, Vec3> delta) {
-            this.particles.put(key, new ParticleContainer(particle, Optional.of(delta)));
+        public Pattern addParticleDelta(char key, ParticleOptions particle, ParticleVector delta) {
+            return this.addParticle(key, particle, null, delta);
+        }
+
+        public Pattern addParticlePos(char key, ParticleOptions particle, ParticleVector position) {
+            return this.addParticle(key, particle, position, null);
+        }
+
+        public Pattern addParticle(char key, ParticleOptions particle, ParticleVector position, ParticleVector delta) {
+            this.particles.put(key, new ParticleContainer(particle, Optional.ofNullable(position), Optional.ofNullable(delta)));
             return this;
         }
 
@@ -133,7 +142,7 @@ public class ParticleEffect extends PatreonEffectConfig {
                             case Y -> this.initialOffset.add(planeX, 0, planeY);
                             case Z -> this.initialOffset.add(0, planeY, planeX);
                         };
-                        result.add(new Particle(pos, particle.delta.orElse(null), 1, particle));
+                        result.add(new Particle(pos, 1, particle));
                     }
                     planeX += this.spacing;
                 }
@@ -144,6 +153,12 @@ public class ParticleEffect extends PatreonEffectConfig {
         }
     }
 
-    private record ParticleContainer(ParticleOptions particle, Optional<Function<Player, Vec3>> delta) {
+    private record ParticleContainer(ParticleOptions particle, Optional<ParticleVector> positionMod,
+                                     Optional<ParticleVector> delta) {
+    }
+
+    public interface ParticleVector {
+
+        Vec3 apply(Player player, int num);
     }
 }
