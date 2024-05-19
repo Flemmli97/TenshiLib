@@ -114,6 +114,7 @@ public class SpawnEgg extends SpawnEggItem {
     }
 
     public static Optional<SpawnEgg> fromType(EntityType<?> type) {
+        resolveEggs();
         return Optional.ofNullable(EGGS.get(type));
     }
 
