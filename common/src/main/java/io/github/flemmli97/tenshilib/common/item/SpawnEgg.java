@@ -50,8 +50,8 @@ import java.util.function.Supplier;
  */
 public class SpawnEgg extends SpawnEggItem {
 
-    private static final Map<Supplier<? extends EntityType<? extends Mob>>, SpawnEgg> EGGS_SUP = Maps.newIdentityHashMap();
-    private static final Map<EntityType<? extends Mob>, SpawnEgg> EGGS = Maps.newIdentityHashMap();
+    private static final Map<Supplier<? extends EntityType<?>>, SpawnEgg> EGGS_SUP = Maps.newIdentityHashMap();
+    private static final Map<EntityType<?>, SpawnEgg> EGGS = Maps.newIdentityHashMap();
     private static final Map<EntityType<? extends Mob>, SpawnEggItem> BY_ID = fetchMapFromSpawnEgg();
     private static boolean resolved;
 
@@ -63,12 +63,26 @@ public class SpawnEgg extends SpawnEggItem {
     };
 
     private final Supplier<? extends EntityType<?>> type;
+    private final boolean mob;
 
-    public SpawnEgg(Supplier<? extends EntityType<? extends Mob>> type, int primary, int secondary, Properties props) {
+    public SpawnEgg(Supplier<? extends EntityType<?>> type, int primary, int secondary, Properties props) {
         super(null, primary, secondary, props);
         BY_ID.remove(null);
         this.type = type;
+        this.mob = false;
         this.onInit(type);
+    }
+
+    /**
+     * Constructor with a generics check as vanilla spawnegg map uses a EntityType<? extends Mob> key map.
+     * If you don't use this constructor the spawnegg will not be added to the vanilla map
+     */
+    public SpawnEgg(EntityTypeHolder<?> type, int primary, int secondary, Properties props) {
+        super(null, primary, secondary, props);
+        BY_ID.remove(null);
+        this.type = type.type;
+        this.mob = Mob.class.isAssignableFrom(type.clss);
+        this.onInit(type.type);
     }
 
     @SuppressWarnings("unchecked")
@@ -92,18 +106,19 @@ public class SpawnEgg extends SpawnEggItem {
     /**
      * Resolve the suppliers. Adding to vanilla map if applicable
      */
+    @SuppressWarnings("unchecked")
     public static void resolveEggs() {
         if (resolved)
             return;
         resolved = true;
         EGGS_SUP.forEach((type, egg) -> {
-            if (egg.addToDefaultSpawneggs())
-                BY_ID.put(type.get(), egg);
+            if (egg.addToDefaultSpawneggs() && egg.mob)
+                BY_ID.put((EntityType<? extends Mob>) type.get(), egg);
             EGGS.put(type.get(), egg);
         });
     }
 
-    protected void onInit(Supplier<? extends EntityType<? extends Mob>> type) {
+    protected void onInit(Supplier<? extends EntityType<?>> type) {
         EGGS_SUP.put(type, this);
     }
 
@@ -137,6 +152,10 @@ public class SpawnEgg extends SpawnEggItem {
         return DEF;
     }
 
+    /**
+     * Whether the spawnegg should be added to the vanilla map or not.
+     * If you didn't use the correct constructor this will not do anything
+     */
     public boolean addToDefaultSpawneggs() {
         return true;
     }
@@ -239,5 +258,8 @@ public class SpawnEgg extends SpawnEggItem {
         }
 
         return this.type.get();
+    }
+
+    public record EntityTypeHolder<T extends Entity>(Class<T> clss, Supplier<? extends EntityType<? extends T>> type) {
     }
 }

@@ -1,6 +1,8 @@
 TenshiLib 1.7.8
 ================
 - Add byNameCodec to registry wrappers
+- Add json codec wrapper
+- Loosen generics on spawnegg
 
 TenshiLib 1.7.7
 ================

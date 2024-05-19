@@ -57,11 +57,18 @@ public class CodecUtils {
      * @param gson The Gson instance that handles the value. The instance needs to be able to handle it (e.g. by having a serializer registered)
      */
     public static <E> Codec<E> jsonCodecBuilder(Gson gson, Class<E> clss, String name) {
+        return jsonCodecBuilder(gson::toJsonTree, e -> gson.fromJson(e, clss), name);
+    }
+
+    /**
+     * A codec that encodes/decodes via a json converter
+     */
+    public static <E> Codec<E> jsonCodecBuilder(Function<E, JsonElement> encode, Function<JsonElement, E> decode, String name) {
         return new Codec<>() {
             @Override
             public <T> DataResult<T> encode(E input, DynamicOps<T> ops, T prefix) {
                 try {
-                    JsonElement e = gson.toJsonTree(input);
+                    JsonElement e = encode.apply(input);
                     return DataResult.success(NullableJsonOps.INSTANCE.convertTo(ops, e));
                 } catch (JsonParseException err) {
                     return DataResult.error("Couldn't encode value " + input + " error: " + err);
@@ -72,7 +79,7 @@ public class CodecUtils {
             public <T> DataResult<Pair<E, T>> decode(DynamicOps<T> ops, T input) {
                 JsonElement element = ops.convertTo(JsonOps.INSTANCE, input);
                 try {
-                    E result = gson.fromJson(element, clss);
+                    E result = decode.apply(element);
                     return DataResult.success(Pair.of(result, input));
                 } catch (JsonParseException err) {
                     return DataResult.error("Couldn't decode value " + err);
