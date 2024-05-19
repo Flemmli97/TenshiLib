@@ -126,10 +126,8 @@ public class SpawnEgg extends SpawnEggItem {
         return Iterables.unmodifiableIterable(EGGS_SUP.values());
     }
 
-    /**
-     * IDK how to find it faster since its saved as suppliers
-     */
     public static Optional<SpawnEgg> fromType(EntityType<?> type) {
+        resolveEggs();
         return Optional.ofNullable(EGGS.get(type));
     }
 
