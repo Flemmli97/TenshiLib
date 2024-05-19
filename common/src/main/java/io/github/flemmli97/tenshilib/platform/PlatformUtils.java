@@ -15,6 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public abstract class PlatformUtils {
 
@@ -33,6 +34,7 @@ public abstract class PlatformUtils {
     /**
      * Obtains a custom registry.
      * Note on fabric: Since there is no loading order be careful of calling this. The registry might not have been created yet
+     * In most cases this shouldn't be used
      */
     public abstract <T> PlatformRegistry<T> customRegistry(ResourceKey<? extends Registry<T>> registryKey, String modid);
 
@@ -40,8 +42,10 @@ public abstract class PlatformUtils {
      * Creates a custom registry.
      * On fabric the registry is created immediately
      * On forge the registry is created on RegistryEvent.NewRegistry
+     *
+     * @param registryRef A callback to the newly created Registry
      */
-    public abstract <T> PlatformRegistry<T> customRegistry(ResourceKey<? extends Registry<T>> registryKey, ResourceLocation defaultVal, boolean saveToDisk, boolean sync);
+    public abstract <T> PlatformRegistry<T> newRegistry(ResourceKey<? extends Registry<T>> registryKey, ResourceLocation defaultVal, boolean saveToDisk, boolean sync, Consumer<Registry<T>> registryRef);
 
     public TagKey<Item> itemTag(ResourceLocation res) {
         return TagKey.create(BuiltInRegistries.ITEM.key(), res);

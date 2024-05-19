@@ -1,3 +1,7 @@
+TenshiLib 1.8.1
+================
+- Add registry callback for new registries
+
 TenshiLib 1.8.0
 ================
 - Update to 1.20.6. Refactoring lots of things too

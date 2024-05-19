@@ -18,6 +18,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class PlatformUtilsImpl extends PlatformUtils {
 
@@ -27,13 +28,14 @@ public class PlatformUtilsImpl extends PlatformUtils {
     }
 
     @Override
-    public <T> PlatformRegistry<T> customRegistry(ResourceKey<? extends Registry<T>> registryKey, ResourceLocation defaultVal, boolean saveToDisk, boolean sync) {
+    public <T> PlatformRegistry<T> newRegistry(ResourceKey<? extends Registry<T>> registryKey, ResourceLocation defaultVal, boolean saveToDisk, boolean sync,
+                                               Consumer<Registry<T>> registryRef) {
         FabricRegistryBuilder<T, WritableRegistry<T>> builder = FabricRegistryBuilder.from(new DefaultedMappedRegistry<>(defaultVal.toString(), registryKey, Lifecycle.stable(), false));
         if (saveToDisk)
             builder.attribute(RegistryAttribute.SYNCED);
         if (sync)
             builder.attribute(RegistryAttribute.SYNCED);
-        builder.buildAndRegister();
+        registryRef.accept(builder.buildAndRegister());
         return new VanillaRegistryHandler<>(registryKey, registryKey.location().getNamespace());
     }
 

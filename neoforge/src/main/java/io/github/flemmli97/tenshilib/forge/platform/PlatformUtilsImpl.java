@@ -30,9 +30,10 @@ public class PlatformUtilsImpl extends PlatformUtils {
     }
 
     @Override
-    public <T> PlatformRegistry<T> customRegistry(ResourceKey<? extends Registry<T>> registryKey, ResourceLocation defaultVal, boolean saveToDisk, boolean sync) {
+    public <T> PlatformRegistry<T> newRegistry(ResourceKey<? extends Registry<T>> registryKey, ResourceLocation defaultVal, boolean saveToDisk, boolean sync,
+                                               Consumer<Registry<T>> registryRef) {
         DeferredRegister<T> r = DeferredRegister.create(registryKey, registryKey.location().getNamespace());
-        r.makeRegistry(b -> b.defaultKey(defaultVal).sync(sync));
+        registryRef.accept(r.makeRegistry(b -> b.defaultKey(defaultVal).sync(sync)));
         return new ForgeRegistryHandler<>(r);
     }
 
