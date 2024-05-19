@@ -1,3 +1,7 @@
+TenshiLib 1.7.8
+================
+- Add byNameCodec to registry wrappers
+
 TenshiLib 1.7.7
 ================
 - Send animation data on tracking

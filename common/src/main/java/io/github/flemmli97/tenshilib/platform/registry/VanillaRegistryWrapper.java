@@ -1,5 +1,6 @@
 package io.github.flemmli97.tenshilib.platform.registry;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 
@@ -42,5 +43,10 @@ public record VanillaRegistryWrapper<T>(Registry<T> delegate) implements SimpleR
     @Override
     public Collection<ResourceLocation> keys() {
         return this.delegate.keySet();
+    }
+
+    @Override
+    public Codec<T> byNameCodec() {
+        return this.delegate().byNameCodec();
     }
 }

@@ -1,5 +1,6 @@
 package io.github.flemmli97.tenshilib.forge.platform.registry;
 
+import com.mojang.serialization.Codec;
 import io.github.flemmli97.tenshilib.platform.registry.SimpleRegistryWrapper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -44,5 +45,10 @@ public record ForgeRegistryWrapper<T extends IForgeRegistryEntry<T>>(
     @Override
     public Collection<ResourceLocation> keys() {
         return this.registry.getKeys();
+    }
+
+    @Override
+    public Codec<T> byNameCodec() {
+        return this.registry.getCodec();
     }
 }

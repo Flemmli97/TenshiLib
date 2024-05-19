@@ -1,5 +1,6 @@
 package io.github.flemmli97.tenshilib.platform.registry;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collection;
@@ -23,4 +24,6 @@ public interface SimpleRegistryWrapper<T> {
     boolean contains(ResourceLocation id);
 
     Collection<ResourceLocation> keys();
+
+    Codec<T> byNameCodec();
 }
