@@ -32,7 +32,7 @@ public class EventCallsImpl implements EventCalls {
 
     @Override
     public Pair<Boolean, Float> criticalAttackCall(Player player, Entity target, boolean crit, float dmgMod) {
-        return Pair.of(true, dmgMod);
+        return Pair.of(crit, dmgMod);
     }
 
     @Override

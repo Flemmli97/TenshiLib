@@ -34,8 +34,8 @@ public class EventCallsImpl implements EventCalls {
 
     @Override
     public Pair<Boolean, Float> criticalAttackCall(Player player, Entity target, boolean crit, float dmgMod) {
-        CriticalHitEvent hitResult = CommonHooks.getCriticalHit(player, target, crit, dmgMod);
-        return Pair.of(hitResult != null, hitResult == null ? dmgMod : hitResult.getDamageModifier());
+        CriticalHitEvent hitResult = CommonHooks.fireCriticalHit(player, target, crit, dmgMod);
+        return Pair.of(hitResult.isCriticalHit(), hitResult.getDamageMultiplier());
     }
 
     @Override

@@ -10,7 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.bus.api.Event;
+import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
@@ -31,7 +31,7 @@ public class CommonEvents {
 
     public static void disableOffhandBlock(PlayerInteractEvent.RightClickBlock event) {
         if (event.getHand() == InteractionHand.OFF_HAND && event.getEntity().getMainHandItem().getItem() instanceof IDualWeapon weapon && weapon.disableOffhand()) {
-            event.setUseItem(Event.Result.DENY);
+            event.setUseItem(TriState.FALSE);
         }
     }
 
