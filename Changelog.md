@@ -1,3 +1,7 @@
+TenshiLib 1.8.1.b
+================
+- Update neoforge
+
 TenshiLib 1.8.1
 ================
 - Add registry callback for new registries
