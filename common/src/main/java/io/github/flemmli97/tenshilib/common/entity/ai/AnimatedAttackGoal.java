@@ -14,6 +14,10 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.EnumSet;
 
+/**
+ * Use {@link io.github.flemmli97.tenshilib.common.entity.ai.animated.AnimatedAttackGoal}
+ */
+@Deprecated
 public abstract class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> extends Goal {
 
     protected final T attacker;

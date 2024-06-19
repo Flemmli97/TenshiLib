@@ -1,3 +1,7 @@
+TenshiLib 1.9.0
+================
+- New animated attack system
+
 TenshiLib 1.7.8
 ================
 - Add byNameCodec to registry wrappers
