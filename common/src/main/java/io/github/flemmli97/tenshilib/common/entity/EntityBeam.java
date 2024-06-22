@@ -32,7 +32,6 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
 
     private Entity shooter;
     protected int livingTicks;
-    protected int coolDown;
     protected HitResult hit;
     protected Vec3 hitVec;
 
@@ -151,9 +150,11 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         super.tick();
         this.livingTicks++;
         if (!this.level.isClientSide) {
-            if (this.livingTicks >= this.livingTickMax())
+            if (this.livingTicks > this.livingTickMax()) {
                 this.remove(RemovalReason.KILLED);
-            if (this.hit != null && --this.coolDown <= 0 && this.isAlive()) {
+                return;
+            }
+            if (this.hit != null && this.canStartDamage() && this.isAlive()) {
                 List<Entity> list = this.level.getEntities(this,
                         new AABB(this.getX(), this.getY(), this.getZ(), this.hitVec.x, this.hitVec.y, this.hitVec.z).inflate(1 + this.radius()));
                 Vec3 pos = this.position();
@@ -162,7 +163,6 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
                         EntityHitResult raytraceresult = new EntityHitResult(entity);
                         if (!EventCalls.INSTANCE.beamHitCall(this, raytraceresult)) {
                             this.onImpact(raytraceresult);
-                            this.coolDown = this.attackCooldown();
                             if (!this.piercing())
                                 return;
                         }
@@ -198,8 +198,8 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         return this.livingTicks;
     }
 
-    public int attackCooldown() {
-        return 20;
+    public boolean canStartDamage() {
+        return (this.livingTicks - 1) % 20 == 0;
     }
 
     @Override

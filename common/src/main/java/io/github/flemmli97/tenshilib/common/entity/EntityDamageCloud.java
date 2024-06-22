@@ -69,7 +69,7 @@ public abstract class EntityDamageCloud extends Entity implements OwnableEntity 
     }
 
     public boolean canStartDamage() {
-        return this.livingTicks % 5 == 0;
+        return (this.livingTicks - 1) % 5 == 0;
     }
 
     @Override
@@ -101,8 +101,10 @@ public abstract class EntityDamageCloud extends Entity implements OwnableEntity 
         super.tick();
         this.livingTicks++;
         if (!this.level.isClientSide) {
-            if (this.livingTicks > this.livingTickMax())
+            if (this.livingTicks > this.livingTickMax()) {
                 this.remove(RemovalReason.KILLED);
+                return;
+            }
             float radius = this.getRadius();
             if (radius < this.maxRadius()) {
                 this.setRadius(radius + this.radiusIncrease());

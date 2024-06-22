@@ -19,7 +19,6 @@ import java.util.List;
 
 /**
  * Attack goal using a very customizable animated attack system
- * @param <T>
  */
 public class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> extends Goal {
 
