@@ -11,7 +11,7 @@ public class StrafingRunner<T extends PathfinderMob & IAnimated> implements Acti
 
     private final float radius, speed, directionSwitchChance;
 
-    private boolean clockWise;
+    private boolean start, clockWise;
     private int strafingTime;
     private int seeTime;
 
@@ -27,6 +27,10 @@ public class StrafingRunner<T extends PathfinderMob & IAnimated> implements Acti
 
     @Override
     public boolean run(AnimatedAttackGoal<T> goal, LivingEntity target, AnimatedAction anim) {
+        if (!this.start) {
+            this.start = true;
+            this.clockWise = goal.attacker.getRandom().nextBoolean();
+        }
         boolean saw = this.seeTime > 0;
         if (goal.canSee != saw) {
             this.seeTime = 0;
