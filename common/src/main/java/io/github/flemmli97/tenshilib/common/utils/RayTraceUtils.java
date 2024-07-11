@@ -104,6 +104,8 @@ public class RayTraceUtils {
 
     public static HitResult entityRayTrace(Entity e, float range, ClipContext.Block blockMode, ClipContext.Fluid fluidMode,
                                            boolean includeEntities, boolean getEntityHitVec, @Nullable Predicate<Entity> pred) {
+        if (pred == null)
+            pred = entity -> true;
         Vec3 posEye = e.getEyePosition(1);
         Vec3 dir = e.getLookAngle().scale(range);
         Vec3 lookPos = posEye.add(dir);
@@ -116,7 +118,7 @@ public class RayTraceUtils {
             if (getEntityHitVec)
                 entityHitResult = rayTraceEntities(e.level, e, posEye, lookPos, e.getBoundingBox().expandTowards(dir).inflate(1.0D), pred, ent -> 0.3f);
             else
-                entityHitResult = ProjectileUtil.getEntityHitResult(e.level, e, posEye, lookPos, e.getBoundingBox().expandTowards(dir).inflate(1.0D), pred == null ? entity -> true : pred);
+                entityHitResult = ProjectileUtil.getEntityHitResult(e.level, e, posEye, lookPos, e.getBoundingBox().expandTowards(dir).inflate(1.0D), pred);
 
             if (entityHitResult != null) {
                 raytraceresult = entityHitResult;
