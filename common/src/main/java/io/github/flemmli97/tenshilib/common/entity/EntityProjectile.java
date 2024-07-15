@@ -131,31 +131,34 @@ public abstract class EntityProjectile extends Projectile {
         this.shoot(dir.x, dir.y, dir.z, velocity, inaccuracy);
     }
 
-    public void shootAtEntity(Entity target, float velocity, float inaccuracy, float yOffsetModifier) {
-        this.shootAtEntity(target, velocity, inaccuracy, yOffsetModifier, 0.33);
-    }
-
     /**
-     * Shoot at the given entity. Unlike #shootAtPosition this doesnt shoot directly where the entity is but rather through it (like arrows)
-     *
-     * @param yOffsetModifier Modifies the offset of the y motion based on distance to target. Vanilla arrows use 0.2
+     * Shoot at the given entity. Considers the gravity of the projectile too so it will aim a bit higher if needed
      */
-    public void shootAtEntity(Entity target, float velocity, float inaccuracy, float yOffsetModifier, double heightMod) {
-        Vec3 targetPos = new Vec3(target.getX(), target.getY(heightMod), target.getZ());
-        if (this.getGravityVelocity() == 0)
-            targetPos = EntityUtil.getStraightProjectileTarget(this.position(), target);
+    public void shootAtEntity(Entity target, float velocity, float inaccuracy) {
+        Vec3 targetPos = EntityUtil.getStraightProjectileTarget(this.position(), target);
         Vec3 dir = new Vec3(targetPos.x() - this.getX(), targetPos.y() - this.getY(), targetPos.z() - this.getZ());
-        double l = Math.sqrt(dir.x * dir.x + dir.z * dir.z);
-        this.shoot(dir.x, dir.y + l * yOffsetModifier, dir.z, velocity, inaccuracy);
+        if (this.getGravityVelocity() == 0)
+            this.shoot(dir.x, dir.y, dir.z, velocity, inaccuracy);
+        else {
+            Vec3 motion = dir.normalize().add(this.random.nextGaussian() * 0.0075F * inaccuracy, this.random.nextGaussian() * 0.0075F * inaccuracy, this.random.nextGaussian() * 0.0075F * inaccuracy).scale(velocity);
+            double gravityOffset = dir.length() / motion.length() * 0.5 * this.getGravityVelocity();
+            gravityOffset *= 0.99; // Friction
+            motion = motion.add(0, gravityOffset, 0);
+            this.setMotionWithRotation(motion);
+        }
     }
 
     @Override
     public void shoot(double x, double y, double z, float velocity, float inaccuracy) {
-        Vec3 vector3d = (new Vec3(x, y, z)).normalize().add(this.random.nextGaussian() * 0.0075F * inaccuracy, this.random.nextGaussian() * 0.0075F * inaccuracy, this.random.nextGaussian() * 0.0075F * inaccuracy).scale(velocity);
-        this.setDeltaMovement(vector3d);
-        double f = Math.sqrt(horizontalMag(vector3d));
-        this.setYRot((float) (Mth.atan2(vector3d.x, vector3d.z) * (180F / (float) Math.PI)));
-        this.setXRot((float) (Mth.atan2(vector3d.y, f) * (180F / (float) Math.PI)));
+        Vec3 motion = new Vec3(x, y, z).normalize().add(this.random.nextGaussian() * 0.0075F * inaccuracy, this.random.nextGaussian() * 0.0075F * inaccuracy, this.random.nextGaussian() * 0.0075F * inaccuracy).scale(velocity);
+        this.setMotionWithRotation(motion);
+    }
+
+    private void setMotionWithRotation(Vec3 motion) {
+        this.setDeltaMovement(motion);
+        double f = Math.sqrt(horizontalMag(motion));
+        this.setYRot((float) (Mth.atan2(motion.x, motion.z) * (180F / (float) Math.PI)));
+        this.setXRot((float) (Mth.atan2(motion.y, f) * (180F / (float) Math.PI)));
         this.yRotO = this.getYRot();
         this.xRotO = this.getXRot();
         this.ticksInGround = 0;
