@@ -15,6 +15,9 @@ public class ParticleRenderTypes {
 
     /**
      * From botanias particle types (vazkii.botania.client.fx.FXWisp)
+     * This RenderType applies a blur to the particle sheet.
+     * Neighboring particles thus overflow into the current particle!
+     * Reducing the UV can circumvent this
      */
     public static final ParticleRenderType TRANSLUCENTADD = new ParticleRenderType() {
         @Override
