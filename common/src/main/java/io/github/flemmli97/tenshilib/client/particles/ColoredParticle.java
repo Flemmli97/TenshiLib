@@ -14,6 +14,12 @@ public class ColoredParticle extends TextureSheetParticle {
     public final SpriteSet spriteProvider;
 
     protected boolean randomMovements, gravity;
+    /**
+     * The size of the particles texture.
+     * This is important since we reduce the size of uv by one pixel to prevent texture atlas overflow from using a blurred texture (e.g. by using {@link ParticleRenderTypes#TRANSLUCENTADD}.
+     * Set to 0 to disable
+     */
+    protected int textureSizeX = 16, textureSizeY = 16;
 
     public ColoredParticle(ClientLevel world, double x, double y, double z, double motionX, double motionY, double motionZ,
                            ColoredParticleData colorData, SpriteSet sprite, int maxAge, float minAgeRand, float maxAgeRand,
@@ -51,30 +57,38 @@ public class ColoredParticle extends TextureSheetParticle {
 
     @Override
     protected float getU0() {
+        if (this.textureSizeX <= 0)
+            return super.getU0();
         float u0 = super.getU0();
         float u1 = super.getU1();
-        return u0 + (u1 - u0) * 0.125f;
+        return u0 + (u1 - u0) * (1f / this.textureSizeX);
     }
 
     @Override
     protected float getU1() {
+        if (this.textureSizeX <= 0)
+            return super.getU1();
         float u0 = super.getU0();
         float u1 = super.getU1();
-        return u1 - (u1 - u0) * 0.125f;
+        return u1 - (u1 - u0) * (1f / this.textureSizeX);
     }
 
     @Override
     protected float getV0() {
+        if (this.textureSizeY <= 0)
+            return super.getV0();
         float v0 = super.getV0();
         float v1 = super.getV1();
-        return v0 + (v1 - v0) * 0.125f;
+        return v0 + (v1 - v0) * (1f / this.textureSizeY);
     }
 
     @Override
     protected float getV1() {
+        if (this.textureSizeY <= 0)
+            return super.getV1();
         float v0 = super.getV0();
         float v1 = super.getV1();
-        return v1 - (v1 - v0) * 0.125f;
+        return v1 - (v1 - v0) * (1f / this.textureSizeY);
     }
 
     @Override
