@@ -1,6 +1,9 @@
 TenshiLib 1.9.0
 ================
 - New animated attack system
+- Fix nullpointer with raytrace predicate
+- Reduce uv of blurred particles
+- Improve projectile motion when shot
 
 TenshiLib 1.7.8
 ================
