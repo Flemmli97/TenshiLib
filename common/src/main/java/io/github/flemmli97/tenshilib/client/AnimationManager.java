@@ -38,7 +38,7 @@ public class AnimationManager implements ResourceManagerReloadListener {
             try {
                 InputStream input = res.getValue().open();
                 JsonObject obj = GSON.getAdapter(JsonObject.class).read(GSON.newJsonReader(new InputStreamReader(input)));
-                ResourceLocation animID = new ResourceLocation(res.getKey().getNamespace(), res.getKey().getPath().replace("animation/entity/", "").replace(".json", ""));
+                ResourceLocation animID = ResourceLocation.fromNamespaceAndPath(res.getKey().getNamespace(), res.getKey().getPath().replace("animation/entity/", "").replace(".json", ""));
                 BlockBenchAnimations anim = this.getAnimation(animID);
                 anim.reload(obj);
             } catch (IOException e) {

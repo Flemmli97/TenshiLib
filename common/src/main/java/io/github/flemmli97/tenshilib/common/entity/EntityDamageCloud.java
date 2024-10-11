@@ -1,9 +1,6 @@
 package io.github.flemmli97.tenshilib.common.entity;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -168,10 +165,5 @@ public abstract class EntityDamageCloud extends Entity implements OwnableEntity 
     @Override
     public UUID getOwnerUUID() {
         return this.entityData.get(SHOOTER_UUID).orElse(null);
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return new ClientboundAddEntityPacket(this);
     }
 }

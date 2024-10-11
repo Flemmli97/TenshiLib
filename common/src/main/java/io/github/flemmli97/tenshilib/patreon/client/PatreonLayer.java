@@ -57,7 +57,7 @@ public class PatreonLayer<T extends Player, M extends EntityModel<T> & HeadedMod
             case BACK -> stack.translate(0, entity.isCrouching() ? -0.6 : -0.8, 0.8);
         }
         int hexColor = setting.getColor();
-        renderer.render(stack, buffer, packedLight, entity, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, hexColor >> 16 & 0xFF, hexColor >> 8 & 0xFF, hexColor & 0xFF, hexColor >> 24 & 0xFF, setting.getRenderLocation());
+        renderer.render(stack, buffer, packedLight, entity, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, hexColor, setting.getRenderLocation());
         stack.popPose();
     }
 }

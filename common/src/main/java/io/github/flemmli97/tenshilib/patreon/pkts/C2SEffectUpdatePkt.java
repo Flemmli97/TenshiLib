@@ -15,7 +15,7 @@ import net.minecraft.server.level.ServerPlayer;
 
 public class C2SEffectUpdatePkt implements CustomPacketPayload {
 
-    public static final Type<C2SEffectUpdatePkt> TYPE = new Type<>(new ResourceLocation(TenshiLib.MODID, "c2s_patreon_effect_pkt"));
+    public static final Type<C2SEffectUpdatePkt> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "c2s_patreon_effect_pkt"));
     public static final StreamCodec<RegistryFriendlyByteBuf, C2SEffectUpdatePkt> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public C2SEffectUpdatePkt decode(RegistryFriendlyByteBuf buf) {

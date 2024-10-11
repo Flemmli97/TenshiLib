@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class PatreonButton extends Button {
 
-    private static final ResourceLocation TEXT = new ResourceLocation(TenshiLib.MODID, "textures/misc/tenshilib_patreon.png");
+    private static final ResourceLocation TEXT = ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "textures/misc/tenshilib_patreon.png");
 
     public PatreonButton(int x, int y, Screen parent) {
         super(x, y, 20, 20, Component.literal(""), b -> Minecraft.getInstance().setScreen(new PatreonGui(parent)), DEFAULT_NARRATION);

@@ -12,7 +12,7 @@ import net.minecraft.world.entity.player.Player;
 
 public class S2CEffectUpdatePkt extends C2SEffectUpdatePkt {
 
-    public static final Type<S2CEffectUpdatePkt> TYPE = new Type<>(new ResourceLocation(TenshiLib.MODID, "s2c_patreon_effect_pkt"));
+    public static final Type<S2CEffectUpdatePkt> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "s2c_patreon_effect_pkt"));
     public static final StreamCodec<RegistryFriendlyByteBuf, S2CEffectUpdatePkt> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public S2CEffectUpdatePkt decode(RegistryFriendlyByteBuf buf) {

@@ -15,6 +15,7 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.HashMap;
@@ -31,15 +32,16 @@ public class PatreonModelProvider {
     private static final EffectRenderer<CatModel> CAT = register(PatreonEffects.CAT, new EffectRenderer<>(CatModel::new));
     private static final EffectRenderer<HaloModel> HALO = register(PatreonEffects.HALO, new EffectRenderer<>(HaloModel::new) {
         @Override
-        public void render(PoseStack stack, MultiBufferSource buffer, int packedLight, Player entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, int red, int green, int blue, int alpha, RenderLocation location) {
+        public void render(PoseStack stack, MultiBufferSource buffer, int packedLight, Player entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, int color, RenderLocation location) {
             HaloModel model = this.get();
             model.setRenderLocation(location);
             model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
             int i = LivingEntityRenderer.getOverlayCoords(entity, 0);
-            model.renderToBuffer(stack, buffer.getBuffer(alpha != 255 ? RenderType.entityTranslucent(model.texture(entity)) : model.renderType(model.texture(entity))), packedLight, i, red / 255f, green / 255f, blue / 255f, alpha / 255f);
+            int alpha = FastColor.ARGB32.alpha(color);
+            model.renderToBuffer(stack, buffer.getBuffer(alpha != 255 ? RenderType.entityTranslucent(model.texture(entity)) : model.renderType(model.texture(entity))), packedLight, i, color);
             stack.scale(1.15f, 1.15f, 1.15f);
             stack.translate(0, -0.175, 0);
-            model.renderToBuffer(stack, buffer.getBuffer(RenderType.entityTranslucent(model.texture(entity))), packedLight, i, red / 255f, green / 255f, blue / 255f, (alpha * 0.15f) / 255f);
+            model.renderToBuffer(stack, buffer.getBuffer(RenderType.entityTranslucent(model.texture(entity))), packedLight, i, FastColor.ARGB32.color((int) (alpha * 0.15f), color));
         }
     });
 
@@ -74,12 +76,12 @@ public class PatreonModelProvider {
             return this.val;
         }
 
-        public void render(PoseStack stack, MultiBufferSource buffer, int packedLight, Player entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, int red, int green, int blue, int alpha, RenderLocation location) {
+        public void render(PoseStack stack, MultiBufferSource buffer, int packedLight, Player entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, int color, RenderLocation location) {
             T model = this.get();
             model.setRenderLocation(location);
             model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
             int i = LivingEntityRenderer.getOverlayCoords(entity, 0);
-            model.renderToBuffer(stack, buffer.getBuffer(alpha != 255 ? RenderType.entityTranslucent(model.texture(entity)) : model.renderType(model.texture(entity))), packedLight, i, red / 255f, green / 255f, blue / 255f, alpha / 255f);
+            model.renderToBuffer(stack, buffer.getBuffer((color >> 24 & 0xFF) != 255 ? RenderType.entityTranslucent(model.texture(entity)) : model.renderType(model.texture(entity))), packedLight, i, color);
         }
     }
 }

@@ -12,5 +12,5 @@ public class TenshiLib {
     public static final String MODID = "tenshilib";
     public static final Logger LOGGER = LogManager.getLogger("TenshiLib");
 
-    public static final TagKey<EntityType<?>> MULTIPART_ENTITY = TagKey.create(BuiltInRegistries.ENTITY_TYPE.key(), new ResourceLocation("c", "multipart_entity"));
+    public static final TagKey<EntityType<?>> MULTIPART_ENTITY = TagKey.create(BuiltInRegistries.ENTITY_TYPE.key(), ResourceLocation.fromNamespaceAndPath("c", "multipart_entity"));
 }

@@ -9,24 +9,21 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ProjectileDeflection;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.TheEndGatewayBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -263,25 +260,24 @@ public abstract class EntityProjectile extends Projectile {
         }
 
         if (raytraceresult.getType() == HitResult.Type.BLOCK) {
-            BlockPos blockpos = raytraceresult.getBlockPos();
-            BlockState blockstate = this.level().getBlockState(blockpos);
-            if (blockstate.is(Blocks.NETHER_PORTAL)) {
-                this.handleInsidePortal(blockpos);
-            } else if (blockstate.is(Blocks.END_GATEWAY)) {
-                BlockEntity tileentity = this.level().getBlockEntity(blockpos);
-                if (tileentity instanceof TheEndGatewayBlockEntity && TheEndGatewayBlockEntity.canEntityTeleport(this)) {
-                    TheEndGatewayBlockEntity.teleportEntity(this.level(), blockpos, blockstate, this, (TheEndGatewayBlockEntity) tileentity);
-                }
-            } else if (!EventCalls.INSTANCE.projectileHitCall(this, raytraceresult))
-                this.onBlockHit(raytraceresult);
+            if (!EventCalls.INSTANCE.projectileHitCall(this, raytraceresult)) {
+                this.onHitBlock(raytraceresult);
+                BlockPos blockPos = raytraceresult.getBlockPos();
+                this.level().gameEvent(GameEvent.PROJECTILE_LAND, blockPos, GameEvent.Context.of(this, this.level().getBlockState(blockPos)));
+            }
         } else {
             EntityHitResult res;
             while ((res = this.getEntityHit(pos, to)) != null && this.isAlive()) {
                 this.checkedEntities.add(res.getEntity().getUUID());
-                if (!EventCalls.INSTANCE.projectileHitCall(this, res) && !this.attackedEntities.contains(res.getEntity().getUUID()) && this.entityRayTraceHit(res)) {
-                    this.attackedEntities.add(res.getEntity().getUUID());
-                    if (this.maxPierceAmount() != -1 && this.attackedEntities.size() > this.maxPierceAmount())
-                        this.onReachMaxPierce();
+                if (!EventCalls.INSTANCE.projectileHitCall(this, res) && !this.attackedEntities.contains(res.getEntity().getUUID())) {
+                    EntityHitState hit = this.entityHit(res);
+                    if (hit != EntityHitState.FAIL) {
+                        this.attackedEntities.add(res.getEntity().getUUID());
+                        if (this.maxPierceAmount() != -1 && this.attackedEntities.size() > this.maxPierceAmount())
+                            this.onReachMaxPierce();
+                        if (hit == EntityHitState.DEFLECT)
+                            break;
+                    }
                 }
             }
         }
@@ -337,9 +333,27 @@ public abstract class EntityProjectile extends Projectile {
         return inWater ? 0.8f : 0.99f;
     }
 
+    protected EntityHitState entityHit(EntityHitResult result) {
+        EntityHitState state = EntityHitState.FAIL;
+        Entity entity = result.getEntity();
+        if (entity.getType().is(EntityTypeTags.REDIRECTABLE_PROJECTILE) && entity instanceof Projectile projectile) {
+            projectile.deflect(ProjectileDeflection.AIM_DEFLECT, this.getOwner(), this.getOwner(), true);
+            state = EntityHitState.DEFLECT;
+        }
+        if (this.entityRayTraceHit(result)) {
+            if (state == EntityHitState.FAIL)
+                state = EntityHitState.SUCCESS;
+            this.level().gameEvent(GameEvent.PROJECTILE_LAND, result.getLocation(), GameEvent.Context.of(this, null));
+        }
+        return state;
+    }
+
     protected abstract boolean entityRayTraceHit(EntityHitResult result);
 
-    protected abstract void onBlockHit(BlockHitResult result);
+    @Override
+    protected void onHitBlock(BlockHitResult result) {
+        super.onHitBlock(result);
+    }
 
     protected void onReachMaxPierce() {
     }
@@ -389,22 +403,11 @@ public abstract class EntityProjectile extends Projectile {
         return this.entityData.get(SHOOTER_UUID).orElse(null);
     }
 
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return new ClientboundAddEntityPacket(this);
-    }
-
     /*===== Things below here don't actually get called. They just delegate to the actual implementation. =====*/
 
     @Override
     protected final void onHitEntity(EntityHitResult result) {
         this.entityRayTraceHit(result);
-    }
-
-    @Override
-    protected final void onHitBlock(BlockHitResult result) {
-        super.onHitBlock(result);
-        this.onBlockHit(result);
     }
 
     @Override
@@ -417,5 +420,11 @@ public abstract class EntityProjectile extends Projectile {
             this.entityData.set(SHOOTER_UUID, Optional.of(entity.getUUID()));
         }
         this.onUpdateOwner();
+    }
+
+    public enum EntityHitState {
+        FAIL,
+        SUCCESS,
+        DEFLECT
     }
 }

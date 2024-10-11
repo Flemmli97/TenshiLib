@@ -102,9 +102,9 @@ public class HorizontalColorSlider extends AbstractWidget {
         float k = (float) (colorB >> 16 & 0xFF) / 255.0f;
         float l = (float) (colorB >> 8 & 0xFF) / 255.0f;
         float m = (float) (colorB & 0xFF) / 255.0f;
-        builder.vertex(matrix, x2, y1, 0).color(k, l, m, j).endVertex();
-        builder.vertex(matrix, x1, y1, 0).color(g, h, i, f).endVertex();
-        builder.vertex(matrix, x1, y2, 0).color(g, h, i, f).endVertex();
-        builder.vertex(matrix, x2, y2, 0).color(k, l, m, j).endVertex();
+        builder.addVertex(matrix, x2, y1, 0).setColor(k, l, m, j);
+        builder.addVertex(matrix, x1, y1, 0).setColor(g, h, i, f);
+        builder.addVertex(matrix, x1, y2, 0).setColor(g, h, i, f);
+        builder.addVertex(matrix, x2, y2, 0).setColor(k, l, m, j);
     }
 }

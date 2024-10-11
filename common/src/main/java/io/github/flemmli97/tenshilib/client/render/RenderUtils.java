@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -25,6 +26,16 @@ public class RenderUtils {
     public static final int DEFAULT_COLOR = 0xFFFFFFFF;
     private static final float TRIANGLE_MULT = (float) (Math.sqrt(3.0D) / 2.0D);
     private static final Random RANDOM = new Random(432L);
+
+    public static float getPartialTicks() {
+        return Minecraft.getInstance().getTimer()
+                .getGameTimeDeltaTicks();
+    }
+
+    public static float getPartialTicks(Entity entity) {
+        return Minecraft.getInstance().getTimer()
+                .getGameTimeDeltaPartialTick(!entity.level().tickRateManager().isEntityFrozen(entity));
+    }
 
     public static void renderBlockOutline(PoseStack matrixStack, MultiBufferSource buffer, Player player, BlockPos pos, float partialTicks, boolean drawImmediately) {
         renderBlockOutline(matrixStack, buffer, player, pos, partialTicks, 0, 0, 0, 1, drawImmediately);
@@ -54,8 +65,8 @@ public class RenderUtils {
             float r = (float) (o - l);
             float s = (float) (p - m);
             float t = Mth.sqrt(q * q + r * r + s * s);
-            consumer.vertex(pose.pose(), (float) (k + x), (float) (l + y), (float) (m + z)).color(red, green, blue, alpha).normal(pose, q /= t, r /= t, s /= t).endVertex();
-            consumer.vertex(pose.pose(), (float) (n + x), (float) (o + y), (float) (p + z)).color(red, green, blue, alpha).normal(pose, q, r, s).endVertex();
+            consumer.addVertex(pose.pose(), (float) (k + x), (float) (l + y), (float) (m + z)).setColor(red, green, blue, alpha).setNormal(pose, q /= t, r /= t, s /= t);
+            consumer.addVertex(pose.pose(), (float) (n + x), (float) (o + y), (float) (p + z)).setColor(red, green, blue, alpha).setNormal(pose, q, r, s);
         });
     }
 
@@ -103,10 +114,10 @@ public class RenderUtils {
         ySize = ySize / 2f;
         Matrix4f matrix4f = stack.last().pose();
         PoseStack.Pose pose = stack.last();
-        builder.vertex(matrix4f, -xSize, ySize, 0).color(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).uv(textureBuilder.u, textureBuilder.v).overlayCoords(textureBuilder.overlay).uv2(textureBuilder.light).normal(pose, 0, 0, 1).endVertex();
-        builder.vertex(matrix4f, xSize, ySize, 0).color(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).uv(textureBuilder.u + textureBuilder.uLength, textureBuilder.v).overlayCoords(textureBuilder.overlay).uv2(textureBuilder.light).normal(pose, 0, 0, 1).endVertex();
-        builder.vertex(matrix4f, xSize, -ySize, 0).color(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).uv(textureBuilder.u + textureBuilder.uLength, textureBuilder.v + textureBuilder.vLength).overlayCoords(textureBuilder.overlay).uv2(textureBuilder.light).normal(pose, 0, 0, 1).endVertex();
-        builder.vertex(matrix4f, -xSize, -ySize, 0).color(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).uv(textureBuilder.u, textureBuilder.v + textureBuilder.vLength).overlayCoords(textureBuilder.overlay).uv2(textureBuilder.light).normal(pose, 0, 0, 1).endVertex();
+        builder.addVertex(matrix4f, -xSize, ySize, 0).setColor(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).setUv(textureBuilder.u, textureBuilder.v).setOverlay(textureBuilder.overlay).setLight(textureBuilder.light).setNormal(pose, 0, 0, 1);
+        builder.addVertex(matrix4f, xSize, ySize, 0).setColor(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).setUv(textureBuilder.u + textureBuilder.uLength, textureBuilder.v).setOverlay(textureBuilder.overlay).setLight(textureBuilder.light).setNormal(pose, 0, 0, 1);
+        builder.addVertex(matrix4f, xSize, -ySize, 0).setColor(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).setUv(textureBuilder.u + textureBuilder.uLength, textureBuilder.v + textureBuilder.vLength).setOverlay(textureBuilder.overlay).setLight(textureBuilder.light).setNormal(pose, 0, 0, 1);
+        builder.addVertex(matrix4f, -xSize, -ySize, 0).setColor(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).setUv(textureBuilder.u, textureBuilder.v + textureBuilder.vLength).setOverlay(textureBuilder.overlay).setLight(textureBuilder.light).setNormal(pose, 0, 0, 1);
     }
 
     public static void renderGradientBeams3d(PoseStack stack, MultiBufferSource renderTypeBuffer, float length, float width, int ticks, float partialTicks, float rotationPerTick, int amount, BeamBuilder builder) {
@@ -132,20 +143,20 @@ public class RenderUtils {
         float widthHalf = width * 0.5f;
         Matrix4f matrix4f = stack.last().pose();
         VertexConsumer buffer = renderTypeBuffer.getBuffer(builder.renderType);
-        buffer.vertex(matrix4f, 0, 0, 0).color(builder.red, builder.green, builder.blue, builder.alpha).endVertex();
-        buffer.vertex(matrix4f, 0, 0, 0).color(builder.red, builder.green, builder.blue, builder.alpha).endVertex();
-        buffer.vertex(matrix4f, -widthHalf, length, -heightHalf).color(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha).endVertex();
-        buffer.vertex(matrix4f, widthHalf, length, -heightHalf).color(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha).endVertex();
+        buffer.addVertex(matrix4f, 0, 0, 0).setColor(builder.red, builder.green, builder.blue, builder.alpha);
+        buffer.addVertex(matrix4f, 0, 0, 0).setColor(builder.red, builder.green, builder.blue, builder.alpha);
+        buffer.addVertex(matrix4f, -widthHalf, length, -heightHalf).setColor(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha);
+        buffer.addVertex(matrix4f, widthHalf, length, -heightHalf).setColor(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha);
 
-        buffer.vertex(matrix4f, 0, 0, 0).color(builder.red, builder.green, builder.blue, builder.alpha).endVertex();
-        buffer.vertex(matrix4f, 0, 0, 0).color(builder.red, builder.green, builder.blue, builder.alpha).endVertex();
-        buffer.vertex(matrix4f, widthHalf, length, -heightHalf).color(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha).endVertex();
-        buffer.vertex(matrix4f, 0, length, heightHalf).color(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha).endVertex();
+        buffer.addVertex(matrix4f, 0, 0, 0).setColor(builder.red, builder.green, builder.blue, builder.alpha);
+        buffer.addVertex(matrix4f, 0, 0, 0).setColor(builder.red, builder.green, builder.blue, builder.alpha);
+        buffer.addVertex(matrix4f, widthHalf, length, -heightHalf).setColor(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha);
+        buffer.addVertex(matrix4f, 0, length, heightHalf).setColor(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha);
 
-        buffer.vertex(matrix4f, 0, 0, 0).color(builder.red, builder.green, builder.blue, builder.alpha).endVertex();
-        buffer.vertex(matrix4f, 0, 0, 0).color(builder.red, builder.green, builder.blue, builder.alpha).endVertex();
-        buffer.vertex(matrix4f, 0, length, heightHalf).color(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha).endVertex();
-        buffer.vertex(matrix4f, -widthHalf, length, -heightHalf).color(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha).endVertex();
+        buffer.addVertex(matrix4f, 0, 0, 0).setColor(builder.red, builder.green, builder.blue, builder.alpha);
+        buffer.addVertex(matrix4f, 0, 0, 0).setColor(builder.red, builder.green, builder.blue, builder.alpha);
+        buffer.addVertex(matrix4f, 0, length, heightHalf).setColor(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha);
+        buffer.addVertex(matrix4f, -widthHalf, length, -heightHalf).setColor(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha);
     }
 
     public static void renderGradientBeams(PoseStack matrixStack, MultiBufferSource renderTypeBuffer, float length, float width, int ticks, float partialTicks, float rotationPerTick, int amount, BeamBuilder builder) {
@@ -170,15 +181,15 @@ public class RenderUtils {
         float widthHalf = width * 0.5f;
         Matrix4f matrix4f = matrixStack.last().pose();
         VertexConsumer buffer = renderTypeBuffer.getBuffer(builder.renderType);
-        buffer.vertex(matrix4f, 0, 0, 0).color(builder.red, builder.green, builder.blue, builder.alpha).endVertex();
-        buffer.vertex(matrix4f, 0, 0, 0).color(builder.red, builder.green, builder.blue, builder.alpha).endVertex();
-        buffer.vertex(matrix4f, -widthHalf, length, 0).color(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha).endVertex();
-        buffer.vertex(matrix4f, widthHalf, length, 0).color(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha).endVertex();
+        buffer.addVertex(matrix4f, 0, 0, 0).setColor(builder.red, builder.green, builder.blue, builder.alpha);
+        buffer.addVertex(matrix4f, 0, 0, 0).setColor(builder.red, builder.green, builder.blue, builder.alpha);
+        buffer.addVertex(matrix4f, -widthHalf, length, 0).setColor(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha);
+        buffer.addVertex(matrix4f, widthHalf, length, 0).setColor(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha);
 
-        buffer.vertex(matrix4f, 0, 0, 0).color(builder.red, builder.green, builder.blue, builder.alpha).endVertex();
-        buffer.vertex(matrix4f, 0, 0, 0).color(builder.red, builder.green, builder.blue, builder.alpha).endVertex();
-        buffer.vertex(matrix4f, widthHalf, length, 0).color(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha).endVertex();
-        buffer.vertex(matrix4f, -widthHalf, length, 0).color(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha).endVertex();
+        buffer.addVertex(matrix4f, 0, 0, 0).setColor(builder.red, builder.green, builder.blue, builder.alpha);
+        buffer.addVertex(matrix4f, 0, 0, 0).setColor(builder.red, builder.green, builder.blue, builder.alpha);
+        buffer.addVertex(matrix4f, widthHalf, length, 0).setColor(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha);
+        buffer.addVertex(matrix4f, -widthHalf, length, 0).setColor(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha);
     }
 
     public static class TextureBuilder {

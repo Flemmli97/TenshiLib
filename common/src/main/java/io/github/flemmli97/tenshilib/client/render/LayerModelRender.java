@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.LivingEntity;
 
 public class LayerModelRender<T extends LivingEntity, M extends EntityModel<T>> extends RenderLayer<T, M> {
@@ -47,7 +48,7 @@ public class LayerModelRender<T extends LivingEntity, M extends EntityModel<T>> 
         if (rendertype != null) {
             VertexConsumer ivertexbuilder = buffer.getBuffer(rendertype);
             int i = LivingEntityRenderer.getOverlayCoords(entity, 0);
-            this.model.renderToBuffer(matrixStack, ivertexbuilder, packedLightIn, i, 1.0F, 1.0F, 1.0F, flag1 ? 0.15F : 1.0F);
+            this.model.renderToBuffer(matrixStack, ivertexbuilder, packedLightIn, i, FastColor.ARGB32.colorFromFloat(flag1 ? 0.15F : 1.0F, 1, 1, 1));
         }
         matrixStack.popPose();
     }

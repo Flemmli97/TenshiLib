@@ -10,7 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 
 public class C2SRequestUpdateClientPkt implements CustomPacketPayload {
 
-    public static final CustomPacketPayload.Type<C2SRequestUpdateClientPkt> TYPE = new CustomPacketPayload.Type<>(new ResourceLocation(TenshiLib.MODID, "c2s_update_effect_pkt"));
+    public static final CustomPacketPayload.Type<C2SRequestUpdateClientPkt> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "c2s_update_effect_pkt"));
     public static final C2SRequestUpdateClientPkt INSTANCE = new C2SRequestUpdateClientPkt();
     public static final StreamCodec<RegistryFriendlyByteBuf, C2SRequestUpdateClientPkt> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 

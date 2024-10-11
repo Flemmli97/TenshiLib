@@ -20,6 +20,6 @@ public class AnimReloader implements ResourceManagerReloadListener, Identifiable
 
     @Override
     public ResourceLocation getFabricId() {
-        return new ResourceLocation(TenshiLib.MODID, "entity_animations");
+        return ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "entity_animations");
     }
 }

@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 
@@ -37,7 +38,7 @@ public abstract class RenderProjectileModel<T extends Entity> extends EntityRend
         this.model.setupAnim(entity, 0, 0, partialLivingTicks, yaw, pitch);
 
         VertexConsumer ivertexbuilder = buffer.getBuffer(this.model.renderType(this.getTextureLocation(entity)));
-        this.model.renderToBuffer(stack, ivertexbuilder, packedLight, OverlayTexture.NO_OVERLAY, this.red, this.green, this.blue, this.alpha);
+        this.model.renderToBuffer(stack, ivertexbuilder, packedLight, OverlayTexture.NO_OVERLAY, FastColor.ARGB32.colorFromFloat(this.red, this.green, this.blue, this.alpha));
         this.afterModelRender(entity, rotation, partialTicks, stack, buffer, packedLight);
         stack.popPose();
         super.render(entity, rotation, partialTicks, stack, buffer, packedLight);

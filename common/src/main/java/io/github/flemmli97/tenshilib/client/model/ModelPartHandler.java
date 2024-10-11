@@ -139,17 +139,17 @@ public class ModelPartHandler {
         }
 
         public void render(PoseStack poseStack, VertexConsumer vertexConsumer, int i, int j) {
-            this.render(poseStack, vertexConsumer, i, j, 1.0F, 1.0F, 1.0F, 1.0F);
+            this.render(poseStack, vertexConsumer, i, j, 0xFFFFFFFF);
         }
 
-        public void render(PoseStack poseStack, VertexConsumer vertexConsumer, int i, int j, float f, float g, float h, float k) {
+        public void render(PoseStack poseStack, VertexConsumer vertexConsumer, int i, int j, int color) {
             if (this.visible) {
                 if (!this.cubes.isEmpty() || !this.children.isEmpty()) {
                     poseStack.pushPose();
                     this.translateAndRotate(poseStack);
-                    this.compile(poseStack.last(), vertexConsumer, i, j, f, g, h, k);
+                    this.compile(poseStack.last(), vertexConsumer, i, j, color);
                     for (ModelPartExtended modelPart : this.children.values()) {
-                        modelPart.render(poseStack, vertexConsumer, i, j, f, g, h, k);
+                        modelPart.render(poseStack, vertexConsumer, i, j, color);
                     }
 
                     poseStack.popPose();
@@ -191,9 +191,9 @@ public class ModelPartHandler {
                 poseStack.scale(this.xScale, this.yScale, this.zScale);
         }
 
-        private void compile(PoseStack.Pose pose, VertexConsumer vertexConsumer, int i, int j, float f, float g, float h, float k) {
+        private void compile(PoseStack.Pose pose, VertexConsumer vertexConsumer, int i, int j, int color) {
             for (ModelPart.Cube cube : this.cubes) {
-                cube.compile(pose, vertexConsumer, i, j, f, g, h, k);
+                cube.compile(pose, vertexConsumer, i, j, color);
             }
         }
 

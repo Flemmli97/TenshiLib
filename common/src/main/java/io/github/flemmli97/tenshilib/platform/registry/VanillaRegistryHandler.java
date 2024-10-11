@@ -26,7 +26,7 @@ public class VanillaRegistryHandler<T> implements PlatformRegistry<T> {
 
     @Override
     public <I extends T> RegistryEntrySupplier<T, I> register(String name, Supplier<I> sup) {
-        ResourceLocation id = new ResourceLocation(this.modid, name);
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(this.modid, name);
         VanillaEntrySupplier<T, I> v = new VanillaEntrySupplier<>(id);
         this.entries.putIfAbsent(v, sup);
         return v;

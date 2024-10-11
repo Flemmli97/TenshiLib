@@ -170,8 +170,8 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
     }
 
     protected void buildVertex(Matrix4f matrix4f, PoseStack.Pose pose, VertexConsumer builder, float x, float y, float z, float u, float v, float nX, float nY, float nZ, int light) {
-        builder.vertex(matrix4f, x, y, z).color(this.red, this.green, this.blue, this.alpha)
-                .uv(u, v).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(pose, nX, nY, nZ).endVertex();
+        builder.addVertex(matrix4f, x, y, z).setColor(this.red, this.green, this.blue, this.alpha)
+                .setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, nX, nY, nZ);
     }
 
     /**

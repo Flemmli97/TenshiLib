@@ -4,6 +4,7 @@
   "package": "io.github.flemmli97.tenshilib.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "LivingMixin"
   ],
   "client": [
     "EntityRenderDispatcherAccessor",

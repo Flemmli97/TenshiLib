@@ -29,6 +29,7 @@ public class TenshiLibForge {
         if (FMLEnvironment.dist == Dist.CLIENT) {
             modBus.addListener(ClientEvents::reloadListener);
             modBus.addListener(ClientEvents::itemColors);
+            modBus.addListener(ClientEvents::registerShader);
             ClientPatreonImpl.setup(modBus);
             forgeBus.addListener(ClientEvents::clickSpecial);
             forgeBus.addListener(ClientEvents::onEntityRender);

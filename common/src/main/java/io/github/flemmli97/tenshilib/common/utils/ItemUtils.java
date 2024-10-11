@@ -1,7 +1,12 @@
 package io.github.flemmli97.tenshilib.common.utils;
 
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Inventory;
@@ -10,41 +15,37 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
+import org.jetbrains.annotations.Nullable;
 
 public class ItemUtils {
 
-    public static boolean isItemBetter(ItemStack stack, ItemStack currentEquipped) {
+    public static boolean isItemBetter(LivingEntity holder, @Nullable LivingEntity target, ItemStack stack, ItemStack currentEquipped) {
+        if (target == null) {
+            target = holder instanceof Mob mob && mob.getTarget() != null ? mob.getTarget() : holder;
+        }
         if (stack.getItem() instanceof ArmorItem) {
-            if (!(currentEquipped.getItem() instanceof ArmorItem) || EnchantmentHelper.hasBindingCurse(currentEquipped))
+            if (!(currentEquipped.getItem() instanceof ArmorItem) || EnchantmentHelper.has(currentEquipped, EnchantmentEffectComponents.PREVENT_ARMOR_CHANGE))
                 return true;
-            else if (currentEquipped.getItem() instanceof ArmorItem armorItem1) {
-                ArmorItem armorItem = (ArmorItem) stack.getItem();
+            else if (currentEquipped.getItem() instanceof ArmorItem itemarmor1) {
+                ArmorItem itemarmor = (ArmorItem) stack.getItem();
 
-                if (armorItem.getDefense() == armorItem1.getDefense()) {
+                if (itemarmor.getDefense() == itemarmor1.getDefense()) {
                     return stack.getDamageValue() > currentEquipped.getDamageValue() || stack.getComponentsPatch().isEmpty() && !currentEquipped.getComponentsPatch().isEmpty();
                 } else {
-                    return armorItem.getDefense() > armorItem1.getDefense();
+                    return itemarmor.getDefense() > itemarmor1.getDefense();
                 }
             }
-        } else if (stack.getItem() instanceof BowItem) {
-            if (currentEquipped.isEmpty())
-                return true;
-            if (currentEquipped.getItem() instanceof BowItem) {
-                int power = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER, stack);
-                int power2 = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER, currentEquipped);
-                return power > power2;
-            }
-        } else {
-            if (currentEquipped.isEmpty())
-                return true;
-            return damage(stack) > damage(currentEquipped);
         }
-        return false;
+        if (currentEquipped.isEmpty())
+            return true;
+        double d1 = damage(holder, target, stack);
+        double d2 = damage(holder, target, currentEquipped);
+        return d1 > d2;
     }
 
-    public static double damage(ItemStack stack) {
+    public static double damage(LivingEntity holder, @Nullable LivingEntity target, ItemStack stack) {
         AttributeInstance m = new AttributeInstance(Attributes.ATTACK_DAMAGE, (inst) -> {
         });
         ItemAttributeModifiers stackMod = stack.get(DataComponents.ATTRIBUTE_MODIFIERS);
@@ -53,11 +54,14 @@ public class ItemUtils {
                 if (attr.equals(Attributes.ATTACK_DAMAGE))
                     m.addTransientModifier(mod);
             });
-        double dmg = m.getValue();
-        int sharp = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SHARPNESS, stack);
-        if (sharp > 0)
-            dmg += sharp * 0.5 + 0.5;
-        return Attributes.ATTACK_DAMAGE.value().sanitizeValue(dmg);
+        double dmg = Attributes.ATTACK_DAMAGE.value().sanitizeValue(m.getValue());
+        DamageSource damageSource = holder.damageSources().mobAttack(holder);
+        if (stack.getItem() instanceof BowItem)
+            damageSource = holder.damageSources().arrow(EntityType.ARROW.create(holder.level()), holder);
+        double bonus = holder.level() instanceof ServerLevel serverLevel ?
+                EnchantmentHelper.modifyDamage(serverLevel, holder.getWeaponItem(), target == null ? holder : target, damageSource, (float) dmg) - dmg
+                : 0;
+        return Attributes.ATTACK_DAMAGE.value().sanitizeValue(dmg) + bonus;
     }
 
     /**

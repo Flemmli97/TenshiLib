@@ -7,6 +7,7 @@ import io.github.flemmli97.tenshilib.client.AnimationManager;
 import io.github.flemmli97.tenshilib.client.model.BlockBenchAnimations;
 import io.github.flemmli97.tenshilib.client.model.ExtendedModel;
 import io.github.flemmli97.tenshilib.client.model.ModelPartHandler;
+import io.github.flemmli97.tenshilib.client.render.RenderUtils;
 import io.github.flemmli97.tenshilib.patreon.RenderLocation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
@@ -22,8 +23,8 @@ import net.minecraft.world.entity.player.Player;
 
 public class MeguHatModel extends EntityModel<Player> implements ExtendedModel, PatreonModelData<Player> {
 
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(TenshiLib.MODID, "megu_hat"), "main");
-    public static ResourceLocation MEGU_TEXTURE = new ResourceLocation(TenshiLib.MODID, "textures/model/megu_hat.png");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "megu_hat"), "main");
+    public static ResourceLocation MEGU_TEXTURE = ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "textures/model/megu_hat.png");
 
     protected final ModelPartHandler model;
     protected final BlockBenchAnimations anim;
@@ -32,7 +33,7 @@ public class MeguHatModel extends EntityModel<Player> implements ExtendedModel, 
 
     public MeguHatModel() {
         this.model = new ModelPartHandler(Minecraft.getInstance().getEntityModels().bakeLayer(MeguHatModel.LAYER_LOCATION));
-        this.anim = AnimationManager.getInstance().getAnimation(new ResourceLocation(TenshiLib.MODID, "megu_hat"));
+        this.anim = AnimationManager.getInstance().getAnimation(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "megu_hat"));
     }
 
     public static LayerDefinition createBodyLayer() {
@@ -68,14 +69,14 @@ public class MeguHatModel extends EntityModel<Player> implements ExtendedModel, 
     @Override
     public void setupAnim(Player entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.model.resetPoses();
-        this.anim.doAnimation(this, "idle", entity.tickCount, Minecraft.getInstance().getFrameTime());
+        this.anim.doAnimation(this, "idle", entity.tickCount, RenderUtils.getPartialTicks(entity));
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
         if (RenderLocation.isHead(this.location))
             poseStack.translate(0, 0.1, 0.0);
-        this.model.getMainPart().render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha);
+        this.model.getMainPart().render(poseStack, buffer, packedLight, packedOverlay, color);
     }
 
     @Override

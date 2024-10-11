@@ -16,6 +16,6 @@ public class RiderLayerReloader implements ResourceManagerReloadListener, Identi
 
     @Override
     public ResourceLocation getFabricId() {
-        return new ResourceLocation(TenshiLib.MODID, "rider_layer_manager");
+        return ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "rider_layer_manager");
     }
 }

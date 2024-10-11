@@ -16,7 +16,7 @@ import java.util.Optional;
 
 public class S2CEntityAnimation implements CustomPacketPayload {
 
-    public static final Type<S2CEntityAnimation> TYPE = new Type<>(new ResourceLocation(TenshiLib.MODID, "s2c_entity_animation"));
+    public static final Type<S2CEntityAnimation> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "s2c_entity_animation"));
     public static final StreamCodec<RegistryFriendlyByteBuf, S2CEntityAnimation> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public S2CEntityAnimation decode(RegistryFriendlyByteBuf buf) {

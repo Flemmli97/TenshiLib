@@ -15,7 +15,7 @@ import net.minecraft.world.phys.EntityHitResult;
 
 public class C2SPacketHit implements CustomPacketPayload {
 
-    public static final Type<C2SPacketHit> TYPE = new Type<>(new ResourceLocation(TenshiLib.MODID, "c2s_item_special"));
+    public static final Type<C2SPacketHit> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "c2s_item_special"));
     public static final StreamCodec<RegistryFriendlyByteBuf, C2SPacketHit> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public C2SPacketHit decode(RegistryFriendlyByteBuf buf) {
