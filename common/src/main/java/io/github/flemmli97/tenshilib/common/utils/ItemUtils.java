@@ -45,7 +45,7 @@ public class ItemUtils {
         return d1 > d2;
     }
 
-    public static double damage(LivingEntity holder, @Nullable LivingEntity target, ItemStack stack) {
+    public static double damageRaw(ItemStack stack) {
         AttributeInstance m = new AttributeInstance(Attributes.ATTACK_DAMAGE, (inst) -> {
         });
         ItemAttributeModifiers stackMod = stack.get(DataComponents.ATTRIBUTE_MODIFIERS);
@@ -54,14 +54,18 @@ public class ItemUtils {
                 if (attr.equals(Attributes.ATTACK_DAMAGE))
                     m.addTransientModifier(mod);
             });
-        double dmg = Attributes.ATTACK_DAMAGE.value().sanitizeValue(m.getValue());
+        return Attributes.ATTACK_DAMAGE.value().sanitizeValue(m.getValue());
+    }
+
+    public static double damage(LivingEntity holder, @Nullable LivingEntity target, ItemStack stack) {
+        double dmg = damageRaw(stack);
         DamageSource damageSource = holder.damageSources().mobAttack(holder);
         if (stack.getItem() instanceof BowItem)
             damageSource = holder.damageSources().arrow(EntityType.ARROW.create(holder.level()), holder);
         double bonus = holder.level() instanceof ServerLevel serverLevel ?
                 EnchantmentHelper.modifyDamage(serverLevel, holder.getWeaponItem(), target == null ? holder : target, damageSource, (float) dmg) - dmg
                 : 0;
-        return Attributes.ATTACK_DAMAGE.value().sanitizeValue(dmg) + bonus;
+        return dmg + bonus;
     }
 
     /**
