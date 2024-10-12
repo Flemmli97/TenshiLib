@@ -65,7 +65,7 @@ public class AOEWeaponHandler {
                 }
                 if (baseDmg > 0.0F || enchantBonus > 0.0F) {
                     boolean flag = cooldown > 0.9F;
-                    float knocback = ((LivingMixin) player).getKnockback(target, damageSource);
+                    float knocback = ((LivingMixin) player).getKnockbackInv(target, damageSource);
                     if (player.isSprinting() && flag) {
                         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_KNOCKBACK, player.getSoundSource(), 1.0F, 1.0F);
                         ++knocback;

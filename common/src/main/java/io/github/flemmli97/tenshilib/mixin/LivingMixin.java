@@ -10,6 +10,6 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface LivingMixin {
 
     @Invoker("getKnockback")
-    float getKnockback(Entity attacker, DamageSource damageSource);
+    float getKnockbackInv(Entity attacker, DamageSource damageSource);
 
 }
