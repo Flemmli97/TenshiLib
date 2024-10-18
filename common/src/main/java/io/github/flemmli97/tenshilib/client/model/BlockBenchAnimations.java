@@ -316,17 +316,17 @@ public class BlockBenchAnimations {
                         scale = this.scales[id];
                     AnimationValue scalePrev = this.scales[id - 1];
                     float prog = Mth.clamp((actualTick - scalePrev.startTick) / (scale.startTick - scalePrev.startTick), 0F, 1F);
-                    float x = this.interpolate(scalePrev.getXVal(secTime) - 1, scale.getXVal(secTime) - 1, prog);
-                    float y = this.interpolate(scalePrev.getYVal(secTime) - 1, scale.getYVal(secTime) - 1, prog);
-                    float z = this.interpolate(scalePrev.getZVal(secTime) - 1, scale.getZVal(secTime) - 1, prog);
+                    float x = this.interpolate(scalePrev.getXVal(secTime), scale.getXVal(secTime), prog);
+                    float y = this.interpolate(scalePrev.getYVal(secTime), scale.getYVal(secTime), prog);
+                    float z = this.interpolate(scalePrev.getZVal(secTime), scale.getZVal(secTime), prog);
                     if (interpolateFromCurrent) {
                         modelPart.xScale += (x - modelPart.xScale) * interpolation;
                         modelPart.yScale += (y - modelPart.yScale) * interpolation;
                         modelPart.zScale += (z - modelPart.zScale) * interpolation;
                     } else {
-                        modelPart.xScale += x * interpolation;
-                        modelPart.yScale += y * interpolation;
-                        modelPart.zScale += z * interpolation;
+                        modelPart.xScale += (x - 1) * interpolation;
+                        modelPart.yScale += (y - 1) * interpolation;
+                        modelPart.zScale += (z - 1) * interpolation;
                     }
                 }
             }

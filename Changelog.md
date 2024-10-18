@@ -1,3 +1,7 @@
+TenshiLib 1.9.1
+================
+- Fix interpolation error with scaling in animations
+
 TenshiLib 1.9.0
 ================
 - New animated attack system
