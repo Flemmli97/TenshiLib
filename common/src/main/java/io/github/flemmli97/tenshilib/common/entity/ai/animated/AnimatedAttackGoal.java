@@ -30,11 +30,12 @@ public class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> extends Goa
     @Nullable
     public GoalAttackAction.ActiveAction<T> current;
     protected GoalAttackAction.ActiveAction<T> previous;
+    protected List<GoalAttackAction.ChainedAction<T>> chained;
     private ActionRun<T> onIdle;
     private boolean reset;
 
     protected Vec3 lastPathTargetPos;
-    protected int idleTime, prepare;
+    protected int idleTime, prepare, chainDelay, chainSelect;
     public double distanceToTargetSq;
     public boolean canSee;
 
@@ -64,14 +65,25 @@ public class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> extends Goa
     public void stop() {
         this.current = null;
         this.previous = null;
+        this.chained = null;
         this.target = null;
         this.reset = false;
         this.lastPathTargetPos = null;
         this.idleTime = 0;
         this.prepare = 0;
+        this.chainDelay = 0;
         this.attacker.getNavigation().stop();
         this.attacker.setZza(0);
         this.attacker.setXxa(0);
+    }
+
+    protected void resetAttack() {
+        this.current = null;
+        this.reset = false;
+        this.onIdle = null;
+        this.lastPathTargetPos = null;
+        this.chained = null;
+        this.chainSelect = 0;
     }
 
     @Override
@@ -88,9 +100,7 @@ public class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> extends Goa
     }
 
     protected void selectNextAction() {
-        this.reset = false;
-        this.onIdle = null;
-        this.lastPathTargetPos = null;
+        this.resetAttack();
         List<WeightedEntry.Wrapper<IdleAction<T>>> idles = this.idleActions.stream().filter(d -> d.getData().test(this, this.target)).toList();
         IdleAction<T> idle = WeightedRandom.getRandomItem(this.attacker.getRandom(), idles).map(WeightedEntry.Wrapper::getData).orElse(null);
         this.onIdle = idle != null ? idle.runner.create() : null;
@@ -106,6 +116,10 @@ public class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> extends Goa
         if (action != null) {
             this.prepare = this.current.start().timeout().getInt(this.attacker);
             this.idleTime = action.getCooldown().getInt(this.attacker);
+            if (action.getChainedAction() != null && action.getChainedAction().check().test(this.attacker)) {
+                this.chained = action.getChainedAction().anims().get(this.attacker.getRandom().nextInt(action.getChainedAction().anims().size()));
+                this.chainDelay = Math.max(1, this.chained.get(0).delay().getInt(this.attacker));
+            }
         }
     }
 
@@ -124,10 +138,23 @@ public class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> extends Goa
             this.reset = false;
             this.current = null;
         }
-        if (this.current == null && --this.idleTime > 0) {
-            if (this.onIdle != null)
-                this.onIdle.run(this, this.target, null);
-            return;
+        if (this.current == null) {
+            if (this.chainDelay > 0) {
+                --this.chainDelay;
+                if (this.chainDelay == 0) {
+                    this.attacker.getAnimationHandler().setAnimation(this.chained.get(this.chainSelect).anim());
+                    ++this.chainSelect;
+                    if (this.chainSelect < this.chained.size()) {
+                        this.chainDelay = this.chained.get(0).delay().getInt(this.attacker);
+                    }
+                }
+                return;
+            }
+            if (--this.idleTime > 0) {
+                if (this.onIdle != null)
+                    this.onIdle.run(this, this.target, null);
+                return;
+            }
         }
         if (this.current == null) {
             this.selectNextAction();

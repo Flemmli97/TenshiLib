@@ -7,6 +7,10 @@ import io.github.flemmli97.tenshilib.common.entity.ai.animated.impl.WrappedRunne
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+
 /**
  * An action instance generator used in animated attack goals
  *
@@ -19,6 +23,7 @@ public class GoalAttackAction<T extends PathfinderMob & IAnimated> {
     private ActionStart.Factory<T> preparation = () -> new WrappedRunner<>(new DoNothingRunner<>());
     private ActionRun.Factory<T> runner = DoNothingRunner::new;
     private IntProvider<T> cooldown = e -> 20;
+    private ChainedActions<T> chained;
 
     public GoalAttackAction(AnimatedAction action) {
         this.action = action;
@@ -55,12 +60,27 @@ public class GoalAttackAction<T extends PathfinderMob & IAnimated> {
         return this;
     }
 
+    /**
+     * Chain multiple animation attacks together
+     * When this action is done the next animation is selected and is executed with a given delay.
+     * {@link ChainedActions#anims} Is a list of multiple actions to be run in sequence
+     * The list and the sequences inside cannot be empty
+     */
+    public GoalAttackAction<T> chain(ChainedActions.Builder<T> chained) {
+        this.chained = chained.build();
+        return this;
+    }
+
     public boolean test(AnimatedAttackGoal<T> goal, LivingEntity target, String previous) {
         return this.condition.test(goal, target, previous);
     }
 
     public IntProvider<T> getCooldown() {
         return this.cooldown;
+    }
+
+    public ChainedActions<T> getChainedAction() {
+        return this.chained;
     }
 
     public ActiveAction<T> createActive() {
@@ -83,5 +103,64 @@ public class GoalAttackAction<T extends PathfinderMob & IAnimated> {
 
     public record ActiveAction<T extends PathfinderMob & IAnimated>(AnimatedAction anim, ActionStart<T> start,
                                                                     ActionRun<T> runner) {
+    }
+
+    public record ChainedActions<T extends PathfinderMob & IAnimated>(List<List<ChainedAction<T>>> anims,
+                                                                      Predicate<T> check) {
+
+        public static class Builder<T extends PathfinderMob & IAnimated> {
+
+            private final List<List<ChainedAction<T>>> anims = new ArrayList<>();
+            private Predicate<T> check = e -> true;
+
+            public Builder(List<ChainedAction<T>> chainedList) {
+                if (chainedList.isEmpty())
+                    throw new IllegalStateException("Animations can't be empty");
+                this.anims.add(chainedList);
+            }
+
+            public Builder<T> chain(AnimatedAction anim) {
+                return this.chain(anim, e -> 0);
+            }
+
+            public Builder<T> chain(AnimatedAction anim, IntProvider<T> delay) {
+                return this.chain(List.of(new ChainedAction<>(anim, delay)));
+            }
+
+            public Builder<T> chain(List<ChainedAction<T>> chainedList) {
+                this.anims.add(chainedList);
+                return this;
+            }
+
+            public Builder<T> withPredicate(Predicate<T> check) {
+                this.check = check;
+                return this;
+            }
+
+            public ChainedActions<T> build() {
+                return new ChainedActions<>(List.copyOf(this.anims), this.check);
+            }
+        }
+    }
+
+    public static <T extends PathfinderMob & IAnimated> ChainedActions.Builder<T> chainBuilder(AnimatedAction anim) {
+        return chainBuilder(anim, e -> 0);
+    }
+
+    public static <T extends PathfinderMob & IAnimated> ChainedActions.Builder<T> chainBuilder(AnimatedAction anim, IntProvider<T> delay) {
+        return chainBuilder(List.of(new ChainedAction<>(anim, delay)));
+    }
+
+    public static <T extends PathfinderMob & IAnimated> ChainedActions.Builder<T> chainBuilder(List<ChainedAction<T>> chainedList) {
+        return new ChainedActions.Builder<>(chainedList);
+    }
+
+    /**
+     * A chained AnimatedAction
+     *
+     * @param anim  The animation to play
+     * @param delay A delay after which this animation will be played
+     */
+    public record ChainedAction<T extends PathfinderMob & IAnimated>(AnimatedAction anim, IntProvider<T> delay) {
     }
 }
