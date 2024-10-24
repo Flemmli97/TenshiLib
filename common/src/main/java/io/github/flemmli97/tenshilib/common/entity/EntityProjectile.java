@@ -47,8 +47,8 @@ public abstract class EntityProjectile extends Projectile {
     public final List<UUID> attackedEntities = new ArrayList<>();
     public final List<UUID> checkedEntities = new ArrayList<>();
 
-    private BlockState ground;
-    private BlockPos groundPos;
+    protected BlockState groundState;
+    protected BlockPos groundPos;
 
     protected static final EntityDataAccessor<Optional<UUID>> SHOOTER_UUID = SynchedEntityData.defineId(EntityProjectile.class, EntityDataSerializers.OPTIONAL_UUID);
 
@@ -181,11 +181,13 @@ public abstract class EntityProjectile extends Projectile {
         BlockState state = this.level.getBlockState(pos);
         if (!state.getMaterial().isSolid()) {
             this.inGround = false;
+            this.groundPos = null;
+            this.groundState = null;
             return;
         }
         this.inGround = true;
         this.groundPos = pos;
-        this.ground = state;
+        this.groundState = state;
     }
 
     @Override
@@ -205,15 +207,11 @@ public abstract class EntityProjectile extends Projectile {
             this.yRotO = this.getYRot();
         }
 
-        BlockState inState = this.level.getBlockState(this.blockPosition());
+        BlockState groundState = this.groundPos != null ? this.level.getBlockState(this.groundPos) : null;
         if (this.inGround) {
-            if (inState != this.ground && this.noGround())
+            if (groundState != this.groundState && this.noGround())
                 this.resetInGround();
-            else if (!this.level.isClientSide) {
-                ++this.ticksInGround;
-                if (this.ticksInGround == 1200)
-                    this.remove(RemovalReason.KILLED);
-            }
+            this.tickInGround();
             return;
         }
 
@@ -221,6 +219,12 @@ public abstract class EntityProjectile extends Projectile {
             this.doCollision();
         }
         this.moveEntity();
+    }
+
+    protected void tickInGround() {
+        ++this.ticksInGround;
+        if (!this.level.isClientSide && this.ticksInGround == 1200)
+            this.remove(RemovalReason.KILLED);
     }
 
     public void moveEntity() {
@@ -259,7 +263,7 @@ public abstract class EntityProjectile extends Projectile {
         return Mth.lerp(0.2F, prev, current);
     }
 
-    private void doCollision() {
+    protected void doCollision() {
         Vec3 pos = this.position();
         Vec3 to = pos.add(this.getDeltaMovement());
         BlockHitResult raytraceresult = this.level.clip(new ClipContext(pos, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
@@ -292,12 +296,14 @@ public abstract class EntityProjectile extends Projectile {
         }
     }
 
-    private boolean noGround() {
+    protected boolean noGround() {
         return this.inGround && this.level.noCollision((new AABB(this.position(), this.position())).inflate(0.06D));
     }
 
-    private void resetInGround() {
+    protected void resetInGround() {
         this.inGround = false;
+        this.groundPos = null;
+        this.groundState = null;
         this.setDeltaMovement(this.getDeltaMovement().multiply((this.random.nextFloat() * 0.2F), (this.random.nextFloat() * 0.2F), (this.random.nextFloat() * 0.2F)));
         this.ticksInGround = 0;
     }
@@ -329,7 +335,7 @@ public abstract class EntityProjectile extends Projectile {
                 return RayTraceUtils.rayTraceEntities(this, from, to, this::canHit);
             return null;
         }
-        if (this.attackedEntities.size() < 1)
+        if (this.attackedEntities.isEmpty())
             return RayTraceUtils.rayTraceEntities(this, from, to, this::canHit);
         return null;
     }
@@ -352,7 +358,7 @@ public abstract class EntityProjectile extends Projectile {
     @Override
     protected void readAdditionalSaveData(CompoundTag compound) {
         this.inGround = compound.getBoolean("InGround");
-        if (this.inGround)
+        if (compound.contains("GroundPos"))
             this.setInGround(NbtUtils.readBlockPos(compound.getCompound("GroundPos")));
         if (compound.hasUUID("Shooter"))
             this.entityData.set(SHOOTER_UUID, Optional.of(compound.getUUID("Shooter")));
@@ -364,7 +370,7 @@ public abstract class EntityProjectile extends Projectile {
 
     @Override
     protected void addAdditionalSaveData(CompoundTag compound) {
-        if (this.inGround)
+        if (this.groundPos != null)
             compound.put("GroundPos", NbtUtils.writeBlockPos(this.groundPos));
         compound.putBoolean("InGround", this.inGround);
         this.entityData.get(SHOOTER_UUID).ifPresent(uuid -> compound.putUUID("Shooter", uuid));
