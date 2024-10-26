@@ -11,12 +11,18 @@ public class RandomMoveAroundRunner<T extends PathfinderMob & IAnimated> impleme
 
     private final double maxDistSqr;
     private final int distance;
+    private final boolean needsLoS;
 
     private boolean start;
 
     public RandomMoveAroundRunner(double maxDist, int distance) {
+        this(maxDist, distance, true);
+    }
+
+    public RandomMoveAroundRunner(double maxDist, int distance, boolean needsLoS) {
         this.maxDistSqr = maxDist * maxDist;
         this.distance = distance;
+        this.needsLoS = needsLoS;
     }
 
     @Override
@@ -25,6 +31,15 @@ public class RandomMoveAroundRunner<T extends PathfinderMob & IAnimated> impleme
             this.start = true;
             goal.moveRandomlyAround(this.maxDistSqr, this.distance);
         }
-        return goal.attacker.getNavigation().isDone();
+        boolean done = goal.attacker.getNavigation().isDone();
+        if (done && !this.canSee(goal)) {
+            this.start = false;
+            return false;
+        }
+        return done;
+    }
+
+    private boolean canSee(AnimatedAttackGoal<T> goal) {
+        return !this.needsLoS || goal.canSee;
     }
 }

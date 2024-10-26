@@ -9,18 +9,24 @@ import net.minecraft.world.entity.PathfinderMob;
 
 public class StrafingRunner<T extends PathfinderMob & IAnimated> implements ActionRun<T> {
 
-    private final float radius, speed, directionSwitchChance;
+    private final float radiusSq, minRadiusSq, speed, directionSwitchChance;
 
     private boolean start, clockWise;
     private int strafingTime;
-    private int seeTime;
+    private int seeTime = 10;
+    private boolean strafingBackwards;
 
     public StrafingRunner(float radius, float speed) {
         this(radius, speed, 0.3f);
     }
 
     public StrafingRunner(float radius, float speed, float directionSwitchChance) {
-        this.radius = radius;
+        this(radius, radius * 0.5f, speed, directionSwitchChance);
+    }
+
+    public StrafingRunner(float radius, float minRadius, float speed, float directionSwitchChance) {
+        this.radiusSq = radius * radius;
+        this.minRadiusSq = minRadius * minRadius;
         this.speed = speed;
         this.directionSwitchChance = directionSwitchChance;
     }
@@ -41,7 +47,7 @@ public class StrafingRunner<T extends PathfinderMob & IAnimated> implements Acti
         } else {
             --this.seeTime;
         }
-        if (goal.distanceToTargetSq <= this.radius * this.radius && this.seeTime >= 20) {
+        if (goal.distanceToTargetSq <= this.radiusSq * this.radiusSq && this.seeTime >= 20) {
             goal.attacker.getNavigation().stop();
             ++this.strafingTime;
         } else {
@@ -55,7 +61,12 @@ public class StrafingRunner<T extends PathfinderMob & IAnimated> implements Acti
             this.strafingTime = 0;
         }
         if (this.strafingTime > -1) {
-            goal.circleAroundTargetFacing(this.radius, this.clockWise, this.speed);
+            if (goal.distanceToTargetSq > this.radiusSq * 0.75) {
+                this.strafingBackwards = false;
+            } else if (goal.distanceToTargetSq < this.minRadiusSq) {
+                this.strafingBackwards = true;
+            }
+            goal.attacker.getMoveControl().strafe(this.strafingBackwards ? -0.5f : 0.5f, this.clockWise ? this.speed : -this.speed);
         }
         goal.attacker.lookAt(target, 30.0F, 30.0F);
         return false;

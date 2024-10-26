@@ -13,13 +13,19 @@ public class MoveAwayRunner<T extends PathfinderMob & IAnimated> implements Acti
 
     private final double minDistSqr, speed;
     private final int dist;
+    private final boolean needsLoS;
 
     private boolean start;
 
     public MoveAwayRunner(double minDist, double speed, int dist) {
+        this(minDist, speed, dist, false);
+    }
+
+    public MoveAwayRunner(double minDist, double speed, int dist, boolean needsLoS) {
         this.minDistSqr = minDist * minDist;
         this.speed = speed;
         this.dist = dist;
+        this.needsLoS = needsLoS;
     }
 
     @Override
@@ -37,6 +43,15 @@ public class MoveAwayRunner<T extends PathfinderMob & IAnimated> implements Acti
                 }
             }
         }
-        return goal.attacker.getNavigation().isDone();
+        boolean done = goal.attacker.getNavigation().isDone();
+        if (done && !this.canSee(goal)) {
+            this.start = false;
+            return false;
+        }
+        return done;
+    }
+
+    private boolean canSee(AnimatedAttackGoal<T> goal) {
+        return !this.needsLoS || goal.canSee;
     }
 }

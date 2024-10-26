@@ -10,6 +10,7 @@ import net.minecraft.world.entity.PathfinderMob;
 
 /**
  * A wrapper around a runner that will run either till the runner returns true or for the given duration.
+ * Unlike {@link WrappedRunner} if the timer runs out the attack is still executed
  *
  * @param <T>
  */
