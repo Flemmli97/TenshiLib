@@ -19,7 +19,7 @@ public class WrappedRunner<T extends PathfinderMob & IAnimated> implements Actio
     private final ActionRun<T> runner;
 
     public WrappedRunner(ActionRun<T> runner) {
-        this(e -> 200, runner);
+        this(e -> 100, runner);
     }
 
     public WrappedRunner(GoalAttackAction.IntProvider<T> timout, ActionRun<T> runner) {

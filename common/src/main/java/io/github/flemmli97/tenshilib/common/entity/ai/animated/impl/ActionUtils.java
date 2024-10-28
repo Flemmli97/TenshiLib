@@ -2,7 +2,9 @@ package io.github.flemmli97.tenshilib.common.entity.ai.animated.impl;
 
 import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.GoalAttackAction;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.phys.Vec3;
 
 public class ActionUtils {
 
@@ -33,8 +35,19 @@ public class ActionUtils {
         };
     }
 
+    public static PathDistance distanceToNavTargetSqr(Mob entity) {
+        if (entity.getNavigation().isDone())
+            return null;
+        Vec3 pos = entity.position();
+        Vec3 target = entity.getNavigation().getPath().getNextEntityPos(entity);
+        return new PathDistance(pos.distanceToSqr(target), entity.getNavigation().getPath().getNextNodeIndex());
+    }
+
     public interface FloatGetter<T> {
 
         float get(T value);
+    }
+
+    public record PathDistance(double dist, int index) {
     }
 }

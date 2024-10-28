@@ -23,7 +23,6 @@ public class MoveToTargetRunner<T extends PathfinderMob & IAnimated> implements 
         this.requireSight = requireSight;
     }
 
-
     @Override
     public boolean run(AnimatedAttackGoal<T> goal, LivingEntity target, AnimatedAction anim) {
         goal.moveToTarget(this.speed);

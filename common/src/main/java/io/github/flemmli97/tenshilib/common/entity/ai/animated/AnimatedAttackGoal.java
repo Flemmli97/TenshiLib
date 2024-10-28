@@ -3,7 +3,6 @@ package io.github.flemmli97.tenshilib.common.entity.ai.animated;
 import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
 import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.common.utils.MathUtils;
-import net.minecraft.core.BlockPos;
 import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.world.entity.LivingEntity;
@@ -83,6 +82,7 @@ public class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> extends Goa
         this.onIdle = null;
         this.lastPathTargetPos = null;
         this.chained = null;
+        this.chainDelay = 0;
         this.chainSelect = 0;
     }
 
@@ -139,7 +139,7 @@ public class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> extends Goa
             this.current = null;
         }
         if (this.current == null) {
-            if (this.chainDelay > 0) {
+            if (this.chainDelay > 0 && this.chained != null) {
                 --this.chainDelay;
                 if (this.chainDelay == 0) {
                     this.attacker.getAnimationHandler().setAnimation(this.chained.get(this.chainSelect).anim());
@@ -166,7 +166,7 @@ public class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> extends Goa
             if (done)
                 this.prepare = -1;
             else if (this.prepare == 0) {
-                this.current = null;
+                this.resetAttack();
                 return;
             }
         }
@@ -223,18 +223,6 @@ public class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> extends Goa
         }
     }
 
-    public BlockPos randomPosAwayFrom(LivingEntity away, float minDis) {
-        double angle = Math.random() * 3.141592653589793 * 2.0;
-        double x = Math.cos(angle) * minDis;
-        double z = Math.sin(angle) * minDis;
-        float min = minDis * minDis;
-        BlockPos pos = this.attacker.blockPosition().offset(x, 0.0, z);
-        if (away.distanceToSqr(Vec3.atCenterOf(pos)) > min && this.attacker.isWithinRestriction(pos)) {
-            return pos;
-        }
-        return this.attacker.blockPosition();
-    }
-
     /**
      * Circle around given point. y coord not needed
      */
@@ -251,14 +239,6 @@ public class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> extends Goa
             double nPosZ = radius * Math.sin(angle);
             this.attacker.getNavigation().moveTo(posX + nPosX, this.attacker.getY(), posZ + nPosZ, speed);
         }
-    }
-
-    public void circleAroundTargetFacing(float radius, boolean clockWise, float speed) {
-        this.attacker.lookAt(this.target, 30, 30);
-        double x = this.attacker.getX() - this.target.getX();
-        double z = this.attacker.getZ() - this.target.getZ();
-        double r = x * x + z * z;
-        this.attacker.getMoveControl().strafe(r < (radius - 1.5) * (radius - 1.5) ? -0.5f : r > (radius + 1.5) * (radius + 1.5) ? 0.5f : 0, clockWise ? speed : -speed);
     }
 
     public void teleportAround(double posX, double posY, double posZ, int range) {

@@ -14,6 +14,7 @@ public class RandomMoveAroundRunner<T extends PathfinderMob & IAnimated> impleme
     private final boolean needsLoS;
 
     private boolean start;
+    private ActionUtils.PathDistance pathDist;
 
     public RandomMoveAroundRunner(double maxDist, int distance) {
         this(maxDist, distance, true);
@@ -30,6 +31,17 @@ public class RandomMoveAroundRunner<T extends PathfinderMob & IAnimated> impleme
         if (!this.start) {
             this.start = true;
             goal.moveRandomlyAround(this.maxDistSqr, this.distance);
+        }
+        if (goal.attacker.tickCount % 3 == 0) {
+            // Check if entity is getting close. If not retry
+            ActionUtils.PathDistance lastCheck = this.pathDist;
+            this.pathDist = ActionUtils.distanceToNavTargetSqr(goal.attacker);
+            if (lastCheck != null && this.pathDist != null) {
+                if (lastCheck.index() == this.pathDist.index() && lastCheck.dist() + 2 <= this.pathDist.dist()) {
+                    this.start = false;
+                    return false;
+                }
+            }
         }
         boolean done = goal.attacker.getNavigation().isDone();
         if (done && !this.canSee(goal)) {

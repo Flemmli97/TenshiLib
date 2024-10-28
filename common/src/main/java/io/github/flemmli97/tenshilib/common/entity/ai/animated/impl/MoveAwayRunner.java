@@ -16,6 +16,7 @@ public class MoveAwayRunner<T extends PathfinderMob & IAnimated> implements Acti
     private final boolean needsLoS;
 
     private boolean start;
+    private ActionUtils.PathDistance pathDist;
 
     public MoveAwayRunner(double minDist, double speed, int dist) {
         this(minDist, speed, dist, false);
@@ -43,7 +44,18 @@ public class MoveAwayRunner<T extends PathfinderMob & IAnimated> implements Acti
                 }
             }
         }
-        boolean done = goal.attacker.getNavigation().isDone();
+        if (goal.attacker.tickCount % 3 == 0) {
+            // Check if entity is getting close. If not retry
+            ActionUtils.PathDistance lastCheck = this.pathDist;
+            this.pathDist = ActionUtils.distanceToNavTargetSqr(goal.attacker);
+            if (lastCheck != null && this.pathDist != null) {
+                if (lastCheck.index() == this.pathDist.index() && lastCheck.dist() + 2 <= this.pathDist.dist()) {
+                    this.start = false;
+                    return false;
+                }
+            }
+        }
+        boolean done = goal.attacker.getNavigation().isStuck();
         if (done && !this.canSee(goal)) {
             this.start = false;
             return false;

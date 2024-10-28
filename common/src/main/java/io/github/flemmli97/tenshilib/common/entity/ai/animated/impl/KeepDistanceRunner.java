@@ -17,6 +17,7 @@ public class KeepDistanceRunner<T extends PathfinderMob & IAnimated> implements 
     private final boolean needsLoS;
 
     private int moveType;
+    private ActionUtils.PathDistance pathDist;
 
     public KeepDistanceRunner(double minDist, double maxDist) {
         this(minDist, maxDist, 1, true);
@@ -63,6 +64,17 @@ public class KeepDistanceRunner<T extends PathfinderMob & IAnimated> implements 
                 }
             }
             case 2 -> {
+                if (goal.attacker.tickCount % 3 == 0) {
+                    // Check if entity is getting close. If not retry
+                    ActionUtils.PathDistance lastCheck = this.pathDist;
+                    this.pathDist = ActionUtils.distanceToNavTargetSqr(goal.attacker);
+                    if (lastCheck != null && this.pathDist != null) {
+                        if (lastCheck.index() == this.pathDist.index() && lastCheck.dist() + 2 <= this.pathDist.dist()) {
+                            this.moveType = 0;
+                            return false;
+                        }
+                    }
+                }
                 // Reset if out of sight
                 if (!this.canSee(goal)) {
                     this.moveType = 0;
