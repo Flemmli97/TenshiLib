@@ -215,12 +215,7 @@ public class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> extends Goa
     }
 
     public void moveToTarget(double speed) {
-        if (this.lastPathTargetPos == null || this.attacker.getNavigation().isDone() || this.lastPathTargetPos.distanceToSqr(this.target.position()) > 4) {
-            this.lastPathTargetPos = this.target.position();
-            Path path = this.attacker.getNavigation().createPath(this.target, 0);
-            if (path != null)
-                this.attacker.getNavigation().moveTo(path, speed);
-        }
+        this.moveToTargetPosition(this.target.getX(), this.target.getY(), this.target.getZ(), speed);
     }
 
     /**

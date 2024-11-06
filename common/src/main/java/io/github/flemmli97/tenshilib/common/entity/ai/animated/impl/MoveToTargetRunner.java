@@ -9,30 +9,34 @@ import net.minecraft.world.entity.PathfinderMob;
 
 public class MoveToTargetRunner<T extends PathfinderMob & IAnimated> implements ActionRun<T> {
 
-    private final double speed, distanceSqr;
-    private final boolean accountWidth, requireSight;
+    private final double speed, distance;
+    private final boolean accountWidth, requireSight, stopOnReach;
 
     public MoveToTargetRunner(double speed, double distance) {
-        this(speed, distance, true, false);
+        this(speed, distance, true, false, true);
     }
 
-    public MoveToTargetRunner(double speed, double distance, boolean accountWidth, boolean requireSight) {
+    public MoveToTargetRunner(double speed, double distance, boolean accountWidth, boolean requireSight, boolean stopOnReach) {
         this.speed = speed;
-        this.distanceSqr = distance * distance;
+        this.distance = distance;
         this.accountWidth = accountWidth;
         this.requireSight = requireSight;
+        this.stopOnReach = stopOnReach;
     }
 
     @Override
     public boolean run(AnimatedAttackGoal<T> goal, LivingEntity target, AnimatedAction anim) {
-        goal.moveToTarget(this.speed);
+        double dist = this.accountWidth ? goal.attacker.getBbWidth() * 0.5 + target.getBbWidth() * 0.5 : 0;
+        dist += this.distance;
+        double distSq = dist * dist;
         goal.attacker.lookAt(target, 30.0F, 30.0F);
-        double dist = this.accountWidth ? goal.attacker.getBbWidth() * goal.attacker.getBbWidth() : 0;
-        dist += this.distanceSqr;
-        if (goal.distanceToTargetSq < dist && (!this.requireSight || goal.canSee)) {
+        if (goal.distanceToTargetSq < distSq && (!this.requireSight || goal.canSee)) {
             goal.attacker.getLookControl().setLookAt(target, 360, 90);
+            if (this.stopOnReach)
+                goal.attacker.getNavigation().stop();
             return true;
         }
+        goal.moveToTarget(this.speed);
         return false;
     }
 }
