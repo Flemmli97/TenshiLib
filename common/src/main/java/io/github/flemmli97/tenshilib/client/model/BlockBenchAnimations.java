@@ -52,7 +52,7 @@ public class BlockBenchAnimations {
         float interpolationRev = 1 - interpolation;
         boolean changed = false;
         if (last != null && interpolationRev > 0) {
-            changed = this.doAnimation(model, last.getAnimationClient(), last.getTick(), partialTicks, current != null ? 1 : interpolationRev, mirror, InterpolationCheck.END, false);
+            changed = this.doAnimation(model, last.getAnimationClient(), last.getTick(), partialTicks, current != null || handler.getTimeSinceLastChange() <= 1 ? 1 : interpolationRev, mirror, InterpolationCheck.END, false);
         }
         if (current != null) {
             changed = this.doAnimation(model, current.getAnimationClient(), current.getTick(), partialTicks, interpolation, mirror, InterpolationCheck.START, changed);
@@ -254,9 +254,15 @@ public class BlockBenchAnimations {
             float mirrorMult = (mirror ? -1 : 1);
             if (this.positions != null) {
                 if (this.positions.length == 1) {
-                    modelPart.x += this.positions[0].getXVal(secTime) * interpolation * mirrorMult;
-                    modelPart.y -= this.positions[0].getYVal(secTime) * interpolation;
-                    modelPart.z += this.positions[0].getZVal(secTime) * interpolation;
+                    float x = this.positions[0].getXVal(secTime) * mirrorMult;
+                    float y = this.positions[0].getYVal(secTime);
+                    float z = this.positions[0].getZVal(secTime);
+                    float dX = modelPart.x - modelPart.defaultPose.x;
+                    modelPart.x += (x - dX) * interpolation;
+                    float dY = modelPart.y - modelPart.defaultPose.y;
+                    modelPart.y -= (y + dY) * interpolation;
+                    float dZ = modelPart.z - modelPart.defaultPose.z;
+                    modelPart.z += (z - dZ) * interpolation;
                 } else {
                     int id = 1;
                     AnimationValue pos = this.positions[id];
@@ -264,16 +270,28 @@ public class BlockBenchAnimations {
                         pos = this.positions[id];
                     AnimationValue posPrev = this.positions[id - 1];
                     float prog = Mth.clamp((actualTick - posPrev.startTick) / (pos.startTick - posPrev.startTick), 0F, 1F);
-                    modelPart.x += this.interpolate(posPrev.getXVal(secTime), pos.getXVal(secTime), prog) * interpolation * mirrorMult;
-                    modelPart.y -= this.interpolate(posPrev.getYVal(secTime), pos.getYVal(secTime), prog) * interpolation;
-                    modelPart.z += this.interpolate(posPrev.getZVal(secTime), pos.getZVal(secTime), prog) * interpolation;
+                    float x = this.interpolate(posPrev.getXVal(secTime), pos.getXVal(secTime), prog) * mirrorMult;
+                    float y = this.interpolate(posPrev.getYVal(secTime), pos.getYVal(secTime), prog);
+                    float z = this.interpolate(posPrev.getZVal(secTime), pos.getZVal(secTime), prog);
+                    float dX = modelPart.x - modelPart.defaultPose.x;
+                    modelPart.x += (x - dX) * interpolation;
+                    float dY = modelPart.y - modelPart.defaultPose.y;
+                    modelPart.y -= (y + dY) * interpolation;
+                    float dZ = modelPart.z - modelPart.defaultPose.z;
+                    modelPart.z += (z - dZ) * interpolation;
                 }
             }
             if (this.rotations != null) {
                 if (this.rotations.length == 1) {
-                    modelPart.xRot += Mth.DEG_TO_RAD * (this.rotations[0].getXVal(secTime) % 360) * interpolation;
-                    modelPart.yRot += Mth.DEG_TO_RAD * (this.rotations[0].getYVal(secTime) % 360) * interpolation * mirrorMult;
-                    modelPart.zRot += Mth.DEG_TO_RAD * (this.rotations[0].getZVal(secTime) % 360) * interpolation * mirrorMult;
+                    float x = this.rotations[0].getXVal(secTime) % 360;
+                    float y = (this.rotations[0].getYVal(secTime) % 360) * mirrorMult;
+                    float z = (this.rotations[0].getZVal(secTime) % 360) * mirrorMult;
+                    float dX = Mth.RAD_TO_DEG * (modelPart.xRot - modelPart.defaultPose.xRot) % 360;
+                    modelPart.xRot += Mth.DEG_TO_RAD * (x - dX) * interpolation;
+                    float dY = Mth.RAD_TO_DEG * (modelPart.yRot - modelPart.defaultPose.yRot) % 360;
+                    modelPart.yRot += Mth.DEG_TO_RAD * (y - dY) * interpolation;
+                    float dZ = Mth.RAD_TO_DEG * (modelPart.zRot - modelPart.defaultPose.zRot) % 360;
+                    modelPart.zRot += Mth.DEG_TO_RAD * (z - dZ) * interpolation;
                 } else {
                     int id = 1;
                     AnimationValue rot = this.rotations[id];
@@ -284,31 +302,25 @@ public class BlockBenchAnimations {
                     float x = (this.interpolate(rotPrev.getXVal(secTime), rot.getXVal(secTime), prog) % 360);
                     float y = (this.interpolate(rotPrev.getYVal(secTime), rot.getYVal(secTime), prog) % 360) * mirrorMult;
                     float z = (this.interpolate(rotPrev.getZVal(secTime), rot.getZVal(secTime), prog) % 360) * mirrorMult;
-                    if (interpolateFromCurrent) {
-                        modelPart.xRot += Mth.DEG_TO_RAD * this.smallestDegDiff(x, modelPart.xRot) * interpolation;
-                        modelPart.yRot += Mth.DEG_TO_RAD * this.smallestDegDiff(y, modelPart.yRot) * interpolation;
-                        modelPart.zRot += Mth.DEG_TO_RAD * this.smallestDegDiff(z, modelPart.zRot) * interpolation;
-                    } else {
-                        modelPart.xRot += Mth.DEG_TO_RAD * x * interpolation;
-                        modelPart.yRot += Mth.DEG_TO_RAD * y * interpolation;
-                        modelPart.zRot += Mth.DEG_TO_RAD * z * interpolation;
-                    }
+                    float dX = Mth.RAD_TO_DEG * (modelPart.xRot - modelPart.defaultPose.xRot) % 360;
+                    modelPart.xRot += Mth.DEG_TO_RAD * (x - dX) * interpolation;
+                    float dY = Mth.RAD_TO_DEG * (modelPart.yRot - modelPart.defaultPose.yRot) % 360;
+                    modelPart.yRot += Mth.DEG_TO_RAD * (y - dY) * interpolation;
+                    float dZ = Mth.RAD_TO_DEG * (modelPart.zRot - modelPart.defaultPose.zRot) % 360;
+                    modelPart.zRot += Mth.DEG_TO_RAD * (z - dZ) * interpolation;
                 }
             }
             if (this.scales != null) {
                 if (this.scales.length == 1) {
-                    float x = (this.scales[0].getXVal(secTime) - 1);
-                    float y = (this.scales[0].getYVal(secTime) - 1);
-                    float z = (this.scales[0].getZVal(secTime) - 1);
-                    if (interpolateFromCurrent) {
-                        modelPart.xScale += (x - modelPart.xScale) * interpolation;
-                        modelPart.yScale += (y - modelPart.yScale) * interpolation;
-                        modelPart.zScale += (z - modelPart.zScale) * interpolation;
-                    } else {
-                        modelPart.xScale += x * interpolation;
-                        modelPart.yScale += y * interpolation;
-                        modelPart.zScale += z * interpolation;
-                    }
+                    float x = this.scales[0].getXVal(secTime) - 1;
+                    float y = this.scales[0].getYVal(secTime) - 1;
+                    float z = this.scales[0].getZVal(secTime) - 1;
+                    float dX = modelPart.xScale - modelPart.defaultPose.xScale;
+                    modelPart.xScale += (x - dX) * interpolation;
+                    float dY = modelPart.yScale - modelPart.defaultPose.yScale;
+                    modelPart.yScale += (y - dY) * interpolation;
+                    float dZ = modelPart.zScale - modelPart.defaultPose.zScale;
+                    modelPart.zScale += (z - dZ) * interpolation;
                 } else {
                     int id = 1;
                     AnimationValue scale = this.scales[id];
@@ -316,27 +328,17 @@ public class BlockBenchAnimations {
                         scale = this.scales[id];
                     AnimationValue scalePrev = this.scales[id - 1];
                     float prog = Mth.clamp((actualTick - scalePrev.startTick) / (scale.startTick - scalePrev.startTick), 0F, 1F);
-                    float x = this.interpolate(scalePrev.getXVal(secTime), scale.getXVal(secTime), prog);
-                    float y = this.interpolate(scalePrev.getYVal(secTime), scale.getYVal(secTime), prog);
-                    float z = this.interpolate(scalePrev.getZVal(secTime), scale.getZVal(secTime), prog);
-                    if (interpolateFromCurrent) {
-                        modelPart.xScale += (x - modelPart.xScale) * interpolation;
-                        modelPart.yScale += (y - modelPart.yScale) * interpolation;
-                        modelPart.zScale += (z - modelPart.zScale) * interpolation;
-                    } else {
-                        modelPart.xScale += (x - 1) * interpolation;
-                        modelPart.yScale += (y - 1) * interpolation;
-                        modelPart.zScale += (z - 1) * interpolation;
-                    }
+                    float x = this.interpolate(scalePrev.getXVal(secTime), scale.getXVal(secTime), prog) - 1;
+                    float y = this.interpolate(scalePrev.getYVal(secTime), scale.getYVal(secTime), prog) - 1;
+                    float z = this.interpolate(scalePrev.getZVal(secTime), scale.getZVal(secTime), prog) - 1;
+                    float dX = modelPart.xScale - modelPart.defaultPose.xScale;
+                    modelPart.xScale += (x - dX) * interpolation;
+                    float dY = modelPart.yScale - modelPart.defaultPose.yScale;
+                    modelPart.yScale += (y - dY) * interpolation;
+                    float dZ = modelPart.zScale - modelPart.defaultPose.zScale;
+                    modelPart.zScale += (z - dZ) * interpolation;
                 }
             }
-        }
-
-        private float smallestDegDiff(float first, float sec) {
-            sec = (Mth.RAD_TO_DEG * sec) % 360;
-            float diff1 = first - sec;
-            float diff2 = sec - first;
-            return Math.abs(diff1) > Math.abs(diff2) ? diff2 : diff1;
         }
 
         private float interpolate(float start, float end, float progress) {

@@ -21,7 +21,7 @@ public class AnimationHandler<T extends Entity & IAnimated> {
     private Consumer<AnimatedAction> onAnimationSetCons;
     private Consumer<AnimatedAction> onRunAnimation;
     private ToFloatFunction<AnimatedAction> animationSpeedHandler;
-    private int timeSinceLastChange;
+    private int timeSinceLastChange = -1;
 
     public AnimationHandler(T entity, AnimatedAction[] anims) {
         this.entity = entity;
@@ -77,8 +77,10 @@ public class AnimationHandler<T extends Entity & IAnimated> {
             this.onAnimationSetCons.accept(anim);
         if (this.onAnimationSetFunc != null && this.onAnimationSetFunc.test(anim))
             return;
-        this.lastAnim = this.currentAnim;
-        this.timeSinceLastChange = 0;
+        if (this.currentAnim != null) {
+            this.lastAnim = this.currentAnim;
+            this.timeSinceLastChange = 0;
+        }
         this.currentAnim = anim == null ? null : anim.create(this.animationSpeedHandler == null ? anim.getSpeed() : this.animationSpeedHandler.apply(anim));
         if (!this.entity.level.isClientSide) {
             EventCalls.INSTANCE.sendEntityAnimationPacket(this.entity);
@@ -118,13 +120,14 @@ public class AnimationHandler<T extends Entity & IAnimated> {
     }
 
     public void tick() {
+        if (this.timeSinceLastChange >= 0)
+            this.timeSinceLastChange++;
         if (this.hasAnimation()) {
             if (this.getAnimation().tick())
                 this.setAnimation(null);
             else if (this.onRunAnimation != null)
                 this.onRunAnimation.accept(this.getAnimation());
         }
-        this.timeSinceLastChange++;
     }
 
     /**
@@ -151,6 +154,8 @@ public class AnimationHandler<T extends Entity & IAnimated> {
     }
 
     public float getInterpolatedAnimationVal(float partialTicks, float adjustTime) {
-        return Mth.clamp((this.getTimeSinceLastChange() + partialTicks) / adjustTime, 0, 1);
+        if (this.getTimeSinceLastChange() < 0)
+            return 1;
+        return Mth.clamp((this.getTimeSinceLastChange() - 1 + partialTicks) / adjustTime, 0, 1);
     }
 }
