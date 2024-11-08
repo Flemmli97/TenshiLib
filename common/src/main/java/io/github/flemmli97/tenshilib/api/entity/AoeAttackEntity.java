@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.api.entity;
 
+import io.github.flemmli97.tenshilib.common.utils.OrientedBoundingBox;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.phys.AABB;
 
 public interface AoeAttackEntity {
 
@@ -13,6 +13,6 @@ public interface AoeAttackEntity {
      * @param grow      A value to modify the AABB with
      * @param withDebug If true then the context in which this is called in should show a visual for the AABB
      */
-    AABB prepareAttackBox(AnimatedAction anim, LivingEntity target, double grow, boolean withDebug);
+    OrientedBoundingBox prepareAttackBox(AnimatedAction anim, LivingEntity target, double grow, boolean withDebug);
 
 }

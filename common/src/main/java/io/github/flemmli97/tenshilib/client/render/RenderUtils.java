@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
+import io.github.flemmli97.tenshilib.common.utils.OrientedBoundingBox;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -84,9 +85,49 @@ public class RenderUtils {
                                          boolean drawImmediately) {
         Vec3 vec = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         RenderType renderType = RenderType.lines();
-        LevelRenderer.renderLineBox(matrixStack, buffer.getBuffer(renderType), aabb.inflate(0.002).move(-vec.x, -vec.y, -vec.z), red, green, blue, alpha);
+        matrixStack.pushPose();
+        matrixStack.translate(-vec.x, -vec.y, -vec.z);
+        LevelRenderer.renderLineBox(matrixStack, buffer.getBuffer(renderType), aabb.inflate(0.002), red, green, blue, alpha);
         if (drawImmediately && buffer instanceof MultiBufferSource.BufferSource)
             ((MultiBufferSource.BufferSource) buffer).endBatch();
+        matrixStack.popPose();
+    }
+
+    /**
+     * Renders the given oriented bounding box
+     *
+     * @param drawImmediately If true draws the content immediately to the buffer
+     */
+    public static void renderOBB(PoseStack stack, MultiBufferSource buffer, OrientedBoundingBox obb, float red, float green, float blue, float alpha,
+                                 boolean drawImmediately) {
+        Vec3 vec = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        stack.pushPose();
+        stack.translate(-vec.x, -vec.y, -vec.z);
+        RenderType renderType = RenderType.lines();
+        VertexConsumer consumer = buffer.getBuffer(renderType);
+        Matrix4f matrix4f = stack.last().pose();
+        Matrix3f matrix3f = stack.last().normal();
+        for (int b = 0; b < 4; b++) {
+            Vec3 first = obb.getVertices()[b];
+            Vec3 second = obb.getVertices()[(b + 1) % 4];
+            consumer.vertex(matrix4f, (float) first.x(), (float) first.y(), (float) first.z()).color(red, green, blue, alpha).normal(matrix3f, 1.0F, 0.0F, 0.0F).endVertex();
+            consumer.vertex(matrix4f, (float) second.x(), (float) second.y(), (float) second.z()).color(red, green, blue, alpha).normal(matrix3f, 1.0F, 0.0F, 0.0F).endVertex();
+
+            // Vertical lines
+            Vec3 top = obb.getVertices()[4 + b];
+            consumer.vertex(matrix4f, (float) first.x(), (float) first.y(), (float) first.z()).color(red, green, blue, alpha).normal(matrix3f, 1.0F, 0.0F, 0.0F).endVertex();
+            consumer.vertex(matrix4f, (float) top.x(), (float) top.y(), (float) top.z()).color(red, green, blue, alpha).normal(matrix3f, 1.0F, 0.0F, 0.0F).endVertex();
+        }
+
+        for (int b = 4; b < 8; b++) {
+            Vec3 first = obb.getVertices()[b];
+            Vec3 second = obb.getVertices()[4 + (b + 1) % 4];
+            consumer.vertex(matrix4f, (float) first.x(), (float) first.y(), (float) first.z()).color(red, green, blue, alpha).normal(matrix3f, 1.0F, 0.0F, 0.0F).endVertex();
+            consumer.vertex(matrix4f, (float) second.x(), (float) second.y(), (float) second.z()).color(red, green, blue, alpha).normal(matrix3f, 1.0F, 0.0F, 0.0F).endVertex();
+        }
+        if (drawImmediately && buffer instanceof MultiBufferSource.BufferSource)
+            ((MultiBufferSource.BufferSource) buffer).endBatch();
+        stack.popPose();
     }
 
     public static void applyYawPitch(PoseStack stack, float yaw, float pitch) {
