@@ -55,7 +55,7 @@ public class MoveAwayRunner<T extends PathfinderMob & IAnimated> implements Acti
                 }
             }
         }
-        boolean done = goal.attacker.getNavigation().isStuck();
+        boolean done = goal.attacker.getNavigation().isDone();
         if (done && !this.canSee(goal)) {
             this.start = false;
             return false;
