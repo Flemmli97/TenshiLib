@@ -12,4 +12,6 @@ public interface IBeamEntity extends OwnableEntity {
     int livingTickMax();
 
     void updateYawPitch();
+
+    float radius();
 }

@@ -51,6 +51,14 @@ public class OrientedBoundingBox {
     }
 
     /**
+     * Creates an AABB with given dimension that will result
+     * in a front facing Hitbox
+     */
+    public static AABB baseBox(double width, double height, double length) {
+        return new AABB(-width * 0.5, -height * 0.5, 0, width * 0.5, height * 0.5, length);
+    }
+
+    /**
      * Gets the AABB of the entity based on the origin (Zero)
      * As OBBs require relative AABB
      */

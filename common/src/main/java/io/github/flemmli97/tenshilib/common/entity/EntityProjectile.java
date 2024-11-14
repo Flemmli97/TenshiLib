@@ -1,5 +1,6 @@
 package io.github.flemmli97.tenshilib.common.entity;
 
+import io.github.flemmli97.tenshilib.common.utils.OrientedBoundingBox;
 import io.github.flemmli97.tenshilib.common.utils.RayTraceUtils;
 import io.github.flemmli97.tenshilib.platform.EventCalls;
 import net.minecraft.core.BlockPos;
@@ -40,6 +41,8 @@ import java.util.UUID;
 
 public abstract class EntityProjectile extends Projectile {
 
+    protected static final EntityDataAccessor<Optional<UUID>> SHOOTER_UUID = SynchedEntityData.defineId(EntityProjectile.class, EntityDataSerializers.OPTIONAL_UUID);
+
     private Entity shooter;
 
     protected boolean inGround;
@@ -49,8 +52,6 @@ public abstract class EntityProjectile extends Projectile {
 
     protected BlockState groundState;
     protected BlockPos groundPos;
-
-    protected static final EntityDataAccessor<Optional<UUID>> SHOOTER_UUID = SynchedEntityData.defineId(EntityProjectile.class, EntityDataSerializers.OPTIONAL_UUID);
 
     public EntityProjectile(EntityType<? extends EntityProjectile> type, Level world) {
         super(type, world);
@@ -77,9 +78,6 @@ public abstract class EntityProjectile extends Projectile {
         return -1;
     }
 
-    /**
-     * Doesnt work properly yet
-     */
     public float radius() {
         return 0;
     }
@@ -330,13 +328,29 @@ public abstract class EntityProjectile extends Projectile {
     protected EntityHitResult getEntityHit(Vec3 from, Vec3 to) {
         if (!this.isAlive())
             return null;
+        double amount = 1;
         if (this.isPiercing()) {
-            if (this.maxPierceAmount() == -1 || this.attackedEntities.size() < this.maxPierceAmount())
-                return RayTraceUtils.rayTraceEntities(this, from, to, this::canHit);
-            return null;
+            amount = this.maxPierceAmount();
         }
-        if (this.attackedEntities.isEmpty())
+        if (amount == -1 || this.attackedEntities.size() < amount) {
+            if (this.radius() != 0) {
+                double dist = to.subtract(from).length();
+                OrientedBoundingBox obb = new OrientedBoundingBox(OrientedBoundingBox.baseBox(this.radius() * 2, this.radius() * 2, dist),
+                        -this.getYRot(), this.getXRot(), this.position());
+                List<Entity> list = this.level.getEntities(this, obb.getEncompassingBox());
+                for (Entity e : list) {
+                    if (this.canHit(e) && obb.intersects(e.getBoundingBox())) {
+                        AABB outer = obb.getEncompassingBox();
+                        Vec3 hit = new Vec3(Mth.clamp(e.position().x, outer.minX, outer.maxX),
+                                Mth.clamp(e.position().y, outer.minY, outer.maxY),
+                                Mth.clamp(e.position().z, outer.minZ, outer.maxZ));
+                        return new EntityHitResult(e, hit);
+                    }
+                }
+                return null;
+            }
             return RayTraceUtils.rayTraceEntities(this, from, to, this::canHit);
+        }
         return null;
     }
 

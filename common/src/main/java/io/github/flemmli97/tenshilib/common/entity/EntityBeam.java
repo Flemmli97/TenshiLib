@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.common.entity;
 
 import io.github.flemmli97.tenshilib.api.entity.IBeamEntity;
-import io.github.flemmli97.tenshilib.common.utils.MathUtils;
+import io.github.flemmli97.tenshilib.common.utils.OrientedBoundingBox;
 import io.github.flemmli97.tenshilib.common.utils.RayTraceUtils;
 import io.github.flemmli97.tenshilib.platform.EventCalls;
 import net.minecraft.nbt.CompoundTag;
@@ -38,6 +38,8 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
     protected static final EntityDataAccessor<Optional<UUID>> SHOOTER_UUID = SynchedEntityData.defineId(EntityBeam.class, EntityDataSerializers.OPTIONAL_UUID);
 
     protected final Predicate<Entity> notShooter = (entity) -> entity != EntityBeam.this.getOwner() && EntitySelector.NO_SPECTATORS.test(entity) && entity.isPickable();
+
+    protected OrientedBoundingBox hitObb;
 
     public EntityBeam(EntityType<? extends EntityBeam> type, Level world) {
         super(type, world);
@@ -91,9 +93,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         return 32;
     }
 
-    /**
-     * Doesnt work properly yet
-     */
+    @Override
     public float radius() {
         return 0;
     }
@@ -136,6 +136,12 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         this.entityData.define(SHOOTER_UUID, Optional.empty());
     }
 
+    public void updateHitDetectBox() {
+        double dist = this.hitVec != null ? this.hitVec.subtract(this.position()).length() : 0;
+        this.hitObb = new OrientedBoundingBox(OrientedBoundingBox.baseBox(this.radius() * 2, this.radius() * 2, dist),
+                this.getYRot(), -this.getXRot(), this.position());
+    }
+
     @Override
     public void tick() {
         this.updateYawPitch();
@@ -146,6 +152,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
                 Vec3 dir = this.hitVec.subtract(this.position()).normalize();
                 this.hitVec = this.hitVec.subtract(dir.scale(this.radius() * 0.3));
             }
+            this.updateHitDetectBox();
         }
         super.tick();
         this.livingTicks++;
@@ -157,9 +164,15 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
             if (this.hit != null && this.canStartDamage() && this.isAlive()) {
                 List<Entity> list = this.level.getEntities(this,
                         new AABB(this.getX(), this.getY(), this.getZ(), this.hitVec.x, this.hitVec.y, this.hitVec.z).inflate(1 + this.radius()));
-                Vec3 pos = this.position();
+                Predicate<AABB> collisionCheck = aabb -> {
+                    if (this.radius() == 0) {
+                        Optional<Vec3> ray = aabb.clip(this.position(), this.hitVec);
+                        return ray.isPresent() || aabb.contains(this.position());
+                    }
+                    return this.hitObb.intersects(aabb);
+                };
                 for (Entity entity : list) {
-                    if (!entity.equals(this.getOwner()) && !EntityUtil.isSameMultipart(entity, this.getOwner()) && this.check(entity, pos, this.hitVec)) {
+                    if (!entity.equals(this.getOwner()) && !EntityUtil.isSameMultipart(entity, this.getOwner()) && this.check(entity, collisionCheck)) {
                         EntityHitResult raytraceresult = new EntityHitResult(entity);
                         if (!EventCalls.INSTANCE.beamHitCall(this, raytraceresult)) {
                             this.onImpact(raytraceresult);
@@ -177,19 +190,11 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
                 !this.piercing(), true, this.notShooter);
     }
 
-    protected boolean check(Entity e, Vec3 from, Vec3 to) {
+    protected boolean check(Entity e, Predicate<AABB> intersects) {
         if (e.isSpectator() || !e.isAlive() || !e.isPickable())
             return false;
-        AABB aabb = e.getBoundingBox().inflate(this.radius() + 0.3);
-        Optional<Vec3> ray = aabb.clip(from, to);
-        if (ray.isEmpty() && !aabb.contains(this.position()))
-            return false;
-        if (this.radius() == 0)
-            return true;
-        double dist = MathUtils.distTo(e, from, to);
-        Vec3 dir = to.subtract(from).normalize().scale(0.1);
-        double maxdist = this.radius() + e.getBbWidth() + 0.3;
-        return dist <= maxdist * maxdist && MathUtils.isInFront(e.position(), from, dir);
+        AABB aabb = e.getBoundingBox();
+        return intersects.test(aabb);
     }
 
     public abstract void onImpact(EntityHitResult result);
