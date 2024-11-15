@@ -32,7 +32,7 @@ public class S2CEntityAnimation implements Packet {
         IAnimated entity = (IAnimated) e;
         this.animID = Optional.ofNullable(entity.getAnimationHandler().getAnimation())
                 .map(anim -> {
-                    if (anim == AnimatedAction.vanillaAttack)
+                    if (anim == AnimatedAction.VANILLA_ATTACK)
                         return -1;
                     else {
                         int i = 0;

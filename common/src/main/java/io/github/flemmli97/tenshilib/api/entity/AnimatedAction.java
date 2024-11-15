@@ -4,8 +4,8 @@ import net.minecraft.util.Mth;
 
 public class AnimatedAction {
 
-    public static final AnimatedAction vanillaAttack = new AnimatedAction(20, 1, "vanilla");
-    public static final AnimatedAction[] vanillaAttackOnly = {vanillaAttack};
+    public static final AnimatedAction VANILLA_ATTACK = new AnimatedAction(20, 1, "vanilla");
+    public static final AnimatedAction[] VANILLA_ATTACK_ONLY = {VANILLA_ATTACK};
 
     private final int length, attackTime;
     private final boolean shouldRunOut;

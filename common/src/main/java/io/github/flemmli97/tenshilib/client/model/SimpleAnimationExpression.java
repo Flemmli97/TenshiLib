@@ -2,9 +2,12 @@ package io.github.flemmli97.tenshilib.client.model;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
 import net.minecraft.util.Mth;
+import org.jetbrains.annotations.TestOnly;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -21,17 +24,18 @@ import java.util.Stack;
  */
 public class SimpleAnimationExpression {
 
-    private static final String REGEX_SPLIT = "(?<=%1$s)|(?=%1$s)";
+    private static final String OPERATORS = "[+\\-%*/()]";
 
-    private static final String DELIMITER = "[+\\-\\*/()]";
+    private static final String VARS = "([A-z]|\\.)+";
 
-    private static final String[] DELIMS = {
-            "[+\\-\\*/()]",
-            "(math\\.sin)",
-            "(math\\.cos)",
-            "(time)",
-            "(query.time)"
-    };
+    private static final String REGEX_SPLIT = String.format("(?<=%1$s)|(?=%1$s)", OPERATORS);
+
+    private static String variableEquivalent(String variable) {
+        variable = variable.replace("query.", "");
+        if (variable.equals("anim_time"))
+            variable = "time";
+        return variable;
+    }
 
     private static Type type(String s) {
         return switch (s) {
@@ -43,12 +47,13 @@ public class SimpleAnimationExpression {
             case ")" -> Type.BRACKETCLOSE;
             case "math.sin" -> Type.SIN;
             case "math.cos" -> Type.COS;
-            case "time", "query.time" -> Type.VAR;
-            default -> Type.NUMBER;
+            default -> {
+                if (s.matches(VARS))
+                    yield Type.VAR;
+                yield Type.NUMBER;
+            }
         };
     }
-
-    private static final String DEL_COMP = String.join("|", DELIMS);
 
     public static Value of(String exp) {
         exp = exp.replace(" ", "");
@@ -57,7 +62,7 @@ public class SimpleAnimationExpression {
             return new ConstantValue(f);
         } catch (NumberFormatException e) {
             try {
-                return ofSplit(exp.split(String.format(REGEX_SPLIT, DEL_COMP)));
+                return ofSplit(exp.split(REGEX_SPLIT));
             } catch (NumberFormatException ignored) {
             }
         }
@@ -94,7 +99,7 @@ public class SimpleAnimationExpression {
             if (type == Type.NUMBER)
                 consts.push(new ConstantValue(Float.parseFloat(s)));
             else if (type == Type.VAR)
-                consts.push(new TickValue());
+                consts.push(new VariableValue(variableEquivalent(s)));
             else if (!ops.isEmpty() && ops.peek().priority > type.priority) {
                 Value v = null;
                 while (!ops.empty() && ops.peek().priority > type.priority) {
@@ -157,8 +162,8 @@ public class SimpleAnimationExpression {
         return new ConstantValue(0);
     }
 
-    interface Value {
-        float get(float time);
+    public interface Value {
+        float get(VariableMap vars);
     }
 
     interface BiValue extends Value {
@@ -176,7 +181,7 @@ public class SimpleAnimationExpression {
     record ConstantValue(float constant) implements Value {
 
         @Override
-        public float get(float time) {
+        public float get(VariableMap vars) {
             return this.constant;
         }
 
@@ -193,8 +198,8 @@ public class SimpleAnimationExpression {
     record NegValue(Value val) implements Value {
 
         @Override
-        public float get(float time) {
-            return -this.val.get(time);
+        public float get(VariableMap vars) {
+            return -this.val.get(vars);
         }
 
         @Override
@@ -203,24 +208,24 @@ public class SimpleAnimationExpression {
         }
     }
 
-    record TickValue() implements Value {
+    record VariableValue(String variable) implements Value {
 
         @Override
-        public float get(float time) {
-            return time;
+        public float get(VariableMap vars) {
+            return vars.getValue(this.variable);
         }
 
         @Override
         public String toString() {
-            return "time";
+            return this.variable;
         }
     }
 
     record Addition(Value first, Value second) implements BiValue {
 
         @Override
-        public float get(float time) {
-            return this.first.get(time) + this.second.get(time);
+        public float get(VariableMap vars) {
+            return this.first.get(vars) + this.second.get(vars);
         }
 
         @Override
@@ -249,8 +254,8 @@ public class SimpleAnimationExpression {
 
         @Override
         public String toString() {
-            String f = this.first instanceof ConstantValue || this.first instanceof TickValue ? this.first.toString() : String.format("(%s)", this.first);
-            String s = this.second instanceof ConstantValue || this.second instanceof TickValue ? this.second.toString() : String.format("(%s)", this.second);
+            String f = this.first instanceof ConstantValue || this.first instanceof VariableValue ? this.first.toString() : String.format("(%s)", this.first);
+            String s = this.second instanceof ConstantValue || this.second instanceof VariableValue ? this.second.toString() : String.format("(%s)", this.second);
             return String.format("%s+%s", f, s);
         }
     }
@@ -258,8 +263,8 @@ public class SimpleAnimationExpression {
     record Substraction(Value first, Value second) implements BiValue {
 
         @Override
-        public float get(float time) {
-            return this.first.get(time) - this.second.get(time);
+        public float get(VariableMap vars) {
+            return this.first.get(vars) - this.second.get(vars);
         }
 
         @Override
@@ -288,8 +293,8 @@ public class SimpleAnimationExpression {
 
         @Override
         public String toString() {
-            String f = this.first instanceof ConstantValue || this.first instanceof TickValue ? this.first.toString() : String.format("(%s)", this.first);
-            String s = this.second instanceof ConstantValue || this.second instanceof TickValue ? this.second.toString() : String.format("(%s)", this.second);
+            String f = this.first instanceof ConstantValue || this.first instanceof VariableValue ? this.first.toString() : String.format("(%s)", this.first);
+            String s = this.second instanceof ConstantValue || this.second instanceof VariableValue ? this.second.toString() : String.format("(%s)", this.second);
             return String.format("%s-%s", f, s);
         }
     }
@@ -297,8 +302,8 @@ public class SimpleAnimationExpression {
     record Multiplication(Value first, Value second) implements BiValue {
 
         @Override
-        public float get(float time) {
-            return this.first.get(time) * this.second.get(time);
+        public float get(VariableMap vars) {
+            return this.first.get(vars) * this.second.get(vars);
         }
 
         @Override
@@ -327,8 +332,8 @@ public class SimpleAnimationExpression {
 
         @Override
         public String toString() {
-            String f = this.first instanceof ConstantValue || this.first instanceof TickValue ? this.first.toString() : String.format("(%s)", this.first);
-            String s = this.second instanceof ConstantValue || this.second instanceof TickValue ? this.second.toString() : String.format("(%s)", this.second);
+            String f = this.first instanceof ConstantValue || this.first instanceof VariableValue ? this.first.toString() : String.format("(%s)", this.first);
+            String s = this.second instanceof ConstantValue || this.second instanceof VariableValue ? this.second.toString() : String.format("(%s)", this.second);
             return String.format("%s*%s", f, s);
         }
     }
@@ -336,8 +341,8 @@ public class SimpleAnimationExpression {
     record Division(Value first, Value second) implements BiValue {
 
         @Override
-        public float get(float time) {
-            return this.first.get(time) / this.second.get(time);
+        public float get(VariableMap vars) {
+            return this.first.get(vars) / this.second.get(vars);
         }
 
         @Override
@@ -366,8 +371,8 @@ public class SimpleAnimationExpression {
 
         @Override
         public String toString() {
-            String f = this.first instanceof ConstantValue || this.first instanceof TickValue ? this.first.toString() : String.format("(%s)", this.first);
-            String s = this.second instanceof ConstantValue || this.second instanceof TickValue ? this.second.toString() : String.format("(%s)", this.second);
+            String f = this.first instanceof ConstantValue || this.first instanceof VariableValue ? this.first.toString() : String.format("(%s)", this.first);
+            String s = this.second instanceof ConstantValue || this.second instanceof VariableValue ? this.second.toString() : String.format("(%s)", this.second);
             return String.format("%s/%s", f, s);
         }
     }
@@ -375,8 +380,8 @@ public class SimpleAnimationExpression {
     record Sin(Value value) implements Value {
 
         @Override
-        public float get(float time) {
-            return Mth.sin(Mth.DEG_TO_RAD * this.value.get(time));
+        public float get(VariableMap vars) {
+            return Mth.sin(Mth.DEG_TO_RAD * this.value.get(vars));
         }
 
         @Override
@@ -388,8 +393,8 @@ public class SimpleAnimationExpression {
     record Cos(Value value) implements Value {
 
         @Override
-        public float get(float time) {
-            return Mth.cos(Mth.DEG_TO_RAD * this.value.get(time));
+        public float get(VariableMap vars) {
+            return Mth.cos(Mth.DEG_TO_RAD * this.value.get(vars));
         }
 
         @Override
@@ -415,5 +420,68 @@ public class SimpleAnimationExpression {
         Type(int priority) {
             this.priority = priority;
         }
+    }
+
+    public interface FloatSupplier {
+        float get();
+    }
+
+    public static class VariableMap {
+
+        private final Map<String, FloatSupplier> variables = new HashMap<>();
+
+        public VariableMap setVariable(String variable, FloatSupplier value) {
+            this.variables.put(variable, value);
+            return this;
+        }
+
+        public float getValue(String variable) {
+            FloatSupplier sup = this.variables.get(variable);
+            return sup != null ? sup.get() : 0;
+        }
+    }
+
+    @TestOnly
+    public static void test() {
+        Value exp1 = SimpleAnimationExpression.of("5+(44+1)*4*1/6+99");
+        Value exp2 = SimpleAnimationExpression.of("5+2*4+7");
+        Value exp3 = SimpleAnimationExpression.of("-5+5+(-3*5)");
+
+        Value exp4 = SimpleAnimationExpression.of("math.sin(time*(44+1)+3)*4*1/6");
+        Value exp5 = SimpleAnimationExpression.of("99*math.cos(1)");
+        Value exp6 = SimpleAnimationExpression.of("-math.sin(time*180)+17.5");
+        Value exp7 = SimpleAnimationExpression.of("math.sin(time*180)-17.5");
+
+        Value exp8 = SimpleAnimationExpression.of("math.sin(query.anim_time * 1200) * 6 * query.above_top_solid");
+
+        System.out.println("Expression 1: " + exp1);
+        verify(exp1.get(new VariableMap()), 134);
+        System.out.println("Expression 2: " + exp2);
+        verify(exp2.get(new VariableMap()), 20);
+        System.out.println("Expression 3: " + exp3);
+        verify(exp3.get(new VariableMap()), -15);
+
+        System.out.println("Expression 4: " + exp4);
+        verify(roundDecimal(exp4.get(new VariableMap().setVariable("time", () -> 5)), 5), -0.49542f);
+        System.out.println("Expression 5: " + exp5);
+        verify(exp5.get(new VariableMap()), 98.98493f);
+        System.out.println("Expression 6: " + exp6);
+        verify(exp6.get(new VariableMap().setVariable("time", () -> 8)), 17.5f);
+        System.out.println("Expression 7: " + exp7);
+        verify(exp7.get(new VariableMap().setVariable("time", () -> 8)), -17.5f);
+
+        System.out.println("Expression 8: " + exp8);
+        verify(roundDecimal(exp8.get(new VariableMap().setVariable("time", () -> 4)
+                .setVariable("above_top_solid", () -> 9)), 3), 46.766f);
+    }
+
+    private static void verify(float value, float truth) {
+        if (value != truth)
+            throw new IllegalStateException(String.format("Wrong value. Expected %s but was %s", truth, value));
+    }
+
+    private static float roundDecimal(float value, int decimals) {
+        float pow = (float) Math.pow(10, decimals);
+        return Math.round(value * pow) / pow;
     }
 }

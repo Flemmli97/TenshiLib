@@ -12,16 +12,16 @@ public class AnimationValue {
         this.zVal = zVal;
     }
 
-    public float getXVal(float time) {
-        return this.xVal.get(time);
+    public float getXVal(SimpleAnimationExpression.VariableMap vars) {
+        return this.xVal.get(vars);
     }
 
-    public float getYVal(float time) {
-        return this.yVal.get(time);
+    public float getYVal(SimpleAnimationExpression.VariableMap vars) {
+        return this.yVal.get(vars);
     }
 
-    public float getZVal(float time) {
-        return this.zVal.get(time);
+    public float getZVal(SimpleAnimationExpression.VariableMap vars) {
+        return this.zVal.get(vars);
     }
 
     @Override
