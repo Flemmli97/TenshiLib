@@ -172,7 +172,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
                     return this.hitObb.intersects(aabb);
                 };
                 for (Entity entity : list) {
-                    if (!entity.equals(this.getOwner()) && !EntityUtil.isSameMultipart(entity, this.getOwner()) && this.check(entity, collisionCheck)) {
+                    if (!entity.equals(this.getOwner()) && this.canHitEntity(entity) && this.check(entity, collisionCheck)) {
                         EntityHitResult raytraceresult = new EntityHitResult(entity);
                         if (!EventCalls.INSTANCE.beamHitCall(this, raytraceresult)) {
                             this.onImpact(raytraceresult);
@@ -185,9 +185,19 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         }
     }
 
+    protected boolean canHitEntity(Entity target) {
+        if (target.isSpectator() || !target.isAlive() || !target.isPickable()) {
+            return false;
+        }
+        Entity entity = this.getOwner();
+        if (entity == null)
+            return true;
+        return target != entity && !EntityUtil.isSameMultipart(target, entity) && !entity.isPassengerOfSameVehicle(target);
+    }
+
     public HitResult getHitRay() {
         return RayTraceUtils.entityRayTrace(this, this.getRange(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,
-                !this.piercing(), true, this.notShooter);
+                !this.piercing(), true, this::canHitEntity);
     }
 
     protected boolean check(Entity e, Predicate<AABB> intersects) {

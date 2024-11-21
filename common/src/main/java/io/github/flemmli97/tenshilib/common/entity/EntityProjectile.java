@@ -314,15 +314,19 @@ public abstract class EntityProjectile extends Projectile {
         }
     }
 
-    protected boolean canHit(Entity entity) {
-        if (!entity.isSpectator() && entity.isAlive() && entity.isPickable()) {
-            if (entity.equals(this.getOwner()) || EntityUtil.isSameMultipart(entity, this.getOwner())) {
-                if (!this.canHitShooter() || this.getOwner().isPassengerOfSameVehicle(entity) || this.tickCount < 5)
-                    return false;
-            }
-            return !this.checkedEntities.contains(entity.getUUID());
+    protected boolean canHit(Entity target) {
+        if (target.isSpectator() || !target.isAlive() || !target.isPickable()) {
+            return false;
         }
-        return false;
+        Entity entity = this.getOwner();
+        if (entity == null)
+            return true;
+        if (entity.isPassengerOfSameVehicle(target) || EntityUtil.isSameMultipart(target, this.getOwner()))
+            return false;
+        if (target.equals(this.getOwner()) && (!this.canHitShooter() || this.tickCount < 5)) {
+            return false;
+        }
+        return !this.checkedEntities.contains(target.getUUID());
     }
 
     protected EntityHitResult getEntityHit(Vec3 from, Vec3 to) {

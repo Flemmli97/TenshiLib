@@ -125,8 +125,16 @@ public abstract class EntityDamageCloud extends Entity implements OwnableEntity 
         }
     }
 
-    protected boolean canHit(LivingEntity entity) {
-        return this.getOwner() == null || (!this.getOwner().isPassengerOfSameVehicle(entity) && ((this.canHitShooter() && this.tickCount > 2) || !entity.equals(this.getOwner())));
+    protected boolean canHit(LivingEntity target) {
+        if (target.isSpectator() || !target.isAlive() || !target.isPickable()) {
+            return false;
+        }
+        Entity entity = this.getOwner();
+        if (entity == null)
+            return true;
+        if (EntityUtil.isSameMultipart(target, this.getOwner()))
+            return false;
+        return !target.equals(this.getOwner()) || !entity.isPassengerOfSameVehicle(target) || (this.canHitShooter() && this.tickCount >= 3);
     }
 
     protected abstract boolean damageEntity(LivingEntity target);
