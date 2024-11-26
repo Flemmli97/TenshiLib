@@ -1,8 +1,16 @@
+TenshiLib 1.9.3
+================
+- Update projectile etc to use OBB
+- Animations support variables now
+
+TenshiLib 1.9.2
+================
+- Fix various ai handling stuff
+- Implement oriented bounding boxes with collision detection
+
 TenshiLib 1.9.1
 ================
 - Fix interpolation error with scaling in animations
-- Fix various ai handling stuff
-- Implement oriented bounding boxes with collision detection
 
 TenshiLib 1.9.0
 ================
