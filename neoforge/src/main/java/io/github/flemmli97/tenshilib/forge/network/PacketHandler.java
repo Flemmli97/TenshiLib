@@ -17,7 +17,7 @@ import java.util.function.BiConsumer;
 public class PacketHandler {
 
     public static void register(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar(TenshiLib.MODID);
+        PayloadRegistrar registrar = event.registrar(TenshiLib.MODID).optional();
         PacketRegistrar.registerServerPackets(new PacketRegistrar.ServerPacketRegister() {
             @Override
             public <P extends CustomPacketPayload> void register(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf, P> codec, BiConsumer<P, ServerPlayer> handler) {
