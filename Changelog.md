@@ -1,3 +1,7 @@
+TenshiLib 1.8.2
+================
+- Fix packets not being optional
+
 TenshiLib 1.8.1.b
 ================
 - Update to 1.21.1  
