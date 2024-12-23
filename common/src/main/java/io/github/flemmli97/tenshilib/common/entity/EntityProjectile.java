@@ -70,6 +70,13 @@ public abstract class EntityProjectile extends Projectile {
         this.onUpdateOwner();
     }
 
+    public static double getGravityOffset(EntityProjectile projectile, Vec3 dir, Vec3 motion) {
+        if (projectile.getGravityVelocity() == 0)
+            return 0;
+        double gravityOffset = dir.length() / motion.length() * 0.5 * projectile.getGravityVelocity();
+        return gravityOffset * 0.99; // Friction
+    }
+
     public boolean isPiercing() {
         return false;
     }
@@ -122,26 +129,31 @@ public abstract class EntityProjectile extends Projectile {
     }
 
     /**
-     * Shoots directly at the given position
-     */
-    public void shootAtPosition(double x, double y, double z, float velocity, float inaccuracy) {
-        Vec3 dir = new Vec3(x - this.getX(), y - this.getY(), z - this.getZ());
-        this.shoot(dir.x, dir.y, dir.z, velocity, inaccuracy);
-    }
-
-    /**
      * Shoot at the given entity. Considers the gravity of the projectile too so it will aim a bit higher if needed
      */
     public void shootAtEntity(Entity target, float velocity, float inaccuracy) {
+        this.shootAtEntity(target, velocity, inaccuracy, false);
+    }
+
+    public void shootAtEntity(Entity target, float velocity, float inaccuracy, boolean ignoreGravity) {
         Vec3 targetPos = EntityUtil.getStraightProjectileTarget(this.position(), target);
-        Vec3 dir = new Vec3(targetPos.x() - this.getX(), targetPos.y() - this.getY(), targetPos.z() - this.getZ());
-        if (this.getGravityVelocity() == 0)
+        this.shootAtPosition(targetPos.x(), targetPos.y(), targetPos.z(), velocity, inaccuracy, ignoreGravity);
+    }
+
+    /**
+     * Shoots directly at the given position. Considers the gravity of the projectile too so it will aim a bit higher if needed
+     */
+    public void shootAtPosition(double x, double y, double z, float velocity, float inaccuracy) {
+        this.shootAtPosition(x, y, z, velocity, inaccuracy, false);
+    }
+
+    public void shootAtPosition(double x, double y, double z, float velocity, float inaccuracy, boolean ignoreGravity) {
+        Vec3 dir = new Vec3(x - this.getX(), y - this.getY(), z - this.getZ());
+        if (this.getGravityVelocity() == 0 || ignoreGravity)
             this.shoot(dir.x, dir.y, dir.z, velocity, inaccuracy);
         else {
             Vec3 motion = dir.normalize().add(this.random.nextGaussian() * 0.0075F * inaccuracy, this.random.nextGaussian() * 0.0075F * inaccuracy, this.random.nextGaussian() * 0.0075F * inaccuracy).scale(velocity);
-            double gravityOffset = dir.length() / motion.length() * 0.5 * this.getGravityVelocity();
-            gravityOffset *= 0.99; // Friction
-            motion = motion.add(0, gravityOffset, 0);
+            motion = motion.add(0, getGravityOffset(this, dir, motion), 0);
             this.setMotionWithRotation(motion);
         }
     }
