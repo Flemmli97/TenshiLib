@@ -1,3 +1,7 @@
+TenshiLib 1.9.4
+================
+- Some internal projectile stuff
+
 TenshiLib 1.9.3
 ================
 - Update projectile etc to use OBB
