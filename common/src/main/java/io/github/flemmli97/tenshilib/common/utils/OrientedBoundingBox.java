@@ -1,15 +1,25 @@
 package io.github.flemmli97.tenshilib.common.utils;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.PathNavigationRegion;
+import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Oriented bounding box with collision detection
@@ -178,8 +188,21 @@ public class OrientedBoundingBox {
         return collides(this.vertices, verticesAABB, axis);
     }
 
+    public <T extends Entity> List<T> intersectingEntities(Level level, LivingEntity entity,
+                                                           boolean ignoreBlocks, EntityTypeTest<Entity, T> typeTest, Predicate<T> pred) {
+        BlockCollisionDetector collisionDetector = ignoreBlocks ? null : new BlockCollisionDetector(level, this, entity);
+        return this.intersectingEntities(level, collisionDetector, typeTest, pred);
+    }
+
+    public <T extends Entity> List<T> intersectingEntities(Level level, BlockCollisionDetector collisionDetector, EntityTypeTest<Entity, T> typeTest, Predicate<T> pred) {
+        AABB box = this.getEncompassingBox();
+        List<T> list = level.getEntities(typeTest, box, pred);
+        list.removeIf(e -> !this.intersects(e.getBoundingBox()) || (collisionDetector != null && !collisionDetector.noBlockCollide(e)));
+        return list;
+    }
+
     public boolean collidesBlocks(Level level, @Nullable Entity entity) {
-        for (VoxelShape shape : level.getBlockCollisions(entity, this.outerBox)) {
+        for (VoxelShape shape : level.getBlockCollisions(entity, this.getEncompassingBox())) {
             if (this.intersects(shape.bounds()))
                 return true;
         }
@@ -288,5 +311,83 @@ public class OrientedBoundingBox {
     }
 
     private record Projection(double min, double max) {
+    }
+
+    public static class BlockCollisionDetector {
+
+        private final BlockGetter blockGetter;
+        private final Vec3 from;
+        private final Entity source;
+
+        public BlockCollisionDetector(Level level, OrientedBoundingBox obb, Entity source) {
+            AABB box = obb.getEncompassingBox();
+            BlockPos first = new BlockPos(box.minX, box.minY, box.minZ);
+            BlockPos second = new BlockPos(Mth.ceil(box.maxX), Mth.ceil(box.maxY), Mth.ceil(box.maxZ));
+            this.blockGetter = new PathNavigationRegion(level, first, second);
+            this.from = obb.getOffset();
+            this.source = source;
+        }
+
+
+        /**
+         * Check if entity is not behind blocks.
+         * Divides the bounding boxes into multiple points to raycast
+         * Checks the position and vertices of the bounding box first.
+         * If bounding box is large will also divide the edges to check
+         */
+        public boolean noBlockCollide(Entity entity) {
+            AABB aabb = entity.getBoundingBox();
+            if (this.blockGetter.clip(new ClipContext(this.from, entity.position(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,
+                    this.source)).getType() == HitResult.Type.MISS)
+                return true;
+            // Vertices of AABB
+            List<Vec3> points = new ArrayList<>();
+            List<Vec3> maxYs = new ArrayList<>();
+            points.add(new Vec3(aabb.minX, aabb.minY, aabb.minZ));
+            points.add(new Vec3(aabb.maxX, aabb.minY, aabb.minZ));
+            points.add(new Vec3(aabb.maxX, aabb.minY, aabb.maxZ));
+            points.add(new Vec3(aabb.minX, aabb.minY, aabb.maxZ));
+
+            maxYs.add(new Vec3(aabb.minX, aabb.maxY, aabb.minZ));
+            maxYs.add(new Vec3(aabb.maxX, aabb.maxY, aabb.minZ));
+            maxYs.add(new Vec3(aabb.maxX, aabb.maxY, aabb.maxZ));
+            maxYs.add(new Vec3(aabb.minX, aabb.maxY, aabb.maxZ));
+            // Check in between
+            int xSplit = (int) (entity.getBbWidth() / 0.4);
+            if (xSplit > 0) {
+                xSplit += 1;
+                double xStep = entity.getBbWidth() / xSplit;
+                for (int x = 1; x < xSplit; x++) {
+                    points.add(new Vec3(aabb.minX + x * xStep, aabb.minY, aabb.minZ));
+                    points.add(new Vec3(aabb.minX + x * xStep, aabb.minY, aabb.maxZ));
+                    points.add(new Vec3(aabb.minX, aabb.minY, aabb.minZ + x * xStep));
+                    points.add(new Vec3(aabb.maxX, aabb.minY, aabb.minZ + x * xStep));
+
+                    maxYs.add(new Vec3(aabb.minX + x * xStep, aabb.maxY, aabb.minZ));
+                    maxYs.add(new Vec3(aabb.minX + x * xStep, aabb.maxY, aabb.maxZ));
+                    maxYs.add(new Vec3(aabb.minX, aabb.maxY, aabb.minZ + x * xStep));
+                    maxYs.add(new Vec3(aabb.maxX, aabb.maxY, aabb.minZ + x * xStep));
+                }
+            }
+            int ySplit = (int) (entity.getBbHeight() / 0.5);
+            if (ySplit > 0) {
+                ySplit += 1;
+                double yStep = entity.getBbHeight() / ySplit;
+                List<Vec3> verticals = new ArrayList<>();
+                for (int y = 1; y < ySplit; y++) {
+                    for (Vec3 current : points) {
+                        verticals.add(new Vec3(current.x(), aabb.minY + y * yStep, current.z()));
+                    }
+                }
+                points.addAll(verticals);
+            }
+            points.addAll(maxYs);
+            for (Vec3 point : points) {
+                if (this.blockGetter.clip(new ClipContext(this.from, point, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,
+                        this.source)).getType() == HitResult.Type.MISS)
+                    return true;
+            }
+            return false;
+        }
     }
 }
