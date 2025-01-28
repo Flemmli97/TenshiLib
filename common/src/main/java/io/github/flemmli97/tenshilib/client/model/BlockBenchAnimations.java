@@ -54,16 +54,16 @@ public class BlockBenchAnimations {
         float interpolationRev = 1 - interpolation;
         boolean changed = false;
         if (last != null && interpolationRev > 0) {
-            changed = this.doAnimation(model, last.getAnimationClient(), last.getTick(), partialTicks, current != null || handler.getTimeSinceLastChange() <= 1 ? 1 : interpolationRev, mirror, InterpolationCheck.END, false);
+            changed = this.doAnimation(model, last.getAnimationClient(), last.getTick(), partialTicks, current != null || handler.getTimeSinceLastChange() <= 1 ? 1 : interpolationRev, mirror, InterpolationCheck.END);
         }
         if (current != null) {
-            changed = this.doAnimation(model, current.getAnimationClient(), current.getTick(), partialTicks, interpolation, mirror, InterpolationCheck.START, changed);
+            changed = this.doAnimation(model, current.getAnimationClient(), current.getTick(), partialTicks, interpolation, mirror, InterpolationCheck.START);
         }
         return changed;
     }
 
     public boolean doAnimation(ExtendedModel model, String name, int ticker, float partialTicks, float interpolation, boolean mirror) {
-        return this.doAnimation(model, name, ticker, partialTicks, interpolation, mirror, InterpolationCheck.NONE, false);
+        return this.doAnimation(model, name, ticker, partialTicks, interpolation, mirror, InterpolationCheck.NONE);
     }
 
     /**
@@ -79,18 +79,16 @@ public class BlockBenchAnimations {
      *                               NONE: interpolation value is always applied
      *                               START: interpolation value is only applied if the animation starts in a non default pose
      *                               END: interpolation value is only applied if the animation ends in a non default pose
-     * @param interpolateFromCurrent If difference between this animation and the current model values should be used as interpolation
      * @return True if the animation is being played
      */
-    public boolean doAnimation(ExtendedModel model, String name, int ticker, float partialTicks, float interpolation, boolean mirror, InterpolationCheck check,
-                               boolean interpolateFromCurrent) {
+    public boolean doAnimation(ExtendedModel model, String name, int ticker, float partialTicks, float interpolation, boolean mirror, InterpolationCheck check) {
         Animation animation = this.animations.get(name);
         if (animation != null && interpolation != 0) {
             if (check == InterpolationCheck.END && animation.endsDefault)
                 return false;
             if (check == InterpolationCheck.START && animation.startsDefault)
                 interpolation = 1;
-            animation.animate(model, ticker, partialTicks, Mth.clamp(interpolation, 0, 1), this.variables, mirror, interpolateFromCurrent);
+            animation.animate(model, ticker, partialTicks, Mth.clamp(interpolation, 0, 1), this.variables, mirror);
             return true;
         }
         return false;
@@ -140,12 +138,12 @@ public class BlockBenchAnimations {
             });
         }
 
-        public void animate(ExtendedModel model, int ticker, float partialTicks, float interpolation, SimpleAnimationExpression.VariableMap vars, boolean mirror, boolean interpolateFromCurrent) {
+        public void animate(ExtendedModel model, int ticker, float partialTicks, float interpolation, SimpleAnimationExpression.VariableMap vars, boolean mirror) {
             float actualTick = Math.max(ticker - 1 + partialTicks, 0);
             if (this.loop)
                 actualTick = actualTick % this.length;
             for (AnimationComponent comp : this.components)
-                comp.animate(model, actualTick, vars, interpolation, mirror, interpolateFromCurrent);
+                comp.animate(model, actualTick, vars, interpolation, mirror);
         }
 
         @Override
@@ -248,7 +246,7 @@ public class BlockBenchAnimations {
             return null;
         }
 
-        public void animate(ExtendedModel model, float actualTick, SimpleAnimationExpression.VariableMap vars, float interpolation, boolean mirror, boolean interpolateFromCurrent) {
+        public void animate(ExtendedModel model, float actualTick, SimpleAnimationExpression.VariableMap vars, float interpolation, boolean mirror) {
             ModelPartHandler.ModelPartExtended modelPart = model.getHandler().getPartNullable(this.name);
             if (mirror) {
                 //Try getting the mirrored modelpart
