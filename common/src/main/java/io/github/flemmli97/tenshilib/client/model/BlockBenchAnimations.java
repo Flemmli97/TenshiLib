@@ -307,15 +307,15 @@ public class BlockBenchAnimations {
                         rot = this.rotations[id];
                     AnimationValue rotPrev = this.rotations[id - 1];
                     float prog = Mth.clamp((actualTick - rotPrev.startTick) / (rot.startTick - rotPrev.startTick), 0F, 1F);
-                    float x = (this.interpolate(rotPrev.getXVal(vars), rot.getXVal(vars), prog) % 360);
-                    float y = (this.interpolate(rotPrev.getYVal(vars), rot.getYVal(vars), prog) % 360) * mirrorMult;
-                    float z = (this.interpolate(rotPrev.getZVal(vars), rot.getZVal(vars), prog) % 360) * mirrorMult;
-                    float dX = Mth.RAD_TO_DEG * (modelPart.xRot - modelPart.defaultPose.xRot) % 360;
-                    modelPart.xRot += Mth.DEG_TO_RAD * (x - dX) * interpolation;
-                    float dY = Mth.RAD_TO_DEG * (modelPart.yRot - modelPart.defaultPose.yRot) % 360;
-                    modelPart.yRot += Mth.DEG_TO_RAD * (y - dY) * interpolation;
-                    float dZ = Mth.RAD_TO_DEG * (modelPart.zRot - modelPart.defaultPose.zRot) % 360;
-                    modelPart.zRot += Mth.DEG_TO_RAD * (z - dZ) * interpolation;
+                    float x = wrapDegrees(this.interpolate(rotPrev.getXVal(vars), rot.getXVal(vars), prog));
+                    float y = wrapDegrees(this.interpolate(rotPrev.getYVal(vars), rot.getYVal(vars), prog)) * mirrorMult;
+                    float z = wrapDegrees(this.interpolate(rotPrev.getZVal(vars), rot.getZVal(vars), prog)) * mirrorMult;
+                    float dX = wrapDegrees(Mth.RAD_TO_DEG * (modelPart.xRot - modelPart.defaultPose.xRot));
+                    modelPart.xRot += Mth.DEG_TO_RAD * degreeDiff(dX, x) * interpolation;
+                    float dY = wrapDegrees(Mth.RAD_TO_DEG * (modelPart.yRot - modelPart.defaultPose.yRot));
+                    modelPart.yRot += Mth.DEG_TO_RAD * degreeDiff(dY, y) * interpolation;
+                    float dZ = wrapDegrees(Mth.RAD_TO_DEG * (modelPart.zRot - modelPart.defaultPose.zRot));
+                    modelPart.zRot += Mth.DEG_TO_RAD * degreeDiff(dZ, z) * interpolation;
                 }
             }
             if (this.scales != null) {
@@ -347,6 +347,23 @@ public class BlockBenchAnimations {
                     modelPart.zScale += (z - dZ) * interpolation;
                 }
             }
+        }
+
+        public static float wrapDegrees(float value) {
+            float f = value % 360.0F;
+            if (f < 0) {
+                f += 360.0F;
+            }
+            return f;
+        }
+
+        public static float degreeDiff(float current, float target) {
+            float diff = target - current;
+            if (diff > 180)
+                diff -= 360;
+            else if (diff < -180)
+                diff += 360;
+            return diff;
         }
 
         private float interpolate(float start, float end, float progress) {
