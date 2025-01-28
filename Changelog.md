@@ -1,6 +1,8 @@
 TenshiLib 1.9.4
 ================
 - Some internal projectile stuff
+- AOE weapon api use OBB now
+- Fix some animation stuff
 
 TenshiLib 1.9.3
 ================
