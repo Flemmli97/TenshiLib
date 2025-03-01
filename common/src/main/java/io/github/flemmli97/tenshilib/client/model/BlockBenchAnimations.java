@@ -69,16 +69,16 @@ public class BlockBenchAnimations {
     /**
      * Run the given animation
      *
-     * @param model                  The model to run the animation on
-     * @param name                   The name of the animation
-     * @param ticker                 Animation ticker
-     * @param partialTicks           Partial tick for lerping
-     * @param interpolation          An interpolation value between 0-1 indicating
-     * @param mirror                 If true mirrors the animation. Components with "left"/"right" in their names will be swapped
-     * @param check                  What to do with interpolating the animation:
-     *                               NONE: interpolation value is always applied
-     *                               START: interpolation value is only applied if the animation starts in a non default pose
-     *                               END: interpolation value is only applied if the animation ends in a non default pose
+     * @param model         The model to run the animation on
+     * @param name          The name of the animation
+     * @param ticker        Animation ticker
+     * @param partialTicks  Partial tick for lerping
+     * @param interpolation An interpolation value between 0-1 indicating
+     * @param mirror        If true mirrors the animation. Components with "left"/"right" in their names will be swapped
+     * @param check         What to do with interpolating the animation:
+     *                      NONE: interpolation value is always applied
+     *                      START: interpolation value is only applied if the animation starts in a non default pose
+     *                      END: interpolation value is only applied if the animation ends in a non default pose
      * @return True if the animation is being played
      */
     public boolean doAnimation(ExtendedModel model, String name, int ticker, float partialTicks, float interpolation, boolean mirror, InterpolationCheck check) {

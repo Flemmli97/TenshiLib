@@ -18,6 +18,8 @@ public class VanillaRegistryHandler<T> implements PlatformRegistry<T> {
     private final Map<VanillaEntrySupplier<T>, Supplier<? extends T>> entries = new LinkedHashMap<>();
     private final Set<VanillaEntrySupplier<T>> entriesView = Collections.unmodifiableSet(this.entries.keySet());
 
+    private Registry<T> registry;
+
     public VanillaRegistryHandler(ResourceKey<? extends Registry<T>> key, String modid) {
         this.key = key;
         this.modid = modid;
@@ -46,10 +48,13 @@ public class VanillaRegistryHandler<T> implements PlatformRegistry<T> {
 
     @SuppressWarnings("unchecked")
     protected Registry<T> registryFrom() {
-        Registry<?> reg = Registry.REGISTRY.get(this.key.location());
-        if (reg == null)
-            throw new NullPointerException("Failed to get a corresponding registry for " + this.key);
-        return (Registry<T>) reg;
+        if (this.registry == null) {
+            Registry<?> reg = Registry.REGISTRY.get(this.key.location());
+            if (reg == null)
+                throw new NullPointerException("Failed to get a corresponding registry for " + this.key);
+            this.registry = (Registry<T>) reg;
+        }
+        return this.registry;
     }
 
     @Override
