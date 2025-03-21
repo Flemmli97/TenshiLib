@@ -36,7 +36,7 @@ public interface EventCalls {
 
     boolean beamHitCall(EntityBeam beam, HitResult result);
 
-    <T extends Entity & IAnimated> void sendEntityAnimationPacket(T entity);
+    <T extends Entity & IAnimated> void sendEntityAnimationPacket(T entity, int startTransition, int endTransition, float start);
 
     interface Func3<A, B, C, D> {
         D apply(A a, B b, C c);

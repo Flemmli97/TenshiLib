@@ -64,7 +64,7 @@ public class EventCallsImpl implements EventCalls {
     }
 
     @Override
-    public <T extends Entity & IAnimated> void sendEntityAnimationPacket(T entity) {
-        PacketHandler.sendToTracking(S2CEntityAnimation.create(entity), entity);
+    public <T extends Entity & IAnimated> void sendEntityAnimationPacket(T entity, int startTransition, int endTransition, float start) {
+        PacketHandler.sendToTracking(S2CEntityAnimation.create(entity, startTransition, endTransition, start), entity);
     }
 }

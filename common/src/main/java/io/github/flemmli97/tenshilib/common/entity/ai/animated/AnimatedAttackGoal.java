@@ -142,7 +142,8 @@ public class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> extends Goa
             if (this.chainDelay > 0 && this.chained != null) {
                 --this.chainDelay;
                 if (this.chainDelay == 0) {
-                    this.attacker.getAnimationHandler().setAnimation(this.chained.get(this.chainSelect).anim());
+                    GoalAttackAction.ChainedAction<T> action = this.chained.get(this.chainSelect);
+                    this.attacker.getAnimationHandler().setAnimation(action.anim(), action.transitionTime(), -1, action.offset());
                     ++this.chainSelect;
                     if (this.chainSelect < this.chained.size()) {
                         this.chainDelay = Math.max(1, this.chained.get(this.chainSelect).delay().getInt(this.attacker));

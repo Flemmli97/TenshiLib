@@ -12,7 +12,6 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
@@ -30,14 +29,12 @@ import java.util.function.Predicate;
 
 public abstract class EntityBeam extends Entity implements IBeamEntity {
 
+    protected static final EntityDataAccessor<Optional<UUID>> SHOOTER_UUID = SynchedEntityData.defineId(EntityBeam.class, EntityDataSerializers.OPTIONAL_UUID);
+
     private Entity shooter;
     protected int livingTicks;
     protected HitResult hit;
     protected Vec3 hitVec;
-
-    protected static final EntityDataAccessor<Optional<UUID>> SHOOTER_UUID = SynchedEntityData.defineId(EntityBeam.class, EntityDataSerializers.OPTIONAL_UUID);
-
-    protected final Predicate<Entity> notShooter = (entity) -> entity != EntityBeam.this.getOwner() && EntitySelector.NO_SPECTATORS.test(entity) && entity.isPickable();
 
     protected OrientedBoundingBox hitObb;
 

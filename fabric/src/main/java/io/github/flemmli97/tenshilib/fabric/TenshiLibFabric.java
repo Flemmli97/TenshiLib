@@ -1,5 +1,6 @@
 package io.github.flemmli97.tenshilib.fabric;
 
+import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
 import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.common.entity.CustomDataSerializers;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
@@ -26,7 +27,9 @@ public class TenshiLibFabric implements ModInitializer {
         UseItemCallback.EVENT.register(CommonEvents::disableOffhand);
         EntityTrackingEvents.START_TRACKING.register(((entity, player) -> {
             if (entity instanceof IAnimated animated && animated.getAnimationHandler().hasAnimation()) {
-                S2CEntityAnimation pkt = S2CEntityAnimation.create((Entity & IAnimated) entity);
+                AnimatedAction anim = animated.getAnimationHandler().getAnimation();
+                S2CEntityAnimation pkt = S2CEntityAnimation.create((Entity & IAnimated) entity,
+                        anim.getStartTransition(), anim.getEndTransitionTime(), anim.getTick(1));
                 FriendlyByteBuf buf = PacketByteBufs.create();
                 pkt.write(buf);
                 ServerPlayNetworking.send(player, pkt.getID(), buf);

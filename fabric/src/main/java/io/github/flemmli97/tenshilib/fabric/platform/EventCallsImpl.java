@@ -60,7 +60,7 @@ public class EventCallsImpl implements EventCalls {
     }
 
     @Override
-    public <T extends Entity & IAnimated> void sendEntityAnimationPacket(T entity) {
-        ServerPacketHandler.updateAnimationPkt(entity);
+    public <T extends Entity & IAnimated> void sendEntityAnimationPacket(T entity, int startTransition, int endTransition, float start) {
+        ServerPacketHandler.updateAnimationPkt(entity, startTransition, endTransition, start);
     }
 }

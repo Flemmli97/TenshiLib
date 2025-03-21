@@ -1,6 +1,7 @@
 package io.github.flemmli97.tenshilib.common.entity.ai.animated;
 
 import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
+import io.github.flemmli97.tenshilib.api.entity.AnimationHandler;
 import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.impl.DoNothingRunner;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.impl.WrappedRunner;
@@ -113,10 +114,10 @@ public class GoalAttackAction<T extends PathfinderMob & IAnimated> {
             private final List<List<ChainedAction<T>>> anims = new ArrayList<>();
             private Predicate<T> check = e -> true;
 
-            public Builder(List<ChainedAction<T>> chainedList) {
-                if (chainedList.isEmpty())
-                    throw new IllegalStateException("Animations can't be empty");
-                this.anims.add(chainedList);
+            private Builder(AnimatedAction anim, int transitionTime, float offset, IntProvider<T> delay) {
+                List<ChainedAction<T>> list = new ArrayList<>();
+                list.add(new ChainedAction<>(anim, transitionTime, offset, delay));
+                this.anims.add(list);
             }
 
             public Builder<T> chain(AnimatedAction anim) {
@@ -124,11 +125,35 @@ public class GoalAttackAction<T extends PathfinderMob & IAnimated> {
             }
 
             public Builder<T> chain(AnimatedAction anim, IntProvider<T> delay) {
-                return this.chain(List.of(new ChainedAction<>(anim, delay)));
+                return this.chain(anim, AnimationHandler.DEFAULT_TRANSIT_TIME, 0, delay);
             }
 
-            public Builder<T> chain(List<ChainedAction<T>> chainedList) {
-                this.anims.add(chainedList);
+            /**
+             * Adds an action to the current chain
+             */
+            public Builder<T> chain(AnimatedAction anim, int transitionTime, float offset, IntProvider<T> delay) {
+                this.anims.get(this.anims.size() - 1).add(new ChainedAction<>(anim, transitionTime, offset, delay));
+                return this;
+            }
+
+            public Builder<T> or(AnimatedAction anim) {
+                return this.or(anim, e -> 0);
+            }
+
+            /**
+             * Appends a new chain
+             */
+            public Builder<T> or(AnimatedAction anim, IntProvider<T> delay) {
+                return this.or(anim, AnimationHandler.DEFAULT_TRANSIT_TIME, 0, delay);
+            }
+
+            /**
+             * Appends a new chain
+             */
+            public Builder<T> or(AnimatedAction anim, int transitionTime, float offset, IntProvider<T> delay) {
+                List<ChainedAction<T>> list = new ArrayList<>();
+                list.add(new ChainedAction<>(anim, transitionTime, offset, delay));
+                this.anims.add(list);
                 return this;
             }
 
@@ -148,19 +173,22 @@ public class GoalAttackAction<T extends PathfinderMob & IAnimated> {
     }
 
     public static <T extends PathfinderMob & IAnimated> ChainedActions.Builder<T> chainBuilder(AnimatedAction anim, IntProvider<T> delay) {
-        return chainBuilder(List.of(new ChainedAction<>(anim, delay)));
+        return chainBuilder(anim, AnimationHandler.DEFAULT_TRANSIT_TIME, 0, delay);
     }
 
-    public static <T extends PathfinderMob & IAnimated> ChainedActions.Builder<T> chainBuilder(List<ChainedAction<T>> chainedList) {
-        return new ChainedActions.Builder<>(chainedList);
+    public static <T extends PathfinderMob & IAnimated> ChainedActions.Builder<T> chainBuilder(AnimatedAction anim, int transitionTime, float offset, IntProvider<T> delay) {
+        return new ChainedActions.Builder<>(anim, transitionTime, offset, delay);
     }
 
     /**
      * A chained AnimatedAction
      *
-     * @param anim  The animation to play
-     * @param delay A delay after which this animation will be played
+     * @param anim   The animation to play
+     * @param offset Offset tick of the chained animation
+     * @param delay  A delay after which this animation will be played
      */
-    public record ChainedAction<T extends PathfinderMob & IAnimated>(AnimatedAction anim, IntProvider<T> delay) {
+    public record ChainedAction<T extends PathfinderMob & IAnimated>(AnimatedAction anim, int transitionTime,
+                                                                     float offset,
+                                                                     IntProvider<T> delay) {
     }
 }

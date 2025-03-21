@@ -25,10 +25,10 @@ public class ServerPacketHandler {
         }, 0);
     }
 
-    public static <T extends Entity & IAnimated> void updateAnimationPkt(T entity) {
+    public static <T extends Entity & IAnimated> void updateAnimationPkt(T entity, int startTransition, int endTransition, float start) {
         if (entity.getLevel().isClientSide)
             return;
-        S2CEntityAnimation pkt = S2CEntityAnimation.create(entity);
+        S2CEntityAnimation pkt = S2CEntityAnimation.create(entity, startTransition, endTransition, start);
         FriendlyByteBuf buf = PacketByteBufs.create();
         pkt.write(buf);
         PlayerLookup.tracking(entity)

@@ -17,42 +17,50 @@ public class S2CEntityAnimation implements Packet {
 
     private final int entityID;
     private final int animID;
+    private final float start;
 
-    private S2CEntityAnimation(int entityID, int animID) {
+    private final int startTransition, endTransition;
+
+    private S2CEntityAnimation(int entityID, int animID, int startTransition, int endTransition, float start) {
         this.entityID = entityID;
         this.animID = animID;
+        this.start = start;
+        this.startTransition = startTransition;
+        this.endTransition = endTransition;
     }
 
-    public static <T extends Entity & IAnimated> S2CEntityAnimation create(T entity) {
-        return new S2CEntityAnimation(entity);
+    public static <T extends Entity & IAnimated> S2CEntityAnimation create(T entity, int startTransition, int endTransition, float start) {
+        return new S2CEntityAnimation(entity, startTransition, endTransition, start);
     }
 
-    private S2CEntityAnimation(Entity e) {
+    private S2CEntityAnimation(Entity e, int startTransition, int endTransition, float start) {
         this.entityID = e.getId();
+        this.start = start;
+        this.startTransition = startTransition;
+        this.endTransition = endTransition;
         IAnimated entity = (IAnimated) e;
         this.animID = Optional.ofNullable(entity.getAnimationHandler().getAnimation())
                 .map(anim -> {
-                    if (anim == AnimatedAction.VANILLA_ATTACK)
-                        return -1;
-                    else {
-                        int i = 0;
-                        for (AnimatedAction a : entity.getAnimationHandler().getAnimations()) {
-                            if (a.getID().equals(anim.getID()))
-                                break;
-                            i++;
-                        }
-                        if (i < entity.getAnimationHandler().getAnimations().length)
-                            return i;
-                        TenshiLib.LOGGER.error("This animation is not registered for {}. Registered animations are {} but set animation is {}", e, ArrayUtils.arrayToString(entity.getAnimationHandler().getAnimations(), AnimatedAction::getID), anim.getID());
-                        return -2;
+                    int i = 0;
+                    for (AnimatedAction a : entity.getAnimationHandler().getAnimations()) {
+                        if (a.getID().equals(anim.getID()))
+                            break;
+                        i++;
                     }
-                }).orElse(-2);
+                    if (i < entity.getAnimationHandler().getAnimations().length)
+                        return i;
+                    TenshiLib.LOGGER.error("This animation is not registered for {}. Registered animations are {} but set animation is {}", e, ArrayUtils.arrayToString(entity.getAnimationHandler().getAnimations(), AnimatedAction::getID), anim.getID());
+                    return -1;
+                }).orElse(-1);
     }
 
     @Override
     public void write(FriendlyByteBuf buf) {
         buf.writeInt(this.entityID);
         buf.writeInt(this.animID);
+        buf.writeInt(this.startTransition);
+        buf.writeInt(this.endTransition);
+        buf.writeFloat(this.start);
     }
 
     @Override
@@ -61,12 +69,12 @@ public class S2CEntityAnimation implements Packet {
     }
 
     public static S2CEntityAnimation fromBytes(FriendlyByteBuf buf) {
-        return new S2CEntityAnimation(buf.readInt(), buf.readInt());
+        return new S2CEntityAnimation(buf.readInt(), buf.readInt(), buf.readInt(), buf.readInt(), buf.readFloat());
     }
 
     public static class Handler {
         public static void handlePacket(S2CEntityAnimation pkt) {
-            ClientHandlers.updateAnim(pkt.entityID, pkt.animID);
+            ClientHandlers.updateAnim(pkt.entityID, pkt.animID, pkt.startTransition, pkt.endTransition, pkt.start);
         }
     }
 }

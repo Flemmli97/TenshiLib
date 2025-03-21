@@ -4,13 +4,14 @@ import net.minecraft.util.Mth;
 
 public class AnimatedAction {
 
-    public static final AnimatedAction VANILLA_ATTACK = new AnimatedAction(20, 1, "vanilla");
-    public static final AnimatedAction[] VANILLA_ATTACK_ONLY = {VANILLA_ATTACK};
-
     private final int length, attackTime;
     private final boolean shouldRunOut;
-    private final String id, animationClient;
+
+    private final String id, clientIdentifier;
+
     private final float speed;
+
+    private final int startTransition, endTransition;
 
     private float ticker;
 
@@ -19,15 +20,15 @@ public class AnimatedAction {
      * @param id     Unique id for the animation
      */
     public AnimatedAction(double length, String id) {
-        this((int) Math.ceil(length * 20), id);
+        this(Mth.ceil(length * 20), id);
     }
 
     /**
-     * @param length Length of the animation
+     * @param length Length of the animation in ticks
      * @param id     Unique id for the animation
      */
     public AnimatedAction(int length, String id) {
-        this(length, 1, id, id, 1, true);
+        this(length, 1, id, id, 0, AnimationHandler.DEFAULT_TRANSIT_TIME, 1, true);
     }
 
     /**
@@ -37,33 +38,30 @@ public class AnimatedAction {
      *                   Example in a sword slash do the damage mid swing and not at the beginning.
      */
     public AnimatedAction(double length, double attackTime, String id) {
-        this((int) Math.ceil(length * 20), (int) Math.ceil(attackTime * 20), id, id, 1, true);
-    }
-
-    /**
-     * @param length     Length of the animation
-     * @param id         Unique id for the animation
-     * @param attackTime A flag for various things e.g. when the entity should actually do damage
-     *                   Example in a sword slash do the damage mid swing and not at the beginning.
-     */
-    public AnimatedAction(int length, int attackTime, String id) {
-        this(length, attackTime, id, id, 1, true);
+        this(Mth.ceil(length * 20), Mth.ceil(attackTime * 20), id, id, 0, AnimationHandler.DEFAULT_TRANSIT_TIME, 1, true);
     }
 
     /**
      * Use the builder {@link #builder}
      */
-    private AnimatedAction(int length, int attackTime, String id, String animationClient, float speedMod, boolean shouldRunOut) {
-        this.speed = speedMod;
+    private AnimatedAction(int length, int attackTime, String id, String clientIdentifier, int startTransition, int endTransition, float speedMod, boolean shouldRunOut) {
         this.length = Math.max(1, length);
-        this.attackTime = Mth.clamp(attackTime, 1, this.length);
+        this.speed = speedMod;
         this.id = id;
-        this.animationClient = animationClient;
+        this.attackTime = Mth.clamp(attackTime, 1, this.length);
+        this.clientIdentifier = clientIdentifier;
         this.shouldRunOut = shouldRunOut;
+        this.startTransition = Math.max(0, startTransition);
+        this.endTransition = Math.max(0, endTransition);
     }
 
     public static AnimatedAction copyOf(AnimatedAction animatedAction, String id) {
-        return new AnimatedAction(animatedAction.length, animatedAction.attackTime, id, animatedAction.animationClient, animatedAction.speed, animatedAction.shouldRunOut);
+        return new AnimatedAction(animatedAction.length, animatedAction.attackTime, id, animatedAction.clientIdentifier,
+                animatedAction.startTransition, animatedAction.endTransition, animatedAction.speed, animatedAction.shouldRunOut);
+    }
+
+    public static AnimatedAction.Builder builder(float length, String id) {
+        return builder(Mth.ceil(length * 20), id);
     }
 
     public static AnimatedAction.Builder builder(int length, String id) {
@@ -81,15 +79,27 @@ public class AnimatedAction {
      * @return Creates a new copy instance of the animation with the given speed modifier
      */
     public AnimatedAction create(float speed) {
-        return new AnimatedAction(this.length, this.attackTime, this.id, this.animationClient, speed, this.shouldRunOut);
+        return this.create(-1, -1, 0, speed);
+    }
+
+    public AnimatedAction create(int startTransition, int endTransition, float offset, float speed) {
+        AnimatedAction anim = new AnimatedAction(this.length, this.attackTime, this.id, this.clientIdentifier,
+                this.startTransition > 0 && startTransition == -1 ? this.startTransition : startTransition,
+                this.endTransition > 0 && endTransition == -1 ? this.endTransition : endTransition, speed, this.shouldRunOut);
+        anim.ticker = offset;
+        return anim;
     }
 
     public boolean tick() {
         return this.tick(1);
     }
 
-    public boolean tick(int offSet) {
-        return (this.ticker += this.speed) >= (this.length + offSet) && this.shouldRunOut;
+    public boolean tick(int offset) {
+        return (this.ticker += this.speed) >= (this.length + this.startTransition + offset) && this.shouldRunOut;
+    }
+
+    public boolean done(int offset) {
+        return this.ticker >= (this.length + this.startTransition + offset);
     }
 
     public float getSpeed() {
@@ -100,36 +110,51 @@ public class AnimatedAction {
         return this.isAtTick(this.attackTime);
     }
 
-    /**
-     * @return In most cases this should be used. E.g. animations only take an int
-     */
-    public int getTick() {
-        return (int) this.ticker;
+    public float progress(float partialTicks) {
+        return Mth.clamp(this.adjustedTick() - 1 + partialTicks / this.length, 0, 1);
     }
 
-    /**
-     * @return The under the hood float ticker
-     */
-    public float getTickRaw() {
-        return this.ticker;
+    public float getStartTransitionProgress(float partialTicks) {
+        if (this.startTransition == 0) {
+            return 1;
+        }
+        return Mth.clamp(this.ticker - 1 + partialTicks / this.startTransition, 0, 1);
+    }
+
+    public int getStartTransition() {
+        return this.startTransition;
+    }
+
+    public int getEndTransitionTime() {
+        return this.endTransition;
+    }
+
+    private float adjustedTick() {
+        return this.ticker - this.startTransition;
+    }
+
+    public float getTick(float partialTicks) {
+        return Math.max(this.adjustedTick() - 1 + partialTicks, 0);
     }
 
     public boolean isAtTick(double tick) {
-        return this.isAtTick((int) Math.ceil(tick * 20));
+        return this.isAtTick(Mth.ceil(tick * 20));
     }
 
     /**
      * @return True if the current animation is at the given tick. Use this instead of #getTick() == tick since this respects animation speed
      */
     public boolean isAtTick(int tick) {
+        float current = this.adjustedTick();
         if (this.speed == 1)
-            return this.getTick() == tick;
+            return current == tick;
         if (this.speed < 1) {
-            int lower = (int) (this.ticker - this.speed);
-            return lower != tick && this.getTick() == tick;
+            int last = (int) (current - this.speed);
+            int currentInt = (int) current;
+            return last != tick && currentInt == tick;
         }
-        float next = this.ticker + this.speed;
-        return this.ticker <= tick && tick < next;
+        float next = current + this.speed;
+        return current <= tick && tick < next;
     }
 
     public boolean isPastTick(double tick) {
@@ -140,7 +165,7 @@ public class AnimatedAction {
      * @return True if the current animation is past the given tick
      */
     public boolean isPastTick(int tick) {
-        return this.getTick() >= tick;
+        return this.adjustedTick() >= tick;
     }
 
     public int getLength() {
@@ -166,8 +191,8 @@ public class AnimatedAction {
         return false;
     }
 
-    public String getAnimationClient() {
-        return this.animationClient;
+    public String getClientIdentifier() {
+        return this.clientIdentifier;
     }
 
     /**
@@ -179,7 +204,7 @@ public class AnimatedAction {
 
     @Override
     public String toString() {
-        return "ID: " + this.id + "; length: " + this.length + "; attackTime: " + this.attackTime + "; speed: " + this.speed;
+        return String.format("ID: %s, length: %s, speed: %s", this.id, this.length, this.speed);
     }
 
     @Override
@@ -199,9 +224,13 @@ public class AnimatedAction {
         private final int length;
         private int attackTime = 1;
         private boolean shouldRunOut = true;
+
         private final String id;
-        private String animationClient;
+        private String clientIdentifier;
+
         private float speed = 1;
+
+        private int startTransition, endTransition = AnimationHandler.DEFAULT_TRANSIT_TIME;
 
         /**
          * @param length Length of the animation
@@ -210,7 +239,7 @@ public class AnimatedAction {
         public Builder(int length, String id) {
             this.length = Math.max(1, length);
             this.id = id;
-            this.animationClient = id;
+            this.clientIdentifier = id;
         }
 
         /**
@@ -218,7 +247,7 @@ public class AnimatedAction {
          * where you have multiple attacks with same animation set this
          */
         public Builder withClientID(String id) {
-            this.animationClient = id;
+            this.clientIdentifier = id;
             return this;
         }
 
@@ -248,8 +277,18 @@ public class AnimatedAction {
             return this;
         }
 
+        /**
+         * Time in ticks to transition to/from this animation
+         */
+        public Builder withTransitionTime(int start, int end) {
+            this.startTransition = start;
+            this.endTransition = end;
+            return this;
+        }
+
         public AnimatedAction build() {
-            return new AnimatedAction(this.length, this.attackTime, this.id, this.animationClient, this.speed, this.shouldRunOut);
+            return new AnimatedAction(this.length, this.attackTime, this.id, this.clientIdentifier,
+                    this.startTransition, this.endTransition, this.speed, this.shouldRunOut);
         }
     }
 }

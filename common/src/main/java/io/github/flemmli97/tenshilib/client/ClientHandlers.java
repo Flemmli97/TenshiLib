@@ -1,6 +1,5 @@
 package io.github.flemmli97.tenshilib.client;
 
-import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
 import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.api.entity.IOverlayEntityRender;
 import io.github.flemmli97.tenshilib.api.item.IAOEWeapon;
@@ -23,11 +22,12 @@ public class ClientHandlers {
 
     public static final Set<UUID> RIDING_RENDER_BLACKLIST = new HashSet<>();
 
-    public static void updateAnim(int entityID, int animID) {
+    public static void updateAnim(int entityID, int animID, int startTransition, int endTransition, float start) {
         Minecraft mc = Minecraft.getInstance();
         Entity e = mc.level.getEntity(entityID);
         if (e instanceof IAnimated anim) {
-            anim.getAnimationHandler().setAnimation(animID == -2 ? null : animID == -1 ? AnimatedAction.VANILLA_ATTACK : anim.getAnimationHandler().getAnimations()[animID]);
+            anim.getAnimationHandler().setAnimation(animID < 0 ? null : anim.getAnimationHandler().getAnimations()[animID],
+                    startTransition, endTransition, start);
         }
     }
 

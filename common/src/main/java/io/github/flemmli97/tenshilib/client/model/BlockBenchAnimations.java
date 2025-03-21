@@ -43,29 +43,6 @@ public class BlockBenchAnimations {
         this.doAnimation(model, name, ticker, partialTicks, interpolation, false);
     }
 
-    public boolean doAnimation(ExtendedModel model, AnimationHandler<?> handler, float partialTicks) {
-        return this.doAnimation(model, handler, partialTicks, AnimationHandler.DEFAULT_ADJUST_TIME, false);
-    }
-
-    public boolean doAnimation(ExtendedModel model, AnimationHandler<?> handler, float partialTicks, float adjustTime, boolean mirror) {
-        AnimatedAction current = handler.getAnimation();
-        AnimatedAction last = handler.getLastAnim();
-        float interpolation = handler.getInterpolatedAnimationVal(partialTicks, adjustTime);
-        float interpolationRev = 1 - interpolation;
-        boolean changed = false;
-        if (last != null && interpolationRev > 0) {
-            changed = this.doAnimation(model, last.getAnimationClient(), last.getTick(), partialTicks, current != null || handler.getTimeSinceLastChange() <= 1 ? 1 : interpolationRev, mirror, InterpolationCheck.END);
-        }
-        if (current != null) {
-            changed = this.doAnimation(model, current.getAnimationClient(), current.getTick(), partialTicks, interpolation, mirror, InterpolationCheck.START);
-        }
-        return changed;
-    }
-
-    public boolean doAnimation(ExtendedModel model, String name, int ticker, float partialTicks, float interpolation, boolean mirror) {
-        return this.doAnimation(model, name, ticker, partialTicks, interpolation, mirror, InterpolationCheck.NONE);
-    }
-
     /**
      * Run the given animation
      *
@@ -75,20 +52,35 @@ public class BlockBenchAnimations {
      * @param partialTicks  Partial tick for lerping
      * @param interpolation An interpolation value between 0-1 indicating
      * @param mirror        If true mirrors the animation. Components with "left"/"right" in their names will be swapped
-     * @param check         What to do with interpolating the animation:
-     *                      NONE: interpolation value is always applied
-     *                      START: interpolation value is only applied if the animation starts in a non default pose
-     *                      END: interpolation value is only applied if the animation ends in a non default pose
      * @return True if the animation is being played
      */
-    public boolean doAnimation(ExtendedModel model, String name, int ticker, float partialTicks, float interpolation, boolean mirror, InterpolationCheck check) {
+    public boolean doAnimation(ExtendedModel model, String name, int ticker, float partialTicks, float interpolation, boolean mirror) {
+        return this.doAnimation(model, name, Math.max(ticker - 1 + partialTicks, 0), interpolation, mirror);
+    }
+
+    public boolean doAnimation(ExtendedModel model, AnimationHandler<?> handler, float partialTicks) {
+        return this.doAnimation(model, handler, partialTicks, false);
+    }
+
+    public boolean doAnimation(ExtendedModel model, AnimationHandler<?> handler, float partialTicks, boolean mirror) {
+        AnimatedAction current = handler.getAnimation();
+        AnimatedAction last = handler.getLastAnimation();
+        float interpolationLast = handler.getLastTransitionProgress(partialTicks);
+        boolean changed = false;
+        if (last != null && interpolationLast > 0) {
+            changed = this.doAnimation(model, last.getClientIdentifier(), last.getTick(partialTicks), interpolationLast, mirror);
+        }
+        float interpolation = handler.getCurrentTransitionProgress(partialTicks);
+        if (current != null) {
+            changed = this.doAnimation(model, current.getClientIdentifier(), current.getTick(partialTicks), interpolation, mirror);
+        }
+        return changed;
+    }
+
+    private boolean doAnimation(ExtendedModel model, String name, float tick, float interpolation, boolean mirror) {
         Animation animation = this.animations.get(name);
         if (animation != null && interpolation != 0) {
-            if (check == InterpolationCheck.END && animation.endsDefault)
-                return false;
-            if (check == InterpolationCheck.START && animation.startsDefault)
-                interpolation = 1;
-            animation.animate(model, ticker, partialTicks, Mth.clamp(interpolation, 0, 1), this.variables, mirror);
+            animation.animate(model, tick, Mth.clamp(interpolation, 0, 1), this.variables, mirror);
             return true;
         }
         return false;
@@ -118,32 +110,21 @@ public class BlockBenchAnimations {
 
         public final float length;
         public final boolean loop;
-        /**
-         * Whether this animation starts/end with a default pose (all 0) to decide whether to interpolate or not
-         */
-        private boolean startsDefault = true, endsDefault = true;
+
         private final List<AnimationComponent> components = new ArrayList<>();
 
         public Animation(JsonObject json) {
             this.length = (float) (JsonUtils.get(json, "animation_length", 0.0) * 20);
             this.loop = JsonUtils.get(json, "loop", false);
             JsonObject components = JsonUtils.getObj(json, "bones");
-            components.entrySet().forEach(e -> {
-                AnimationComponent component = new AnimationComponent(e.getKey(), this.length, e.getValue().getAsJsonObject());
-                this.components.add(component);
-                if (this.startsDefault)
-                    this.startsDefault = component.isDefaultPose(true, 0);
-                if (this.endsDefault)
-                    this.endsDefault = component.isDefaultPose(false, this.length);
-            });
+            components.entrySet().forEach(e -> this.components.add(new AnimationComponent(e.getKey(), e.getValue().getAsJsonObject())));
         }
 
-        public void animate(ExtendedModel model, int ticker, float partialTicks, float interpolation, SimpleAnimationExpression.VariableMap vars, boolean mirror) {
-            float actualTick = Math.max(ticker - 1 + partialTicks, 0);
+        public void animate(ExtendedModel model, float tick, float interpolation, SimpleAnimationExpression.VariableMap vars, boolean mirror) {
             if (this.loop)
-                actualTick = actualTick % this.length;
+                tick = tick % this.length;
             for (AnimationComponent comp : this.components)
-                comp.animate(model, actualTick, vars, interpolation, mirror);
+                comp.animate(model, tick, vars, interpolation, mirror);
         }
 
         @Override
@@ -159,7 +140,7 @@ public class BlockBenchAnimations {
         private AnimationValue[] positions;
         private AnimationValue[] scales;
 
-        public AnimationComponent(String name, float length, JsonObject obj) {
+        public AnimationComponent(String name, JsonObject obj) {
             this.name = name;
             this.mirroredName = name.toLowerCase(Locale.ROOT).contains("right") ? name.replace("Right", "Left").replace("right", "left")
                     : name.replace("Left", "Right").replace("left", "right");
@@ -208,22 +189,6 @@ public class BlockBenchAnimations {
                 }
                 Arrays.sort(this.scales, Comparator.comparingDouble(arr -> arr.startTick));
             }
-        }
-
-        private boolean isDefaultPose(boolean start, float time) {
-            SimpleAnimationExpression.VariableMap vars = new SimpleAnimationExpression.VariableMap();
-            vars.setVariable("time", () -> time);
-            if (!start)
-                return (this.positions == null || this.positions.length == 0 || this.isZero(this.positions[this.positions.length - 1], vars))
-                        && (this.rotations == null || this.rotations.length == 0 || this.isZero(this.rotations[this.rotations.length - 1], vars))
-                        && (this.scales == null || this.scales.length == 0 || this.isZero(this.scales[this.scales.length - 1], vars));
-            return (this.positions == null || this.positions.length == 0 || this.isZero(this.positions[0], vars))
-                    && (this.rotations == null || this.rotations.length == 0 || this.isZero(this.rotations[0], vars))
-                    && (this.scales == null || this.scales.length == 0 || this.isZero(this.scales[0], vars));
-        }
-
-        private boolean isZero(AnimationValue value, SimpleAnimationExpression.VariableMap vars) {
-            return value.getXVal(vars) == 0 && value.getYVal(vars) == 0 && value.getZVal(vars) == 0;
         }
 
         private JsonObject tryGet(JsonObject obj, String name) {
@@ -373,11 +338,5 @@ public class BlockBenchAnimations {
             return String.format("%s rot: {%s}; pos: {%s}; scale: {%s}", this.name, ArrayUtils.arrayToString(this.rotations),
                     ArrayUtils.arrayToString(this.positions), ArrayUtils.arrayToString(this.scales));
         }
-    }
-
-    public enum InterpolationCheck {
-        NONE,
-        START,
-        END
     }
 }

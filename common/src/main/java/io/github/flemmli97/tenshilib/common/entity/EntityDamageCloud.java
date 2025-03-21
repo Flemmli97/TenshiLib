@@ -20,13 +20,13 @@ import java.util.UUID;
 
 public abstract class EntityDamageCloud extends Entity implements OwnableEntity {
 
+    protected static final EntityDataAccessor<Optional<UUID>> SHOOTER_UUID = SynchedEntityData.defineId(EntityDamageCloud.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<Float> RADIUS = SynchedEntityData.defineId(EntityDamageCloud.class, EntityDataSerializers.FLOAT);
+
     private Entity shooter;
 
     protected int livingTicks;
     private int attackedEntities = 0;
-
-    protected static final EntityDataAccessor<Optional<UUID>> SHOOTER_UUID = SynchedEntityData.defineId(EntityDamageCloud.class, EntityDataSerializers.OPTIONAL_UUID);
-    private static final EntityDataAccessor<Float> RADIUS = SynchedEntityData.defineId(EntityDamageCloud.class, EntityDataSerializers.FLOAT);
 
     public EntityDamageCloud(EntityType<? extends EntityDamageCloud> type, Level world) {
         super(type, world);

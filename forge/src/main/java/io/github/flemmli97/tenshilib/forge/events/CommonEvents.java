@@ -1,5 +1,6 @@
 package io.github.flemmli97.tenshilib.forge.events;
 
+import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
 import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.api.item.IDualWeapon;
 import io.github.flemmli97.tenshilib.common.network.S2CEntityAnimation;
@@ -26,7 +27,9 @@ public class CommonEvents {
 
     public static void onTracking(PlayerEvent.StartTracking event) {
         if (event.getTarget() instanceof IAnimated animated && animated.getAnimationHandler().hasAnimation()) {
-            PacketHandler.sendToClientChecked(S2CEntityAnimation.create((Entity & IAnimated) event.getTarget()), (ServerPlayer) event.getPlayer());
+            AnimatedAction anim = animated.getAnimationHandler().getAnimation();
+            PacketHandler.sendToClientChecked(S2CEntityAnimation.create((Entity & IAnimated) event.getTarget(),
+                    anim.getStartTransition(), anim.getEndTransitionTime(), anim.getTick(1)), (ServerPlayer) event.getPlayer());
         }
     }
 }
