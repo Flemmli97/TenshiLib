@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 public class AnimationHandler<T extends Entity & IAnimated> {
 
     public static final int DEFAULT_TRANSIT_TIME = 3;
+    public static final int FALLBACK_TRANSIT_TIME = -1;
 
     private final T entity;
     private final AnimatedAction[] anims;
@@ -73,13 +74,13 @@ public class AnimationHandler<T extends Entity & IAnimated> {
     }
 
     public void setAnimation(AnimatedAction anim) {
-        this.setAnimation(anim, -1, -1, 0);
+        this.setAnimation(anim, AnimationHandler.FALLBACK_TRANSIT_TIME, AnimationHandler.FALLBACK_TRANSIT_TIME, 0);
     }
 
     /**
      * @param anim            The animation to set. Or null for no animation
-     * @param startTransition Duration in ticks to transition INTO this animation
-     * @param endTransition   Duration in ticks to transition OUT of this animation
+     * @param startTransition Duration in ticks to transition INTO this animation. -1 for fallback
+     * @param endTransition   Duration in ticks to transition OUT of this animation. -1 for fallback
      * @param offset          Start the animation with the given offset
      */
     public void setAnimation(AnimatedAction anim, int startTransition, int endTransition, float offset) {
@@ -88,16 +89,16 @@ public class AnimationHandler<T extends Entity & IAnimated> {
         if (this.currentAnimation != null) {
             this.lastAnimation = this.currentAnimation;
             this.timeSinceLastChange = 0;
-            // Animation is getting replaced. Transition time would then be equal to the replaced end time
             if (anim != null) {
-                startTransition = this.lastAnimation.getEndTransitionTime() > 0 ? this.lastAnimation.getEndTransitionTime() : startTransition;
+                startTransition = startTransition > 0 ? startTransition : this.lastAnimation.getEndTransitionTime();
                 this.lastAnimation = this.lastAnimation.create(this.currentAnimation.getStartTransition(),
                         startTransition, this.currentAnimation.getTick(1),
                         this.currentAnimation.getSpeed());
             }
-        } else if (this.lastAnimation != null && this.timeSinceLastChange < this.lastAnimation.getEndTransitionTime()) {
-            // Still transitioning from old animation. Remaining time is new start transition
-            startTransition = Math.max(0, this.lastAnimation.getEndTransitionTime() - this.timeSinceLastChange);
+        } else if (this.lastAnimation != null && anim != null) {
+            this.lastAnimation = this.lastAnimation.create(this.lastAnimation.getStartTransition(),
+                    startTransition + this.timeSinceLastChange, this.lastAnimation.getTick(1),
+                    this.lastAnimation.getSpeed());
         }
         this.currentAnimation = anim == null ? null : anim.create(startTransition, endTransition,
                 offset, this.animationSpeedHandler == null ? anim.getSpeed() : this.animationSpeedHandler.apply(anim));
@@ -139,8 +140,10 @@ public class AnimationHandler<T extends Entity & IAnimated> {
     }
 
     public void tick() {
-        if (this.timeSinceLastChange >= 0)
-            this.timeSinceLastChange++;
+        this.timeSinceLastChange++;
+        if (this.lastAnimation != null && this.timeSinceLastChange > this.lastAnimation.getEndTransitionTime()) {
+            this.lastAnimation = null;
+        }
         if (this.hasAnimation()) {
             if (this.getAnimation().tick())
                 this.setAnimation(null);

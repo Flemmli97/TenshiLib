@@ -1,10 +1,13 @@
 package io.github.flemmli97.tenshilib.api.entity;
 
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.util.Mth;
+
+import java.util.Map;
 
 public class AnimatedAction {
 
-    private final int length, attackTime;
+    private final float length;
     private final boolean shouldRunOut;
 
     private final String id, clientIdentifier;
@@ -13,6 +16,9 @@ public class AnimatedAction {
 
     private final int startTransition, endTransition;
 
+    private final Map<String, double[]> markerMap;
+
+    private float offset;
     private float ticker;
 
     /**
@@ -20,52 +26,44 @@ public class AnimatedAction {
      * @param id     Unique id for the animation
      */
     public AnimatedAction(double length, String id) {
-        this(Mth.ceil(length * 20), id);
+        this(length, id, true);
     }
 
     /**
      * @param length Length of the animation in ticks
      * @param id     Unique id for the animation
      */
-    public AnimatedAction(int length, String id) {
-        this(length, 1, id, id, 0, AnimationHandler.DEFAULT_TRANSIT_TIME, 1, true);
-    }
-
-    /**
-     * @param length     Length of the animation in seconds
-     * @param id         Unique id for the animation
-     * @param attackTime A flag for various things e.g. when the entity should actually do damage
-     *                   Example in a sword slash do the damage mid swing and not at the beginning.
-     */
-    public AnimatedAction(double length, double attackTime, String id) {
-        this(Mth.ceil(length * 20), Mth.ceil(attackTime * 20), id, id, 0, AnimationHandler.DEFAULT_TRANSIT_TIME, 1, true);
+    public AnimatedAction(double length, String id, boolean seconds) {
+        this((float) (seconds ? length * 20 : length), id, id, 0, AnimationHandler.DEFAULT_TRANSIT_TIME, 1, true, Map.of());
     }
 
     /**
      * Use the builder {@link #builder}
      */
-    private AnimatedAction(int length, int attackTime, String id, String clientIdentifier, int startTransition, int endTransition, float speedMod, boolean shouldRunOut) {
+    private AnimatedAction(float length, String id, String clientIdentifier, int startTransition, int endTransition, float speedMod, boolean shouldRunOut,
+                           Map<String, double[]> markerMap) {
         this.length = Math.max(1, length);
         this.speed = speedMod;
         this.id = id;
-        this.attackTime = Mth.clamp(attackTime, 1, this.length);
         this.clientIdentifier = clientIdentifier;
         this.shouldRunOut = shouldRunOut;
         this.startTransition = Math.max(0, startTransition);
         this.endTransition = Math.max(0, endTransition);
+        this.markerMap = markerMap;
     }
 
     public static AnimatedAction copyOf(AnimatedAction animatedAction, String id) {
-        return new AnimatedAction(animatedAction.length, animatedAction.attackTime, id, animatedAction.clientIdentifier,
-                animatedAction.startTransition, animatedAction.endTransition, animatedAction.speed, animatedAction.shouldRunOut);
+        return new AnimatedAction(animatedAction.length, id, animatedAction.clientIdentifier,
+                animatedAction.startTransition, animatedAction.endTransition, animatedAction.speed, animatedAction.shouldRunOut,
+                animatedAction.markerMap);
     }
 
-    public static AnimatedAction.Builder builder(float length, String id) {
-        return builder(Mth.ceil(length * 20), id);
+    public static AnimatedAction.Builder builder(double length, String id) {
+        return builder(length, id, true);
     }
 
-    public static AnimatedAction.Builder builder(int length, String id) {
-        return new Builder(length, id);
+    public static AnimatedAction.Builder builder(double length, String id, boolean seconds) {
+        return new Builder((float) (seconds ? length * 20 : length), id);
     }
 
     /**
@@ -75,18 +73,20 @@ public class AnimatedAction {
         return this.create(this.speed);
     }
 
-    /**
-     * @return Creates a new copy instance of the animation with the given speed modifier
-     */
     public AnimatedAction create(float speed) {
-        return this.create(-1, -1, 0, speed);
+        return this.create(AnimationHandler.FALLBACK_TRANSIT_TIME, AnimationHandler.FALLBACK_TRANSIT_TIME, 0, speed);
     }
 
+    /**
+     * Creates a new copy instance of the animation with the given modifiers
+     */
     public AnimatedAction create(int startTransition, int endTransition, float offset, float speed) {
-        AnimatedAction anim = new AnimatedAction(this.length, this.attackTime, this.id, this.clientIdentifier,
-                this.startTransition > 0 && startTransition == -1 ? this.startTransition : startTransition,
-                this.endTransition > 0 && endTransition == -1 ? this.endTransition : endTransition, speed, this.shouldRunOut);
+        AnimatedAction anim = new AnimatedAction(this.length, this.id, this.clientIdentifier,
+                this.startTransition > 0 && startTransition == AnimationHandler.FALLBACK_TRANSIT_TIME ? this.startTransition : startTransition,
+                this.endTransition > 0 && endTransition == AnimationHandler.FALLBACK_TRANSIT_TIME ? this.endTransition : endTransition, speed, this.shouldRunOut,
+                this.markerMap);
         anim.ticker = offset;
+        anim.offset = offset;
         return anim;
     }
 
@@ -106,19 +106,16 @@ public class AnimatedAction {
         return this.speed;
     }
 
-    public boolean canAttack() {
-        return this.isAtTick(this.attackTime);
-    }
-
     public float progress(float partialTicks) {
-        return Mth.clamp(this.adjustedTick() - 1 + partialTicks / this.length, 0, 1);
+        return Mth.clamp(this.getTick(partialTicks) / this.length, 0, 1);
     }
 
     public float getStartTransitionProgress(float partialTicks) {
         if (this.startTransition == 0) {
             return 1;
         }
-        return Mth.clamp(this.ticker - 1 + partialTicks / this.startTransition, 0, 1);
+        float tick = Math.max(0, this.ticker - this.offset - 1 + partialTicks * this.speed);
+        return Mth.clamp(tick / this.getStartTransition(), 0, 1);
     }
 
     public int getStartTransition() {
@@ -129,51 +126,87 @@ public class AnimatedAction {
         return this.endTransition;
     }
 
-    private float adjustedTick() {
-        return this.ticker - this.startTransition;
-    }
-
     public float getTick(float partialTicks) {
-        return Math.max(this.adjustedTick() - 1 + partialTicks, 0);
+        return Math.max(this.offset, this.ticker - this.startTransition - 1 + partialTicks * this.speed);
     }
 
-    public boolean isAtTick(double tick) {
-        return this.isAtTick(Mth.ceil(tick * 20));
+    public boolean isAt(double time) {
+        return this.isAt(time, true);
     }
 
     /**
-     * @return True if the current animation is at the given tick. Use this instead of #getTick() == tick since this respects animation speed
+     * @param seconds Whether the given time is in seconds or ticks
+     * @return True if the current animation is at the given tick
      */
-    public boolean isAtTick(int tick) {
-        float current = this.adjustedTick();
-        if (this.speed == 1)
-            return current == tick;
-        if (this.speed < 1) {
-            int last = (int) (current - this.speed);
-            int currentInt = (int) current;
-            return last != tick && currentInt == tick;
-        }
-        float next = current + this.speed;
-        return current <= tick && tick < next;
+    public boolean isAt(double time, boolean seconds) {
+        float tick = (float) (seconds ? time * 20 : time);
+        float current = this.getTick(1);
+        float last = current - this.speed;
+        return last < tick && current >= tick;
     }
 
-    public boolean isPastTick(double tick) {
-        return this.isPastTick((int) Math.ceil(tick * 20));
+    public boolean isPast(double time) {
+        return this.isPast(time, true);
     }
 
     /**
+     * @param seconds Whether the given time is in seconds or ticks
      * @return True if the current animation is past the given tick
      */
-    public boolean isPastTick(int tick) {
-        return this.adjustedTick() >= tick;
+    public boolean isPast(double time, boolean seconds) {
+        float tick = (float) (seconds ? time * 20 : time);
+        return this.getTick(1) >= tick;
     }
 
-    public int getLength() {
+    public boolean isBetween(double start, double end) {
+        return this.isBetween(start, end, true);
+    }
+
+    /**
+     * @param seconds Whether the given time is in seconds or ticks
+     * @return True if the current animation is between the given range
+     */
+    public boolean isBetween(double start, double end, boolean seconds) {
+        float startTick = (float) (seconds ? start * 20 : start);
+        float endTick = (float) (seconds ? end * 20 : end);
+        float tick = this.getTick(1);
+        return tick >= startTick && tick <= endTick;
+    }
+
+    public boolean isAt(String marker) {
+        double[] times = this.markerMap.get(marker);
+        if (times == null) {
+            return false;
+        }
+        for (double time : times) {
+            if (this.isAt(time))
+                return true;
+        }
+        return false;
+    }
+
+    public boolean isPast(String marker) {
+        return this.isPast(marker, -1);
+    }
+
+    /**
+     * @param max The upper time in seconds
+     */
+    public boolean isPast(String marker, double max) {
+        double[] times = this.markerMap.get(marker);
+        if (times == null) {
+            return false;
+        }
+        for (double time : times) {
+            boolean matches = max >= 0 ? this.isBetween(time, max) : this.isPast(time);
+            if (matches)
+                return true;
+        }
+        return false;
+    }
+
+    public float getLength() {
         return this.length;
-    }
-
-    public int getAttackTime() {
-        return this.attackTime;
     }
 
     public void reset() {
@@ -221,8 +254,7 @@ public class AnimatedAction {
 
     public static class Builder {
 
-        private final int length;
-        private int attackTime = 1;
+        private final float length;
         private boolean shouldRunOut = true;
 
         private final String id;
@@ -232,11 +264,13 @@ public class AnimatedAction {
 
         private int startTransition, endTransition = AnimationHandler.DEFAULT_TRANSIT_TIME;
 
+        private final ImmutableMap.Builder<String, double[]> markerMap = new ImmutableMap.Builder<>();
+
         /**
          * @param length Length of the animation
          * @param id     Unique id for the animation
          */
-        public Builder(int length, String id) {
+        private Builder(float length, String id) {
             this.length = Math.max(1, length);
             this.id = id;
             this.clientIdentifier = id;
@@ -254,9 +288,10 @@ public class AnimatedAction {
         /**
          * A marker for various things e.g. when the entity should actually do damage
          * Example in a sword slash do the damage mid swing and not at the beginning.
+         * Time in seconds not ticks
          */
-        public Builder marker(int time) {
-            this.attackTime = Mth.clamp(time, 1, this.length);
+        public Builder marker(String identifier, double... time) {
+            this.markerMap.put(identifier, time);
             return this;
         }
 
@@ -287,8 +322,8 @@ public class AnimatedAction {
         }
 
         public AnimatedAction build() {
-            return new AnimatedAction(this.length, this.attackTime, this.id, this.clientIdentifier,
-                    this.startTransition, this.endTransition, this.speed, this.shouldRunOut);
+            return new AnimatedAction(this.length, this.id, this.clientIdentifier,
+                    this.startTransition, this.endTransition, this.speed, this.shouldRunOut, this.markerMap.build());
         }
     }
 }
