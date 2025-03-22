@@ -1,27 +1,30 @@
 package io.github.flemmli97.tenshilib.client.model;
 
+import io.github.flemmli97.tenshilib.common.utils.mathParser.ExpValue;
+import io.github.flemmli97.tenshilib.common.utils.mathParser.VariableMap;
+
 public class AnimationValue {
 
     public final float startTick;
-    private final SimpleAnimationExpression.Value xVal, yVal, zVal;
+    private final ExpValue xVal, yVal, zVal;
 
-    public AnimationValue(float startTick, SimpleAnimationExpression.Value xVal, SimpleAnimationExpression.Value yVal, SimpleAnimationExpression.Value zVal) {
+    public AnimationValue(float startTick, ExpValue xVal, ExpValue yVal, ExpValue zVal) {
         this.startTick = startTick;
         this.xVal = xVal;
         this.yVal = yVal;
         this.zVal = zVal;
     }
 
-    public float getXVal(SimpleAnimationExpression.VariableMap vars) {
-        return this.xVal.get(vars);
+    public float getXVal(VariableMap vars) {
+        return this.xVal.asFloat(vars);
     }
 
-    public float getYVal(SimpleAnimationExpression.VariableMap vars) {
-        return this.yVal.get(vars);
+    public float getYVal(VariableMap vars) {
+        return this.yVal.asFloat(vars);
     }
 
-    public float getZVal(SimpleAnimationExpression.VariableMap vars) {
-        return this.zVal.get(vars);
+    public float getZVal(VariableMap vars) {
+        return this.zVal.asFloat(vars);
     }
 
     @Override

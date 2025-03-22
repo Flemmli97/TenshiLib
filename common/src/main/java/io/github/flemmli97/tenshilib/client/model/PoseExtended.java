@@ -33,4 +33,16 @@ public class PoseExtended {
         this.yScale = yScale;
         this.zScale = zScale;
     }
+
+    public PoseExtended withTranslation(float x, float y, float z) {
+        return new PoseExtended(x, y, z, this.xRot, this.yRot, this.zRot, this.xScale, this.yScale, this.zScale);
+    }
+
+    public PoseExtended withRotation(float xRot, float yRot, float zRot) {
+        return new PoseExtended(this.x, this.y, this.z, xRot, yRot, zRot, this.xScale, this.yScale, this.zScale);
+    }
+
+    public PoseExtended withScale(float xScale, float yScale, float zScale) {
+        return new PoseExtended(this.x, this.y, this.z, this.xRot, this.yRot, this.zRot, xScale, yScale, zScale);
+    }
 }

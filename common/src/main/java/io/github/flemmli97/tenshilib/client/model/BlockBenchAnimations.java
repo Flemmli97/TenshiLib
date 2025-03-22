@@ -7,6 +7,8 @@ import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
 import io.github.flemmli97.tenshilib.api.entity.AnimationHandler;
 import io.github.flemmli97.tenshilib.common.utils.ArrayUtils;
 import io.github.flemmli97.tenshilib.common.utils.JsonUtils;
+import io.github.flemmli97.tenshilib.common.utils.mathParser.Expression;
+import io.github.flemmli97.tenshilib.common.utils.mathParser.VariableMap;
 import net.minecraft.util.Mth;
 
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.DoubleSupplier;
 
 /**
  * A Blockbench animation using the free model animation from Blockbench.
@@ -24,7 +27,7 @@ public class BlockBenchAnimations {
 
     private final Map<String, Animation> animations = new HashMap<>();
 
-    private final SimpleAnimationExpression.VariableMap variables = new SimpleAnimationExpression.VariableMap();
+    private final VariableMap variables = new VariableMap();
 
     public void reload(JsonObject obj) {
         this.animations.clear();
@@ -40,7 +43,7 @@ public class BlockBenchAnimations {
     }
 
     public void doAnimation(ExtendedModel model, String name, int ticker, float partialTicks, float interpolation) {
-        this.doAnimation(model, name, ticker, partialTicks, interpolation, false);
+        this.doAnimation(model, name, ticker, partialTicks, interpolation, false, false);
     }
 
     /**
@@ -52,10 +55,11 @@ public class BlockBenchAnimations {
      * @param partialTicks  Partial tick for lerping
      * @param interpolation An interpolation value between 0-1 indicating
      * @param mirror        If true mirrors the animation. Components with "left"/"right" in their names will be swapped
+     * @param add           By default animations overwrite eachother. Setting this to true will instead add the poses ontop
      * @return True if the animation is being played
      */
-    public boolean doAnimation(ExtendedModel model, String name, int ticker, float partialTicks, float interpolation, boolean mirror) {
-        return this.doAnimation(model, name, Math.max(ticker - 1 + partialTicks, 0), interpolation, mirror);
+    public boolean doAnimation(ExtendedModel model, String name, int ticker, float partialTicks, float interpolation, boolean mirror, boolean add) {
+        return this.doAnimation(model, name, Math.max(ticker - 1 + partialTicks, 0), interpolation, mirror, add);
     }
 
     public boolean doAnimation(ExtendedModel model, AnimationHandler<?> handler, float partialTicks) {
@@ -69,20 +73,20 @@ public class BlockBenchAnimations {
         float interpolation = handler.getCurrentTransitionProgress(partialTicks);
         boolean changed = false;
         if (last != null && interpolationLast > 0) {
-            changed = this.doAnimation(model, last.getClientIdentifier(), last.getTick(partialTicks), interpolationLast, mirror);
+            changed = this.doAnimation(model, last.getClientIdentifier(), last.getTick(partialTicks), interpolationLast, mirror, false);
         }
         if (current != null) {
-            if (this.doAnimation(model, current.getClientIdentifier(), current.getTick(partialTicks), interpolation, mirror) && !changed) {
+            if (this.doAnimation(model, current.getClientIdentifier(), current.getTick(partialTicks), interpolation, mirror, false) && !changed) {
                 changed = true;
             }
         }
         return changed;
     }
 
-    private boolean doAnimation(ExtendedModel model, String name, float tick, float interpolation, boolean mirror) {
+    private boolean doAnimation(ExtendedModel model, String name, float tick, float interpolation, boolean mirror, boolean add) {
         Animation animation = this.animations.get(name);
         if (animation != null && interpolation != 0) {
-            animation.animate(model, tick, Mth.clamp(interpolation, 0, 1), this.variables, mirror);
+            animation.animate(model, tick, Mth.clamp(interpolation, 0, 1), this.variables, mirror, add);
             return true;
         }
         return false;
@@ -96,7 +100,7 @@ public class BlockBenchAnimations {
         return animation != null ? animation.length : 0;
     }
 
-    public void setVariable(String variable, SimpleAnimationExpression.FloatSupplier value) {
+    public void setVariable(String variable, DoubleSupplier value) {
         this.variables.setVariable(variable, value);
     }
 
@@ -122,11 +126,11 @@ public class BlockBenchAnimations {
             components.entrySet().forEach(e -> this.components.add(new AnimationComponent(e.getKey(), e.getValue().getAsJsonObject())));
         }
 
-        public void animate(ExtendedModel model, float tick, float interpolation, SimpleAnimationExpression.VariableMap vars, boolean mirror) {
-            if (this.loop)
+        public void animate(ExtendedModel model, float tick, float interpolation, VariableMap vars, boolean mirror, boolean add) {
+            if (this.loop && this.length > 0)
                 tick = tick % this.length;
             for (AnimationComponent comp : this.components)
-                comp.animate(model, tick, vars, interpolation, mirror);
+                comp.animate(model, tick, vars, interpolation, mirror, add);
         }
 
         @Override
@@ -153,9 +157,9 @@ public class BlockBenchAnimations {
                 for (Map.Entry<String, JsonElement> e : position.entrySet()) {
                     if (e.getValue() instanceof JsonArray arr) {
                         this.positions[i] = new AnimationValue(Float.parseFloat(e.getKey()) * 20,
-                                SimpleAnimationExpression.of(arr.get(0).getAsString()),
-                                SimpleAnimationExpression.of(arr.get(1).getAsString()),
-                                SimpleAnimationExpression.of(arr.get(2).getAsString()));
+                                Expression.of(arr.get(0).getAsString()),
+                                Expression.of(arr.get(1).getAsString()),
+                                Expression.of(arr.get(2).getAsString()));
                         i++;
                     }
                 }
@@ -168,9 +172,9 @@ public class BlockBenchAnimations {
                 for (Map.Entry<String, JsonElement> e : rotation.entrySet()) {
                     if (e.getValue() instanceof JsonArray arr) {
                         this.rotations[i] = new AnimationValue(Float.parseFloat(e.getKey()) * 20,
-                                SimpleAnimationExpression.of(arr.get(0).getAsString()),
-                                SimpleAnimationExpression.of(arr.get(1).getAsString()),
-                                SimpleAnimationExpression.of(arr.get(2).getAsString()));
+                                Expression.of(arr.get(0).getAsString()),
+                                Expression.of(arr.get(1).getAsString()),
+                                Expression.of(arr.get(2).getAsString()));
                         i++;
                     }
                 }
@@ -183,9 +187,9 @@ public class BlockBenchAnimations {
                 for (Map.Entry<String, JsonElement> e : scale.entrySet()) {
                     if (e.getValue() instanceof JsonArray arr) {
                         this.scales[i] = new AnimationValue(Float.parseFloat(e.getKey()) * 20,
-                                SimpleAnimationExpression.of(arr.get(0).getAsString()),
-                                SimpleAnimationExpression.of(arr.get(1).getAsString()),
-                                SimpleAnimationExpression.of(arr.get(2).getAsString()));
+                                Expression.of(arr.get(0).getAsString()),
+                                Expression.of(arr.get(1).getAsString()),
+                                Expression.of(arr.get(2).getAsString()));
                         i++;
                     }
                 }
@@ -213,7 +217,7 @@ public class BlockBenchAnimations {
             return null;
         }
 
-        public void animate(ExtendedModel model, float actualTick, SimpleAnimationExpression.VariableMap vars, float interpolation, boolean mirror) {
+        public void animate(ExtendedModel model, float actualTick, VariableMap vars, float interpolation, boolean mirror, boolean add) {
             ModelPartHandler.ModelPartExtended modelPart = model.getHandler().getPartNullable(this.name);
             if (mirror) {
                 //Try getting the mirrored modelpart
@@ -223,18 +227,18 @@ public class BlockBenchAnimations {
             }
             if (modelPart == null)
                 return;
-            vars.setVariable("time", () -> actualTick * 0.05f);
+            vars.setVariable("query.anim_time", () -> actualTick * 0.05);
             float mirrorMult = (mirror ? -1 : 1);
             if (this.positions != null) {
                 if (this.positions.length == 1) {
                     float x = this.positions[0].getXVal(vars) * mirrorMult;
                     float y = this.positions[0].getYVal(vars);
                     float z = this.positions[0].getZVal(vars);
-                    float dX = modelPart.x - modelPart.getDefaultPose().x;
+                    float dX = add ? 0 : modelPart.x - modelPart.getDefaultPose().x;
                     modelPart.x += (x - dX) * interpolation;
-                    float dY = modelPart.y - modelPart.getDefaultPose().y;
+                    float dY = add ? 0 : modelPart.y - modelPart.getDefaultPose().y;
                     modelPart.y -= (y + dY) * interpolation;
-                    float dZ = modelPart.z - modelPart.getDefaultPose().z;
+                    float dZ = add ? 0 : modelPart.z - modelPart.getDefaultPose().z;
                     modelPart.z += (z - dZ) * interpolation;
                 } else {
                     int id = 1;
@@ -246,25 +250,25 @@ public class BlockBenchAnimations {
                     float x = this.interpolate(posPrev.getXVal(vars), pos.getXVal(vars), prog) * mirrorMult;
                     float y = this.interpolate(posPrev.getYVal(vars), pos.getYVal(vars), prog);
                     float z = this.interpolate(posPrev.getZVal(vars), pos.getZVal(vars), prog);
-                    float dX = modelPart.x - modelPart.getDefaultPose().x;
+                    float dX = add ? 0 : modelPart.x - modelPart.getDefaultPose().x;
                     modelPart.x += (x - dX) * interpolation;
-                    float dY = modelPart.y - modelPart.getDefaultPose().y;
+                    float dY = add ? 0 : modelPart.y - modelPart.getDefaultPose().y;
                     modelPart.y -= (y + dY) * interpolation;
-                    float dZ = modelPart.z - modelPart.getDefaultPose().z;
+                    float dZ = add ? 0 : modelPart.z - modelPart.getDefaultPose().z;
                     modelPart.z += (z - dZ) * interpolation;
                 }
             }
             if (this.rotations != null) {
                 if (this.rotations.length == 1) {
-                    float x = this.rotations[0].getXVal(vars) % 360;
-                    float y = (this.rotations[0].getYVal(vars) % 360) * mirrorMult;
-                    float z = (this.rotations[0].getZVal(vars) % 360) * mirrorMult;
-                    float dX = Mth.RAD_TO_DEG * (modelPart.xRot - modelPart.getDefaultPose().xRot) % 360;
-                    modelPart.xRot += Mth.DEG_TO_RAD * (x - dX) * interpolation;
-                    float dY = Mth.RAD_TO_DEG * (modelPart.yRot - modelPart.getDefaultPose().yRot) % 360;
-                    modelPart.yRot += Mth.DEG_TO_RAD * (y - dY) * interpolation;
-                    float dZ = Mth.RAD_TO_DEG * (modelPart.zRot - modelPart.getDefaultPose().zRot) % 360;
-                    modelPart.zRot += Mth.DEG_TO_RAD * (z - dZ) * interpolation;
+                    float x = wrapDegrees(this.rotations[0].getXVal(vars));
+                    float y = wrapDegrees(this.rotations[0].getYVal(vars)) * mirrorMult;
+                    float z = wrapDegrees(this.rotations[0].getZVal(vars)) * mirrorMult;
+                    float dX = add ? 0 : wrapDegrees(Mth.RAD_TO_DEG * (modelPart.xRot - modelPart.getDefaultPose().xRot));
+                    modelPart.xRot += Mth.DEG_TO_RAD * degreeDiff(dX, x) * interpolation;
+                    float dY = add ? 0 : wrapDegrees(Mth.RAD_TO_DEG * (modelPart.yRot - modelPart.getDefaultPose().yRot));
+                    modelPart.yRot += Mth.DEG_TO_RAD * degreeDiff(dY, y) * interpolation;
+                    float dZ = add ? 0 : wrapDegrees(Mth.RAD_TO_DEG * (modelPart.zRot - modelPart.getDefaultPose().zRot));
+                    modelPart.zRot += Mth.DEG_TO_RAD * degreeDiff(dZ, z) * interpolation;
                 } else {
                     int id = 1;
                     AnimationValue rot = this.rotations[id];
@@ -272,9 +276,9 @@ public class BlockBenchAnimations {
                         rot = this.rotations[id];
                     AnimationValue rotPrev = this.rotations[id - 1];
                     float prog = Mth.clamp((actualTick - rotPrev.startTick) / (rot.startTick - rotPrev.startTick), 0F, 1F);
-                    float x = wrapDegrees(this.interpolate(rotPrev.getXVal(vars), rot.getXVal(vars), prog));
-                    float y = wrapDegrees(this.interpolate(rotPrev.getYVal(vars), rot.getYVal(vars), prog)) * mirrorMult;
-                    float z = wrapDegrees(this.interpolate(rotPrev.getZVal(vars), rot.getZVal(vars), prog)) * mirrorMult;
+                    float x = add ? 0 : wrapDegrees(this.interpolate(rotPrev.getXVal(vars), rot.getXVal(vars), prog));
+                    float y = add ? 0 : wrapDegrees(this.interpolate(rotPrev.getYVal(vars), rot.getYVal(vars), prog)) * mirrorMult;
+                    float z = add ? 0 : wrapDegrees(this.interpolate(rotPrev.getZVal(vars), rot.getZVal(vars), prog)) * mirrorMult;
                     float dX = wrapDegrees(Mth.RAD_TO_DEG * (modelPart.xRot - modelPart.getDefaultPose().xRot));
                     modelPart.xRot += Mth.DEG_TO_RAD * degreeDiff(dX, x) * interpolation;
                     float dY = wrapDegrees(Mth.RAD_TO_DEG * (modelPart.yRot - modelPart.getDefaultPose().yRot));
@@ -285,14 +289,14 @@ public class BlockBenchAnimations {
             }
             if (this.scales != null) {
                 if (this.scales.length == 1) {
-                    float x = this.scales[0].getXVal(vars) - 1;
-                    float y = this.scales[0].getYVal(vars) - 1;
-                    float z = this.scales[0].getZVal(vars) - 1;
-                    float dX = modelPart.xScale - modelPart.getDefaultPose().xScale;
+                    float x = this.scales[0].getXVal(vars) - modelPart.getDefaultPose().xScale;
+                    float y = this.scales[0].getYVal(vars) - modelPart.getDefaultPose().yScale;
+                    float z = this.scales[0].getZVal(vars) - modelPart.getDefaultPose().zScale;
+                    float dX = add ? 0 : modelPart.xScale - modelPart.getDefaultPose().xScale;
                     modelPart.xScale += (x - dX) * interpolation;
-                    float dY = modelPart.yScale - modelPart.getDefaultPose().yScale;
+                    float dY = add ? 0 : modelPart.yScale - modelPart.getDefaultPose().yScale;
                     modelPart.yScale += (y - dY) * interpolation;
-                    float dZ = modelPart.zScale - modelPart.getDefaultPose().zScale;
+                    float dZ = add ? 0 : modelPart.zScale - modelPart.getDefaultPose().zScale;
                     modelPart.zScale += (z - dZ) * interpolation;
                 } else {
                     int id = 1;
@@ -301,14 +305,14 @@ public class BlockBenchAnimations {
                         scale = this.scales[id];
                     AnimationValue scalePrev = this.scales[id - 1];
                     float prog = Mth.clamp((actualTick - scalePrev.startTick) / (scale.startTick - scalePrev.startTick), 0F, 1F);
-                    float x = this.interpolate(scalePrev.getXVal(vars), scale.getXVal(vars), prog) - 1;
-                    float y = this.interpolate(scalePrev.getYVal(vars), scale.getYVal(vars), prog) - 1;
-                    float z = this.interpolate(scalePrev.getZVal(vars), scale.getZVal(vars), prog) - 1;
-                    float dX = modelPart.xScale - modelPart.getDefaultPose().xScale;
+                    float x = this.interpolate(scalePrev.getXVal(vars), scale.getXVal(vars), prog) - modelPart.getDefaultPose().xScale;
+                    float y = this.interpolate(scalePrev.getYVal(vars), scale.getYVal(vars), prog) - modelPart.getDefaultPose().yScale;
+                    float z = this.interpolate(scalePrev.getZVal(vars), scale.getZVal(vars), prog) - modelPart.getDefaultPose().zScale;
+                    float dX = add ? 0 : modelPart.xScale - modelPart.getDefaultPose().xScale;
                     modelPart.xScale += (x - dX) * interpolation;
-                    float dY = modelPart.yScale - modelPart.getDefaultPose().yScale;
+                    float dY = add ? 0 : modelPart.yScale - modelPart.getDefaultPose().yScale;
                     modelPart.yScale += (y - dY) * interpolation;
-                    float dZ = modelPart.zScale - modelPart.getDefaultPose().zScale;
+                    float dZ = add ? 0 : modelPart.zScale - modelPart.getDefaultPose().zScale;
                     modelPart.zScale += (z - dZ) * interpolation;
                 }
             }

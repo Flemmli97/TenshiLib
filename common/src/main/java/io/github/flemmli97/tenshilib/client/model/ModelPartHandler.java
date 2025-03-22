@@ -66,13 +66,13 @@ public class ModelPartHandler {
         private final List<ModelPart.Cube> cubes;
         private final Map<String, ModelPartExtended> children;
 
-        public final PoseExtended defaultPose;
+        private PoseExtended defaultPose;
 
         public ModelPartExtended(ModelPart orig) {
             this.cubes = ((ModelPartAccessor) (Object) orig).getCubes();
             this.children = ((ModelPartAccessor) (Object) orig).getChildren()
                     .entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new ModelPartExtended(e.getValue())));
-            this.defaultPose = new PoseExtended(orig.storePose());
+            this.updateDefaultPose(new PoseExtended(orig.storePose()));
         }
 
         public PartPose storePose() {
@@ -125,7 +125,7 @@ public class ModelPartHandler {
         }
 
         public void reset() {
-            this.loadPose(this.defaultPose);
+            this.loadPose(this.getDefaultPose());
         }
 
         public void resetAll() {
@@ -143,7 +143,7 @@ public class ModelPartHandler {
         }
 
         public void render(PoseStack poseStack, VertexConsumer vertexConsumer, int i, int j, float f, float g, float h, float k) {
-            if (this.visible) {
+            if (this.visible && this.xScale != 0 && this.yScale != 0 && this.zScale != 0) {
                 if (!this.cubes.isEmpty() || !this.children.isEmpty()) {
                     poseStack.pushPose();
                     this.translateAndRotate(poseStack);
@@ -151,7 +151,6 @@ public class ModelPartHandler {
                     for (ModelPartExtended modelPart : this.children.values()) {
                         modelPart.render(poseStack, vertexConsumer, i, j, f, g, h, k);
                     }
-
                     poseStack.popPose();
                 }
             }
@@ -210,6 +209,14 @@ public class ModelPartHandler {
                 map.put(key, value);
                 value.getMappedParts(map);
             });
+        }
+
+        public PoseExtended getDefaultPose() {
+            return this.defaultPose;
+        }
+
+        public void updateDefaultPose(PoseExtended defaultPose) {
+            this.defaultPose = defaultPose;
         }
     }
 }
