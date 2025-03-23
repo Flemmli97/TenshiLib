@@ -1,6 +1,5 @@
 package io.github.flemmli97.tenshilib.patreon;
 
-import io.github.flemmli97.tenshilib.patreon.pkts.S2CEffectUpdatePkt;
 import io.github.flemmli97.tenshilib.platform.InitUtil;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -16,6 +15,4 @@ public interface PatreonPlatform {
     Optional<PatreonPlayerSetting> playerSettings(Player player);
 
     void sendToClient(ServerPlayer player, ServerPlayer target);
-
-    void sendToTracking(ServerPlayer player, S2CEffectUpdatePkt pkt);
 }

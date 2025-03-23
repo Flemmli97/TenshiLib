@@ -8,12 +8,12 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import io.github.flemmli97.tenshilib.common.utils.JsonUtils;
 import io.github.flemmli97.tenshilib.platform.PlatformUtils;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -134,7 +134,7 @@ public class ItemTagWrapper extends SimpleItemStackWrapper {
         @Override
         public ItemTagWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonObject obj = json.getAsJsonObject();
-            int count = JsonUtils.get(obj, "count", 1);
+            int count = GsonHelper.getAsInt(obj, "count", 1);
             if (obj.has("tag"))
                 return new ItemTagWrapper(PlatformUtils.INSTANCE.itemTag(new ResourceLocation(obj.get("tag").getAsString())), count);
             else

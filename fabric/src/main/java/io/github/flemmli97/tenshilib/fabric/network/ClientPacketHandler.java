@@ -1,6 +1,6 @@
 package io.github.flemmli97.tenshilib.fabric.network;
 
-import io.github.flemmli97.tenshilib.common.network.C2SPacketHit;
+import io.github.flemmli97.tenshilib.common.network.Packet;
 import io.github.flemmli97.tenshilib.common.network.PacketRegistrar;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -22,8 +22,7 @@ public class ClientPacketHandler {
         }, 0);
     }
 
-    public static void sendWeaponHitPkt(boolean isAOE) {
-        C2SPacketHit pkt = new C2SPacketHit(isAOE ? C2SPacketHit.HitType.AOE : C2SPacketHit.HitType.EXT);
+    public static void sendToServer(Packet pkt) {
         FriendlyByteBuf buf = PacketByteBufs.create();
         pkt.write(buf);
         ClientPlayNetworking.send(pkt.getID(), buf);

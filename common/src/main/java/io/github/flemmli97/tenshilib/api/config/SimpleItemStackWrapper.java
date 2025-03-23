@@ -8,7 +8,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import io.github.flemmli97.tenshilib.common.utils.JsonUtils;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 
 import java.lang.reflect.Type;
@@ -81,7 +81,7 @@ public class SimpleItemStackWrapper extends ItemWrapper {
         @Override
         public SimpleItemStackWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonObject obj = json.getAsJsonObject();
-            return new SimpleItemStackWrapper(obj.get("item").getAsString(), JsonUtils.get(obj, "count", 1));
+            return new SimpleItemStackWrapper(obj.get("item").getAsString(), GsonHelper.getAsInt(obj, "count", 1));
         }
     }
 }

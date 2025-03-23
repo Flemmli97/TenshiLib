@@ -2,8 +2,9 @@ package io.github.flemmli97.tenshilib.fabric.platform;
 
 import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.common.entity.EntityBeam;
+import io.github.flemmli97.tenshilib.common.network.NetworkCrossPlat;
+import io.github.flemmli97.tenshilib.common.network.S2CEntityAnimation;
 import io.github.flemmli97.tenshilib.fabric.events.AOEAttackEvent;
-import io.github.flemmli97.tenshilib.fabric.network.ServerPacketHandler;
 import io.github.flemmli97.tenshilib.platform.EventCalls;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.world.InteractionHand;
@@ -61,6 +62,6 @@ public class EventCallsImpl implements EventCalls {
 
     @Override
     public <T extends Entity & IAnimated> void sendEntityAnimationPacket(T entity, int startTransition, int endTransition, float start) {
-        ServerPacketHandler.updateAnimationPkt(entity, startTransition, endTransition, start);
+        NetworkCrossPlat.INSTANCE.sendToTracking(S2CEntityAnimation.create(entity, startTransition, endTransition, start), entity);
     }
 }

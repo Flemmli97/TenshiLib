@@ -1,7 +1,5 @@
 package io.github.flemmli97.tenshilib.forge.platform.patreon;
 
-import io.github.flemmli97.tenshilib.common.network.Packet;
-import io.github.flemmli97.tenshilib.forge.network.PacketHandler;
 import io.github.flemmli97.tenshilib.patreon.client.PatreonClientPlatform;
 import io.github.flemmli97.tenshilib.patreon.client.PatreonLayer;
 import io.github.flemmli97.tenshilib.patreon.client.PatreonModelProvider;
@@ -34,10 +32,5 @@ public class ClientPatreonImpl implements PatreonClientPlatform {
 
         Consumer<ScreenEvent.InitScreenEvent.Post> screen = event -> PatreonClientPlatform.addPatreonButton(event.getScreen());
         MinecraftForge.EVENT_BUS.addListener(screen);
-    }
-
-    @Override
-    public void sendToServer(Packet pkt) {
-        PacketHandler.sendToServer(pkt);
     }
 }

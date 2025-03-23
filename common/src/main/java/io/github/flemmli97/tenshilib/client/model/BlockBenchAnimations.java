@@ -6,9 +6,9 @@ import com.google.gson.JsonObject;
 import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
 import io.github.flemmli97.tenshilib.api.entity.AnimationHandler;
 import io.github.flemmli97.tenshilib.common.utils.ArrayUtils;
-import io.github.flemmli97.tenshilib.common.utils.JsonUtils;
 import io.github.flemmli97.tenshilib.common.utils.mathParser.Expression;
 import io.github.flemmli97.tenshilib.common.utils.mathParser.VariableMap;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
 
 import java.util.ArrayList;
@@ -120,9 +120,9 @@ public class BlockBenchAnimations {
         private final List<AnimationComponent> components = new ArrayList<>();
 
         public Animation(JsonObject json) {
-            this.length = (float) (JsonUtils.get(json, "animation_length", 0.0) * 20);
-            this.loop = JsonUtils.get(json, "loop", false);
-            JsonObject components = JsonUtils.getObj(json, "bones");
+            this.length = GsonHelper.getAsFloat(json, "animation_length", 0.0f) * 20;
+            this.loop = GsonHelper.getAsBoolean(json, "loop", false);
+            JsonObject components = GsonHelper.getAsJsonObject(json, "bones", new JsonObject());
             components.entrySet().forEach(e -> this.components.add(new AnimationComponent(e.getKey(), e.getValue().getAsJsonObject())));
         }
 

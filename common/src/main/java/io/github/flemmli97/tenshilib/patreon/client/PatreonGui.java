@@ -3,6 +3,7 @@ package io.github.flemmli97.tenshilib.patreon.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.flemmli97.tenshilib.client.Color;
 import io.github.flemmli97.tenshilib.client.render.RenderUtils;
+import io.github.flemmli97.tenshilib.common.network.NetworkCrossPlat;
 import io.github.flemmli97.tenshilib.patreon.PatreonDataManager;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlatform;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlayerSetting;
@@ -38,7 +39,7 @@ public class PatreonGui extends Screen {
     private PatreonEffectConfig effect;
     private RenderLocation renderLocation;
     private boolean render = true;
-    private int color = RenderUtils.defaultColor;
+    private int color = RenderUtils.DEFAULT_COLOR;
 
     private EditBox txtField;
     private HorizontalColorSlider red, green, blue, alpha;
@@ -74,7 +75,7 @@ public class PatreonGui extends Screen {
         name = CommonComponents.GUI_DONE;
         this.setting = PatreonPlatform.INSTANCE.playerSettings(this.minecraft.player).orElse(null);
         if (this.setting == null) {
-            this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 8 + 24 * 7, 200, 20, new TranslatableComponent("tenshilib.patreon.save"), button -> PatreonClientPlatform.INSTANCE.sendToServer(new C2SEffectUpdatePkt(this.effect.id(), this.render, this.renderLocation, this.color))));
+            this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 8 + 24 * 7, 200, 20, new TranslatableComponent("tenshilib.patreon.save"), button -> NetworkCrossPlat.INSTANCE.sendToServer(new C2SEffectUpdatePkt(this.effect.id(), this.render, this.renderLocation, this.color))));
             this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 8 + 24 * 8, 200, 20, name, button -> this.minecraft.setScreen(this.parent)));
             return;
         }
@@ -145,7 +146,7 @@ public class PatreonGui extends Screen {
             this.txtField.setValue(HexFormat.of().toHexDigits(this.color));
             this.txtField.setResponder(s -> {
                 if (s.isEmpty())
-                    this.color = RenderUtils.defaultColor;
+                    this.color = RenderUtils.DEFAULT_COLOR;
                 else
                     this.color = HexFormat.fromHexDigits(s);
                 this.update();
@@ -155,7 +156,7 @@ public class PatreonGui extends Screen {
         }
         this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 8 + yOffset, 200, 20, new TranslatableComponent("tenshilib.patreon.save"), button -> {
             if (this.effect != null)
-                PatreonClientPlatform.INSTANCE.sendToServer(new C2SEffectUpdatePkt(this.effect.id(), this.render, this.renderLocation, this.color));
+                NetworkCrossPlat.INSTANCE.sendToServer(new C2SEffectUpdatePkt(this.effect.id(), this.render, this.renderLocation, this.color));
         }));
         yOffset += 24;
         this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 8 + yOffset, 200, 20, name, button -> this.minecraft.setScreen(this.parent)));
@@ -214,6 +215,6 @@ public class PatreonGui extends Screen {
     public void removed() {
         super.removed();
         if (Minecraft.getInstance().getConnection() != null && Minecraft.getInstance().getConnection().getConnection() != null)
-            PatreonClientPlatform.INSTANCE.sendToServer(new C2SRequestUpdateClientPkt());
+            NetworkCrossPlat.INSTANCE.sendToServer(new C2SRequestUpdateClientPkt());
     }
 }

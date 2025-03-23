@@ -4,8 +4,6 @@ import io.github.flemmli97.tenshilib.client.AnimationManager;
 import io.github.flemmli97.tenshilib.client.ClientHandlers;
 import io.github.flemmli97.tenshilib.client.CustomRiderRendererManager;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
-import io.github.flemmli97.tenshilib.common.network.C2SPacketHit;
-import io.github.flemmli97.tenshilib.forge.network.PacketHandler;
 import net.minecraft.world.InteractionHand;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.InputEvent;
@@ -21,7 +19,7 @@ public class ClientEvents {
 
     public static void clickSpecial(InputEvent.ClickInputEvent event) {
         if (event.isAttack() && event.getHand() == InteractionHand.MAIN_HAND) {
-            boolean canceled = ClientHandlers.emptyClick(aoe -> PacketHandler.sendToServer(new C2SPacketHit(aoe ? C2SPacketHit.HitType.AOE : C2SPacketHit.HitType.EXT)));
+            boolean canceled = ClientHandlers.emptyClick();
             if (canceled) {
                 event.setSwingHand(false);
                 event.setCanceled(true);

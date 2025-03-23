@@ -92,7 +92,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
 
     @Override
     public float radius() {
-        return 0;
+        return 1;
     }
 
     public boolean piercing() {
@@ -135,7 +135,7 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
 
     public void updateHitDetectBox() {
         double dist = this.hitVec != null ? this.hitVec.subtract(this.position()).length() : 0;
-        this.hitObb = new OrientedBoundingBox(OrientedBoundingBox.baseBox(this.radius() * 2, this.radius() * 2, dist),
+        this.hitObb = new OrientedBoundingBox(OrientedBoundingBox.baseBox(this.radius() * 2, this.radius() * 2, dist + 1.5),
                 this.getYRot(), -this.getXRot(), this.position());
     }
 

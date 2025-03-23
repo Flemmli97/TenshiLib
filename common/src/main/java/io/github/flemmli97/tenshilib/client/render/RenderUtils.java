@@ -24,7 +24,7 @@ import java.util.Random;
 
 public class RenderUtils {
 
-    public static final int defaultColor = 0xFFFFFFFF;
+    public static final int DEFAULT_COLOR = 0xFFFFFFFF;
     private static final float TRIANGLE_MULT = (float) (Math.sqrt(3.0D) / 2.0D);
     private static final Random RANDOM = new Random(432L);
 

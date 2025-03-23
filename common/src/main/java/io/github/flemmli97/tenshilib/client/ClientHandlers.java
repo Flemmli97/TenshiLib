@@ -4,6 +4,8 @@ import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.api.entity.IOverlayEntityRender;
 import io.github.flemmli97.tenshilib.api.item.IAOEWeapon;
 import io.github.flemmli97.tenshilib.api.item.IExtendedWeapon;
+import io.github.flemmli97.tenshilib.common.network.C2SPacketHit;
+import io.github.flemmli97.tenshilib.common.network.NetworkCrossPlat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.InteractionHand;
@@ -16,7 +18,6 @@ import net.minecraft.world.phys.HitResult;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 public class ClientHandlers {
 
@@ -51,19 +52,19 @@ public class ClientHandlers {
         return false;
     }
 
-    public static boolean emptyClick(Consumer<Boolean> packetHandler) {
+    public static boolean emptyClick() {
         Minecraft client = Minecraft.getInstance();
         ItemStack main = client.player.getMainHandItem();
         if (client.hitResult != null && (client.hitResult.getType() != HitResult.Type.BLOCK || (main.getItem() instanceof IAOEWeapon aoe && !aoe.allowBlockAttack(client.player, main)))) {
             if (main.getItem() instanceof IExtendedWeapon weapon) {
-                packetHandler.accept(false);
+                NetworkCrossPlat.INSTANCE.sendToServer(new C2SPacketHit(C2SPacketHit.HitType.EXT));
                 if (weapon.resetAttackStrength(client.player, main))
                     client.player.resetAttackStrengthTicker();
                 if (weapon.swingWeapon(client.player, main))
                     client.player.swing(InteractionHand.MAIN_HAND);
                 return true;
             } else if (main.getItem() instanceof IAOEWeapon weapon) {
-                packetHandler.accept(true);
+                NetworkCrossPlat.INSTANCE.sendToServer(new C2SPacketHit(C2SPacketHit.HitType.AOE));
                 if (weapon.resetAttackStrength(client.player, main))
                     client.player.resetAttackStrengthTicker();
                 if (weapon.swingWeapon(client.player, main))

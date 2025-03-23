@@ -1,6 +1,7 @@
 package io.github.flemmli97.tenshilib.patreon.pkts;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
+import io.github.flemmli97.tenshilib.common.network.NetworkCrossPlat;
 import io.github.flemmli97.tenshilib.common.network.Packet;
 import io.github.flemmli97.tenshilib.patreon.PatreonDataManager;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlatform;
@@ -53,8 +54,8 @@ public class C2SEffectUpdatePkt implements Packet {
             } else {
                 settings.read(pkt, pkt.id);
             }
-            PatreonPlatform.INSTANCE.sendToTracking(player,
-                    new S2CEffectUpdatePkt(player.getId(), settings.effect() != null ? settings.effect().id() : "", settings.shouldRender(), settings.getRenderLocation(), settings.getColor()));
+            NetworkCrossPlat.INSTANCE.sendToTracking(new S2CEffectUpdatePkt(player.getId(), settings.effect() != null ? settings.effect().id() : "", settings.shouldRender(), settings.getRenderLocation(), settings.getColor()),
+                    player);
         });
     }
 }

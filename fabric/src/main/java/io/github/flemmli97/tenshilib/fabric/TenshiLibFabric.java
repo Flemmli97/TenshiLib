@@ -4,6 +4,7 @@ import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
 import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.common.entity.CustomDataSerializers;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
+import io.github.flemmli97.tenshilib.common.network.NetworkCrossPlat;
 import io.github.flemmli97.tenshilib.common.network.S2CEntityAnimation;
 import io.github.flemmli97.tenshilib.fabric.events.CommonEvents;
 import io.github.flemmli97.tenshilib.fabric.network.ServerPacketHandler;
@@ -12,9 +13,6 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.DispenserBlock;
 
@@ -28,11 +26,8 @@ public class TenshiLibFabric implements ModInitializer {
         EntityTrackingEvents.START_TRACKING.register(((entity, player) -> {
             if (entity instanceof IAnimated animated && animated.getAnimationHandler().hasAnimation()) {
                 AnimatedAction anim = animated.getAnimationHandler().getAnimation();
-                S2CEntityAnimation pkt = S2CEntityAnimation.create((Entity & IAnimated) entity,
-                        anim.getStartTransition(), anim.getEndTransitionTime(), anim.getTick(1));
-                FriendlyByteBuf buf = PacketByteBufs.create();
-                pkt.write(buf);
-                ServerPlayNetworking.send(player, pkt.getID(), buf);
+                NetworkCrossPlat.INSTANCE.sendToClient(S2CEntityAnimation.create((Entity & IAnimated) entity,
+                        anim.getStartTransition(), anim.getEndTransitionTime(), anim.getTick(1)), player);
             }
         }));
         ServerPacketHandler.register();

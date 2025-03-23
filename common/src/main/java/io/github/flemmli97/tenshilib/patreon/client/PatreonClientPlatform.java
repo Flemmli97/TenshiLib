@@ -1,6 +1,5 @@
 package io.github.flemmli97.tenshilib.patreon.client;
 
-import io.github.flemmli97.tenshilib.common.network.Packet;
 import io.github.flemmli97.tenshilib.mixinhelper.ScreenWidgetAdder;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlatform;
 import io.github.flemmli97.tenshilib.patreon.RenderLocation;
@@ -32,6 +31,4 @@ public interface PatreonClientPlatform {
     }
 
     void setup();
-
-    void sendToServer(Packet pkt);
 }

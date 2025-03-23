@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.forge.platform.patreon;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
-import io.github.flemmli97.tenshilib.forge.network.PacketHandler;
+import io.github.flemmli97.tenshilib.common.network.NetworkCrossPlat;
 import io.github.flemmli97.tenshilib.patreon.PatreonDataManager;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlatform;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlayerSetting;
@@ -96,13 +96,8 @@ public class PatreonImpl implements PatreonPlatform {
         PatreonPlatform.INSTANCE.playerSettings(target).ifPresent(setting -> {
             if (PatreonDataManager.get(target.getUUID().toString()).tier() < 1)
                 setting.setEffect(null);
-            PacketHandler.sendToClientChecked(new S2CEffectUpdatePkt(target.getId(), setting.effect() != null ? setting.effect().id() : "", setting.shouldRender(), setting.getRenderLocation(), setting.getColor()), player);
+            NetworkCrossPlat.INSTANCE.sendToClient(new S2CEffectUpdatePkt(target.getId(), setting.effect() != null ? setting.effect().id() : "", setting.shouldRender(), setting.getRenderLocation(), setting.getColor()), player);
         });
-    }
-
-    @Override
-    public void sendToTracking(ServerPlayer player, S2CEffectUpdatePkt pkt) {
-        PacketHandler.sendToTracking(pkt, player);
     }
 
     public static class PlayerCap extends PatreonPlayerSetting implements ICapabilitySerializable<CompoundTag> {

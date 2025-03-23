@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.server.packs.PackType;
 
 public class TenshiLibFabricClient implements ClientModInitializer {
+
     @Override
     public void onInitializeClient() {
         ClientPacketHandler.register();

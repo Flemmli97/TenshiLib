@@ -9,10 +9,10 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import io.github.flemmli97.tenshilib.common.utils.JsonUtils;
 import io.github.flemmli97.tenshilib.platform.PlatformUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -123,7 +123,7 @@ public class ExtendedItemStackWrapper extends SimpleItemStackWrapper {
         @Override
         public ExtendedItemStackWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonObject obj = json.getAsJsonObject();
-            int count = JsonUtils.get(obj, "count", 1);
+            int count = GsonHelper.getAsInt(obj, "count", 1);
             JsonObject nbt = obj.has("nbt") ? obj.get("nbt").getAsJsonObject() : null;
             CompoundTag compound = null;
             if (nbt != null) {
