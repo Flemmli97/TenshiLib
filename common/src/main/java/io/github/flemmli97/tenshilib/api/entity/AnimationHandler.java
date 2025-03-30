@@ -4,8 +4,12 @@ import io.github.flemmli97.tenshilib.platform.EventCalls;
 import net.minecraft.util.Mth;
 import net.minecraft.util.ToFloatFunction;
 import net.minecraft.world.entity.Entity;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -18,8 +22,8 @@ public class AnimationHandler<T extends Entity & IAnimated> {
     private final T entity;
     private final AnimatedAction[] anims;
 
-    private Predicate<AnimatedAction> animationChangeListener;
-    private Consumer<AnimatedAction> onRunAnimation;
+    private final List<PriorityEntry<Predicate<AnimatedAction>>> animationChangeListener = new ArrayList<>();
+    private final List<PriorityEntry<Consumer<AnimatedAction>>> onRunAnimation = new ArrayList<>();
     private ToFloatFunction<AnimatedAction> animationSpeedHandler;
 
     private AnimatedAction currentAnimation, lastAnimation;
@@ -32,19 +36,37 @@ public class AnimationHandler<T extends Entity & IAnimated> {
         this.anims = anims;
     }
 
+    public AnimationHandler<T> withChangeListener(Predicate<AnimatedAction> onAnimationSet) {
+        return this.withChangeListener(-1, onAnimationSet);
+    }
+
     /**
      * Add a listener for whenever animation changes. Return true to prevent the update
      */
-    public AnimationHandler<T> withChangeListener(Predicate<AnimatedAction> onAnimationSet) {
-        this.animationChangeListener = onAnimationSet;
+    public AnimationHandler<T> withChangeListener(int priority, Predicate<AnimatedAction> onAnimationSet) {
+        if (priority == -1) {
+            this.animationChangeListener.add(new PriorityEntry<>(priority, onAnimationSet));
+        } else {
+            this.animationChangeListener.add(new PriorityEntry<>(priority, onAnimationSet));
+            this.animationChangeListener.sort(Comparator.reverseOrder());
+        }
         return this;
+    }
+
+    public AnimationHandler<T> withHandle(Consumer<AnimatedAction> handleAction) {
+        return this.withHandle(-1, handleAction);
     }
 
     /**
      * Adds a handler for an AnimatedAction.
      */
-    public AnimationHandler<T> withHandle(Consumer<AnimatedAction> handleAction) {
-        this.onRunAnimation = handleAction;
+    public AnimationHandler<T> withHandle(int priority, Consumer<AnimatedAction> handleAction) {
+        if (priority == -1) {
+            this.onRunAnimation.add(new PriorityEntry<>(priority, handleAction));
+        } else {
+            this.onRunAnimation.add(new PriorityEntry<>(priority, handleAction));
+            this.onRunAnimation.sort(Comparator.reverseOrder());
+        }
         return this;
     }
 
@@ -84,8 +106,10 @@ public class AnimationHandler<T extends Entity & IAnimated> {
      * @param offset          Start the animation with the given offset
      */
     public void setAnimation(AnimatedAction anim, int startTransition, int endTransition, float offset) {
-        if (this.animationChangeListener != null && this.animationChangeListener.test(anim))
-            return;
+        for (PriorityEntry<Predicate<AnimatedAction>> listener : this.animationChangeListener) {
+            if (listener.val().test(anim))
+                return;
+        }
         if (this.currentAnimation != null) {
             this.lastAnimation = this.currentAnimation;
             this.timeSinceLastChange = 0;
@@ -147,8 +171,9 @@ public class AnimationHandler<T extends Entity & IAnimated> {
         if (this.hasAnimation()) {
             if (this.getAnimation().tick())
                 this.setAnimation(null);
-            else if (this.onRunAnimation != null)
-                this.onRunAnimation.accept(this.getAnimation());
+            else {
+                this.onRunAnimation.forEach(p -> p.val().accept(this.getAnimation()));
+            }
         }
     }
 
@@ -180,5 +205,13 @@ public class AnimationHandler<T extends Entity & IAnimated> {
             return 0;
         }
         return 1 - Mth.clamp((this.getTimeSinceLastChange() - 1 + partialTicks) / this.lastAnimation.getEndTransitionTime(), 0, 1);
+    }
+
+    private record PriorityEntry<T>(int priority, T val) implements Comparable<PriorityEntry<T>> {
+
+        @Override
+        public int compareTo(@NotNull AnimationHandler.PriorityEntry<T> other) {
+            return Integer.compare(this.priority(), other.priority());
+        }
     }
 }

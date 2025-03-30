@@ -30,8 +30,9 @@ public class AnimatedAction {
     }
 
     /**
-     * @param length Length of the animation in ticks
+     * @param length Length of the animation
      * @param id     Unique id for the animation
+     * @param seconds If the length is in seconds or ticks
      */
     public AnimatedAction(double length, String id, boolean seconds) {
         this((float) (seconds ? length * 20 : length), id, id, 0, AnimationHandler.DEFAULT_TRANSIT_TIME, 1, true, Map.of());
@@ -70,7 +71,7 @@ public class AnimatedAction {
      * @return Creates a new copy instance of the animation
      */
     public AnimatedAction create() {
-        return this.create(this.speed);
+        return this.create(1);
     }
 
     public AnimatedAction create(float speed) {
@@ -83,7 +84,7 @@ public class AnimatedAction {
     public AnimatedAction create(int startTransition, int endTransition, float offset, float speed) {
         AnimatedAction anim = new AnimatedAction(this.length, this.id, this.clientIdentifier,
                 this.startTransition > 0 && startTransition == AnimationHandler.FALLBACK_TRANSIT_TIME ? this.startTransition : startTransition,
-                this.endTransition > 0 && endTransition == AnimationHandler.FALLBACK_TRANSIT_TIME ? this.endTransition : endTransition, speed, this.shouldRunOut,
+                this.endTransition > 0 && endTransition == AnimationHandler.FALLBACK_TRANSIT_TIME ? this.endTransition : endTransition, this.speed * speed, this.shouldRunOut,
                 this.markerMap);
         anim.ticker = offset;
         anim.offset = offset;
@@ -106,8 +107,22 @@ public class AnimatedAction {
         return this.speed;
     }
 
+    /**
+     * How far the animation has progressed towards the end
+     */
     public float progress(float partialTicks) {
-        return Mth.clamp(this.getTick(partialTicks) / this.length, 0, 1);
+        return this.progress(0, this.length, partialTicks, 0);
+    }
+
+    /**
+     * Get the progress in between the given value
+     * @param start Start value in ticks
+     * @param end End value in ticks
+     */
+    public float progress(float start, float end, float partialTicks, int offset) {
+        float tick = this.getTick(partialTicks) + offset * this.speed;
+        float length = end - start;
+        return Mth.clamp((tick - start) / length, 0, 1);
     }
 
     public float getStartTransitionProgress(float partialTicks) {
@@ -215,6 +230,17 @@ public class AnimatedAction {
 
     public String getID() {
         return this.id;
+    }
+
+    /**
+     * Get the marker value of the given index
+     * @return -1 If the marker is not present
+     */
+    public double getMarker(String marker, int index) {
+        double[] times = this.markerMap.get(marker);
+        if (times == null || index >= times.length)
+            return -1;
+        return times[index];
     }
 
     public boolean is(AnimatedAction... others) {

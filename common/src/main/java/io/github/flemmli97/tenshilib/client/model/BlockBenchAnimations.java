@@ -10,6 +10,7 @@ import io.github.flemmli97.tenshilib.common.utils.mathParser.Expression;
 import io.github.flemmli97.tenshilib.common.utils.mathParser.VariableMap;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +20,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * A Blockbench animation using the free model animation from Blockbench.
@@ -67,23 +70,27 @@ public class BlockBenchAnimations {
     }
 
     public boolean doAnimation(ExtendedModel model, AnimationHandler<?> handler, float partialTicks, boolean mirror) {
+        return this.doAnimation(model, handler, partialTicks, a -> mirror, null);
+    }
+
+    public boolean doAnimation(ExtendedModel model, AnimationHandler<?> handler, float partialTicks, @Nullable Predicate<AnimatedAction> mirror, @Nullable Function<AnimatedAction, String> animationID) {
         AnimatedAction current = handler.getAnimation();
         AnimatedAction last = handler.getLastAnimation();
         float interpolationLast = handler.getLastTransitionProgress(partialTicks);
         float interpolation = handler.getCurrentTransitionProgress(partialTicks);
         boolean changed = false;
         if (last != null && interpolationLast > 0) {
-            changed = this.doAnimation(model, last.getClientIdentifier(), last.getTick(partialTicks), interpolationLast, mirror, false);
+            changed = this.doAnimation(model, animationID != null ? animationID.apply(last) : last.getClientIdentifier(), last.getTick(partialTicks), interpolationLast, mirror != null && mirror.test(last), false);
         }
         if (current != null) {
-            if (this.doAnimation(model, current.getClientIdentifier(), current.getTick(partialTicks), interpolation, mirror, false) && !changed) {
+            if (this.doAnimation(model, animationID != null ? animationID.apply(current) : current.getClientIdentifier(), current.getTick(partialTicks), interpolation, mirror != null && mirror.test(last), false) && !changed) {
                 changed = true;
             }
         }
         return changed;
     }
 
-    private boolean doAnimation(ExtendedModel model, String name, float tick, float interpolation, boolean mirror, boolean add) {
+    public boolean doAnimation(ExtendedModel model, String name, float tick, float interpolation, boolean mirror, boolean add) {
         Animation animation = this.animations.get(name);
         if (animation != null && interpolation != 0) {
             animation.animate(model, tick, Mth.clamp(interpolation, 0, 1), this.variables, mirror, add);
