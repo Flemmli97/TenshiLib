@@ -8,7 +8,6 @@ import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -24,6 +23,8 @@ public class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> extends Goa
     public final T attacker;
     protected final List<WeightedEntry.Wrapper<GoalAttackAction<T>>> actions;
     protected final List<WeightedEntry.Wrapper<IdleAction<T>>> idleActions;
+    protected final boolean checkRestriction;
+
     protected LivingEntity target;
 
     @Nullable
@@ -43,16 +44,22 @@ public class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> extends Goa
      * @param idleActions A list of idle actions that runs when the attacks are in cooldown or no matching attack was found.
      */
     public AnimatedAttackGoal(T entity, List<WeightedEntry.Wrapper<GoalAttackAction<T>>> actions, List<WeightedEntry.Wrapper<IdleAction<T>>> idleActions) {
+        this(entity, actions, idleActions, true);
+    }
+
+    public AnimatedAttackGoal(T entity, List<WeightedEntry.Wrapper<GoalAttackAction<T>>> actions, List<WeightedEntry.Wrapper<IdleAction<T>>> idleActions, boolean checkRestriction) {
         this.attacker = entity;
         this.actions = actions;
         this.idleActions = idleActions;
+        this.checkRestriction = checkRestriction;
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }
 
     @Override
     public boolean canUse() {
         LivingEntity living = this.attacker.getTarget();
-        return !this.actions.isEmpty() && living != null && living.isAlive() && this.attacker.isWithinRestriction(living.blockPosition());
+        return !this.actions.isEmpty() && living != null && living.isAlive()
+                && (!this.checkRestriction || this.attacker.isWithinRestriction(living.blockPosition()));
     }
 
     @Override
@@ -176,30 +183,6 @@ public class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> extends Goa
         this.idleTime = 0;
     }
 
-    public void moveRandomlyAround() {
-        this.moveRandomlyAround(81, 7);
-    }
-
-    public void moveRandomlyAround(double maxDistSq, int dist) {
-        this.attacker.getLookControl().setLookAt(this.target, 30.0f, 30.0f);
-        if (this.distanceToTargetSq <= maxDistSq) {
-            if (this.attacker.getNavigation().isDone()) {
-                for (int i = 0; i < 10; i++) {
-                    Vec3 rand = DefaultRandomPos.getPos(this.attacker, dist, 4);
-                    if (rand != null && rand.distanceToSqr(this.target.position()) < maxDistSq) {
-                        Path path = this.attacker.getNavigation().createPath(rand.x, rand.y, rand.z, 0);
-                        if (path != null) {
-                            this.attacker.getNavigation().moveTo(path, 1);
-                            break;
-                        }
-                    }
-                }
-            }
-        } else {
-            this.moveToTarget(1);
-        }
-    }
-
     public void moveToTargetPosition(double x, double y, double z, double speed) {
         if (this.lastPathTargetPos == null || this.attacker.getNavigation().isDone() || this.lastPathTargetPos.distanceToSqr(x, y, z) > 4) {
             this.lastPathTargetPos = new Vec3(x, y, z);
@@ -229,12 +212,5 @@ public class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> extends Goa
             double nPosZ = radius * Math.sin(angle);
             this.attacker.getNavigation().moveTo(posX + nPosX, this.attacker.getY(), posZ + nPosZ, speed);
         }
-    }
-
-    public void teleportAround(double posX, double posY, double posZ, int range) {
-        double x = posX + (this.attacker.getRandom().nextDouble() - 0.5D) * range * 2;
-        double y = posY + (this.attacker.getRandom().nextInt(3));
-        double z = posZ + (this.attacker.getRandom().nextDouble() - 0.5D) * range * 2;
-        this.attacker.randomTeleport(x, y, z, false);
     }
 }

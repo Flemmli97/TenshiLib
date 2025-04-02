@@ -6,6 +6,9 @@ import io.github.flemmli97.tenshilib.common.entity.ai.animated.ActionRun;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.AnimatedAttackGoal;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.util.DefaultRandomPos;
+import net.minecraft.world.level.pathfinder.Path;
+import net.minecraft.world.phys.Vec3;
 
 public class RandomMoveAroundRunner<T extends PathfinderMob & IAnimated> implements ActionRun<T> {
 
@@ -30,7 +33,23 @@ public class RandomMoveAroundRunner<T extends PathfinderMob & IAnimated> impleme
     public boolean run(AnimatedAttackGoal<T> goal, LivingEntity target, AnimatedAction anim) {
         if (!this.start) {
             this.start = true;
-            goal.moveRandomlyAround(this.maxDistSqr, this.distance);
+            goal.attacker.getLookControl().setLookAt(target, 30.0f, 30.0f);
+            if (goal.distanceToTargetSq <= this.maxDistSqr) {
+                if (goal.attacker.getNavigation().isDone()) {
+                    for (int i = 0; i < 10; i++) {
+                        Vec3 rand = DefaultRandomPos.getPos(goal.attacker, this.distance, 4);
+                        if (rand != null && rand.distanceToSqr(target.position()) < this.maxDistSqr) {
+                            Path path = goal.attacker.getNavigation().createPath(rand.x, rand.y, rand.z, 0);
+                            if (path != null) {
+                                goal.attacker.getNavigation().moveTo(path, 1);
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else {
+                goal.moveToTarget(1);
+            }
         }
         if (goal.attacker.tickCount % 3 == 0) {
             // Check if entity is getting close. If not retry

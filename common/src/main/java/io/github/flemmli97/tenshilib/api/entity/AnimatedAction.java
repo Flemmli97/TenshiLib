@@ -30,8 +30,8 @@ public class AnimatedAction {
     }
 
     /**
-     * @param length Length of the animation
-     * @param id     Unique id for the animation
+     * @param length  Length of the animation
+     * @param id      Unique id for the animation
      * @param seconds If the length is in seconds or ticks
      */
     public AnimatedAction(double length, String id, boolean seconds) {
@@ -116,8 +116,9 @@ public class AnimatedAction {
 
     /**
      * Get the progress in between the given value
+     *
      * @param start Start value in ticks
-     * @param end End value in ticks
+     * @param end   End value in ticks
      */
     public float progress(float start, float end, float partialTicks, int offset) {
         float tick = this.getTick(partialTicks) + offset * this.speed;
@@ -234,6 +235,7 @@ public class AnimatedAction {
 
     /**
      * Get the marker value of the given index
+     *
      * @return -1 If the marker is not present
      */
     public double getMarker(String marker, int index) {
