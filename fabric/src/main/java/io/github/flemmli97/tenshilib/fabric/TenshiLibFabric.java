@@ -4,7 +4,7 @@ import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import io.github.flemmli97.tenshilib.common.network.S2CEntityAnimation;
 import io.github.flemmli97.tenshilib.fabric.events.CommonEvents;
-import io.github.flemmli97.tenshilib.fabric.network.ServerPacketHandler;
+import io.github.flemmli97.tenshilib.fabric.network.PacketHandler;
 import io.github.flemmli97.tenshilib.fabric.platform.patreon.PatreonImpl;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
@@ -26,7 +26,7 @@ public class TenshiLibFabric implements ModInitializer {
                 ServerPlayNetworking.send(player, pkt);
             }
         }));
-        ServerPacketHandler.register();
+        PacketHandler.register();
         for (SpawnEgg egg : SpawnEgg.getEggs())
             DispenserBlock.registerBehavior(egg, egg.dispenser());
         PatreonImpl.initPatreonData();
