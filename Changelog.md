@@ -1,3 +1,7 @@
+TenshiLib 1.8.2.b
+================
+- Fix fabric packets
+
 TenshiLib 1.8.2
 ================
 - Fix packets not being optional
