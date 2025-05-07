@@ -1,3 +1,10 @@
+TenshiLib 1.9.5
+================
+- Improve animation interpolation handling
+- Rewrite various animation handling
+- Fix math expression parser for edge cases
+- Removed various unused stuff
+
 TenshiLib 1.9.4
 ================
 - Some internal projectile stuff
