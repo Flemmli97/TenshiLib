@@ -20,11 +20,11 @@ public class C2SRequestUpdateClientPkt implements Packet {
         return ID;
     }
 
-    public static C2SRequestUpdateClientPkt fromBytes(FriendlyByteBuf buf) {
+    public static C2SRequestUpdateClientPkt read(FriendlyByteBuf buf) {
         return new C2SRequestUpdateClientPkt();
     }
 
-    public static void handlePacketServer(C2SRequestUpdateClientPkt pkt, ServerPlayer player) {
+    public static void handle(C2SRequestUpdateClientPkt pkt, ServerPlayer player) {
         PatreonPlatform.INSTANCE.sendToClient(player, player);
     }
 }

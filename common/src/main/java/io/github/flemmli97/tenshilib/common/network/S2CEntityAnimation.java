@@ -54,6 +54,14 @@ public class S2CEntityAnimation implements Packet {
                 }).orElse(-1);
     }
 
+    public static S2CEntityAnimation read(FriendlyByteBuf buf) {
+        return new S2CEntityAnimation(buf.readInt(), buf.readInt(), buf.readInt(), buf.readInt(), buf.readFloat());
+    }
+
+    public static void handle(S2CEntityAnimation pkt) {
+        ClientHandlers.updateAnim(pkt.entityID, pkt.animID, pkt.startTransition, pkt.endTransition, pkt.start);
+    }
+
     @Override
     public void write(FriendlyByteBuf buf) {
         buf.writeInt(this.entityID);
@@ -66,15 +74,5 @@ public class S2CEntityAnimation implements Packet {
     @Override
     public ResourceLocation getID() {
         return ID;
-    }
-
-    public static S2CEntityAnimation fromBytes(FriendlyByteBuf buf) {
-        return new S2CEntityAnimation(buf.readInt(), buf.readInt(), buf.readInt(), buf.readInt(), buf.readFloat());
-    }
-
-    public static class Handler {
-        public static void handlePacket(S2CEntityAnimation pkt) {
-            ClientHandlers.updateAnim(pkt.entityID, pkt.animID, pkt.startTransition, pkt.endTransition, pkt.start);
-        }
     }
 }

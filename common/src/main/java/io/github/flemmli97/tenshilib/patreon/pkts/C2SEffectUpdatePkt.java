@@ -41,11 +41,11 @@ public class C2SEffectUpdatePkt implements Packet {
         return ID;
     }
 
-    public static C2SEffectUpdatePkt fromBytes(FriendlyByteBuf buf) {
+    public static C2SEffectUpdatePkt read(FriendlyByteBuf buf) {
         return new C2SEffectUpdatePkt(buf.readUtf(), buf.readBoolean(), buf.readEnum(RenderLocation.class), buf.readInt());
     }
 
-    public static void handlePacketServer(C2SEffectUpdatePkt pkt, ServerPlayer player) {
+    public static void handle(C2SEffectUpdatePkt pkt, ServerPlayer player) {
         PatreonPlatform.INSTANCE.playerSettings(player).ifPresent(settings -> {
             int tier = PatreonDataManager.get(player.getUUID().toString()).tier();
             PatreonEffectConfig eff;

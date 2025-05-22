@@ -1,4 +1,7 @@
 {
+  "tenshilib.gui.save": "Save",
+  "tenshilib.item.animation.select": "Selected %s",
+  "tenshilib.gui.animation": "Animation Debugger",
   "tenshilib.patreon.title": "TenshiLib Patreon Customization",
   "tenshilib.patreon.level.no": "Need to be in a world to use this",
   "tenshilib.patreon.not": "Support me on patreon to use this. The features here are purely cosmetic",

@@ -20,6 +20,20 @@ public class S2CEffectUpdatePkt extends C2SEffectUpdatePkt {
         this.entityID = entityID;
     }
 
+    public static S2CEffectUpdatePkt read(FriendlyByteBuf buf) {
+        return new S2CEffectUpdatePkt(buf.readInt(), buf.readUtf(), buf.readBoolean(), buf.readEnum(RenderLocation.class), buf.readInt());
+    }
+
+    public static void handle(S2CEffectUpdatePkt pkt) {
+        Player player = ClientHandlers.clientPlayer();
+        if (pkt.entityID != player.getId()) {
+            Entity e = player.level.getEntity(pkt.entityID);
+            if (e instanceof Player)
+                player = (Player) e;
+        }
+        PatreonPlatform.INSTANCE.playerSettings(player).ifPresent(settings -> settings.read(pkt, pkt.id));
+    }
+
     @Override
     public void write(FriendlyByteBuf buf) {
         buf.writeInt(this.entityID);
@@ -32,21 +46,5 @@ public class S2CEffectUpdatePkt extends C2SEffectUpdatePkt {
     @Override
     public ResourceLocation getID() {
         return ID;
-    }
-
-    public static S2CEffectUpdatePkt fromBytes(FriendlyByteBuf buf) {
-        return new S2CEffectUpdatePkt(buf.readInt(), buf.readUtf(), buf.readBoolean(), buf.readEnum(RenderLocation.class), buf.readInt());
-    }
-
-    public static class Handler {
-        public static void handlePktClient(S2CEffectUpdatePkt pkt) {
-            Player player = ClientHandlers.clientPlayer();
-            if (pkt.entityID != player.getId()) {
-                Entity e = player.level.getEntity(pkt.entityID);
-                if (e instanceof Player)
-                    player = (Player) e;
-            }
-            PatreonPlatform.INSTANCE.playerSettings(player).ifPresent(settings -> settings.read(pkt, pkt.id));
-        }
     }
 }

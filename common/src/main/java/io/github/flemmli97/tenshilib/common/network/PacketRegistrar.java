@@ -14,15 +14,17 @@ import java.util.function.Function;
 public class PacketRegistrar {
 
     public static int registerServerPackets(ServerPacketRegister register, int id) {
-        register.registerMessage(id++, C2SPacketHit.ID, C2SPacketHit.class, C2SPacketHit::write, C2SPacketHit::fromBytes, C2SPacketHit::handlePacket);
-        register.registerMessage(id++, C2SEffectUpdatePkt.ID, C2SEffectUpdatePkt.class, C2SEffectUpdatePkt::write, C2SEffectUpdatePkt::fromBytes, C2SEffectUpdatePkt::handlePacketServer);
-        register.registerMessage(id++, C2SRequestUpdateClientPkt.ID, C2SRequestUpdateClientPkt.class, C2SRequestUpdateClientPkt::write, C2SRequestUpdateClientPkt::fromBytes, C2SRequestUpdateClientPkt::handlePacketServer);
+        register.registerMessage(id++, C2SPacketHit.ID, C2SPacketHit.class, C2SPacketHit::write, C2SPacketHit::read, C2SPacketHit::handlePacket);
+        register.registerMessage(id++, C2SEffectUpdatePkt.ID, C2SEffectUpdatePkt.class, C2SEffectUpdatePkt::write, C2SEffectUpdatePkt::read, C2SEffectUpdatePkt::handle);
+        register.registerMessage(id++, C2SRequestUpdateClientPkt.ID, C2SRequestUpdateClientPkt.class, C2SRequestUpdateClientPkt::write, C2SRequestUpdateClientPkt::read, C2SRequestUpdateClientPkt::handle);
+        register.registerMessage(id++, C2SAnimationDebuggerUpdate.ID, C2SAnimationDebuggerUpdate.class, C2SAnimationDebuggerUpdate::write, C2SAnimationDebuggerUpdate::read, C2SAnimationDebuggerUpdate::handle);
         return id;
     }
 
     public static int registerClientPackets(ClientPacketRegister register, int id) {
-        register.registerMessage(id++, S2CEntityAnimation.ID, S2CEntityAnimation.class, S2CEntityAnimation::write, S2CEntityAnimation::fromBytes, S2CEntityAnimation.Handler::handlePacket);
-        register.registerMessage(id++, S2CEffectUpdatePkt.ID, S2CEffectUpdatePkt.class, S2CEffectUpdatePkt::write, S2CEffectUpdatePkt::fromBytes, S2CEffectUpdatePkt.Handler::handlePktClient);
+        register.registerMessage(id++, S2CEntityAnimation.ID, S2CEntityAnimation.class, S2CEntityAnimation::write, S2CEntityAnimation::read, S2CEntityAnimation::handle);
+        register.registerMessage(id++, S2CEffectUpdatePkt.ID, S2CEffectUpdatePkt.class, S2CEffectUpdatePkt::write, S2CEffectUpdatePkt::read, S2CEffectUpdatePkt::handle);
+        register.registerMessage(id++, S2CAnimationScreen.ID, S2CAnimationScreen.class, S2CAnimationScreen::write, S2CAnimationScreen::read, S2CAnimationScreen::handle);
         return id;
     }
 

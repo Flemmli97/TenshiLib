@@ -31,7 +31,7 @@ public class C2SPacketHit implements Packet {
         return ID;
     }
 
-    public static C2SPacketHit fromBytes(FriendlyByteBuf buf) {
+    public static C2SPacketHit read(FriendlyByteBuf buf) {
         return new C2SPacketHit(HitType.values()[buf.readInt()]);
     }
 

@@ -4,6 +4,8 @@ import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.api.entity.IOverlayEntityRender;
 import io.github.flemmli97.tenshilib.api.item.IAOEWeapon;
 import io.github.flemmli97.tenshilib.api.item.IExtendedWeapon;
+import io.github.flemmli97.tenshilib.client.gui.AnimationScreen;
+import io.github.flemmli97.tenshilib.common.item.AnimationDebugger;
 import io.github.flemmli97.tenshilib.common.network.C2SPacketHit;
 import io.github.flemmli97.tenshilib.common.network.NetworkCrossPlat;
 import net.minecraft.client.Minecraft;
@@ -73,5 +75,12 @@ public class ClientHandlers {
             }
         }
         return false;
+    }
+
+    public static <T extends LivingEntity & IAnimated> void openAnimationGui(T entity, InteractionHand hand) {
+        ItemStack stack = Minecraft.getInstance().player.getItemInHand(hand);
+        if (stack.getItem() instanceof AnimationDebugger debug) {
+            Minecraft.getInstance().setScreen(new AnimationScreen<>(entity, hand, debug.getIndex(stack)));
+        }
     }
 }

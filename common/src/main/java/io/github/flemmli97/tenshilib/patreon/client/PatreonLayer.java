@@ -69,7 +69,7 @@ public class PatreonLayer<T extends Player, M extends EntityModel<T> & HeadedMod
                 }
                 case BACK -> {
                     if (this.getParentModel() instanceof HumanoidModel<?> model) {
-                        if(!model.body.visible)
+                        if (!model.body.visible)
                             return;
                         model.body.translateAndRotate(stack);
                         stack.translate(0, -0.8, 0.8);
