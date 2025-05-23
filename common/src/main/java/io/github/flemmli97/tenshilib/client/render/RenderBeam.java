@@ -73,7 +73,8 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
         matrixStack.pushPose();
         matrixStack.mulPose(Vector3f.YN.rotationDegrees(Mth.lerp(partialTicks, entity.yRotO, entity.getYRot()) + 90));
         matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-Mth.lerp(partialTicks, entity.xRotO, entity.getXRot())));
-        boolean playerView = entity.getOwner() == Minecraft.getInstance().player && Minecraft.getInstance().options.getCameraType() != CameraType.THIRD_PERSON_BACK;
+        boolean playerView = !entity.firstPerson3d(Minecraft.getInstance().player)
+                && Minecraft.getInstance().options.getCameraType() != CameraType.THIRD_PERSON_BACK;
         if (playerView) {
             matrixStack.mulPose(Vector3f.XP.rotationDegrees(30));
             matrixStack.translate(0, -0.1, 0);
