@@ -183,7 +183,7 @@ public class SuggestionEditBox extends EditBox {
     }
 
     private void recalculateSuggestions(String input) {
-        this.suggestions = this.allSuggestions.stream().filter(res -> res.matches(input))
+        this.suggestions = this.allSuggestions.stream().filter(ctx -> ctx.matches(input))
                 .map(SuggestionContent::asString).toArray(String[]::new);
         int sizeY = Math.min(this.suggestions.length, this.limit) * this.lineHeight;
         int y = this.y + (this.top ? -sizeY - this.paddingY : this.getHeight() + this.paddingY);
