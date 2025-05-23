@@ -4,6 +4,7 @@ TenshiLib 1.9.5
 - Rewrite various animation handling
 - Fix math expression parser for edge cases
 - Removed various unused stuff
+- Add a suggestion widget to lib
 
 TenshiLib 1.9.4
 ================
