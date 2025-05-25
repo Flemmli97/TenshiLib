@@ -4,11 +4,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
 import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.client.gui.widget.SuggestionEditBox;
+import io.github.flemmli97.tenshilib.client.render.RenderUtils;
 import io.github.flemmli97.tenshilib.common.network.C2SAnimationDebuggerUpdate;
 import io.github.flemmli97.tenshilib.common.network.NetworkCrossPlat;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -52,16 +52,9 @@ public class AnimationScreen<T extends LivingEntity & IAnimated> extends Screen 
     @Override
     public void render(PoseStack stack, int mouseX, int mouseY, float partialTick) {
         this.fillGradient(stack, this.leftPos, this.topPos, this.leftPos + this.sizeX, this.topPos + this.sizeY, 0xc0101010, 0xc0101010);
-        int posX = 180;
-        int posY = 90;
-        float scale = 1;
-        if (this.entity.getBbWidth() > 1.2) {
-            scale = 2f / this.entity.getBbWidth();
-        }
-        if (this.entity.getBbHeight() > 1.6) {
-            scale = Math.min(scale, 2.4f / this.entity.getBbHeight());
-        }
-        InventoryScreen.renderEntityInInventory(this.leftPos + posX, this.topPos + posY, (int) (32 * scale), this.leftPos + posX - mouseX, this.topPos + (posY - 35) - mouseY, this.entity);
+        int padding = 16;
+        RenderUtils.renderScaledEntityGui(this.leftPos + this.sizeX - padding - (3 * 32), this.topPos + padding,
+                32, 3, 3, mouseX, mouseY, this.entity);
         this.minecraft.font.draw(stack, this.getTitle(), this.leftPos + 16, this.topPos + 16, 0xffffff);
         super.render(stack, mouseX, mouseY, partialTick);
     }

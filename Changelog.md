@@ -1,3 +1,7 @@
+TenshiLib 1.9.6
+================
+- Fix some things with animation gui and suggestion box
+
 TenshiLib 1.9.5
 ================
 - Improve animation interpolation handling
