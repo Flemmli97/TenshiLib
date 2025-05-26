@@ -1,12 +1,12 @@
-package io.github.flemmli97.tenshilib.forge;
+package io.github.flemmli97.tenshilib.neoforge;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
-import io.github.flemmli97.tenshilib.forge.client.events.ClientEvents;
-import io.github.flemmli97.tenshilib.forge.events.CommonEvents;
-import io.github.flemmli97.tenshilib.forge.network.PacketHandler;
-import io.github.flemmli97.tenshilib.forge.platform.patreon.ClientPatreonImpl;
-import io.github.flemmli97.tenshilib.forge.platform.patreon.PatreonImpl;
+import io.github.flemmli97.tenshilib.neoforge.client.events.ClientEvents;
+import io.github.flemmli97.tenshilib.neoforge.events.CommonEvents;
+import io.github.flemmli97.tenshilib.neoforge.network.PacketHandler;
+import io.github.flemmli97.tenshilib.neoforge.platform.patreon.ClientPatreonImpl;
+import io.github.flemmli97.tenshilib.neoforge.platform.patreon.PatreonImpl;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -16,23 +16,23 @@ import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 
 @Mod(value = TenshiLib.MODID)
-public class TenshiLibForge {
+public class TenshiLibNeoForge {
 
-    public TenshiLibForge(IEventBus modBus) {
-        IEventBus forgeBus = NeoForge.EVENT_BUS;
-        modBus.addListener(TenshiLibForge::preInit);
+    public TenshiLibNeoForge(IEventBus modBus) {
+        IEventBus eventBus = NeoForge.EVENT_BUS;
+        modBus.addListener(TenshiLibNeoForge::preInit);
         modBus.addListener(PacketHandler::register);
-        forgeBus.addListener(CommonEvents::disableOffhand);
-        forgeBus.addListener(CommonEvents::disableOffhandBlock);
-        forgeBus.addListener(CommonEvents::onTracking);
+        eventBus.addListener(CommonEvents::disableOffhand);
+        eventBus.addListener(CommonEvents::disableOffhandBlock);
+        eventBus.addListener(CommonEvents::onTracking);
         PatreonImpl.initPatreonData(modBus);
         if (FMLEnvironment.dist == Dist.CLIENT) {
             modBus.addListener(ClientEvents::reloadListener);
             modBus.addListener(ClientEvents::itemColors);
             modBus.addListener(ClientEvents::registerShader);
             ClientPatreonImpl.setup(modBus);
-            forgeBus.addListener(ClientEvents::clickSpecial);
-            forgeBus.addListener(ClientEvents::onEntityRender);
+            eventBus.addListener(ClientEvents::clickSpecial);
+            eventBus.addListener(ClientEvents::onEntityRender);
         }
     }
 

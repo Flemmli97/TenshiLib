@@ -1,7 +1,7 @@
-package io.github.flemmli97.tenshilib.forge.platform;
+package io.github.flemmli97.tenshilib.neoforge.platform;
 
-import io.github.flemmli97.tenshilib.forge.events.AOEAttackEvent;
-import io.github.flemmli97.tenshilib.forge.platform.registry.ForgeRegistryHandler;
+import io.github.flemmli97.tenshilib.neoforge.events.AOEAttackEvent;
+import io.github.flemmli97.tenshilib.neoforge.platform.registry.DeferredRegistryHandler;
 import io.github.flemmli97.tenshilib.platform.EventCalls;
 import io.github.flemmli97.tenshilib.platform.PlatformUtils;
 import io.github.flemmli97.tenshilib.platform.registry.PlatformRegistry;
@@ -21,12 +21,12 @@ public class PlatformUtilsImpl extends PlatformUtils {
 
     @Override
     public <T> PlatformRegistry<T> of(ResourceKey<? extends Registry<T>> key, String modid) {
-        return new ForgeRegistryHandler<>(DeferredRegister.create(key, modid));
+        return new DeferredRegistryHandler<>(DeferredRegister.create(key, modid));
     }
 
     @Override
     public <T> PlatformRegistry<T> customRegistry(ResourceKey<? extends Registry<T>> registryKey, String modid) {
-        return new ForgeRegistryHandler<>(DeferredRegister.create(registryKey, modid));
+        return new DeferredRegistryHandler<>(DeferredRegister.create(registryKey, modid));
     }
 
     @Override
@@ -34,7 +34,7 @@ public class PlatformUtilsImpl extends PlatformUtils {
                                                Consumer<Registry<T>> registryRef) {
         DeferredRegister<T> r = DeferredRegister.create(registryKey, registryKey.location().getNamespace());
         registryRef.accept(r.makeRegistry(b -> b.defaultKey(defaultVal).sync(sync)));
-        return new ForgeRegistryHandler<>(r);
+        return new DeferredRegistryHandler<>(r);
     }
 
     @Override

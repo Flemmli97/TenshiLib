@@ -16,7 +16,7 @@ public interface EventCalls {
 
     EventCalls INSTANCE = InitUtil.getPlatformInstance(EventCalls.class,
             "io.github.flemmli97.tenshilib.fabric.platform.EventCallsImpl",
-            "io.github.flemmli97.tenshilib.forge.platform.EventCallsImpl");
+            "io.github.flemmli97.tenshilib.neoforge.platform.EventCallsImpl");
 
     boolean aoeAttackCall(Player player, ItemStack item, List<Entity> list);
 

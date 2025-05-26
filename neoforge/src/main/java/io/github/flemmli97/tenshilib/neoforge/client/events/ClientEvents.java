@@ -1,4 +1,4 @@
-package io.github.flemmli97.tenshilib.forge.client.events;
+package io.github.flemmli97.tenshilib.neoforge.client.events;
 
 import io.github.flemmli97.tenshilib.client.AnimationManager;
 import io.github.flemmli97.tenshilib.client.ClientHandlers;

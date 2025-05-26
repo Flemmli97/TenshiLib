@@ -1,4 +1,4 @@
-package io.github.flemmli97.tenshilib.forge.platform.registry;
+package io.github.flemmli97.tenshilib.neoforge.platform.registry;
 
 import io.github.flemmli97.tenshilib.platform.registry.RegistryEntrySupplier;
 import net.minecraft.core.Holder;

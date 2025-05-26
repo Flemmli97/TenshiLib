@@ -1,4 +1,4 @@
-package io.github.flemmli97.tenshilib.forge.events;
+package io.github.flemmli97.tenshilib.neoforge.events;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;

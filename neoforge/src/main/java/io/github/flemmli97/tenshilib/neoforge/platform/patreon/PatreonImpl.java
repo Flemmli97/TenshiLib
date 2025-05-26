@@ -1,7 +1,7 @@
-package io.github.flemmli97.tenshilib.forge.platform.patreon;
+package io.github.flemmli97.tenshilib.neoforge.platform.patreon;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
-import io.github.flemmli97.tenshilib.forge.network.PacketHandler;
+import io.github.flemmli97.tenshilib.neoforge.network.PacketHandler;
 import io.github.flemmli97.tenshilib.patreon.PatreonDataManager;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlatform;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlayerSetting;

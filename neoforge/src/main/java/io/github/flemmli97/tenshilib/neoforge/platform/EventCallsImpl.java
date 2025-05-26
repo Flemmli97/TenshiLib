@@ -1,10 +1,10 @@
-package io.github.flemmli97.tenshilib.forge.platform;
+package io.github.flemmli97.tenshilib.neoforge.platform;
 
 import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.common.entity.EntityBeam;
 import io.github.flemmli97.tenshilib.common.network.S2CEntityAnimation;
-import io.github.flemmli97.tenshilib.forge.events.AOEAttackEvent;
-import io.github.flemmli97.tenshilib.forge.network.PacketHandler;
+import io.github.flemmli97.tenshilib.neoforge.events.AOEAttackEvent;
+import io.github.flemmli97.tenshilib.neoforge.network.PacketHandler;
 import io.github.flemmli97.tenshilib.platform.EventCalls;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;

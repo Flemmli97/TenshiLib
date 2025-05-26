@@ -19,7 +19,7 @@ dependencies {
     //Fabric/Loom==========    
     modImplementation("io.github.flemmli97:tenshilib:${minecraft_version}-${mod_version}-${mod_loader}")
     
-    //Forge==========    
+    //NeoForge/Forge==========    
     compile fg.deobf("io.github.flemmli97:tenshilib:${minecraft_version}-${mod_version}-${mod_loader}")
 }
 ```

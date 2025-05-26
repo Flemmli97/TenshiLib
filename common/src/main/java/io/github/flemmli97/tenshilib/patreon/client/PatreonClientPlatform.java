@@ -16,7 +16,7 @@ public interface PatreonClientPlatform {
 
     PatreonClientPlatform INSTANCE = InitUtil.getPlatformInstance(PatreonClientPlatform.class,
             "io.github.flemmli97.tenshilib.fabric.platform.patreon.ClientPatreonImpl",
-            "io.github.flemmli97.tenshilib.forge.platform.patreon.ClientPatreonImpl");
+            "io.github.flemmli97.tenshilib.neoforge.platform.patreon.ClientPatreonImpl");
 
     static void addPatreonButton(Screen screen) {
         if (screen instanceof SkinCustomizationScreen skin) {

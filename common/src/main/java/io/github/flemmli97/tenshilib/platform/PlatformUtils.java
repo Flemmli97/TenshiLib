@@ -21,7 +21,7 @@ public abstract class PlatformUtils {
 
     public static final PlatformUtils INSTANCE = InitUtil.getPlatformInstance(PlatformUtils.class,
             "io.github.flemmli97.tenshilib.fabric.platform.PlatformUtilsImpl",
-            "io.github.flemmli97.tenshilib.forge.platform.PlatformUtilsImpl");
+            "io.github.flemmli97.tenshilib.neoforge.platform.PlatformUtilsImpl");
 
     /**
      * Creates a registry handler for the matching key.
@@ -41,7 +41,7 @@ public abstract class PlatformUtils {
     /**
      * Creates a custom registry.
      * On fabric the registry is created immediately
-     * On forge the registry is created on RegistryEvent.NewRegistry
+     * On (neo)forge the registry is created on RegistryEvent.NewRegistry
      *
      * @param registryRef A callback to the newly created Registry
      */

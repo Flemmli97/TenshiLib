@@ -1,4 +1,4 @@
-package io.github.flemmli97.tenshilib.forge.platform.registry;
+package io.github.flemmli97.tenshilib.neoforge.platform.registry;
 
 import io.github.flemmli97.tenshilib.platform.registry.PlatformRegistry;
 import io.github.flemmli97.tenshilib.platform.registry.RegistryEntrySupplier;
@@ -11,14 +11,14 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public class ForgeRegistryHandler<T> implements PlatformRegistry<T> {
+public class DeferredRegistryHandler<T> implements PlatformRegistry<T> {
 
     private final DeferredRegister<T> deferredRegister;
 
     private final Set<RegistryObjectWrapper<T, ? extends T>> entries = new LinkedHashSet<>();
     private final Set<RegistryObjectWrapper<T, ? extends T>> entriesView = Collections.unmodifiableSet(this.entries);
 
-    public ForgeRegistryHandler(DeferredRegister<T> deferredRegister) {
+    public DeferredRegistryHandler(DeferredRegister<T> deferredRegister) {
         this.deferredRegister = deferredRegister;
     }
 

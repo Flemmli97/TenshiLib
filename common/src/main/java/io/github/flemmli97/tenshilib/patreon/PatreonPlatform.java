@@ -9,7 +9,7 @@ public interface PatreonPlatform {
 
     PatreonPlatform INSTANCE = InitUtil.getPlatformInstance(PatreonPlatform.class,
             "io.github.flemmli97.tenshilib.fabric.platform.patreon.PatreonImpl",
-            "io.github.flemmli97.tenshilib.forge.platform.patreon.PatreonImpl");
+            "io.github.flemmli97.tenshilib.neoforge.platform.patreon.PatreonImpl");
 
     PatreonPlayerSetting playerSettings(Player player);
 

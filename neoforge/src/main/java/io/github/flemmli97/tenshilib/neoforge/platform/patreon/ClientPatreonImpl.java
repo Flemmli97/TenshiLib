@@ -1,4 +1,4 @@
-package io.github.flemmli97.tenshilib.forge.platform.patreon;
+package io.github.flemmli97.tenshilib.neoforge.platform.patreon;
 
 import io.github.flemmli97.tenshilib.patreon.client.PatreonClientPlatform;
 import io.github.flemmli97.tenshilib.patreon.client.PatreonLayer;

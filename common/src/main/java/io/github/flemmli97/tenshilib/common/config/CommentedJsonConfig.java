@@ -22,7 +22,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- * Json config with comments that is syntax wise simliar to setup to the forge config.
+ * Json config with comments that is syntax wise simliar to setup to the (neo)forge config.
  * Used for serialization only.
  * Use the provided builder to create a config instance
  */

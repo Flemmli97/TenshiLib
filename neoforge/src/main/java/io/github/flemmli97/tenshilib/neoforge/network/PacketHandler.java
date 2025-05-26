@@ -1,4 +1,4 @@
-package io.github.flemmli97.tenshilib.forge.network;
+package io.github.flemmli97.tenshilib.neoforge.network;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.common.network.PacketRegistrar;
