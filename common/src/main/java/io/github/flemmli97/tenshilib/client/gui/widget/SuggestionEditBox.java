@@ -11,9 +11,19 @@ import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.function.Consumer;
 
 public class SuggestionEditBox extends EditBox {
+
+    public static final Comparator<ResourceLocation> ID_SORT = (r1, r2) -> {
+        if (r1.getNamespace().equals("minecraft")) {
+            if (r2.getNamespace().equals("minecraft"))
+                return r1.getPath().compareTo(r2.getPath());
+            return -1;
+        }
+        return r1.toString().compareTo(r2.toString());
+    };
 
     private final Font font;
     private final int limit, lineHeight;
@@ -21,7 +31,7 @@ public class SuggestionEditBox extends EditBox {
     private final boolean top;
 
     private int offset;
-    private int current, hovered;
+    private int current;
     private String[] suggestions;
     private Rect2i rect;
     private boolean hidden;
@@ -61,7 +71,7 @@ public class SuggestionEditBox extends EditBox {
     }
 
     public static Collection<SuggestionContent> ofResourceLocation(Collection<ResourceLocation> strings) {
-        return strings.stream().<SuggestionContent>map(res -> new SuggestionContent() {
+        return strings.stream().sorted().<SuggestionContent>map(res -> new SuggestionContent() {
 
             @Override
             public boolean matches(String input) {
