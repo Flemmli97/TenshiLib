@@ -3,6 +3,7 @@ package io.github.flemmli97.tenshilib.api.entity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 public interface IBeamEntity extends OwnableEntity {
 
@@ -16,7 +17,7 @@ public interface IBeamEntity extends OwnableEntity {
 
     float radius();
 
-    default boolean firstPerson3d(Entity entity) {
-        return this.getOwner() == entity;
+    default boolean firstPerson3d(@Nullable Entity entity) {
+        return entity == null || !entity.getUUID().equals(this.getOwnerUUID());
     }
 }

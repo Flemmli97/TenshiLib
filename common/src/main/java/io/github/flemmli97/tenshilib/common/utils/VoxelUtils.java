@@ -12,6 +12,7 @@ public class VoxelUtils {
 
     /**
      * Creates and array of Voxelshapes rotated accordingly
+     *
      * @return Voxelshape array with directions in order of the 2d indices defined in {@link Direction}
      */
     public static VoxelShape[] joinedOrDirs(ShapeBuilder... shapes) {
