@@ -2,6 +2,7 @@ TenshiLib 1.9.6
 ================
 - Fix some things with animation gui and suggestion box
 - Add selection list widget
+- Various other utils
 
 TenshiLib 1.9.5
 ================
