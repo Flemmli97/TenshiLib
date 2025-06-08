@@ -11,6 +11,7 @@ import io.github.flemmli97.tenshilib.patreon.effects.PatreonEffectConfig;
 import io.github.flemmli97.tenshilib.patreon.effects.PatreonEffects;
 import io.github.flemmli97.tenshilib.patreon.pkts.C2SEffectUpdatePkt;
 import io.github.flemmli97.tenshilib.patreon.pkts.C2SRequestUpdateClientPkt;
+import io.github.flemmli97.tenshilib.platform.NetworkCrossPlat;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -73,7 +74,7 @@ public class PatreonGui extends Screen {
         name = CommonComponents.GUI_DONE;
         this.setting = PatreonPlatform.INSTANCE.playerSettings(this.minecraft.player);
         if (this.setting == null) {
-            this.addRenderableWidget(Button.builder(Component.translatable("tenshilib.patreon.save"), button -> PatreonClientPlatform.INSTANCE.sendToServer(new C2SEffectUpdatePkt(this.effect.id(), this.render, this.renderLocation, this.color)))
+            this.addRenderableWidget(Button.builder(Component.translatable("tenshilib.patreon.save"), button -> NetworkCrossPlat.INSTANCE.sendToServer(new C2SEffectUpdatePkt(this.effect.id(), this.render, this.renderLocation, this.color)))
                     .pos(this.width / 2 - 100, this.height / 8 + 24 * 7).size(200, 20).build());
             this.addRenderableWidget(Button.builder(name, button -> this.minecraft.setScreen(this.parent))
                     .pos(this.width / 2 - 100, this.height / 8 + 24 * 8).size(200, 20).build());
@@ -156,7 +157,7 @@ public class PatreonGui extends Screen {
         }
         this.addRenderableWidget(Button.builder(Component.translatable("tenshilib.patreon.save"), button -> {
                     if (this.effect != null)
-                        PatreonClientPlatform.INSTANCE.sendToServer(new C2SEffectUpdatePkt(this.effect.id(), this.render, this.renderLocation, this.color));
+                        NetworkCrossPlat.INSTANCE.sendToServer(new C2SEffectUpdatePkt(this.effect.id(), this.render, this.renderLocation, this.color));
                 })
                 .pos(this.width / 2 - 100, this.height / 8 + yOffset).size(200, 20).build());
         yOffset += 24;
@@ -217,6 +218,6 @@ public class PatreonGui extends Screen {
     public void removed() {
         super.removed();
         if (Minecraft.getInstance().getConnection() != null)
-            PatreonClientPlatform.INSTANCE.sendToServer(C2SRequestUpdateClientPkt.INSTANCE);
+            NetworkCrossPlat.INSTANCE.sendToServer(C2SRequestUpdateClientPkt.INSTANCE);
     }
 }

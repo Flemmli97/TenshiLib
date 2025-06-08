@@ -1,6 +1,6 @@
 package io.github.flemmli97.tenshilib.mixin.dual;
 
-import io.github.flemmli97.tenshilib.api.item.IDualWeapon;
+import io.github.flemmli97.tenshilib.common.item.IDualWeapon;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;

@@ -43,7 +43,7 @@ public class C2SEffectUpdatePkt implements CustomPacketPayload {
         this.color = color;
     }
 
-    public static void handlePacket(C2SEffectUpdatePkt pkt, ServerPlayer player) {
+    public static void handle(C2SEffectUpdatePkt pkt, ServerPlayer player) {
         PatreonPlayerSetting setting = PatreonPlatform.INSTANCE.playerSettings(player);
         int tier = PatreonDataManager.get(player.getUUID().toString()).tier();
         PatreonEffectConfig eff;

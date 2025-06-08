@@ -1,6 +1,6 @@
 package io.github.flemmli97.tenshilib.mixin.dual;
 
-import io.github.flemmli97.tenshilib.api.item.IDualWeapon;
+import io.github.flemmli97.tenshilib.common.item.IDualWeapon;
 import io.github.flemmli97.tenshilib.mixinhelper.MixinUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;

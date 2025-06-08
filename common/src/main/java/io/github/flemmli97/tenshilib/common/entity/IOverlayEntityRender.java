@@ -1,4 +1,4 @@
-package io.github.flemmli97.tenshilib.api.entity;
+package io.github.flemmli97.tenshilib.common.entity;
 
 public interface IOverlayEntityRender {
 

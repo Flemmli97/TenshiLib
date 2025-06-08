@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.mixinhelper;
 
-import io.github.flemmli97.tenshilib.api.item.IAOEWeapon;
-import io.github.flemmli97.tenshilib.api.item.IDualWeapon;
+import io.github.flemmli97.tenshilib.common.item.IAOEWeapon;
+import io.github.flemmli97.tenshilib.common.item.IDualWeapon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectUtil;
@@ -49,6 +49,6 @@ public class MixinUtils {
     public static boolean disableContinueAttack() {
         Minecraft client = Minecraft.getInstance();
         ItemStack main = client.player.getMainHandItem();
-        return (main.getItem() instanceof IAOEWeapon aoe && !aoe.allowBlockAttack(client.player, main));
+        return (main.getItem() instanceof IAOEWeapon aoe && aoe.disableBlockAttack(client.player, main));
     }
 }

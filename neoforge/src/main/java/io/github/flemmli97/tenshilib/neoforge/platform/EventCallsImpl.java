@@ -1,10 +1,7 @@
 package io.github.flemmli97.tenshilib.neoforge.platform;
 
-import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.common.entity.EntityBeam;
-import io.github.flemmli97.tenshilib.common.network.S2CEntityAnimation;
 import io.github.flemmli97.tenshilib.neoforge.events.AOEAttackEvent;
-import io.github.flemmli97.tenshilib.neoforge.network.PacketHandler;
 import io.github.flemmli97.tenshilib.platform.EventCalls;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
@@ -51,10 +48,5 @@ public class EventCallsImpl implements EventCalls {
     @Override
     public boolean beamHitCall(EntityBeam beam, HitResult result) {
         return false;
-    }
-
-    @Override
-    public <T extends Entity & IAnimated> void sendEntityAnimationPacket(T entity) {
-        PacketHandler.sendToTracking(S2CEntityAnimation.create(entity), entity);
     }
 }

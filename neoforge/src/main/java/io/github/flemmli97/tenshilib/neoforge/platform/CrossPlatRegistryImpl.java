@@ -2,8 +2,8 @@ package io.github.flemmli97.tenshilib.neoforge.platform;
 
 import io.github.flemmli97.tenshilib.neoforge.events.AOEAttackEvent;
 import io.github.flemmli97.tenshilib.neoforge.platform.registry.DeferredRegistryHandler;
+import io.github.flemmli97.tenshilib.platform.CrossPlatRegistry;
 import io.github.flemmli97.tenshilib.platform.EventCalls;
-import io.github.flemmli97.tenshilib.platform.PlatformUtils;
 import io.github.flemmli97.tenshilib.platform.registry.PlatformRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -17,7 +17,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class PlatformUtilsImpl extends PlatformUtils {
+public class CrossPlatRegistryImpl extends CrossPlatRegistry {
 
     @Override
     public <T> PlatformRegistry<T> of(ResourceKey<? extends Registry<T>> key, String modid) {

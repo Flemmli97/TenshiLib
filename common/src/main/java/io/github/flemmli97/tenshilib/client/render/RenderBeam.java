@@ -72,7 +72,8 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
         matrixStack.pushPose();
         matrixStack.mulPose(Axis.YN.rotationDegrees(Mth.lerp(partialTicks, entity.yRotO, entity.getYRot()) + 90));
         matrixStack.mulPose(Axis.ZP.rotationDegrees(-Mth.lerp(partialTicks, entity.xRotO, entity.getXRot())));
-        boolean playerView = entity.getOwner() == Minecraft.getInstance().player && Minecraft.getInstance().options.getCameraType() != CameraType.THIRD_PERSON_BACK;
+        boolean playerView = !entity.firstPerson3d(Minecraft.getInstance().cameraEntity)
+                && Minecraft.getInstance().options.getCameraType() != CameraType.THIRD_PERSON_BACK;
         if (playerView) {
             matrixStack.mulPose(Axis.XP.rotationDegrees(30));
             matrixStack.translate(0, -0.1, 0);
@@ -138,6 +139,7 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
 
     protected void render3dBeam(PoseStack stack, VertexConsumer build, float[][] corners, float minX, float length, int animationFrame, float maxFrames, int light) {
         Matrix4f matrix4f = stack.last().pose();
+        PoseStack.Pose last = stack.last();
         float vMin = (animationFrame - 1) / maxFrames;
         float vMax = animationFrame / maxFrames;
         for (int i = 0; i < corners.length; i++) {
@@ -147,7 +149,7 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
                 next = corners[i + 1];
             else
                 next = corners[0];
-            this.buildQuad(matrix4f, stack.last(), build, minX, length, point[0], next[0], point[1], next[1], vMin, vMax, light, true);
+            this.buildQuad(matrix4f, last, build, minX, length, point[0], next[0], point[1], next[1], vMin, vMax, light, true);
         }
     }
 
@@ -185,7 +187,7 @@ public abstract class RenderBeam<T extends Entity & IBeamEntity> extends EntityR
     public abstract ResourcePair endTexture(T entity);
 
     public float widthFunc(T entity) {
-        return (float) (this.radius * (Math.sin(Math.sqrt(entity.tickCount / (float) entity.livingTickMax()) * Math.PI)));
+        return (float) (entity.radius() * 2 * (Math.sin(Math.sqrt(entity.tickCount / (float) entity.livingTickMax()) * Math.PI)));
     }
 
     public float segmentLength() {

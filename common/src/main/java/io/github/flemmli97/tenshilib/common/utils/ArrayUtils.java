@@ -19,7 +19,7 @@ public class ArrayUtils {
             return "";
         if (parser == null)
             parser = T::toString;
-        StringBuilder s = new StringBuilder("" + (t[0] == null ? "" : parser.apply(t[0])));
+        StringBuilder s = new StringBuilder(t[0] == null ? "" : parser.apply(t[0]));
         if (t.length == 1)
             return s.toString();
         for (int i = 1; i < t.length; i++)

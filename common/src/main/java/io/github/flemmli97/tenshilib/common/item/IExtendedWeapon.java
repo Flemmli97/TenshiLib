@@ -1,4 +1,4 @@
-package io.github.flemmli97.tenshilib.api.item;
+package io.github.flemmli97.tenshilib.common.item;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;

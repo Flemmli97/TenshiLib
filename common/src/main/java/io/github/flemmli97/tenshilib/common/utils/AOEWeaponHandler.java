@@ -1,6 +1,6 @@
 package io.github.flemmli97.tenshilib.common.utils;
 
-import io.github.flemmli97.tenshilib.api.item.IAOEWeapon;
+import io.github.flemmli97.tenshilib.common.item.IAOEWeapon;
 import io.github.flemmli97.tenshilib.mixin.LivingMixin;
 import io.github.flemmli97.tenshilib.platform.EventCalls;
 import net.minecraft.core.particles.ParticleTypes;
@@ -23,9 +23,12 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ProjectileDeflection;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.entity.EntityTypeTest;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AOEWeaponHandler {
@@ -33,7 +36,16 @@ public class AOEWeaponHandler {
     public static void onAOEWeaponSwing(Player player, ItemStack stack, IAOEWeapon weapon) {
         if (player.level().isClientSide)
             return;
-        List<Entity> list = RayTraceUtils.getEntities(player, weapon.getRange(player, stack), weapon.getFOV(player, stack));
+        OrientedBoundingBox obb = weapon.attackOBB(player, stack, true);
+        List<Entity> list;
+        if (obb == null) {
+            list = new ArrayList<>();
+            EntityHitResult hit = RayTraceUtils.calculateEntityFromLook(player, weapon.getRange(player, stack));
+            if (hit != null)
+                list.add(hit.getEntity());
+        } else {
+            list = RayTraceUtils.getEntitiesIn(player, obb, EntityTypeTest.forClass(Entity.class), null);
+        }
         if (EventCalls.INSTANCE.aoeAttackCall(player, stack, list) || list.isEmpty())
             return;
         for (int i = 0; i < list.size(); i++)

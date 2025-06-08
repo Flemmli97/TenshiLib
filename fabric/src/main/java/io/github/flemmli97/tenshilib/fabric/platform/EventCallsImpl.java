@@ -1,9 +1,7 @@
 package io.github.flemmli97.tenshilib.fabric.platform;
 
-import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.common.entity.EntityBeam;
 import io.github.flemmli97.tenshilib.fabric.events.AOEAttackEvent;
-import io.github.flemmli97.tenshilib.fabric.network.PacketHandler;
 import io.github.flemmli97.tenshilib.platform.EventCalls;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.world.InteractionHand;
@@ -48,10 +46,5 @@ public class EventCallsImpl implements EventCalls {
     @Override
     public boolean beamHitCall(EntityBeam beam, HitResult result) {
         return false;
-    }
-
-    @Override
-    public <T extends Entity & IAnimated> void sendEntityAnimationPacket(T entity) {
-        PacketHandler.updateAnimationPkt(entity);
     }
 }

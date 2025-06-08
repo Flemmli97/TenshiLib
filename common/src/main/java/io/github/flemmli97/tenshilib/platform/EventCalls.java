@@ -1,6 +1,5 @@
 package io.github.flemmli97.tenshilib.platform;
 
-import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.common.entity.EntityBeam;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
@@ -29,8 +28,6 @@ public interface EventCalls {
     boolean projectileHitCall(Projectile projectile, HitResult result);
 
     boolean beamHitCall(EntityBeam beam, HitResult result);
-
-    <T extends Entity & IAnimated> void sendEntityAnimationPacket(T entity);
 
     interface Func3<A, B, C, D> {
         D apply(A a, B b, C c);

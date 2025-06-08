@@ -2,8 +2,8 @@ package io.github.flemmli97.tenshilib.common.network;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
-import io.github.flemmli97.tenshilib.api.entity.IAnimated;
 import io.github.flemmli97.tenshilib.client.ClientHandlers;
+import io.github.flemmli97.tenshilib.common.entity.IAnimated;
 import io.github.flemmli97.tenshilib.common.utils.ArrayUtils;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -20,48 +20,56 @@ public class S2CEntityAnimation implements CustomPacketPayload {
     public static final StreamCodec<RegistryFriendlyByteBuf, S2CEntityAnimation> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public S2CEntityAnimation decode(RegistryFriendlyByteBuf buf) {
-            return new S2CEntityAnimation(buf.readInt(), buf.readInt());
+            return new S2CEntityAnimation(buf.readInt(), buf.readInt(), buf.readInt(), buf.readInt(), buf.readFloat());
         }
 
         @Override
         public void encode(RegistryFriendlyByteBuf buf, S2CEntityAnimation pkt) {
             buf.writeInt(pkt.entityID);
             buf.writeInt(pkt.animID);
+            buf.writeInt(pkt.startTransition);
+            buf.writeInt(pkt.endTransition);
+            buf.writeFloat(pkt.start);
         }
     };
 
     private final int entityID;
     private final int animID;
+    private final float start;
 
-    private S2CEntityAnimation(int entityID, int animID) {
+    private final int startTransition, endTransition;
+
+    private S2CEntityAnimation(int entityID, int animID, int startTransition, int endTransition, float start) {
         this.entityID = entityID;
         this.animID = animID;
+        this.start = start;
+        this.startTransition = startTransition;
+        this.endTransition = endTransition;
     }
 
-    public static <T extends Entity & IAnimated> S2CEntityAnimation create(T entity) {
-        return new S2CEntityAnimation(entity);
+    public static <T extends Entity & IAnimated> S2CEntityAnimation create(T entity, int startTransition, int endTransition, float start) {
+        return new S2CEntityAnimation(entity, startTransition, endTransition, start);
     }
 
-    private S2CEntityAnimation(Entity e) {
+    private S2CEntityAnimation(Entity e, int startTransition, int endTransition, float start) {
         this.entityID = e.getId();
+        this.start = start;
+        this.startTransition = startTransition;
+        this.endTransition = endTransition;
         IAnimated entity = (IAnimated) e;
         this.animID = Optional.ofNullable(entity.getAnimationHandler().getAnimation())
                 .map(anim -> {
-                    if (anim == AnimatedAction.VANILLA_ATTACK)
-                        return -1;
-                    else {
-                        int i = 0;
-                        for (AnimatedAction a : entity.getAnimationHandler().getAnimations()) {
-                            if (a.getID().equals(anim.getID()))
-                                break;
-                            i++;
-                        }
-                        if (i < entity.getAnimationHandler().getAnimations().length)
-                            return i;
-                        TenshiLib.LOGGER.error("This animation is not registered for {}. Registered animations are {} but set animation is {}", e, ArrayUtils.arrayToString(entity.getAnimationHandler().getAnimations(), AnimatedAction::getID), anim.getID());
-                        return -2;
+                    int i = 0;
+                    for (AnimatedAction a : entity.getAnimationHandler().getAnimations()) {
+                        if (a.getID().equals(anim.getID()))
+                            break;
+                        i++;
                     }
-                }).orElse(-2);
+                    if (i < entity.getAnimationHandler().getAnimations().length)
+                        return i;
+                    TenshiLib.LOGGER.error("This animation is not registered for {}. Registered animations are {} but set animation is {}", e, ArrayUtils.arrayToString(entity.getAnimationHandler().getAnimations(), AnimatedAction::getID), anim.getID());
+                    return -1;
+                }).orElse(-1);
     }
 
     @Override
@@ -70,8 +78,8 @@ public class S2CEntityAnimation implements CustomPacketPayload {
     }
 
     public static class Handler {
-        public static void handlePacket(S2CEntityAnimation pkt, Player player) {
-            ClientHandlers.updateAnim(pkt.entityID, pkt.animID);
+        public static void handle(S2CEntityAnimation pkt, Player player) {
+            ClientHandlers.updateAnim(pkt.entityID, pkt.animID, pkt.startTransition, pkt.endTransition, pkt.start);
         }
     }
 }

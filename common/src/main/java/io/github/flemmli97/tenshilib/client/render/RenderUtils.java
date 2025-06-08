@@ -4,6 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -11,6 +13,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -18,6 +21,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.Random;
 
@@ -190,6 +195,60 @@ public class RenderUtils {
         buffer.addVertex(matrix4f, 0, 0, 0).setColor(builder.red, builder.green, builder.blue, builder.alpha);
         buffer.addVertex(matrix4f, widthHalf, length, 0).setColor(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha);
         buffer.addVertex(matrix4f, -widthHalf, length, 0).setColor(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha);
+    }
+
+    /**
+     * Improved version of {@link InventoryScreen#renderEntityInInventory}.
+     * Automatically scales the entity if its too big
+     *
+     * @param x         Top left x position
+     * @param y         Top left y positon
+     * @param maxWidth  Width in blocks. E.g. width of 1 = entity that are 1 block wide
+     * @param maxHeight Height in blocks
+     */
+    public static void renderScaledEntityGui(GuiGraphics guiGraphics, int x, int y, int scale, float maxWidth, float maxHeight,
+                                             float yOffset, float mouseX, float mouseY, LivingEntity entity) {
+        int sizeX = (int) (maxWidth * scale);
+        int sizeY = (int) (maxHeight * scale);
+        float scaleMult = 1;
+        if (entity.getBbWidth() > maxWidth) {
+            scaleMult = maxWidth / entity.getBbWidth();
+        }
+        if (entity.getBbHeight() > maxHeight) {
+            scaleMult = Math.min(scaleMult, maxHeight / entity.getBbHeight());
+        }
+        renderEntityMouseNoClip(guiGraphics,
+                x, y, x + sizeX, y + sizeY,
+                (int) (scale * scaleMult), yOffset, mouseX, mouseY, entity);
+    }
+
+    private static void renderEntityMouseNoClip(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2, int scale, float yOffset, float mouseX, float mouseY, LivingEntity entity) {
+        float xM = (float) (x1 + x2) / 2.0f;
+        float yM = (float) (y1 + y2) / 2.0f;
+        float yRot = (float) Math.atan((xM - mouseX) / 40.0f);
+        float xRot = (float) Math.atan((yM - mouseY) / 40.0f);
+        Quaternionf quaternionf = new Quaternionf().rotateZ((float) Math.PI);
+        Quaternionf quaternionf2 = new Quaternionf().rotateX(xRot * 20.0f * ((float) Math.PI / 180));
+        quaternionf.mul(quaternionf2);
+        float j = entity.yBodyRot;
+        float k = entity.getYRot();
+        float l = entity.getXRot();
+        float m = entity.yHeadRotO;
+        float n = entity.yHeadRot;
+        entity.yBodyRot = 180.0f + yRot * 20.0f;
+        entity.setYRot(180.0f + yRot * 40.0f);
+        entity.setXRot(-xRot * 20.0f);
+        entity.yHeadRot = entity.getYRot();
+        entity.yHeadRotO = entity.getYRot();
+        float o = entity.getScale();
+        Vector3f vector3f = new Vector3f(0.0f, entity.getBbHeight() / 2.0f + yOffset * o, 0.0f);
+        float p = (float) scale / o;
+        InventoryScreen.renderEntityInInventory(guiGraphics, xM, yM, p, vector3f, quaternionf, quaternionf2, entity);
+        entity.yBodyRot = j;
+        entity.setYRot(k);
+        entity.setXRot(l);
+        entity.yHeadRotO = m;
+        entity.yHeadRot = n;
     }
 
     public static class TextureBuilder {

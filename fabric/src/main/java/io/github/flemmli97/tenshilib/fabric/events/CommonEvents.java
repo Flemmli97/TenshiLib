@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.fabric.events;
 
-import io.github.flemmli97.tenshilib.api.item.IAOEWeapon;
-import io.github.flemmli97.tenshilib.api.item.IDualWeapon;
+import io.github.flemmli97.tenshilib.common.item.IAOEWeapon;
+import io.github.flemmli97.tenshilib.common.item.IDualWeapon;
 import io.github.flemmli97.tenshilib.common.utils.AOEWeaponHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

@@ -3,11 +3,9 @@ package io.github.flemmli97.tenshilib.neoforge.platform.patreon;
 import io.github.flemmli97.tenshilib.patreon.client.PatreonClientPlatform;
 import io.github.flemmli97.tenshilib.patreon.client.PatreonLayer;
 import io.github.flemmli97.tenshilib.patreon.client.PatreonModelProvider;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.resources.PlayerSkin;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
@@ -37,10 +35,5 @@ public class ClientPatreonImpl implements PatreonClientPlatform {
         if (r != null) {
             r.addLayer(new PatreonLayer(r));
         }
-    }
-
-    @Override
-    public void sendToServer(CustomPacketPayload pkt) {
-        Minecraft.getInstance().getConnection().send(pkt);
     }
 }

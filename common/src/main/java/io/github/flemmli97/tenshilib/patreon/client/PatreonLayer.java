@@ -6,6 +6,7 @@ import io.github.flemmli97.tenshilib.patreon.PatreonPlayerSetting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HeadedModel;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
@@ -49,12 +50,34 @@ public class PatreonLayer<T extends Player, M extends EntityModel<T> & HeadedMod
                         -Mth.sin(Mth.DEG_TO_RAD * tick * 5));
             }
             case HATNOARMOR, HAT -> {
+                if (!this.getParentModel().getHead().visible) {
+                    return;
+                }
                 this.getParentModel().getHead().translateAndRotate(stack);
                 stack.translate(0, -2, 0.0);
             }
-            case LEFTSHOULDER -> stack.translate(0.4, entity.isCrouching() ? -1.3 : -1.5, 0.0);
-            case RIGHTSHOULDER -> stack.translate(-0.4, entity.isCrouching() ? -1.3 : -1.5, 0.0);
-            case BACK -> stack.translate(0, entity.isCrouching() ? -0.6 : -0.8, 0.8);
+            case LEFTSHOULDER -> {
+                if (this.getParentModel() instanceof HumanoidModel<?> model && !model.body.visible) {
+                    return;
+                }
+                stack.translate(0.4, entity.isCrouching() ? -1.3 : -1.5, 0.0);
+            }
+            case RIGHTSHOULDER -> {
+                if (this.getParentModel() instanceof HumanoidModel<?> model && !model.body.visible) {
+                    return;
+                }
+                stack.translate(-0.4, entity.isCrouching() ? -1.3 : -1.5, 0.0);
+            }
+            case BACK -> {
+                if (this.getParentModel() instanceof HumanoidModel<?> model) {
+                    if (!model.body.visible)
+                        return;
+                    model.body.translateAndRotate(stack);
+                    stack.translate(0, -0.8, 0.8);
+                } else {
+                    stack.translate(0, entity.isCrouching() ? -0.6 : -0.8, 0.8);
+                }
+            }
         }
         int hexColor = setting.getColor();
         renderer.render(stack, buffer, packedLight, entity, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, hexColor, setting.getRenderLocation());

@@ -14,14 +14,16 @@ import java.util.function.BiConsumer;
 public class PacketRegistrar {
 
     public static void registerServerPackets(ServerPacketRegister register) {
-        register.register(C2SPacketHit.TYPE, C2SPacketHit.STREAM_CODEC, C2SPacketHit::handlePacket);
-        register.register(C2SEffectUpdatePkt.TYPE, C2SEffectUpdatePkt.STREAM_CODEC, C2SEffectUpdatePkt::handlePacket);
-        register.register(C2SRequestUpdateClientPkt.TYPE, C2SRequestUpdateClientPkt.STREAM_CODEC, C2SRequestUpdateClientPkt::handlePacket);
+        register.register(C2SPacketHit.TYPE, C2SPacketHit.STREAM_CODEC, C2SPacketHit::handle);
+        register.register(C2SEffectUpdatePkt.TYPE, C2SEffectUpdatePkt.STREAM_CODEC, C2SEffectUpdatePkt::handle);
+        register.register(C2SRequestUpdateClientPkt.TYPE, C2SRequestUpdateClientPkt.STREAM_CODEC, C2SRequestUpdateClientPkt::handle);
+        register.register(C2SAnimationDebuggerUpdate.TYPE, C2SAnimationDebuggerUpdate.STREAM_CODEC, C2SAnimationDebuggerUpdate::handle);
     }
 
     public static void registerClientPackets(ClientPacketRegister register) {
-        register.register(S2CEntityAnimation.TYPE, S2CEntityAnimation.STREAM_CODEC, S2CEntityAnimation.Handler::handlePacket);
-        register.register(S2CEffectUpdatePkt.TYPE, S2CEffectUpdatePkt.STREAM_CODEC, S2CEffectUpdatePkt.Handler::handlePacket);
+        register.register(S2CEntityAnimation.TYPE, S2CEntityAnimation.STREAM_CODEC, S2CEntityAnimation.Handler::handle);
+        register.register(S2CEffectUpdatePkt.TYPE, S2CEffectUpdatePkt.STREAM_CODEC, S2CEffectUpdatePkt.Handler::handle);
+        register.register(S2CAnimationScreen.TYPE, S2CAnimationScreen.STREAM_CODEC, S2CAnimationScreen.Handler::handle);
     }
 
     public interface ServerPacketRegister {

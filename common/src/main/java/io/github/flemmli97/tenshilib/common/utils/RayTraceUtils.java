@@ -9,6 +9,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -29,32 +30,17 @@ import java.util.function.Predicate;
 
 public class RayTraceUtils {
 
-    /**
-     * Gets a list of entities in a certain fov around the player
-     *
-     * @param reach Radius around the entity
-     * @param aoe   FOV in degrees. 0 means vanilla raytracing. use 1 to have it like vanilla but get multiple entities.
-     */
-    public static List<Entity> getEntities(LivingEntity entity, float reach, float aoe) {
-        return getEntities(entity, reach, aoe, null);
+    public static List<Entity> getEntitiesIn(LivingEntity entity, OrientedBoundingBox obb, Predicate<Entity> pred) {
+        return getEntitiesIn(entity, obb, false, EntityTypeTest.forClass(Entity.class), pred);
     }
 
-    public static List<Entity> getEntities(LivingEntity entity, float reach, float aoe, Predicate<Entity> pred) {
-        return getEntitiesIn(entity, entity.position().add(0, entity.getEyeHeight(), 0), entity.getViewVector(1), reach,
-                aoe, pred);
+    public static <T extends Entity> List<T> getEntitiesIn(LivingEntity entity, OrientedBoundingBox obb, EntityTypeTest<Entity, T> typeTest, Predicate<T> pred) {
+        return getEntitiesIn(entity, obb, false, typeTest, pred);
     }
 
-    public static List<Entity> getEntitiesIgnorePitch(LivingEntity entity, float reach, float aoe, Predicate<Entity> pred) {
-        return getEntitiesIn(entity, entity.position().add(0, 0.1, 0), Vec3.directionFromRotation(0, entity.getViewYRot(1)), reach,
-                aoe, pred);
-    }
-
-    public static List<Entity> getEntitiesIn(LivingEntity entity, Vec3 pos, Vec3 look, float reach,
-                                             float aoe, Predicate<Entity> pred) {
-        CircleSector circ = new CircleSector(pos, look, reach, aoe, entity);
-        return entity.level().getEntities(entity, entity.getBoundingBox().inflate(reach + 1),
-                t -> t != entity && (pred == null || pred.test(t)) && !t.isAlliedTo(entity) && t.isPickable()
-                        && circ.intersects(t.level(), t.getBoundingBox().inflate(0.15, t.getBbHeight() <= 0.3 ? t.getBbHeight() : 0.15, 0.15)));
+    public static <T extends Entity> List<T> getEntitiesIn(LivingEntity entity, OrientedBoundingBox obb, boolean ignoreBlocks, EntityTypeTest<Entity, T> typeTest, Predicate<T> pred) {
+        return obb.intersectingEntities(entity.level(), entity, ignoreBlocks, typeTest,
+                t -> t != entity && (pred == null || pred.test(t)) && !t.isAlliedTo(entity) && t.isPickable());
     }
 
     public static EntityHitResult calculateEntityFromLook(LivingEntity entity, float reach) {
@@ -106,6 +92,8 @@ public class RayTraceUtils {
 
     public static HitResult entityRayTrace(Entity e, float range, ClipContext.Block blockMode, ClipContext.Fluid fluidMode,
                                            boolean includeEntities, boolean getEntityHitVec, @Nullable Predicate<Entity> pred) {
+        if (pred == null)
+            pred = entity -> true;
         Vec3 posEye = e.getEyePosition(1);
         Vec3 dir = e.getLookAngle().scale(range);
         Vec3 lookPos = posEye.add(dir);
@@ -118,7 +106,7 @@ public class RayTraceUtils {
             if (getEntityHitVec)
                 entityHitResult = rayTraceEntities(e.level(), e, posEye, lookPos, e.getBoundingBox().expandTowards(dir).inflate(1.0D), pred, ent -> 0.3f);
             else
-                entityHitResult = ProjectileUtil.getEntityHitResult(e.level(), e, posEye, lookPos, e.getBoundingBox().expandTowards(dir).inflate(1.0D), pred == null ? entity -> true : pred);
+                entityHitResult = ProjectileUtil.getEntityHitResult(e.level(), e, posEye, lookPos, e.getBoundingBox().expandTowards(dir).inflate(1.0D), pred);
 
             if (entityHitResult != null) {
                 raytraceresult = entityHitResult;

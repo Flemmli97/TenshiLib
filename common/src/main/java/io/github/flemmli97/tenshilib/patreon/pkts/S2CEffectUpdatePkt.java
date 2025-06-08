@@ -36,7 +36,7 @@ public class S2CEffectUpdatePkt extends C2SEffectUpdatePkt {
     }
 
     public static class Handler {
-        public static void handlePacket(S2CEffectUpdatePkt pkt, Player player) {
+        public static void handle(S2CEffectUpdatePkt pkt, Player player) {
             if (pkt.entityID != player.getId()) {
                 Entity e = player.level().getEntity(pkt.entityID);
                 if (e instanceof Player)

@@ -2,7 +2,6 @@ package io.github.flemmli97.tenshilib.patreon.effects;
 
 import io.github.flemmli97.tenshilib.common.utils.RayTraceUtils;
 import io.github.flemmli97.tenshilib.patreon.RenderLocation;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.level.ServerPlayer;
@@ -32,8 +31,6 @@ public class ParticleEffect extends PatreonEffectConfig {
 
     @Override
     public void tick(Player player) {
-        GameRenderer r;
-
         if (!(player instanceof ServerPlayer serverPlayer))
             return;
         for (int i = 0; i < this.particles.length; i++) {

@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.common.entity;
 
 import io.github.flemmli97.tenshilib.api.entity.IBeamEntity;
-import io.github.flemmli97.tenshilib.common.utils.MathUtils;
+import io.github.flemmli97.tenshilib.common.utils.OrientedBoundingBox;
 import io.github.flemmli97.tenshilib.common.utils.RayTraceUtils;
 import io.github.flemmli97.tenshilib.platform.EventCalls;
 import net.minecraft.nbt.CompoundTag;
@@ -10,7 +10,6 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
@@ -19,6 +18,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,15 +27,14 @@ import java.util.function.Predicate;
 
 public abstract class EntityBeam extends Entity implements IBeamEntity {
 
-    private LivingEntity shooter;
+    protected static final EntityDataAccessor<Optional<UUID>> SHOOTER_UUID = SynchedEntityData.defineId(EntityBeam.class, EntityDataSerializers.OPTIONAL_UUID);
+
+    private Entity shooter;
     protected int livingTicks;
-    protected int coolDown;
     protected HitResult hit;
     protected Vec3 hitVec;
 
-    protected static final EntityDataAccessor<Optional<UUID>> SHOOTER_UUID = SynchedEntityData.defineId(EntityBeam.class, EntityDataSerializers.OPTIONAL_UUID);
-
-    protected final Predicate<Entity> notShooter = (entity) -> entity != EntityBeam.this.getOwner() && EntitySelector.NO_SPECTATORS.test(entity) && entity.isPickable();
+    protected OrientedBoundingBox hitObb;
 
     public EntityBeam(EntityType<? extends EntityBeam> type, Level world) {
         super(type, world);
@@ -89,11 +88,9 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         return 32;
     }
 
-    /**
-     * Doesnt work properly yet
-     */
+    @Override
     public float radius() {
-        return 0;
+        return 1;
     }
 
     public boolean piercing() {
@@ -134,6 +131,12 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         builder.define(SHOOTER_UUID, Optional.empty());
     }
 
+    public void updateHitDetectBox() {
+        double dist = this.hitVec != null ? this.hitVec.subtract(this.position()).length() : 0;
+        this.hitObb = new OrientedBoundingBox(OrientedBoundingBox.baseBox(this.radius() * 2, this.radius() * 2, dist + 1.5),
+                this.getYRot(), -this.getXRot(), this.position());
+    }
+
     @Override
     public void tick() {
         this.updateYawPitch();
@@ -144,22 +147,30 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
                 Vec3 dir = this.hitVec.subtract(this.position()).normalize();
                 this.hitVec = this.hitVec.subtract(dir.scale(this.radius() * 0.3));
             }
+            this.updateHitDetectBox();
         }
         super.tick();
         this.livingTicks++;
         if (!this.level().isClientSide) {
-            if (this.livingTicks >= this.livingTickMax())
+            if (this.livingTicks > this.livingTickMax()) {
                 this.remove(RemovalReason.KILLED);
-            if (this.hit != null && --this.coolDown <= 0 && this.isAlive()) {
+                return;
+            }
+            if (this.hit != null && this.canStartDamage() && this.isAlive()) {
                 List<Entity> list = this.level().getEntities(this,
                         new AABB(this.getX(), this.getY(), this.getZ(), this.hitVec.x, this.hitVec.y, this.hitVec.z).inflate(1 + this.radius()));
-                Vec3 pos = this.position();
+                Predicate<AABB> collisionCheck = aabb -> {
+                    if (this.radius() == 0) {
+                        Optional<Vec3> ray = aabb.clip(this.position(), this.hitVec);
+                        return ray.isPresent() || aabb.contains(this.position());
+                    }
+                    return this.hitObb.intersects(aabb);
+                };
                 for (Entity entity : list) {
-                    if (!entity.equals(this.getOwner()) && !EntityUtil.isSameMultipart(entity, this.getOwner()) && this.check(entity, pos, this.hitVec)) {
+                    if (!entity.equals(this.getOwner()) && this.canHitEntity(entity) && this.check(entity, collisionCheck)) {
                         EntityHitResult raytraceresult = new EntityHitResult(entity);
                         if (!EventCalls.INSTANCE.beamHitCall(this, raytraceresult)) {
                             this.onImpact(raytraceresult);
-                            this.coolDown = this.attackCooldown();
                             if (!this.piercing())
                                 return;
                         }
@@ -169,24 +180,26 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         }
     }
 
-    public HitResult getHitRay() {
-        return RayTraceUtils.entityRayTrace(this, this.getRange(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,
-                !this.piercing(), true, this.notShooter);
+    protected boolean canHitEntity(Entity target) {
+        if (target.isSpectator() || !target.isAlive() || !target.isPickable()) {
+            return false;
+        }
+        Entity entity = this.getOwner();
+        if (entity == null)
+            return true;
+        return target != entity && !EntityUtil.isSameMultipart(target, entity) && !entity.isPassengerOfSameVehicle(target);
     }
 
-    protected boolean check(Entity e, Vec3 from, Vec3 to) {
+    public HitResult getHitRay() {
+        return RayTraceUtils.entityRayTrace(this, this.getRange(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,
+                !this.piercing(), true, this::canHitEntity);
+    }
+
+    protected boolean check(Entity e, Predicate<AABB> intersects) {
         if (e.isSpectator() || !e.isAlive() || !e.isPickable())
             return false;
-        AABB aabb = e.getBoundingBox().inflate(this.radius() + 0.3);
-        Optional<Vec3> ray = aabb.clip(from, to);
-        if (ray.isEmpty() && !aabb.contains(this.position()))
-            return false;
-        if (this.radius() == 0)
-            return true;
-        double dist = MathUtils.distTo(e, from, to);
-        Vec3 dir = to.subtract(from).normalize().scale(0.1);
-        double maxdist = this.radius() + e.getBbWidth() + 0.3;
-        return dist <= maxdist * maxdist && MathUtils.isInFront(e.position(), from, dir);
+        AABB aabb = e.getBoundingBox();
+        return intersects.test(aabb);
     }
 
     public abstract void onImpact(EntityHitResult result);
@@ -195,8 +208,8 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         return this.livingTicks;
     }
 
-    public int attackCooldown() {
-        return 20;
+    public boolean canStartDamage() {
+        return (this.livingTicks - 1) % 20 == 0;
     }
 
     @Override
@@ -213,17 +226,17 @@ public abstract class EntityBeam extends Entity implements IBeamEntity {
         compound.putInt("LivingTicks", this.livingTicks);
     }
 
-    @Override
     public UUID getOwnerUUID() {
         return this.entityData.get(SHOOTER_UUID).orElse(null);
     }
 
     @Override
-    public LivingEntity getOwner() {
+    @Nullable
+    public Entity getOwner() {
         if (this.shooter != null && !this.shooter.isRemoved()) {
             return this.shooter;
         }
-        this.entityData.get(SHOOTER_UUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(LivingEntity.class, this.level(), uuid));
+        this.entityData.get(SHOOTER_UUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(Entity.class, this.level(), uuid));
         return this.shooter;
     }
 }

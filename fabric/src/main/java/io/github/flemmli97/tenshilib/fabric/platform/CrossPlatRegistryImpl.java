@@ -2,8 +2,8 @@ package io.github.flemmli97.tenshilib.fabric.platform;
 
 import com.mojang.serialization.Lifecycle;
 import io.github.flemmli97.tenshilib.fabric.events.AOEAttackEvent;
+import io.github.flemmli97.tenshilib.platform.CrossPlatRegistry;
 import io.github.flemmli97.tenshilib.platform.EventCalls;
-import io.github.flemmli97.tenshilib.platform.PlatformUtils;
 import io.github.flemmli97.tenshilib.platform.registry.PlatformRegistry;
 import io.github.flemmli97.tenshilib.platform.registry.VanillaRegistryHandler;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
@@ -20,7 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class PlatformUtilsImpl extends PlatformUtils {
+public class CrossPlatRegistryImpl extends CrossPlatRegistry {
 
     @Override
     public <T> PlatformRegistry<T> customRegistry(ResourceKey<? extends Registry<T>> registryKey, String modid) {

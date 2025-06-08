@@ -1,8 +1,8 @@
 package io.github.flemmli97.tenshilib.common.network;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
-import io.github.flemmli97.tenshilib.api.item.IAOEWeapon;
-import io.github.flemmli97.tenshilib.api.item.IExtendedWeapon;
+import io.github.flemmli97.tenshilib.common.item.IAOEWeapon;
+import io.github.flemmli97.tenshilib.common.item.IExtendedWeapon;
 import io.github.flemmli97.tenshilib.common.utils.AOEWeaponHandler;
 import io.github.flemmli97.tenshilib.common.utils.RayTraceUtils;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -34,7 +34,7 @@ public class C2SPacketHit implements CustomPacketPayload {
         this.type = type;
     }
 
-    public static void handlePacket(C2SPacketHit pkt, ServerPlayer player) {
+    public static void handle(C2SPacketHit pkt, ServerPlayer player) {
         ItemStack stack = player.getMainHandItem();
         if (pkt.type == HitType.EXT && stack.getItem() instanceof IExtendedWeapon item && item.onServerSwing(player, stack)) {
             EntityHitResult res = RayTraceUtils.calculateEntityFromLook(player, item.getRange(player, stack));

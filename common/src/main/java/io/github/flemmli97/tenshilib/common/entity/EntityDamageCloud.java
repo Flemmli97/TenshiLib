@@ -7,23 +7,24 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.TraceableEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public abstract class EntityDamageCloud extends Entity implements OwnableEntity {
-
-    private LivingEntity shooter;
-
-    protected int livingTicks;
-    private int attackedEntities = 0;
+public abstract class EntityDamageCloud extends Entity implements TraceableEntity {
 
     protected static final EntityDataAccessor<Optional<UUID>> SHOOTER_UUID = SynchedEntityData.defineId(EntityDamageCloud.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Float> RADIUS = SynchedEntityData.defineId(EntityDamageCloud.class, EntityDataSerializers.FLOAT);
+
+    private Entity shooter;
+
+    protected int livingTicks;
+    private int attackedEntities = 0;
 
     public EntityDamageCloud(EntityType<? extends EntityDamageCloud> type, Level world) {
         super(type, world);
@@ -66,7 +67,7 @@ public abstract class EntityDamageCloud extends Entity implements OwnableEntity 
     }
 
     public boolean canStartDamage() {
-        return this.livingTicks % 5 == 0;
+        return (this.livingTicks - 1) % 5 == 0;
     }
 
     @Override
@@ -98,8 +99,10 @@ public abstract class EntityDamageCloud extends Entity implements OwnableEntity 
         super.tick();
         this.livingTicks++;
         if (!this.level().isClientSide) {
-            if (this.livingTicks > this.livingTickMax())
+            if (this.livingTicks > this.livingTickMax()) {
                 this.remove(RemovalReason.KILLED);
+                return;
+            }
             float radius = this.getRadius();
             if (radius < this.maxRadius()) {
                 this.setRadius(radius + this.radiusIncrease());
@@ -120,8 +123,16 @@ public abstract class EntityDamageCloud extends Entity implements OwnableEntity 
         }
     }
 
-    protected boolean canHit(LivingEntity entity) {
-        return this.getOwner() == null || (!this.getOwner().isPassengerOfSameVehicle(entity) && ((this.canHitShooter() && this.tickCount > 2) || !entity.equals(this.getOwner())));
+    protected boolean canHit(LivingEntity target) {
+        if (target.isSpectator() || !target.isAlive() || !target.isPickable()) {
+            return false;
+        }
+        Entity entity = this.getOwner();
+        if (entity == null)
+            return true;
+        if (EntityUtil.isSameMultipart(target, this.getOwner()))
+            return false;
+        return !target.equals(this.getOwner()) || !entity.isPassengerOfSameVehicle(target) || (this.canHitShooter() && this.tickCount >= 3);
     }
 
     protected abstract boolean damageEntity(LivingEntity target);
@@ -154,15 +165,15 @@ public abstract class EntityDamageCloud extends Entity implements OwnableEntity 
     }
 
     @Override
-    public LivingEntity getOwner() {
+    @Nullable
+    public Entity getOwner() {
         if (this.shooter != null && !this.shooter.isRemoved()) {
             return this.shooter;
         }
-        this.entityData.get(SHOOTER_UUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(LivingEntity.class, this.level(), uuid));
+        this.entityData.get(SHOOTER_UUID).ifPresent(uuid -> this.shooter = EntityUtil.findFromUUID(Entity.class, this.level(), uuid));
         return this.shooter;
     }
 
-    @Override
     public UUID getOwnerUUID() {
         return this.entityData.get(SHOOTER_UUID).orElse(null);
     }

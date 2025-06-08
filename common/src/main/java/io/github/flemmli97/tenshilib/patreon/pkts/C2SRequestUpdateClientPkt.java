@@ -17,7 +17,7 @@ public class C2SRequestUpdateClientPkt implements CustomPacketPayload {
     private C2SRequestUpdateClientPkt() {
     }
 
-    public static void handlePacket(C2SRequestUpdateClientPkt pkt, ServerPlayer player) {
+    public static void handle(C2SRequestUpdateClientPkt pkt, ServerPlayer player) {
         PatreonPlatform.INSTANCE.sendToClient(player, player);
     }
 
