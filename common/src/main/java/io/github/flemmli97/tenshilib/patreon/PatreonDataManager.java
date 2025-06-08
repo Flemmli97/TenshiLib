@@ -34,7 +34,7 @@ public class PatreonDataManager {
                     reader.close();
                 } catch (IOException e) {
                     TenshiLib.LOGGER.error("Couldn't get patreon file");
-                    e.printStackTrace();
+                    TenshiLib.LOGGER.error(e);
                 }
                 if (arr != null) {
                     PLAYERS = new HashMap<>();

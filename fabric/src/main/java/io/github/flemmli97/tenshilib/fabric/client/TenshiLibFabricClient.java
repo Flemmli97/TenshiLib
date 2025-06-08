@@ -2,7 +2,7 @@ package io.github.flemmli97.tenshilib.fabric.client;
 
 import io.github.flemmli97.tenshilib.client.TenshilibShaders;
 import io.github.flemmli97.tenshilib.fabric.client.events.ClientEvents;
-import io.github.flemmli97.tenshilib.fabric.platform.patreon.ClientPatreonImpl;
+import io.github.flemmli97.tenshilib.fabric.loader.patreon.FabricPatreonClientUtil;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -14,7 +14,7 @@ public class TenshiLibFabricClient implements ClientModInitializer {
         ClientEvents.itemColors();
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new AnimReloader());
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new RiderLayerReloader());
-        ClientPatreonImpl.setup();
+        FabricPatreonClientUtil.setup();
         CoreShaderRegistrationCallback.EVENT.register(reg -> TenshilibShaders.registerShader(reg::register));
     }
 }

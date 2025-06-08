@@ -1,6 +1,6 @@
 package io.github.flemmli97.tenshilib.mixin.dual;
 
-import io.github.flemmli97.tenshilib.mixinhelper.ILastHand;
+import io.github.flemmli97.tenshilib.mixinhelper.LastSwungHand;
 import io.github.flemmli97.tenshilib.mixinhelper.OffHandStrength;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -25,19 +25,19 @@ public abstract class PlayerMixin implements OffHandStrength {
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;resetAttackStrengthTicker()V"))
     private void onSwapItem(CallbackInfo info) {
         this.attackStrengthOffhand = 0;
-        ((ILastHand) this).setLastSwungHand(InteractionHand.OFF_HAND);
+        ((LastSwungHand) this).tenshilib$SetLastSwungHand(InteractionHand.OFF_HAND);
     }
 
     @Inject(method = "resetAttackStrengthTicker", at = @At(value = "HEAD"), cancellable = true)
     private void resetOffhand(CallbackInfo info) {
-        if (((ILastHand) this).lastSwungHand() == InteractionHand.MAIN_HAND) {
+        if (((LastSwungHand) this).tenshilib$lastSwungHand() == InteractionHand.MAIN_HAND) {
             this.attackStrengthOffhand = 0;
             info.cancel();
         }
     }
 
     @Override
-    public float getOffhandStrengthScale(float f) {
+    public float tenshilib$GetOffhandStrengthScale(float f) {
         return Mth.clamp(((float) this.attackStrengthOffhand + f) / ((Player) (Object) this).getCurrentItemAttackStrengthDelay(), 0.0F, 1.0F);
     }
 }

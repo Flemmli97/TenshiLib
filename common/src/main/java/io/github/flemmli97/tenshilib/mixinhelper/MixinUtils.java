@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.mixinhelper;
 
-import io.github.flemmli97.tenshilib.common.item.IAOEWeapon;
-import io.github.flemmli97.tenshilib.common.item.IDualWeapon;
+import io.github.flemmli97.tenshilib.common.item.AOEWeapon;
+import io.github.flemmli97.tenshilib.common.item.DualWeapon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectUtil;
@@ -16,7 +16,7 @@ public class MixinUtils {
 
     public static InteractionHand get(LivingEntity entity, InteractionHand hand, InteractionHand prevSwungHand, Consumer<InteractionHand> update) {
         if (entity.level().isClientSide && hand == InteractionHand.MAIN_HAND) {
-            if (entity.getMainHandItem().getItem() instanceof IDualWeapon) {
+            if (entity.getMainHandItem().getItem() instanceof DualWeapon) {
                 if (!entity.swinging || entity.swingTime >= getCurrentSwingDuration(entity) / 2 || entity.swingTime < 0) {
                     InteractionHand newHand = prevSwungHand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
                     update.accept(newHand);
@@ -40,15 +40,15 @@ public class MixinUtils {
     }
 
     public static float offHandHeight(Player player, float val, float offHandHeight) {
-        if (!(player.getMainHandItem().getItem() instanceof IDualWeapon) || (val + offHandHeight) == 0)
+        if (!(player.getMainHandItem().getItem() instanceof DualWeapon) || (val + offHandHeight) == 0)
             return val;
-        float strength = ((OffHandStrength) player).getOffhandStrengthScale(1);
+        float strength = ((OffHandStrength) player).tenshilib$GetOffhandStrengthScale(1);
         return strength * strength * strength - offHandHeight;
     }
 
     public static boolean disableContinueAttack() {
         Minecraft client = Minecraft.getInstance();
         ItemStack main = client.player.getMainHandItem();
-        return (main.getItem() instanceof IAOEWeapon aoe && aoe.disableBlockAttack(client.player, main));
+        return (main.getItem() instanceof AOEWeapon aoe && aoe.disableBlockAttack(client.player, main));
     }
 }

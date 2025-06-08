@@ -1,6 +1,6 @@
 package io.github.flemmli97.tenshilib.common.entity.ai.animated.impl;
 
-import io.github.flemmli97.tenshilib.common.entity.IAnimated;
+import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.ActionRun;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.ActionStart;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.AnimatedAttackGoal;
@@ -14,7 +14,7 @@ import net.minecraft.world.entity.PathfinderMob;
  *
  * @param <T>
  */
-public class TimedWrappedRunner<T extends PathfinderMob & IAnimated> implements ActionStart<T> {
+public class TimedWrappedRunner<T extends PathfinderMob & AnimatedEntity> implements ActionStart<T> {
 
     private final GoalAttackAction.IntProvider<T> timeout, duration;
     private final ActionRun<T> runner;

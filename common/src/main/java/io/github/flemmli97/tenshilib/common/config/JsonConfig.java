@@ -39,7 +39,7 @@ public class JsonConfig<T> {
                     this.save();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                TenshiLib.LOGGER.error(e);
             }
         }
         this.load();
@@ -57,7 +57,7 @@ public class JsonConfig<T> {
                     Files.copy(defaultConfig, file);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                TenshiLib.LOGGER.error(e);
             }
         }
         this.load();
@@ -121,7 +121,7 @@ public class JsonConfig<T> {
         } catch (IllegalStateException | JsonSyntaxException e) {
             try {
                 TenshiLib.LOGGER.error("Json config doesn't match expected config. Creating a backup. This is probably caused either by a config update or malformed json.");
-                e.printStackTrace();
+                TenshiLib.LOGGER.error(e);
                 int back = 0;
                 String file = this.file.getFileName().toString() + "_back";
                 while (Files.exists(this.file.getParent().resolve(file))) {
@@ -130,10 +130,10 @@ public class JsonConfig<T> {
                 }
                 Files.copy(this.file, this.file.getParent().resolve(file));
             } catch (IOException ex) {
-                ex.printStackTrace();
+                TenshiLib.LOGGER.error(ex);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            TenshiLib.LOGGER.error(e);
         }
         this.save();
     }
@@ -147,7 +147,7 @@ public class JsonConfig<T> {
                 this.gson.toJson(this.element, writer);
             writer.close();
         } catch (JsonIOException | IOException e) {
-            e.printStackTrace();
+            TenshiLib.LOGGER.error(e);
         }
     }
 }

@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.fabric.mixin;
 
 
-import io.github.flemmli97.tenshilib.patreon.PatreonPlatform;
+import io.github.flemmli97.tenshilib.patreon.TenshiLibPatreonPlatform;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -25,6 +25,6 @@ public abstract class TrackingMixin {
     @Inject(method = "addPairing", at = @At("RETURN"))
     private void onStartTracking(ServerPlayer player, CallbackInfo ci) {
         if (this.entity instanceof ServerPlayer target)
-            PatreonPlatform.INSTANCE.sendToClient(player, target);
+            TenshiLibPatreonPlatform.INSTANCE.sendToClient(player, target);
     }
 }

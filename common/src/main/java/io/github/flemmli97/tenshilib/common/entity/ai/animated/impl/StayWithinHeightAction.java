@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.common.entity.ai.animated.impl;
 
-import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
-import io.github.flemmli97.tenshilib.common.entity.IAnimated;
+import io.github.flemmli97.tenshilib.common.entity.AnimatedAction;
+import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.ActionRun;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.AnimatedAttackGoal;
 import net.minecraft.world.entity.LivingEntity;
@@ -10,7 +10,7 @@ import net.minecraft.world.entity.PathfinderMob;
 /**
  * Assumes the entity floats
  */
-public class StayWithinHeightAction<T extends PathfinderMob & IAnimated> implements ActionRun<T> {
+public class StayWithinHeightAction<T extends PathfinderMob & AnimatedEntity> implements ActionRun<T> {
 
     private final Double min, max;
     private final ActionRun<T> other;

@@ -1,6 +1,6 @@
 package io.github.flemmli97.tenshilib.common.entity.ai.animated;
 
-import io.github.flemmli97.tenshilib.common.entity.IAnimated;
+import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 
@@ -9,7 +9,7 @@ import net.minecraft.world.entity.PathfinderMob;
  *
  * @param <T>
  */
-public class IdleAction<T extends PathfinderMob & IAnimated> {
+public class IdleAction<T extends PathfinderMob & AnimatedEntity> {
 
     public final ActionRun.Factory<T> runner;
     private Condition<T> condition = (executor, target) -> true;
@@ -37,7 +37,7 @@ public class IdleAction<T extends PathfinderMob & IAnimated> {
         return this.duration;
     }
 
-    public interface Condition<T extends PathfinderMob & IAnimated> {
+    public interface Condition<T extends PathfinderMob & AnimatedEntity> {
 
         boolean test(AnimatedAttackGoal<T> goal, LivingEntity target);
 

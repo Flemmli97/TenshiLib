@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.mixin.dual;
 
-import io.github.flemmli97.tenshilib.common.item.IDualWeapon;
-import io.github.flemmli97.tenshilib.mixinhelper.ILastHand;
+import io.github.flemmli97.tenshilib.common.item.DualWeapon;
+import io.github.flemmli97.tenshilib.mixinhelper.LastSwungHand;
 import io.github.flemmli97.tenshilib.mixinhelper.MixinUtils;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
@@ -14,14 +14,14 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
-public abstract class LivingEntityMixin implements ILastHand {
+public abstract class LivingEntityMixin implements LastSwungHand {
 
     @Unique
     private InteractionHand prevSwungHand = InteractionHand.OFF_HAND;
 
     @Inject(method = "getOffhandItem", at = @At(value = "HEAD"), cancellable = true)
     private void offhandItem(CallbackInfoReturnable<ItemStack> info) {
-        if (((LivingEntity) (Object) this).level().isClientSide && ((LivingEntity) (Object) this).getMainHandItem().getItem() instanceof IDualWeapon dual) {
+        if (((LivingEntity) (Object) this).level().isClientSide && ((LivingEntity) (Object) this).getMainHandItem().getItem() instanceof DualWeapon dual) {
             info.setReturnValue(dual.offHandStack(((LivingEntity) (Object) this)));
             info.cancel();
         }
@@ -29,7 +29,7 @@ public abstract class LivingEntityMixin implements ILastHand {
 
     @Inject(method = "getItemInHand", at = @At(value = "HEAD"), cancellable = true)
     private void offhandItemGeneric(InteractionHand hand, CallbackInfoReturnable<ItemStack> info) {
-        if (hand == InteractionHand.OFF_HAND && ((LivingEntity) (Object) this).level().isClientSide && ((LivingEntity) (Object) this).getMainHandItem().getItem() instanceof IDualWeapon dual) {
+        if (hand == InteractionHand.OFF_HAND && ((LivingEntity) (Object) this).level().isClientSide && ((LivingEntity) (Object) this).getMainHandItem().getItem() instanceof DualWeapon dual) {
             info.setReturnValue(dual.offHandStack(((LivingEntity) (Object) this)));
             info.cancel();
         }
@@ -41,12 +41,12 @@ public abstract class LivingEntityMixin implements ILastHand {
     }
 
     @Override
-    public InteractionHand lastSwungHand() {
+    public InteractionHand tenshilib$lastSwungHand() {
         return this.prevSwungHand;
     }
 
     @Override
-    public void setLastSwungHand(InteractionHand hand) {
+    public void tenshilib$SetLastSwungHand(InteractionHand hand) {
         this.prevSwungHand = hand;
     }
 }

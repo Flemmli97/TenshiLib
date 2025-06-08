@@ -21,16 +21,16 @@ public class ColoredParticle extends TextureSheetParticle {
      */
     protected int textureSizeX = 16, textureSizeY = 16;
 
-    public ColoredParticle(ClientLevel world, double x, double y, double z, double motionX, double motionY, double motionZ,
+    public ColoredParticle(ClientLevel level, double x, double y, double z, double motionX, double motionY, double motionZ,
                            ColoredParticleData colorData, SpriteSet sprite, int maxAge, float minAgeRand, float maxAgeRand,
                            boolean collide, boolean randomMovements, boolean gravity) {
-        super(world, x, y, z);
+        super(level, x, y, z);
         this.xd = motionX;
         this.yd = motionY;
         this.zd = motionZ;
         this.setColor(colorData.getRed(), colorData.getGreen(), colorData.getBlue());
         this.setAlpha(colorData.getAlpha());
-        float mult = Mth.nextFloat(world.random, minAgeRand, maxAgeRand);
+        float mult = Mth.nextFloat(level.random, minAgeRand, maxAgeRand);
         this.lifetime = (int) (maxAge * mult);
         this.spriteProvider = sprite;
         this.setSpriteFromAge(this.spriteProvider);
@@ -139,8 +139,8 @@ public class ColoredParticle extends TextureSheetParticle {
         }
 
         @Override
-        public Particle createParticle(ColoredParticleData data, ClientLevel world, double x, double y, double z, double motionX, double motionY, double motionZ) {
-            return new ColoredParticle(world, x, y, z, motionX, motionY, motionZ, data, this.sprite, 40, 0.7f, 1.3f, false, true, false);
+        public Particle createParticle(ColoredParticleData data, ClientLevel level, double x, double y, double z, double motionX, double motionY, double motionZ) {
+            return new ColoredParticle(level, x, y, z, motionX, motionY, motionZ, data, this.sprite, 40, 0.7f, 1.3f, false, true, false);
         }
     }
 
@@ -153,8 +153,8 @@ public class ColoredParticle extends TextureSheetParticle {
         }
 
         @Override
-        public Particle createParticle(ColoredParticleData data, ClientLevel world, double x, double y, double z, double motionX, double motionY, double motionZ) {
-            return new ColoredParticle(world, x, y, z, motionX, motionY, motionZ, data, this.sprite, 20, 1, 1, false, false, false).setScale(data.getScale());
+        public Particle createParticle(ColoredParticleData data, ClientLevel level, double x, double y, double z, double motionX, double motionY, double motionZ) {
+            return new ColoredParticle(level, x, y, z, motionX, motionY, motionZ, data, this.sprite, 20, 1, 1, false, false, false).setScale(data.getScale());
         }
     }
 }

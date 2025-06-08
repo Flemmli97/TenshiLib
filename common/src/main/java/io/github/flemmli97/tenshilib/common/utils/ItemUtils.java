@@ -25,12 +25,10 @@ public class ItemUtils {
         if (target == null) {
             target = holder instanceof Mob mob && mob.getTarget() != null ? mob.getTarget() : holder;
         }
-        if (stack.getItem() instanceof ArmorItem) {
+        if (stack.getItem() instanceof ArmorItem itemarmor) {
             if (!(currentEquipped.getItem() instanceof ArmorItem) || EnchantmentHelper.has(currentEquipped, EnchantmentEffectComponents.PREVENT_ARMOR_CHANGE))
                 return true;
             else if (currentEquipped.getItem() instanceof ArmorItem itemarmor1) {
-                ArmorItem itemarmor = (ArmorItem) stack.getItem();
-
                 if (itemarmor.getDefense() == itemarmor1.getDefense()) {
                     return stack.getDamageValue() > currentEquipped.getDamageValue() || stack.getComponentsPatch().isEmpty() && !currentEquipped.getComponentsPatch().isEmpty();
                 } else {

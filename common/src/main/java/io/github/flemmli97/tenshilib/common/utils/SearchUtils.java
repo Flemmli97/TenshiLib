@@ -12,7 +12,7 @@ public class SearchUtils {
      * @param search A function that should return 0,1,-1 indicating equals, greater or lesser
      */
     public static <T> T searchInfFunc(List<T> l, ToIntFunction<T> search, T defaultVal) {
-        if (l.isEmpty() || search.applyAsInt(l.get(0)) > 0)
+        if (l.isEmpty() || search.applyAsInt(l.getFirst()) > 0)
             return defaultVal;
         return get(l, 0, l.size(), search);
     }
@@ -24,7 +24,7 @@ public class SearchUtils {
      * @param search The value to search for
      */
     public static <T extends Comparable<T>> T searchInf(List<T> l, T search, T defaultVal) {
-        if (l.isEmpty() || l.get(0).compareTo(search) > 0)
+        if (l.isEmpty() || l.getFirst().compareTo(search) > 0)
             return defaultVal;
         return get(l, 0, l.size(), search);
     }

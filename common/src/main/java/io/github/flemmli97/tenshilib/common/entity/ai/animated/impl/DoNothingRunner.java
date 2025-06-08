@@ -1,13 +1,13 @@
 package io.github.flemmli97.tenshilib.common.entity.ai.animated.impl;
 
-import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
-import io.github.flemmli97.tenshilib.common.entity.IAnimated;
+import io.github.flemmli97.tenshilib.common.entity.AnimatedAction;
+import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.ActionRun;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.AnimatedAttackGoal;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 
-public class DoNothingRunner<T extends PathfinderMob & IAnimated> implements ActionRun<T> {
+public class DoNothingRunner<T extends PathfinderMob & AnimatedEntity> implements ActionRun<T> {
 
     private final boolean doneImmediately;
 

@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.client;
 
 import com.google.common.collect.ImmutableSet;
-import io.github.flemmli97.tenshilib.client.render.RiderLayerRenderer;
+import io.github.flemmli97.tenshilib.client.render.layer.RiderEntityLayer;
 import io.github.flemmli97.tenshilib.mixin.EntityRenderDispatcherAccessor;
 import io.github.flemmli97.tenshilib.mixin.LivingEntityRendererAccessor;
 import net.minecraft.client.Minecraft;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Checks for all registered renderers to see which ones have a {@link RiderLayerRenderer} added
+ * Checks for all registered renderers to see which ones have a {@link RiderEntityLayer} added
  * and adds those to a list.
  */
 public class CustomRiderRendererManager implements ResourceManagerReloadListener {
@@ -40,7 +40,7 @@ public class CustomRiderRendererManager implements ResourceManagerReloadListener
         for (Map.Entry<EntityType<?>, EntityRenderer<?>> entry : renderers.entrySet()) {
             if (entry.getValue() instanceof LivingEntityRenderer lR) {
                 for (Object layer : ((LivingEntityRendererAccessor) lR).getLayers()) {
-                    if (layer instanceof RiderLayerRenderer)
+                    if (layer instanceof RiderEntityLayer)
                         builder.add(entry.getKey());
                 }
             }

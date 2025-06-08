@@ -4,9 +4,9 @@ import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import io.github.flemmli97.tenshilib.neoforge.client.events.ClientEvents;
 import io.github.flemmli97.tenshilib.neoforge.events.CommonEvents;
+import io.github.flemmli97.tenshilib.neoforge.loader.patreon.NeoForgePatreonClientUtil;
+import io.github.flemmli97.tenshilib.neoforge.loader.patreon.TenshiLibPatreonImpl;
 import io.github.flemmli97.tenshilib.neoforge.network.PacketHandler;
-import io.github.flemmli97.tenshilib.neoforge.platform.patreon.ClientPatreonImpl;
-import io.github.flemmli97.tenshilib.neoforge.platform.patreon.PatreonImpl;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -22,15 +22,16 @@ public class TenshiLibNeoForge {
         IEventBus eventBus = NeoForge.EVENT_BUS;
         modBus.addListener(TenshiLibNeoForge::preInit);
         modBus.addListener(PacketHandler::register);
+        eventBus.addListener(CommonEvents::leftClickBlock);
         eventBus.addListener(CommonEvents::disableOffhand);
         eventBus.addListener(CommonEvents::disableOffhandBlock);
         eventBus.addListener(CommonEvents::onTracking);
-        PatreonImpl.initPatreonData(modBus);
+        TenshiLibPatreonImpl.initPatreonData(modBus);
         if (FMLEnvironment.dist == Dist.CLIENT) {
             modBus.addListener(ClientEvents::reloadListener);
             modBus.addListener(ClientEvents::itemColors);
             modBus.addListener(ClientEvents::registerShader);
-            ClientPatreonImpl.setup(modBus);
+            NeoForgePatreonClientUtil.setup(modBus);
             eventBus.addListener(ClientEvents::clickSpecial);
             eventBus.addListener(ClientEvents::onEntityRender);
         }

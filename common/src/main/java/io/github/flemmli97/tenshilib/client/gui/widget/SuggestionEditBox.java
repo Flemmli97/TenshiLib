@@ -38,7 +38,6 @@ public class SuggestionEditBox extends EditBox {
     private boolean init;
 
     private int paddingX = 4, paddingY = 2;
-    private boolean canLoseFocus = true;
 
     public SuggestionEditBox(Font font, int x, int y, int width, int height, Component message,
                              int maxLimit, boolean top, Collection<SuggestionContent> suggestions) {
@@ -91,8 +90,8 @@ public class SuggestionEditBox extends EditBox {
     }
 
     @Override
-    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        super.renderWidget(graphics, mouseX, mouseY, partialTick);
+    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
         if (this.suggestionsHidden() || this.suggestions.length == 0)
             return;
         if (this.suggestions.length == 1 && this.getValue().equals(this.suggestions[0]))
@@ -101,7 +100,9 @@ public class SuggestionEditBox extends EditBox {
         if (idx >= 0 && idx < this.suggestions.length) {
             this.select(idx);
         }
-        graphics.fill(this.rect.getX(), this.rect.getY(), this.rect.getX() + this.rect.getWidth(), this.rect.getY() + this.rect.getHeight(), 0xe0101010);
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(0, 0, 1);
+        guiGraphics.fill(this.rect.getX(), this.rect.getY(), this.rect.getX() + this.rect.getWidth(), this.rect.getY() + this.rect.getHeight(), 0xe0101010);
         int x = this.getX() + this.paddingX;
         int y = this.rect.getY() + this.paddingY;
         for (int i = 0; i < this.suggestions.length; i++) {
@@ -109,8 +110,9 @@ public class SuggestionEditBox extends EditBox {
             if (i >= 5 || idxx >= this.suggestions.length)
                 break;
             String string = this.suggestions[idxx];
-            graphics.drawString(this.font, string, x, y + i * this.lineHeight, this.current == idxx ? 0xFFFF55 : 0xFFFFFF);
+            guiGraphics.drawString(this.font, string, x, y + i * this.lineHeight, this.current == idxx ? 0xFFFF55 : 0xFFFFFF);
         }
+        guiGraphics.pose().popPose();
     }
 
     private boolean suggestionsHidden() {
@@ -119,16 +121,12 @@ public class SuggestionEditBox extends EditBox {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        boolean pre = this.canLoseFocus;
-        // Super only checks the bounds of the edit box and not suggestions
-        this.setCanLoseFocus(pre && !this.rect.contains((int) mouseX, (int) mouseY));
-        boolean superClicked = super.mouseClicked(mouseX, mouseY, button);
-        this.setCanLoseFocus(pre);
-        if (superClicked) {
+        boolean suggestion = !this.suggestionsHidden() && this.rect.contains((int) mouseX, (int) mouseY);
+        if (!suggestion && super.mouseClicked(mouseX, mouseY, button)) {
             this.hidden = false;
             return true;
         }
-        if (this.suggestionsHidden() || !this.rect.contains((int) mouseX, (int) mouseY)) {
+        if (!suggestion) {
             return false;
         }
         int i = this.indexFromMouse(mouseY);
@@ -137,12 +135,6 @@ public class SuggestionEditBox extends EditBox {
             this.useSuggestion();
         }
         return true;
-    }
-
-    @Override
-    public void setCanLoseFocus(boolean canLoseFocus) {
-        this.canLoseFocus = canLoseFocus;
-        super.setCanLoseFocus(canLoseFocus);
     }
 
     private int indexFromMouse(double mouseY) {
@@ -161,7 +153,7 @@ public class SuggestionEditBox extends EditBox {
 
     @Override
     public boolean isMouseOver(double mouseX, double mouseY) {
-        if (this.rect.contains((int) mouseX, (int) mouseY)) {
+        if (!this.suggestionsHidden() && this.rect.contains((int) mouseX, (int) mouseY)) {
             return true;
         }
         return super.isMouseOver(mouseX, mouseY);

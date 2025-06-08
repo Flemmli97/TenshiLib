@@ -30,41 +30,43 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 public abstract class OverlayTextureMixin {
 
     @Unique
-    private int initCounter = -1;
+    private int tenshilib$initCounter = -1;
 
     @Unique
-    private int initLoops = 0;
+    private int tenshilib$initLoops = 0;
 
     @ModifyConstant(method = "<init>", constant = @Constant(intValue = -1308622593, ordinal = 0))
     private int red(int orig) {
-        return this.tenshilib_getRed(orig);
+        return this.tenshilib$getRed(orig);
     }
 
     @ModifyConstant(method = "<init>", constant = @Constant(intValue = 16777215, ordinal = 0))
     private int white(int orig) {
-        this.initCounter++;
-        if (this.initCounter == 16) {
-            this.initCounter = 0;
-            this.initLoops++;
+        this.tenshilib$initCounter++;
+        if (this.tenshilib$initCounter == 16) {
+            this.tenshilib$initCounter = 0;
+            this.tenshilib$initLoops++;
         }
-        return this.tenshilib_getColor();
+        return this.tenshilib$getColor();
     }
 
-    private int tenshilib_getRed(int orig) {
-        this.initCounter++;
-        if (this.initCounter == 16) {
-            this.initCounter = 0;
-            this.initLoops++;
+    @Unique
+    private int tenshilib$getRed(int orig) {
+        this.tenshilib$initCounter++;
+        if (this.tenshilib$initCounter == 16) {
+            this.tenshilib$initCounter = 0;
+            this.tenshilib$initLoops++;
         }
-        int k = (int) ((1.0F - (float) this.initCounter / 15.0F * 0.75F) * 255);
-        return this.initLoops == 3 ? orig : k << 24 | this.tenshilib_getColor();
+        int k = (int) ((1.0F - (float) this.tenshilib$initCounter / 15.0F * 0.75F) * 255);
+        return this.tenshilib$initLoops == 3 ? orig : k << 24 | this.tenshilib$getColor();
     }
 
     /**
      * r and b are swapped
      */
-    private int tenshilib_getColor() {
-        return switch (this.initLoops) {
+    @Unique
+    private int tenshilib$getColor() {
+        return switch (this.tenshilib$initLoops) {
             case 1 -> 0x00ff00;
             case 2 -> 0xff0000;
             case 4 -> 0x00ffff;

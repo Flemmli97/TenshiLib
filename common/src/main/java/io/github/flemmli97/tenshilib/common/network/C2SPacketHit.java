@@ -1,10 +1,10 @@
 package io.github.flemmli97.tenshilib.common.network;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
-import io.github.flemmli97.tenshilib.common.item.IAOEWeapon;
+import io.github.flemmli97.tenshilib.common.item.AOEWeapon;
+import io.github.flemmli97.tenshilib.common.item.AOEWeaponHandler;
 import io.github.flemmli97.tenshilib.common.item.IExtendedWeapon;
-import io.github.flemmli97.tenshilib.common.utils.AOEWeaponHandler;
-import io.github.flemmli97.tenshilib.common.utils.RayTraceUtils;
+import io.github.flemmli97.tenshilib.common.utils.HitResultUtils;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -37,11 +37,11 @@ public class C2SPacketHit implements CustomPacketPayload {
     public static void handle(C2SPacketHit pkt, ServerPlayer player) {
         ItemStack stack = player.getMainHandItem();
         if (pkt.type == HitType.EXT && stack.getItem() instanceof IExtendedWeapon item && item.onServerSwing(player, stack)) {
-            EntityHitResult res = RayTraceUtils.calculateEntityFromLook(player, item.getRange(player, stack));
+            EntityHitResult res = HitResultUtils.calculateEntityFromLook(player, item.getRange(player, stack));
             if (res != null && res.getEntity() != null && item.onHit(player, stack, res.getEntity()))
                 player.attack(res.getEntity());
         }
-        if (pkt.type == HitType.AOE && stack.getItem() instanceof IAOEWeapon weapon && weapon.onServerSwing(player, stack)) {
+        if (pkt.type == HitType.AOE && stack.getItem() instanceof AOEWeapon weapon && weapon.onServerSwing(player, stack)) {
             AOEWeaponHandler.onAOEWeaponSwing(player, stack, weapon);
         }
     }

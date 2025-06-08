@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.patreon.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import io.github.flemmli97.tenshilib.patreon.PatreonPlatform;
+import io.github.flemmli97.tenshilib.patreon.TenshiLibPatreonPlatform;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlayerSetting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
@@ -23,7 +23,7 @@ public class PatreonLayer<T extends Player, M extends EntityModel<T> & HeadedMod
     public void render(PoseStack stack, MultiBufferSource buffer, int packedLight, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         if (entity.isInvisible())
             return;
-        PatreonPlayerSetting setting = PatreonPlatform.INSTANCE.playerSettings(entity);
+        PatreonPlayerSetting setting = TenshiLibPatreonPlatform.INSTANCE.playerSettings(entity);
         if (entity.isInvisibleTo(Minecraft.getInstance().player) || setting.effect() == null || !setting.shouldRender())
             return;
         PatreonModelProvider.EffectRenderer<?> renderer = PatreonModelProvider.get(setting.effect());

@@ -1,9 +1,9 @@
 package io.github.flemmli97.tenshilib.common.item;
 
-import io.github.flemmli97.tenshilib.common.entity.EntityUtil;
-import io.github.flemmli97.tenshilib.common.entity.IAnimated;
+import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
+import io.github.flemmli97.tenshilib.common.entity.EntityUtils;
 import io.github.flemmli97.tenshilib.common.network.S2CAnimationScreen;
-import io.github.flemmli97.tenshilib.platform.NetworkCrossPlat;
+import io.github.flemmli97.tenshilib.loader.TenshiLibNetworking;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -34,7 +34,7 @@ public class AnimationDebugger extends Item {
     @Override
     public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity, InteractionHand usedHand) {
         if (player instanceof ServerPlayer serverPlayer) {
-            if (entity instanceof IAnimated) {
+            if (entity instanceof AnimatedEntity) {
                 stack.set(this.entityIDType.get(), entity.getUUID());
                 stack.set(this.animationIdx.get(), -1);
                 player.setItemInHand(usedHand, stack);
@@ -50,10 +50,10 @@ public class AnimationDebugger extends Item {
         if (player instanceof ServerPlayer serverPlayer) {
             UUID uuid = stack.get(this.entityIDType.get());
             if (uuid != null) {
-                Mob storedEntity = EntityUtil.findFromUUID(Mob.class, player.level(), uuid);
-                if (storedEntity instanceof IAnimated animated && storedEntity.isAlive()) {
+                Mob storedEntity = EntityUtils.findFromUUID(Mob.class, player.level(), uuid);
+                if (storedEntity instanceof AnimatedEntity animated && storedEntity.isAlive()) {
                     if (player.isShiftKeyDown()) {
-                        NetworkCrossPlat.INSTANCE.sendToClient(new S2CAnimationScreen(usedHand, (Mob) animated), serverPlayer);
+                        TenshiLibNetworking.INSTANCE.sendToClient(new S2CAnimationScreen(usedHand, (Mob) animated), serverPlayer);
                     } else {
                         int idx = this.getIndex(stack);
                         if (idx >= 0 && idx < animated.getAnimationHandler().getAnimations().length) {

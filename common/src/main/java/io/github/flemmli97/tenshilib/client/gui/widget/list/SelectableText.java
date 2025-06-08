@@ -90,7 +90,7 @@ public class SelectableText implements SelectableEntry {
                 int bY = xY[1] + y;
                 textWidth = xY[0] - 2;
                 boolean over = mouseX >= bX && mouseY >= bY && mouseX < bX + 12 && mouseY < bY + 12;
-                graphics.blit(btn.texture(), bX, bY, btn.uOffset(), btn.vOffset() + (over ? 12 : 0), 12, 12);
+                graphics.blit(btn.texture().texture(), bX, bY, btn.texture().uOffset(), btn.texture().vOffset() + (over ? 12 : 0), 12, 12);
             }
         }
         graphics.drawString(widget.getFont(), this.getText(widget.getFont(), textWidth - this.paddingX, selected || hovered),
@@ -138,13 +138,13 @@ public class SelectableText implements SelectableEntry {
         return new int[]{btnX, btnY};
     }
 
-    public record SelectButton(ResourceLocation texture, int uOffset, int vOffset, Runnable onClick,
+    public record SelectButton(TextureLocation texture, Runnable onClick,
                                BooleanSupplier shouldRender) {
 
         private static final BooleanSupplier ALWAYS = () -> true;
 
-        public SelectButton(ResourceLocation texture, int uOffset, int vOffset, Runnable onClick) {
-            this(texture, uOffset, vOffset, onClick, ALWAYS);
+        public SelectButton(TextureLocation texture, Runnable onClick) {
+            this(texture, onClick, ALWAYS);
         }
     }
 }

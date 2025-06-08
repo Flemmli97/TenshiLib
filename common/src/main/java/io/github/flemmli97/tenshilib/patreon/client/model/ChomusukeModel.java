@@ -4,9 +4,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.client.AnimationManager;
-import io.github.flemmli97.tenshilib.client.model.BlockBenchAnimations;
+import io.github.flemmli97.tenshilib.client.model.BedrockAnimations;
 import io.github.flemmli97.tenshilib.client.model.ExtendedModel;
-import io.github.flemmli97.tenshilib.client.model.ModelPartHandler;
+import io.github.flemmli97.tenshilib.client.model.ModelPartsHolder;
 import io.github.flemmli97.tenshilib.client.render.RenderUtils;
 import io.github.flemmli97.tenshilib.patreon.RenderLocation;
 import net.minecraft.client.Minecraft;
@@ -27,13 +27,13 @@ public class ChomusukeModel extends EntityModel<Player> implements ExtendedModel
     public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "textures/model/chomusuke.png");
     public static final ResourceLocation TEXTURE_SLEEPY = ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "textures/model/chomusuke_sleepy.png");
 
-    protected final ModelPartHandler model;
-    protected final BlockBenchAnimations anim;
+    protected final ModelPartsHolder model;
+    protected final BedrockAnimations anim;
 
     private RenderLocation location;
 
     public ChomusukeModel() {
-        this.model = new ModelPartHandler(Minecraft.getInstance().getEntityModels().bakeLayer(ChomusukeModel.LAYER_LOCATION));
+        this.model = new ModelPartsHolder(Minecraft.getInstance().getEntityModels().bakeLayer(ChomusukeModel.LAYER_LOCATION));
         this.anim = AnimationManager.getInstance().getAnimation(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "chomusuke"));
     }
 
@@ -87,7 +87,7 @@ public class ChomusukeModel extends EntityModel<Player> implements ExtendedModel
     }
 
     @Override
-    public ModelPartHandler getHandler() {
+    public ModelPartsHolder getHandler() {
         return this.model;
     }
 

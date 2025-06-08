@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.patreon.pkts;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
-import io.github.flemmli97.tenshilib.patreon.PatreonPlatform;
+import io.github.flemmli97.tenshilib.patreon.TenshiLibPatreonPlatform;
 import io.github.flemmli97.tenshilib.patreon.RenderLocation;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -42,7 +42,7 @@ public class S2CEffectUpdatePkt extends C2SEffectUpdatePkt {
                 if (e instanceof Player)
                     player = (Player) e;
             }
-            PatreonPlatform.INSTANCE.playerSettings(player).read(pkt, pkt.id);
+            TenshiLibPatreonPlatform.INSTANCE.playerSettings(player).read(pkt, pkt.id);
         }
     }
 

@@ -14,7 +14,7 @@ public abstract class PoseStackMixin implements PoseStackExt {
     private Deque<PoseStack.Pose> poseStack;
 
     @Override
-    public void pushPose(PoseStack.Pose pose) {
+    public void tenshilib$PushPose(PoseStack.Pose pose) {
         this.poseStack.addLast(pose);
     }
 }

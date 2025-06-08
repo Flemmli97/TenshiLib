@@ -1,6 +1,6 @@
 package io.github.flemmli97.tenshilib.mixin.dual;
 
-import io.github.flemmli97.tenshilib.common.item.IDualWeapon;
+import io.github.flemmli97.tenshilib.common.item.DualWeapon;
 import io.github.flemmli97.tenshilib.mixinhelper.MixinUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -26,7 +26,7 @@ public abstract class ItemInHandRendererMixin {
 
     @ModifyVariable(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/AbstractClientPlayer;isUsingItem()Z", ordinal = 1), argsOnly = true)
     private InteractionHand renderDualInArm(InteractionHand hand, AbstractClientPlayer player) {
-        if (player.getMainHandItem().getItem() instanceof IDualWeapon)
+        if (player.getMainHandItem().getItem() instanceof DualWeapon)
             return player.getUsedItemHand();
         return hand;
     }
@@ -38,7 +38,7 @@ public abstract class ItemInHandRendererMixin {
 
     @Inject(method = "itemUsed", at = @At("HEAD"))
     private void itemUsed(InteractionHand hand, CallbackInfo info) {
-        if (hand == InteractionHand.MAIN_HAND && this.minecraft.player.getMainHandItem().getItem() instanceof IDualWeapon)
+        if (hand == InteractionHand.MAIN_HAND && this.minecraft.player.getMainHandItem().getItem() instanceof DualWeapon)
             this.offHandHeight = 0;
     }
 }

@@ -1,6 +1,6 @@
 package io.github.flemmli97.tenshilib.patreon.effects;
 
-import io.github.flemmli97.tenshilib.common.utils.RayTraceUtils;
+import io.github.flemmli97.tenshilib.common.utils.math.MathUtils;
 import io.github.flemmli97.tenshilib.patreon.RenderLocation;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
@@ -37,7 +37,7 @@ public class ParticleEffect extends PatreonEffectConfig {
             Particle particle = this.particles[i];
             if (particle.chance < 1 && player.getRandom().nextFloat() < particle.chance)
                 continue;
-            Vector3f off = RayTraceUtils.rotatedAround(particle.position, YP, -player.getYHeadRot());
+            Vector3f off = MathUtils.rotatedAround(particle.position, YP, -player.getYHeadRot());
             Vec3 pos = player.position().add(off.x(), off.y(), off.z());
             if (particle.container.positionMod.isPresent())
                 pos = pos.add(particle.container.positionMod.get().apply(player, i));

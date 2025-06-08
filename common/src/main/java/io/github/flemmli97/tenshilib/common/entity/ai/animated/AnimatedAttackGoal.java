@@ -1,8 +1,9 @@
 package io.github.flemmli97.tenshilib.common.entity.ai.animated;
 
-import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
-import io.github.flemmli97.tenshilib.common.entity.IAnimated;
-import io.github.flemmli97.tenshilib.common.utils.MathUtils;
+import io.github.flemmli97.tenshilib.common.entity.AnimatedAction;
+import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
+import io.github.flemmli97.tenshilib.common.utils.math.MathUtils;
+import net.minecraft.util.Mth;
 import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,7 +19,7 @@ import java.util.List;
 /**
  * Attack goal using a very customizable animated attack system
  */
-public class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> extends Goal {
+public class AnimatedAttackGoal<T extends PathfinderMob & AnimatedEntity> extends Goal {
 
     public final T attacker;
     protected final List<WeightedEntry.Wrapper<GoalAttackAction<T>>> actions;
@@ -207,7 +208,7 @@ public class AnimatedAttackGoal<T extends PathfinderMob & IAnimated> extends Goa
             double[] c = MathUtils.closestOnCircle(posX, posZ, this.attacker.getX(), this.attacker.getZ(), radius);
             this.attacker.getNavigation().moveTo(c[0], this.attacker.getY(), c[1], speed);
         } else {
-            double angle = MathUtils.phiFromPoint(posX, posZ, this.attacker.getX(), this.attacker.getZ()) + (clockWise ? MathUtils.degToRad(15) : -MathUtils.degToRad(15));
+            double angle = MathUtils.phiFromPoint(posX, posZ, this.attacker.getX(), this.attacker.getZ()) + (clockWise ? 15 * Mth.DEG_TO_RAD : -15 * Mth.DEG_TO_RAD);
             double nPosX = radius * Math.cos(angle);
             double nPosZ = radius * Math.sin(angle);
             this.attacker.getNavigation().moveTo(posX + nPosX, this.attacker.getY(), posZ + nPosZ, speed);

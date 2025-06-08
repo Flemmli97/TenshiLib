@@ -1,8 +1,9 @@
 package io.github.flemmli97.tenshilib.patreon.pkts;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
+import io.github.flemmli97.tenshilib.loader.TenshiLibNetworking;
 import io.github.flemmli97.tenshilib.patreon.PatreonDataManager;
-import io.github.flemmli97.tenshilib.patreon.PatreonPlatform;
+import io.github.flemmli97.tenshilib.patreon.TenshiLibPatreonPlatform;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlayerSetting;
 import io.github.flemmli97.tenshilib.patreon.RenderLocation;
 import io.github.flemmli97.tenshilib.patreon.effects.PatreonEffectConfig;
@@ -44,7 +45,7 @@ public class C2SEffectUpdatePkt implements CustomPacketPayload {
     }
 
     public static void handle(C2SEffectUpdatePkt pkt, ServerPlayer player) {
-        PatreonPlayerSetting setting = PatreonPlatform.INSTANCE.playerSettings(player);
+        PatreonPlayerSetting setting = TenshiLibPatreonPlatform.INSTANCE.playerSettings(player);
         int tier = PatreonDataManager.get(player.getUUID().toString()).tier();
         PatreonEffectConfig eff;
         if (tier < 1 || (eff = PatreonEffects.get(pkt.id)) == null || eff.tier > tier) {
@@ -52,8 +53,8 @@ public class C2SEffectUpdatePkt implements CustomPacketPayload {
         } else {
             setting.read(pkt, pkt.id);
         }
-        PatreonPlatform.INSTANCE.sendToTracking(player,
-                new S2CEffectUpdatePkt(player.getId(), setting.effect() != null ? setting.effect().id() : "", setting.shouldRender(), setting.getRenderLocation(), setting.getColor()));
+        TenshiLibNetworking.INSTANCE.sendToTracking(new S2CEffectUpdatePkt(player.getId(), setting.effect() != null ? setting.effect().id() : "", setting.shouldRender(), setting.getRenderLocation(), setting.getColor()),
+                player);
     }
 
     @Override

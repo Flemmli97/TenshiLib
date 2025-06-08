@@ -2,7 +2,7 @@ package io.github.flemmli97.tenshilib.common.network;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.client.ClientHandlers;
-import io.github.flemmli97.tenshilib.common.entity.IAnimated;
+import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -51,9 +51,9 @@ public class S2CAnimationScreen implements CustomPacketPayload {
             if (player == null)
                 return;
             Entity entity = player.level().getEntity(pkt.entity);
-            if (!(entity instanceof LivingEntity) || !(entity instanceof IAnimated))
+            if (!(entity instanceof LivingEntity) || !(entity instanceof AnimatedEntity))
                 return;
-            ClientHandlers.openAnimationGui((LivingEntity & IAnimated) entity, pkt.hand);
+            ClientHandlers.openAnimationGui((LivingEntity & AnimatedEntity) entity, pkt.hand);
         }
     }
 }

@@ -30,7 +30,7 @@ public class RenderUtils {
 
     public static final int DEFAULT_COLOR = 0xFFFFFFFF;
     private static final float TRIANGLE_MULT = (float) (Math.sqrt(3.0D) / 2.0D);
-    private static final Random RANDOM = new Random(432L);
+    private static final Random RANDOM = new Random(432);
 
     public static float getPartialTicks() {
         return Minecraft.getInstance().getTimer()
@@ -42,8 +42,8 @@ public class RenderUtils {
                 .getGameTimeDeltaPartialTick(!entity.level().tickRateManager().isEntityFrozen(entity));
     }
 
-    public static void renderBlockOutline(PoseStack matrixStack, MultiBufferSource buffer, Player player, BlockPos pos, float partialTicks, boolean drawImmediately) {
-        renderBlockOutline(matrixStack, buffer, player, pos, partialTicks, 0, 0, 0, 1, drawImmediately);
+    public static void renderBlockOutline(PoseStack poseStack, MultiBufferSource buffer, Player player, BlockPos pos, float partialTicks, boolean drawImmediately) {
+        renderBlockOutline(poseStack, buffer, player, pos, partialTicks, 0, 0, 0, 1, drawImmediately);
     }
 
     /**
@@ -52,12 +52,12 @@ public class RenderUtils {
      * @param drawImmediately Most of the time this should be true.
      *                        Else it will get drawn next frame and the position will be offset by player movement
      */
-    public static void renderBlockOutline(PoseStack matrixStack, MultiBufferSource buffer, Player player, BlockPos pos, float partialTicks, float red, float green, float blue, float alpha,
+    public static void renderBlockOutline(PoseStack poseStack, MultiBufferSource buffer, Player player, BlockPos pos, float partialTicks, float red, float green, float blue, float alpha,
                                           boolean drawImmediately) {
         BlockState state = player.level().getBlockState(pos);
         RenderType renderType = RenderType.lines();
         Vec3 vec = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-        renderShape(matrixStack, buffer.getBuffer(renderType), state.getShape(player.level(), pos, CollisionContext.of(player)),
+        renderShape(poseStack, buffer.getBuffer(renderType), state.getShape(player.level(), pos, CollisionContext.of(player)),
                 pos.getX() - vec.x, pos.getY() - vec.y, pos.getZ() - vec.z, red, green, blue, alpha);
         if (drawImmediately && buffer instanceof MultiBufferSource.BufferSource)
             ((MultiBufferSource.BufferSource) buffer).endBatch(renderType);
@@ -75,18 +75,18 @@ public class RenderUtils {
         });
     }
 
-    public static void renderAreaAround(PoseStack matrixStack, MultiBufferSource buffer, BlockPos pos, float radius, boolean drawImmediately) {
-        renderBoundingBox(matrixStack, buffer, new AABB(0, 0, 0, 1, 1, 1).inflate(radius).move(pos.below()), drawImmediately);
+    public static void renderAreaAround(PoseStack poseStack, MultiBufferSource buffer, BlockPos pos, float radius, boolean drawImmediately) {
+        renderBoundingBox(poseStack, buffer, new AABB(0, 0, 0, 1, 1, 1).inflate(radius).move(pos.below()), drawImmediately);
     }
 
-    public static void renderAreaAround(PoseStack matrixStack, MultiBufferSource buffer, BlockPos pos, float radius, float red, float green, float blue,
+    public static void renderAreaAround(PoseStack poseStack, MultiBufferSource buffer, BlockPos pos, float radius, float red, float green, float blue,
                                         float alpha, boolean ignoreDepth, boolean drawImmediately) {
-        renderBoundingBox(matrixStack, buffer, new AABB(0, 0, 0, 1, 1, 1).inflate(radius).move(pos.below()), red, green, blue,
+        renderBoundingBox(poseStack, buffer, new AABB(0, 0, 0, 1, 1, 1).inflate(radius).move(pos.below()), red, green, blue,
                 alpha, drawImmediately);
     }
 
-    public static void renderBoundingBox(PoseStack matrixStack, MultiBufferSource buffer, AABB aabb, boolean drawImmediately) {
-        RenderUtils.renderBoundingBox(matrixStack, buffer, aabb, 1, 0.5F, 0.5F, 1, drawImmediately);
+    public static void renderBoundingBox(PoseStack poseStack, MultiBufferSource buffer, AABB aabb, boolean drawImmediately) {
+        RenderUtils.renderBoundingBox(poseStack, buffer, aabb, 1, 0.5F, 0.5F, 1, drawImmediately);
     }
 
     /**
@@ -95,11 +95,11 @@ public class RenderUtils {
      * @param drawImmediately Most of the time this should be true.
      *                        Else it will get drawn next frame and the position will be offset by player movement
      */
-    public static void renderBoundingBox(PoseStack matrixStack, MultiBufferSource buffer, AABB aabb, float red, float green, float blue, float alpha,
+    public static void renderBoundingBox(PoseStack poseStack, MultiBufferSource buffer, AABB aabb, float red, float green, float blue, float alpha,
                                          boolean drawImmediately) {
         Vec3 vec = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         RenderType renderType = RenderType.lines();
-        LevelRenderer.renderLineBox(matrixStack, buffer.getBuffer(renderType), aabb.inflate(0.002).move(-vec.x, -vec.y, -vec.z), red, green, blue, alpha);
+        LevelRenderer.renderLineBox(poseStack, buffer.getBuffer(renderType), aabb.inflate(0.002).move(-vec.x, -vec.y, -vec.z), red, green, blue, alpha);
         if (drawImmediately && buffer instanceof MultiBufferSource.BufferSource)
             ((MultiBufferSource.BufferSource) buffer).endBatch();
     }
@@ -164,17 +164,17 @@ public class RenderUtils {
         buffer.addVertex(matrix4f, -widthHalf, length, -heightHalf).setColor(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha);
     }
 
-    public static void renderGradientBeams(PoseStack matrixStack, MultiBufferSource renderTypeBuffer, float length, float width, int ticks, float partialTicks, float rotationPerTick, int amount, BeamBuilder builder) {
-        matrixStack.pushPose();
+    public static void renderGradientBeams(PoseStack poseStack, MultiBufferSource renderTypeBuffer, float length, float width, int ticks, float partialTicks, float rotationPerTick, int amount, BeamBuilder builder) {
+        poseStack.pushPose();
         RANDOM.setSeed(432L);
         for (int i = 0; i < amount; i++) {
             float ticker = ticks + partialTicks;
-            matrixStack.mulPose(Axis.XP.rotationDegrees(RANDOM.nextFloat() * 360.0F));
-            matrixStack.mulPose(Axis.YP.rotationDegrees(RANDOM.nextFloat() * 360.0F));
-            matrixStack.mulPose(Axis.ZP.rotationDegrees(RANDOM.nextFloat() * 360.0F + ticker * rotationPerTick));
-            renderGradientBeam(matrixStack, renderTypeBuffer, length, width, builder);
+            poseStack.mulPose(Axis.XP.rotationDegrees(RANDOM.nextFloat() * 360.0F));
+            poseStack.mulPose(Axis.YP.rotationDegrees(RANDOM.nextFloat() * 360.0F));
+            poseStack.mulPose(Axis.ZP.rotationDegrees(RANDOM.nextFloat() * 360.0F + ticker * rotationPerTick));
+            renderGradientBeam(poseStack, renderTypeBuffer, length, width, builder);
         }
-        matrixStack.popPose();
+        poseStack.popPose();
     }
 
     /**
@@ -182,9 +182,9 @@ public class RenderUtils {
      *
      * @param builder Structure containing rendering info like color etc. Is mutable so cache an instance of it.
      */
-    public static void renderGradientBeam(PoseStack matrixStack, MultiBufferSource renderTypeBuffer, float length, float width, BeamBuilder builder) {
+    public static void renderGradientBeam(PoseStack poseStack, MultiBufferSource renderTypeBuffer, float length, float width, BeamBuilder builder) {
         float widthHalf = width * 0.5f;
-        Matrix4f matrix4f = matrixStack.last().pose();
+        Matrix4f matrix4f = poseStack.last().pose();
         VertexConsumer buffer = renderTypeBuffer.getBuffer(builder.renderType);
         buffer.addVertex(matrix4f, 0, 0, 0).setColor(builder.red, builder.green, builder.blue, builder.alpha);
         buffer.addVertex(matrix4f, 0, 0, 0).setColor(builder.red, builder.green, builder.blue, builder.alpha);
@@ -206,6 +206,7 @@ public class RenderUtils {
      * @param maxWidth  Width in blocks. E.g. width of 1 = entity that are 1 block wide
      * @param maxHeight Height in blocks
      */
+    // TODO better impl
     public static void renderScaledEntityGui(GuiGraphics guiGraphics, int x, int y, int scale, float maxWidth, float maxHeight,
                                              float yOffset, float mouseX, float mouseY, LivingEntity entity) {
         int sizeX = (int) (maxWidth * scale);
@@ -222,7 +223,7 @@ public class RenderUtils {
                 (int) (scale * scaleMult), yOffset, mouseX, mouseY, entity);
     }
 
-    private static void renderEntityMouseNoClip(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2, int scale, float yOffset, float mouseX, float mouseY, LivingEntity entity) {
+    private static void renderEntityMouseNoClip(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2, float scale, float yOffset, float mouseX, float mouseY, LivingEntity entity) {
         float xM = (float) (x1 + x2) / 2.0f;
         float yM = (float) (y1 + y2) / 2.0f;
         float yRot = (float) Math.atan((xM - mouseX) / 40.0f);
@@ -230,25 +231,25 @@ public class RenderUtils {
         Quaternionf quaternionf = new Quaternionf().rotateZ((float) Math.PI);
         Quaternionf quaternionf2 = new Quaternionf().rotateX(xRot * 20.0f * ((float) Math.PI / 180));
         quaternionf.mul(quaternionf2);
-        float j = entity.yBodyRot;
-        float k = entity.getYRot();
-        float l = entity.getXRot();
-        float m = entity.yHeadRotO;
-        float n = entity.yHeadRot;
+        float preYBody = entity.yBodyRot;
+        float preYRot = entity.getYRot();
+        float preXRot = entity.getXRot();
+        float preYHead0 = entity.yHeadRotO;
+        float preYHead = entity.yHeadRot;
         entity.yBodyRot = 180.0f + yRot * 20.0f;
         entity.setYRot(180.0f + yRot * 40.0f);
         entity.setXRot(-xRot * 20.0f);
         entity.yHeadRot = entity.getYRot();
         entity.yHeadRotO = entity.getYRot();
-        float o = entity.getScale();
-        Vector3f vector3f = new Vector3f(0.0f, entity.getBbHeight() / 2.0f + yOffset * o, 0.0f);
-        float p = (float) scale / o;
-        InventoryScreen.renderEntityInInventory(guiGraphics, xM, yM, p, vector3f, quaternionf, quaternionf2, entity);
-        entity.yBodyRot = j;
-        entity.setYRot(k);
-        entity.setXRot(l);
-        entity.yHeadRotO = m;
-        entity.yHeadRot = n;
+        float entityScale = entity.getScale();
+        Vector3f offset = new Vector3f(0.0f, entity.getBbHeight() / 2.0f + yOffset * entityScale, 0.0f);
+        scale = scale / entityScale;
+        InventoryScreen.renderEntityInInventory(guiGraphics, xM, yM, scale, offset, quaternionf, quaternionf2, entity);
+        entity.yBodyRot = preYBody;
+        entity.setYRot(preYRot);
+        entity.setXRot(preXRot);
+        entity.yHeadRotO = preYHead0;
+        entity.yHeadRot = preYHead;
     }
 
     public static class TextureBuilder {

@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.client.model.ExtendedModel;
-import io.github.flemmli97.tenshilib.client.model.ModelPartHandler;
+import io.github.flemmli97.tenshilib.client.model.ModelPartsHolder;
 import io.github.flemmli97.tenshilib.patreon.RenderLocation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
@@ -23,10 +23,10 @@ public class HaloModel extends EntityModel<Player> implements ExtendedModel, Pat
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "halo"), "main");
     public static ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "textures/model/halo.png");
 
-    protected final ModelPartHandler model;
+    protected final ModelPartsHolder model;
 
     public HaloModel() {
-        this.model = new ModelPartHandler(Minecraft.getInstance().getEntityModels().bakeLayer(HaloModel.LAYER_LOCATION));
+        this.model = new ModelPartsHolder(Minecraft.getInstance().getEntityModels().bakeLayer(HaloModel.LAYER_LOCATION));
     }
 
     public static LayerDefinition createBodyLayer() {
@@ -58,7 +58,7 @@ public class HaloModel extends EntityModel<Player> implements ExtendedModel, Pat
     }
 
     @Override
-    public ModelPartHandler getHandler() {
+    public ModelPartsHolder getHandler() {
         return this.model;
     }
 

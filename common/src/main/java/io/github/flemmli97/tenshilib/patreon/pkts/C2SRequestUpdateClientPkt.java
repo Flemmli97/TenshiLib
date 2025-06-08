@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.patreon.pkts;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
-import io.github.flemmli97.tenshilib.patreon.PatreonPlatform;
+import io.github.flemmli97.tenshilib.patreon.TenshiLibPatreonPlatform;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -18,7 +18,7 @@ public class C2SRequestUpdateClientPkt implements CustomPacketPayload {
     }
 
     public static void handle(C2SRequestUpdateClientPkt pkt, ServerPlayer player) {
-        PatreonPlatform.INSTANCE.sendToClient(player, player);
+        TenshiLibPatreonPlatform.INSTANCE.sendToClient(player, player);
     }
 
     @Override

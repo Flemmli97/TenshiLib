@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.client.model;
 
-import io.github.flemmli97.tenshilib.common.utils.mathParser.ExpValue;
-import io.github.flemmli97.tenshilib.common.utils.mathParser.VariableMap;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.ExpValue;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.VariableMap;
 
 public class AnimationValue {
 

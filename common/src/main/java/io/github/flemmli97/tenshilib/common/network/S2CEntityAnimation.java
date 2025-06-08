@@ -1,9 +1,9 @@
 package io.github.flemmli97.tenshilib.common.network;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
-import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
 import io.github.flemmli97.tenshilib.client.ClientHandlers;
-import io.github.flemmli97.tenshilib.common.entity.IAnimated;
+import io.github.flemmli97.tenshilib.common.entity.AnimatedAction;
+import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.utils.ArrayUtils;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -47,7 +47,7 @@ public class S2CEntityAnimation implements CustomPacketPayload {
         this.endTransition = endTransition;
     }
 
-    public static <T extends Entity & IAnimated> S2CEntityAnimation create(T entity, int startTransition, int endTransition, float start) {
+    public static <T extends Entity & AnimatedEntity> S2CEntityAnimation create(T entity, int startTransition, int endTransition, float start) {
         return new S2CEntityAnimation(entity, startTransition, endTransition, start);
     }
 
@@ -56,7 +56,7 @@ public class S2CEntityAnimation implements CustomPacketPayload {
         this.start = start;
         this.startTransition = startTransition;
         this.endTransition = endTransition;
-        IAnimated entity = (IAnimated) e;
+        AnimatedEntity entity = (AnimatedEntity) e;
         this.animID = Optional.ofNullable(entity.getAnimationHandler().getAnimation())
                 .map(anim -> {
                     int i = 0;

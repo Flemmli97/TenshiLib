@@ -8,8 +8,8 @@ public interface PoseStackExt {
      * Like {@link PoseStack#pushPose()} but pushes the specified pose
      */
     static void pushPose(PoseStack stack, PoseStack.Pose pose) {
-        ((PoseStackExt) stack).pushPose(pose);
+        ((PoseStackExt) stack).tenshilib$PushPose(pose);
     }
 
-    void pushPose(PoseStack.Pose pose);
+    void tenshilib$PushPose(PoseStack.Pose pose);
 }

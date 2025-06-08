@@ -1,11 +1,11 @@
 package io.github.flemmli97.tenshilib.client.gui;
 
-import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
 import io.github.flemmli97.tenshilib.client.gui.widget.SuggestionEditBox;
 import io.github.flemmli97.tenshilib.client.render.RenderUtils;
-import io.github.flemmli97.tenshilib.common.entity.IAnimated;
+import io.github.flemmli97.tenshilib.common.entity.AnimatedAction;
+import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.network.C2SAnimationDebuggerUpdate;
-import io.github.flemmli97.tenshilib.platform.NetworkCrossPlat;
+import io.github.flemmli97.tenshilib.loader.TenshiLibNetworking;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -17,7 +17,7 @@ import net.minecraft.world.entity.LivingEntity;
 import java.util.Arrays;
 import java.util.List;
 
-public class AnimationScreen<T extends LivingEntity & IAnimated> extends Screen {
+public class AnimationScreen<T extends LivingEntity & AnimatedEntity> extends Screen {
 
     protected final T entity;
     private final InteractionHand hand;
@@ -79,7 +79,7 @@ public class AnimationScreen<T extends LivingEntity & IAnimated> extends Screen 
         });
         yOff += 24;
         this.addRenderableWidget(Button.builder(Component.translatable("tenshilib.gui.save"), b -> {
-            NetworkCrossPlat.INSTANCE.sendToServer(new C2SAnimationDebuggerUpdate(this.hand, this.index));
+            TenshiLibNetworking.INSTANCE.sendToServer(new C2SAnimationDebuggerUpdate(this.hand, this.index));
             this.minecraft.setScreen(null);
         }).bounds(this.leftPos + this.sizeX / 2 - 50, this.topPos + yOff, 100, 20).build());
         this.addRenderableWidget(this.box);

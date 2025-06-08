@@ -1,9 +1,9 @@
 package io.github.flemmli97.tenshilib.common.entity.ai.animated;
 
 import com.google.common.collect.ImmutableList;
-import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
-import io.github.flemmli97.tenshilib.api.entity.AnimationHandler;
-import io.github.flemmli97.tenshilib.common.entity.IAnimated;
+import io.github.flemmli97.tenshilib.common.entity.AnimatedAction;
+import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
+import io.github.flemmli97.tenshilib.common.entity.AnimationHandler;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.impl.DoNothingRunner;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.impl.WrappedRunner;
 import net.minecraft.util.random.WeightedEntry;
@@ -21,7 +21,7 @@ import java.util.function.Predicate;
  *
  * @param <T>
  */
-public class GoalAttackAction<T extends PathfinderMob & IAnimated> {
+public class GoalAttackAction<T extends PathfinderMob & AnimatedEntity> {
 
     private final AnimatedAction action;
     private Condition<T> condition = (executor, target, previous) -> true;
@@ -94,23 +94,23 @@ public class GoalAttackAction<T extends PathfinderMob & IAnimated> {
         return new ActiveAction<>(this.action, this.preparation.create(), this.runner.create());
     }
 
-    public interface Condition<T extends PathfinderMob & IAnimated> {
+    public interface Condition<T extends PathfinderMob & AnimatedEntity> {
 
         boolean test(AnimatedAttackGoal<T> goal, LivingEntity target, String previous);
 
     }
 
-    public interface IntProvider<T extends PathfinderMob & IAnimated> {
+    public interface IntProvider<T extends PathfinderMob & AnimatedEntity> {
 
         int getInt(T entity);
 
     }
 
-    public record ActiveAction<T extends PathfinderMob & IAnimated>(AnimatedAction anim, ActionStart<T> start,
-                                                                    ActionRun<T> runner) {
+    public record ActiveAction<T extends PathfinderMob & AnimatedEntity>(AnimatedAction anim, ActionStart<T> start,
+                                                                         ActionRun<T> runner) {
     }
 
-    public static class ChainedActions<T extends PathfinderMob & IAnimated> {
+    public static class ChainedActions<T extends PathfinderMob & AnimatedEntity> {
 
         private final List<WeightedEntry.Wrapper<ChainList<T>>> chains;
         private final float chance;
@@ -128,7 +128,7 @@ public class GoalAttackAction<T extends PathfinderMob & IAnimated> {
             return WeightedRandom.getRandomItem(mob.getRandom(), filtered).map(d -> d.data().chains()).orElse(null);
         }
 
-        public static class Builder<T extends PathfinderMob & IAnimated> {
+        public static class Builder<T extends PathfinderMob & AnimatedEntity> {
 
             private final List<ChainList.ChainListBuilder<T>> anims = new ArrayList<>();
             private float chance = 1;
@@ -187,15 +187,15 @@ public class GoalAttackAction<T extends PathfinderMob & IAnimated> {
         }
     }
 
-    public static <T extends PathfinderMob & IAnimated> ChainedActions.Builder<T> chainBuilder(AnimatedAction anim) {
+    public static <T extends PathfinderMob & AnimatedEntity> ChainedActions.Builder<T> chainBuilder(AnimatedAction anim) {
         return chainBuilder(anim, e -> true);
     }
 
-    public static <T extends PathfinderMob & IAnimated> ChainedActions.Builder<T> chainBuilder(AnimatedAction anim, Predicate<T> delay) {
+    public static <T extends PathfinderMob & AnimatedEntity> ChainedActions.Builder<T> chainBuilder(AnimatedAction anim, Predicate<T> delay) {
         return chainBuilder(anim, AnimationHandler.FALLBACK_TRANSIT_TIME, 0, 1, delay);
     }
 
-    public static <T extends PathfinderMob & IAnimated> ChainedActions.Builder<T> chainBuilder(AnimatedAction anim, int transitionTime, float offset, int weight) {
+    public static <T extends PathfinderMob & AnimatedEntity> ChainedActions.Builder<T> chainBuilder(AnimatedAction anim, int transitionTime, float offset, int weight) {
         return chainBuilder(anim, transitionTime, offset, weight, e -> true);
     }
 
@@ -205,13 +205,14 @@ public class GoalAttackAction<T extends PathfinderMob & IAnimated> {
      * @param offset         Offset of the animation in seconds
      * @param predicate      Condition for this chain
      */
-    public static <T extends PathfinderMob & IAnimated> ChainedActions.Builder<T> chainBuilder(AnimatedAction anim, int transitionTime, float offset, int weight, Predicate<T> predicate) {
+    public static <T extends PathfinderMob & AnimatedEntity> ChainedActions.Builder<T> chainBuilder(AnimatedAction anim, int transitionTime, float offset, int weight, Predicate<T> predicate) {
         return new ChainedActions.Builder<>(anim, transitionTime, offset, weight, predicate);
     }
 
-    private record ChainList<T extends PathfinderMob & IAnimated>(List<ChainedAction> chains, Predicate<T> predicate) {
+    private record ChainList<T extends PathfinderMob & AnimatedEntity>(List<ChainedAction> chains,
+                                                                       Predicate<T> predicate) {
 
-        private static class ChainListBuilder<T extends PathfinderMob & IAnimated> {
+        private static class ChainListBuilder<T extends PathfinderMob & AnimatedEntity> {
 
             private final ImmutableList.Builder<ChainedAction> chains = new ImmutableList.Builder<>();
             private final int weight;

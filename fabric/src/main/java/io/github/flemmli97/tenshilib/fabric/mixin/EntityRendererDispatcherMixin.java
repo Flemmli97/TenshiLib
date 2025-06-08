@@ -1,6 +1,6 @@
 package io.github.flemmli97.tenshilib.fabric.mixin;
 
-import io.github.flemmli97.tenshilib.fabric.platform.patreon.ClientPatreonImpl;
+import io.github.flemmli97.tenshilib.fabric.loader.patreon.FabricPatreonClientUtil;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.resources.PlayerSkin;
@@ -22,6 +22,6 @@ public abstract class EntityRendererDispatcherMixin {
 
     @Inject(method = "onResourceManagerReload", at = @At("RETURN"))
     private void initRendererHook(ResourceManager resourceManager, CallbackInfo info) {
-        ClientPatreonImpl.addPatreonLayer(this.playerRenderers);
+        FabricPatreonClientUtil.addPatreonLayer(this.playerRenderers);
     }
 }

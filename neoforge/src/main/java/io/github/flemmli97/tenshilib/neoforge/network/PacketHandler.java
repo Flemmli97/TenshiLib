@@ -6,9 +6,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
@@ -35,10 +33,6 @@ public class PacketHandler {
     public static void sendToClientChecked(CustomPacketPayload pkt, ServerPlayer player) {
         if (hasChannel(pkt, player))
             player.connection.send(pkt);
-    }
-
-    public static void sendToTracking(CustomPacketPayload message, Entity e) {
-        PacketDistributor.sendToPlayersTrackingEntity(e, message);
     }
 
     private static boolean hasChannel(CustomPacketPayload pkt, ServerPlayer player) {

@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.common.entity.ai.animated.impl;
 
-import io.github.flemmli97.tenshilib.api.entity.AnimatedAction;
-import io.github.flemmli97.tenshilib.common.entity.IAnimated;
+import io.github.flemmli97.tenshilib.common.entity.AnimatedAction;
+import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.ActionRun;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.AnimatedAttackGoal;
 import net.minecraft.util.Mth;
@@ -10,7 +10,7 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.phys.Vec3;
 
-public class KeepDistanceRunner<T extends PathfinderMob & IAnimated> implements ActionRun<T> {
+public class KeepDistanceRunner<T extends PathfinderMob & AnimatedEntity> implements ActionRun<T> {
 
     private final double speed, maxDistSqr, minDistSqr;
     private final int dist;
