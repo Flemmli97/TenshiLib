@@ -1,6 +1,5 @@
 package io.github.flemmli97.tenshilib.neoforge.client.events;
 
-import io.github.flemmli97.tenshilib.patreon.client.PatreonClientUtil;
 import io.github.flemmli97.tenshilib.patreon.client.PatreonLayer;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -8,17 +7,11 @@ import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.ScreenEvent;
-import net.neoforged.neoforge.common.NeoForge;
-
-import java.util.function.Consumer;
 
 public class PatreonClientSetup {
 
     public static void setup(IEventBus modBus) {
         modBus.addListener(PatreonClientSetup::addLayerEvent);
-        Consumer<ScreenEvent.Init.Post> screen = event -> PatreonClientUtil.addPatreonButton(event.getScreen());
-        NeoForge.EVENT_BUS.addListener(screen);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

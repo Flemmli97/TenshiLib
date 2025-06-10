@@ -12,4 +12,7 @@ public interface ScreenAccessor {
     @Invoker("addRenderableWidget")
     <T extends GuiEventListener & Renderable> T addRenderableWidgetTo(T widget);
 
+    @Invoker("removeWidget")
+    void removeWidgetFrom(GuiEventListener widget);
+
 }

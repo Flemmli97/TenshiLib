@@ -12,9 +12,15 @@ import net.minecraft.world.entity.player.Player;
 
 public class PatreonClientUtil {
 
+    private static PatreonButton last;
+
     public static void addPatreonButton(Screen screen) {
         if (screen instanceof SkinCustomizationScreen skin) {
-            ((ScreenAccessor) screen).addRenderableWidgetTo(new PatreonButton(screen.width - 32, screen.height - 32, skin));
+            if (last != null)
+                ((ScreenAccessor) screen).removeWidgetFrom(last);
+            ((ScreenAccessor) screen).addRenderableWidgetTo(last = new PatreonButton(skin.width - 32, skin.height - 32, skin));
+        } else {
+            last = null;
         }
     }
 
