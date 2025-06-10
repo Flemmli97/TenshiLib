@@ -19,10 +19,14 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class BedrockGeometryParser {
@@ -81,11 +85,25 @@ public class BedrockGeometryParser {
 
             ModelPartBuilder root = new ModelPartBuilder();
             Map<String, ModelPartBuilder> parts = new HashMap<>();
-            this.bones().forEach(bone -> {
-                CubeListBuilder cubes = CubeListBuilder.create();
-                bone.cubes().forEach(cube -> {
-                    if (!cube.rotation().equals(ZERO))
-                        throw new JsonParseException("Rotations are not supported for cubes. Use a group for that!");
+            this.bones().forEach(bone -> this.bakeBone(bone, parts, boneMap, root));
+            return new ModelPartsHolder(root.bake(this.textureWidth, this.textureHeight));
+        }
+
+        private void bakeBone(Bone bone, Map<String, ModelPartBuilder> map, Map<String, Bone> boneMap, ModelPartBuilder root) {
+            CubeListBuilder cubes = CubeListBuilder.create();
+            Set<Bone> cubeRotations = new HashSet<>();
+            bone.cubes().forEach(cube -> {
+                if (!cube.rotation().equals(ZERO)) {
+                    Bone newBone = cubeRotations.stream().filter(b -> b.rotation().equals(cube.rotation()) && b.pivot().equals(cube.pivot()))
+                            .findFirst().orElse(null);
+                    if (newBone == null) {
+                        newBone = new Bone(bone.name() + "_generated_" + UUID.randomUUID(), bone.name(),
+                                bone.mirror(), bone.inflate(), cube.pivot(), cube.rotation(), new ArrayList<>());
+                        cubeRotations.add(newBone);
+                    }
+                    newBone.cubes().add(new Cube(cube.origin(), cube.size(), cube.pivot(), ZERO,
+                            cube.mirror(), cube.inflate(), cube.uv()));
+                } else {
                     if (cube.uv != null)
                         cubes.texOffs(cube.uv[0], cube.uv[1]);
                     cubes.mirror(cube.mirror());
@@ -93,20 +111,20 @@ public class BedrockGeometryParser {
                             bone.pivot().y() - (cube.origin().y() + cube.size().y()),
                             cube.origin().z() - bone.pivot().z(),
                             cube.size().x(), cube.size().y(), cube.size().z(), new CubeDeformation(cube.inflate));
-                });
-                ModelPartBuilder build = parts.compute(bone.name(), (name, old) -> {
-                    Vector3f origin = calculateOrigin(bone, boneMap);
-                    ModelPartBuilder builder = old == null ? new ModelPartBuilder() : old;
-                    return builder.update(cubes.getCubes(), PartPose.offsetAndRotation(origin.x(), origin.y(), origin.z(),
-                            bone.rotation().x() * Mth.DEG_TO_RAD, bone.rotation().y() * Mth.DEG_TO_RAD, bone.rotation().z() * Mth.DEG_TO_RAD));
-                });
-                if (bone.parent().isEmpty())
-                    root.addChild(bone.name(), build);
-                else
-                    parts.computeIfAbsent(bone.parent(), k -> new ModelPartBuilder())
-                            .addChild(bone.name(), build);
+                }
             });
-            return new ModelPartsHolder(root.bake(this.textureWidth, this.textureHeight));
+            ModelPartBuilder build = map.compute(bone.name(), (name, old) -> {
+                Vector3f origin = calculateOrigin(bone, boneMap);
+                ModelPartBuilder builder = old == null ? new ModelPartBuilder() : old;
+                return builder.update(cubes.getCubes(), PartPose.offsetAndRotation(origin.x(), origin.y(), origin.z(),
+                        bone.rotation().x() * Mth.DEG_TO_RAD, bone.rotation().y() * Mth.DEG_TO_RAD, bone.rotation().z() * Mth.DEG_TO_RAD));
+            });
+            if (bone.parent().isEmpty())
+                root.addChild(bone.name(), build);
+            else
+                map.computeIfAbsent(bone.parent(), k -> new ModelPartBuilder())
+                        .addChild(bone.name(), build);
+            cubeRotations.forEach(b -> this.bakeBone(b, map, boneMap, root));
         }
     }
 
