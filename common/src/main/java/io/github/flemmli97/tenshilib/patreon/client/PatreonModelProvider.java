@@ -10,8 +10,6 @@ import io.github.flemmli97.tenshilib.patreon.client.model.PatreonModelData;
 import io.github.flemmli97.tenshilib.patreon.effects.PatreonEffectConfig;
 import io.github.flemmli97.tenshilib.patreon.effects.PatreonEffects;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.model.geom.ModelLayerLocation;
-import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -20,7 +18,6 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 public class PatreonModelProvider {
@@ -47,13 +44,6 @@ public class PatreonModelProvider {
 
     public static EffectRenderer<?> get(PatreonEffectConfig conf) {
         return DATA.get(conf);
-    }
-
-    public static void registerModelLayers(BiConsumer<ModelLayerLocation, Supplier<LayerDefinition>> cons) {
-        cons.accept(MeguHatModel.LAYER_LOCATION, MeguHatModel::createBodyLayer);
-        cons.accept(ChomusukeModel.LAYER_LOCATION, ChomusukeModel::createBodyLayer);
-        cons.accept(CatModel.LAYER_LOCATION, CatModel::createBodyLayer);
-        cons.accept(HaloModel.LAYER_LOCATION, HaloModel::createBodyLayer);
     }
 
     private static <T extends EntityModel<Player> & PatreonModelData<Player>, M extends EffectRenderer<T>> M register(PatreonEffectConfig conf, M val) {

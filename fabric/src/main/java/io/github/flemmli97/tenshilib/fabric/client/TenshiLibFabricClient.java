@@ -12,7 +12,7 @@ public class TenshiLibFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientEvents.itemColors();
-        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new AnimReloader());
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new ModelAssetsReloader());
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new RiderLayerReloader());
         FabricPatreonClientUtil.setup();
         CoreShaderRegistrationCallback.EVENT.register(reg -> TenshilibShaders.registerShader(reg::register));

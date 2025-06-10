@@ -2,7 +2,6 @@ package io.github.flemmli97.tenshilib.neoforge.client.events;
 
 import io.github.flemmli97.tenshilib.patreon.client.PatreonClientUtil;
 import io.github.flemmli97.tenshilib.patreon.client.PatreonLayer;
-import io.github.flemmli97.tenshilib.patreon.client.PatreonModelProvider;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.resources.PlayerSkin;
@@ -18,9 +17,6 @@ public class PatreonClientSetup {
 
     public static void setup(IEventBus modBus) {
         modBus.addListener(PatreonClientSetup::addLayerEvent);
-        Consumer<EntityRenderersEvent.RegisterLayerDefinitions> ml = event -> PatreonModelProvider.registerModelLayers(event::registerLayerDefinition);
-        modBus.addListener(ml);
-
         Consumer<ScreenEvent.Init.Post> screen = event -> PatreonClientUtil.addPatreonButton(event.getScreen());
         NeoForge.EVENT_BUS.addListener(screen);
     }

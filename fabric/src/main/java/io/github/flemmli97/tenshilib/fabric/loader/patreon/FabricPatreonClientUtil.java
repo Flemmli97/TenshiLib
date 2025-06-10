@@ -3,8 +3,6 @@ package io.github.flemmli97.tenshilib.fabric.loader.patreon;
 import io.github.flemmli97.tenshilib.fabric.mixin.LivingEntityRendererAccessor;
 import io.github.flemmli97.tenshilib.patreon.client.PatreonClientUtil;
 import io.github.flemmli97.tenshilib.patreon.client.PatreonLayer;
-import io.github.flemmli97.tenshilib.patreon.client.PatreonModelProvider;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -17,7 +15,6 @@ import java.util.Map;
 public class FabricPatreonClientUtil {
 
     public static void setup() {
-        PatreonModelProvider.registerModelLayers(((modelLayerLocation, layerDefinitionSupplier) -> EntityModelLayerRegistry.registerModelLayer(modelLayerLocation, layerDefinitionSupplier::get)));
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> PatreonClientUtil.addPatreonButton(screen));
     }
 

@@ -1,9 +1,10 @@
 package io.github.flemmli97.tenshilib.neoforge.client.events;
 
-import io.github.flemmli97.tenshilib.client.AnimationManager;
 import io.github.flemmli97.tenshilib.client.ClientHandlers;
 import io.github.flemmli97.tenshilib.client.CustomRiderRendererManager;
 import io.github.flemmli97.tenshilib.client.TenshilibShaders;
+import io.github.flemmli97.tenshilib.client.data.AnimationManager;
+import io.github.flemmli97.tenshilib.client.data.ModelManager;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.world.InteractionHand;
@@ -18,6 +19,7 @@ public class ClientEvents {
     public static void reloadListener(RegisterClientReloadListenersEvent event) {
         event.registerReloadListener(AnimationManager.getInstance());
         event.registerReloadListener(CustomRiderRendererManager.getInstance());
+        event.registerReloadListener(ModelManager.getInstance());
     }
 
     public static void clickSpecial(InputEvent.InteractionKeyMappingTriggered event) {

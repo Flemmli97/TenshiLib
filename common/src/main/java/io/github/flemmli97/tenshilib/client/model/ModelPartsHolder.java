@@ -59,6 +59,7 @@ public class ModelPartsHolder {
     }
 
     public static class ModelPartExtended {
+
         public float x, y, z;
         public float xRot, yRot, zRot;
         public float xScale = 1, yScale = 1, zScale = 1;
