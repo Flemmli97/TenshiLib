@@ -1,11 +1,11 @@
 package io.github.flemmli97.tenshilib.patreon.pkts;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
-import io.github.flemmli97.tenshilib.loader.TenshiLibNetworking;
+import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
 import io.github.flemmli97.tenshilib.patreon.PatreonDataManager;
-import io.github.flemmli97.tenshilib.patreon.TenshiLibPatreonPlatform;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlayerSetting;
 import io.github.flemmli97.tenshilib.patreon.RenderLocation;
+import io.github.flemmli97.tenshilib.patreon.TenshiLibPatreonPlatform;
 import io.github.flemmli97.tenshilib.patreon.effects.PatreonEffectConfig;
 import io.github.flemmli97.tenshilib.patreon.effects.PatreonEffects;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -53,7 +53,7 @@ public class C2SEffectUpdatePkt implements CustomPacketPayload {
         } else {
             setting.read(pkt, pkt.id);
         }
-        TenshiLibNetworking.INSTANCE.sendToTracking(new S2CEffectUpdatePkt(player.getId(), setting.effect() != null ? setting.effect().id() : "", setting.shouldRender(), setting.getRenderLocation(), setting.getColor()),
+        LoaderNetwork.INSTANCE.sendToTracking(new S2CEffectUpdatePkt(player.getId(), setting.effect() != null ? setting.effect().id() : "", setting.shouldRender(), setting.getRenderLocation(), setting.getColor()),
                 player);
     }
 

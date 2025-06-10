@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  */
 @Mixin(ServerEntity.class)
 public abstract class TrackingMixin {
+
     @Shadow
     @Final
     private Entity entity;

@@ -3,8 +3,8 @@ package io.github.flemmli97.tenshilib.neoforge;
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import io.github.flemmli97.tenshilib.neoforge.client.events.ClientEvents;
+import io.github.flemmli97.tenshilib.neoforge.client.events.PatreonClientSetup;
 import io.github.flemmli97.tenshilib.neoforge.events.CommonEvents;
-import io.github.flemmli97.tenshilib.neoforge.loader.patreon.NeoForgePatreonClientUtil;
 import io.github.flemmli97.tenshilib.neoforge.loader.patreon.TenshiLibPatreonImpl;
 import io.github.flemmli97.tenshilib.neoforge.network.PacketHandler;
 import net.minecraft.world.level.block.DispenserBlock;
@@ -31,7 +31,7 @@ public class TenshiLibNeoForge {
             modBus.addListener(ClientEvents::reloadListener);
             modBus.addListener(ClientEvents::itemColors);
             modBus.addListener(ClientEvents::registerShader);
-            NeoForgePatreonClientUtil.setup(modBus);
+            PatreonClientSetup.setup(modBus);
             eventBus.addListener(ClientEvents::clickSpecial);
             eventBus.addListener(ClientEvents::onEntityRender);
         }

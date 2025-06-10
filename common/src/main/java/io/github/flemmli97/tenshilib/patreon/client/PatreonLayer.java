@@ -1,8 +1,8 @@
 package io.github.flemmli97.tenshilib.patreon.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import io.github.flemmli97.tenshilib.patreon.TenshiLibPatreonPlatform;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlayerSetting;
+import io.github.flemmli97.tenshilib.patreon.TenshiLibPatreonPlatform;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HeadedModel;

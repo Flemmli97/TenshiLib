@@ -3,7 +3,7 @@ package io.github.flemmli97.tenshilib.common.item;
 import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.entity.EntityUtils;
 import io.github.flemmli97.tenshilib.common.network.S2CAnimationScreen;
-import io.github.flemmli97.tenshilib.loader.TenshiLibNetworking;
+import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -53,7 +53,7 @@ public class AnimationDebugger extends Item {
                 Mob storedEntity = EntityUtils.findFromUUID(Mob.class, player.level(), uuid);
                 if (storedEntity instanceof AnimatedEntity animated && storedEntity.isAlive()) {
                     if (player.isShiftKeyDown()) {
-                        TenshiLibNetworking.INSTANCE.sendToClient(new S2CAnimationScreen(usedHand, (Mob) animated), serverPlayer);
+                        LoaderNetwork.INSTANCE.sendToPlayer(new S2CAnimationScreen(usedHand, (Mob) animated), serverPlayer);
                     } else {
                         int idx = this.getIndex(stack);
                         if (idx >= 0 && idx < animated.getAnimationHandler().getAnimations().length) {

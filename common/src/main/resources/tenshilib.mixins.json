@@ -6,21 +6,7 @@
   "mixins": [
     "LivingMixin"
   ],
-  "client": [
-    "EntityRenderDispatcherAccessor",
-    "HumanoidArmorMixin",
-    "LivingEntityRendererAccessor",
-    "LivingOverlayMixin",
-    "ModelPartAccessor",
-    "OverlayTextureMixin",
-    "PoseStackMixin",
-    "ScreenAccessor",
-    "MinecraftMixin",
-    "dual.LivingEntityMixin",
-    "dual.ItemInHandRendererMixin",
-    "dual.PlayerMixin",
-    "dual.HumanoidModelMixin"
-  ],
+  "client": ["EntityRenderDispatcherAccessor", "HumanoidArmorMixin", "LivingEntityRendererAccessor", "LivingOverlayMixin", "MinecraftMixin", "ModelPartAccessor", "OverlayTextureMixin", "PoseStackMixin", "ScreenAccessor", "dual.HumanoidModelMixin", "dual.ItemInHandRendererMixin", "dual.LivingEntityMixin", "dual.PlayerMixin"],
   "injectors": {
     "defaultRequire": 1
   }

@@ -1,6 +1,6 @@
 package io.github.flemmli97.tenshilib.neoforge.loader.registry;
 
-import io.github.flemmli97.tenshilib.loader.registry.LoaderRegistry;
+import io.github.flemmli97.tenshilib.loader.registry.LoaderRegister;
 import io.github.flemmli97.tenshilib.loader.registry.RegistryEntrySupplier;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -11,14 +11,14 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public class DeferredRegistryHandler<T> implements LoaderRegistry<T> {
+public class DeferredRegisterHandler<T> implements LoaderRegister<T> {
 
     private final DeferredRegister<T> deferredRegister;
 
     private final Set<RegistryObjectWrapper<T, ? extends T>> entries = new LinkedHashSet<>();
     private final Set<RegistryObjectWrapper<T, ? extends T>> entriesView = Collections.unmodifiableSet(this.entries);
 
-    public DeferredRegistryHandler(DeferredRegister<T> deferredRegister) {
+    public DeferredRegisterHandler(DeferredRegister<T> deferredRegister) {
         this.deferredRegister = deferredRegister;
     }
 

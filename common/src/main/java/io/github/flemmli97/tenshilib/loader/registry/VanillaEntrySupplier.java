@@ -2,31 +2,29 @@ package io.github.flemmli97.tenshilib.loader.registry;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
 public class VanillaEntrySupplier<T, I extends T> implements RegistryEntrySupplier<T, I> {
 
     private final ResourceLocation name;
-    @Nullable
-    private I value;
+    private Holder<T> holder;
 
     protected VanillaEntrySupplier(ResourceLocation res) {
         this.name = res;
     }
 
-    @SuppressWarnings("unchecked")
     public void updateValue(Registry<T> registry) {
-        this.value = (I) registry.get(this.name);
+        this.holder = registry.getHolder(this.name).orElse(null);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public I get() {
-        I ret = this.value;
-        Objects.requireNonNull(ret, () -> "Object not present: " + this.name);
-        return ret;
+        Objects.requireNonNull(this.holder, () -> "Holder not present: " + this.name);
+        return (I) this.holder.value();
     }
 
     @Override
@@ -35,7 +33,12 @@ public class VanillaEntrySupplier<T, I extends T> implements RegistryEntrySuppli
     }
 
     @Override
+    public ResourceKey<T> getKey() {
+        return this.holder.unwrapKey().get();
+    }
+
+    @Override
     public Holder<T> asHolder() {
-        return Holder.direct(this.value);
+        return this.holder;
     }
 }

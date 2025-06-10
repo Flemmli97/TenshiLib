@@ -5,9 +5,9 @@ import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.entity.OverlayEntityRender;
 import io.github.flemmli97.tenshilib.common.item.AOEWeapon;
 import io.github.flemmli97.tenshilib.common.item.AnimationDebugger;
-import io.github.flemmli97.tenshilib.common.item.IExtendedWeapon;
+import io.github.flemmli97.tenshilib.common.item.ExtendedWeapon;
 import io.github.flemmli97.tenshilib.common.network.C2SPacketHit;
-import io.github.flemmli97.tenshilib.loader.TenshiLibNetworking;
+import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.InteractionHand;
@@ -53,15 +53,15 @@ public class ClientHandlers {
         Minecraft client = Minecraft.getInstance();
         ItemStack main = client.player.getMainHandItem();
         if (client.hitResult != null && (client.hitResult.getType() != HitResult.Type.BLOCK || (main.getItem() instanceof AOEWeapon aoe && aoe.disableBlockAttack(client.player, main)))) {
-            if (main.getItem() instanceof IExtendedWeapon weapon) {
-                TenshiLibNetworking.INSTANCE.sendToServer(new C2SPacketHit(C2SPacketHit.HitType.EXT));
+            if (main.getItem() instanceof ExtendedWeapon weapon) {
+                LoaderNetwork.INSTANCE.sendToServer(new C2SPacketHit(C2SPacketHit.HitType.EXT));
                 if (weapon.resetAttackStrength(client.player, main))
                     client.player.resetAttackStrengthTicker();
-                if (weapon.swingWeapon(client.player, main))
+                if (weapon.shouldSwingWeapon(client.player, main))
                     client.player.swing(InteractionHand.MAIN_HAND);
                 return true;
             } else if (main.getItem() instanceof AOEWeapon weapon) {
-                TenshiLibNetworking.INSTANCE.sendToServer(new C2SPacketHit(C2SPacketHit.HitType.AOE));
+                LoaderNetwork.INSTANCE.sendToServer(new C2SPacketHit(C2SPacketHit.HitType.AOE));
                 if (weapon.resetAttackStrength(client.player, main))
                     client.player.resetAttackStrengthTicker();
                 if (weapon.swingWeapon(client.player, main))

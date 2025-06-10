@@ -3,7 +3,7 @@ package io.github.flemmli97.tenshilib.loader.registry;
 import java.util.Collection;
 import java.util.function.Supplier;
 
-public interface LoaderRegistry<T> {
+public interface LoaderRegister<T> {
 
     <I extends T> RegistryEntrySupplier<T, I> register(String name, Supplier<I> sup);
 

@@ -1,13 +1,14 @@
 package io.github.flemmli97.tenshilib.loader;
 
-import io.github.flemmli97.tenshilib.loader.registry.LoaderRegistry;
-import io.github.flemmli97.tenshilib.loader.registry.VanillaRegistryHandler;
+import io.github.flemmli97.tenshilib.loader.registry.LoaderRegister;
+import io.github.flemmli97.tenshilib.loader.registry.VanillaRegisterHandler;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.function.Consumer;
-
+/**
+ * Loader agnostic registry interface
+ */
 public abstract class LoaderRegistryAccess {
 
     public static final LoaderRegistryAccess INSTANCE = LoaderInitializer.getImplInstance(LoaderRegistryAccess.class,
@@ -18,8 +19,8 @@ public abstract class LoaderRegistryAccess {
      * Creates a registry handler for the matching key.
      * The registry needs to exist for the key else an exeption will be thrown.
      */
-    public <T> LoaderRegistry<T> of(ResourceKey<? extends Registry<T>> key, String modid) {
-        return new VanillaRegistryHandler<>(key, modid);
+    public <T> LoaderRegister<T> of(ResourceKey<? extends Registry<T>> key, String modid) {
+        return new VanillaRegisterHandler<>(key, modid);
     }
 
     /**
@@ -27,15 +28,22 @@ public abstract class LoaderRegistryAccess {
      * Note on fabric: Since there is no loading order be careful of calling this. The registry might not have been created yet
      * In most cases this shouldn't be used
      */
-    public abstract <T> LoaderRegistry<T> customRegistry(ResourceKey<? extends Registry<T>> registryKey, String modid);
+    public abstract <T> LoaderRegister<T> customRegistry(ResourceKey<? extends Registry<T>> registryKey, String modid);
 
     /**
-     * Creates a custom registry.
+     * Creates a new custom registry.
      * On fabric the registry is created immediately
      * On (neo)forge the registry is created on RegistryEvent.NewRegistry
-     *
-     * @param registryRef A callback to the newly created Registry
      */
-    public abstract <T> LoaderRegistry<T> newRegistry(ResourceKey<? extends Registry<T>> registryKey, ResourceLocation defaultVal, boolean saveToDisk, boolean sync, Consumer<Registry<T>> registryRef);
+    public abstract <T> CustomLoaderRegistry<T> newRegistry(ResourceKey<? extends Registry<T>> registryKey, ResourceLocation defaultVal, boolean saveToDisk, boolean sync);
 
+    /**
+     * A pair of a {@link LoaderRegister} used to register new content and the underlying {@link Registry}
+     * This is used for custom registry.
+     *
+     * @param register Register to register new content with
+     * @param registry The actual registry to access registered content with
+     */
+    public record CustomLoaderRegistry<T>(LoaderRegister<T> register, Registry<T> registry) {
+    }
 }

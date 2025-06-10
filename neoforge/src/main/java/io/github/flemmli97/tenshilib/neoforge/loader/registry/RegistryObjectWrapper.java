@@ -2,6 +2,7 @@ package io.github.flemmli97.tenshilib.neoforge.loader.registry;
 
 import io.github.flemmli97.tenshilib.loader.registry.RegistryEntrySupplier;
 import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
@@ -11,6 +12,11 @@ public record RegistryObjectWrapper<T, I extends T>(
     @Override
     public ResourceLocation getID() {
         return this.object.getId();
+    }
+
+    @Override
+    public ResourceKey<T> getKey() {
+        return this.object.getKey();
     }
 
     @Override

@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.common.entity;
 
 import io.github.flemmli97.tenshilib.common.network.S2CEntityAnimation;
-import io.github.flemmli97.tenshilib.loader.TenshiLibNetworking;
+import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
 import net.minecraft.util.Mth;
 import net.minecraft.util.ToFloatFunction;
 import net.minecraft.world.entity.Entity;
@@ -128,7 +128,7 @@ public class AnimationHandler<T extends Entity & AnimatedEntity> {
         this.currentAnimation = anim == null ? null : anim.create(startTransition, endTransition,
                 offset, this.animationSpeedHandler == null ? anim.getSpeed() : this.animationSpeedHandler.apply(anim));
         if (!this.entity.level().isClientSide) {
-            TenshiLibNetworking.INSTANCE.sendToTracking(S2CEntityAnimation.create(this.entity, startTransition, endTransition, offset), this.entity);
+            LoaderNetwork.INSTANCE.sendToTracking(S2CEntityAnimation.create(this.entity, startTransition, endTransition, offset), this.entity);
         }
     }
 

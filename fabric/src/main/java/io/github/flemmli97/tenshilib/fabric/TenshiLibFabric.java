@@ -7,7 +7,7 @@ import io.github.flemmli97.tenshilib.common.network.S2CEntityAnimation;
 import io.github.flemmli97.tenshilib.fabric.events.CommonEvents;
 import io.github.flemmli97.tenshilib.fabric.loader.patreon.TenshiLibPatreonImpl;
 import io.github.flemmli97.tenshilib.fabric.network.PacketHandler;
-import io.github.flemmli97.tenshilib.loader.TenshiLibNetworking;
+import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
@@ -24,7 +24,7 @@ public class TenshiLibFabric implements ModInitializer {
         EntityTrackingEvents.START_TRACKING.register(((entity, player) -> {
             if (entity instanceof AnimatedEntity animated && animated.getAnimationHandler().hasAnimation()) {
                 AnimatedAction anim = animated.getAnimationHandler().getAnimation();
-                TenshiLibNetworking.INSTANCE.sendToClient(S2CEntityAnimation.create((Entity & AnimatedEntity) entity,
+                LoaderNetwork.INSTANCE.sendToPlayer(S2CEntityAnimation.create((Entity & AnimatedEntity) entity,
                         anim.getStartTransition(), anim.getEndTransitionTime(), anim.getTick(1)), player);
             }
         }));

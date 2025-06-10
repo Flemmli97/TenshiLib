@@ -6,7 +6,7 @@ import io.github.flemmli97.tenshilib.common.item.AOEWeapon;
 import io.github.flemmli97.tenshilib.common.item.AOEWeaponHandler;
 import io.github.flemmli97.tenshilib.common.item.DualWeapon;
 import io.github.flemmli97.tenshilib.common.network.S2CEntityAnimation;
-import io.github.flemmli97.tenshilib.loader.TenshiLibNetworking;
+import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
@@ -39,7 +39,7 @@ public class CommonEvents {
     public static void onTracking(PlayerEvent.StartTracking event) {
         if (event.getTarget() instanceof AnimatedEntity animated && animated.getAnimationHandler().hasAnimation()) {
             AnimatedAction anim = animated.getAnimationHandler().getAnimation();
-            TenshiLibNetworking.INSTANCE.sendToClient(S2CEntityAnimation.create((Entity & AnimatedEntity) event.getTarget(),
+            LoaderNetwork.INSTANCE.sendToPlayer(S2CEntityAnimation.create((Entity & AnimatedEntity) event.getTarget(),
                     anim.getStartTransition(), anim.getEndTransitionTime(), anim.getTick(1)), (ServerPlayer) event.getEntity());
         }
     }

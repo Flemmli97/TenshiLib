@@ -1,8 +1,8 @@
 package io.github.flemmli97.tenshilib.patreon.pkts;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
-import io.github.flemmli97.tenshilib.patreon.TenshiLibPatreonPlatform;
 import io.github.flemmli97.tenshilib.patreon.RenderLocation;
+import io.github.flemmli97.tenshilib.patreon.TenshiLibPatreonPlatform;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;

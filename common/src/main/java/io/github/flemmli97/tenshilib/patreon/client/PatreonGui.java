@@ -2,11 +2,11 @@ package io.github.flemmli97.tenshilib.patreon.client;
 
 import io.github.flemmli97.tenshilib.client.Color;
 import io.github.flemmli97.tenshilib.client.render.RenderUtils;
-import io.github.flemmli97.tenshilib.loader.TenshiLibNetworking;
+import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
 import io.github.flemmli97.tenshilib.patreon.PatreonDataManager;
-import io.github.flemmli97.tenshilib.patreon.TenshiLibPatreonPlatform;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlayerSetting;
 import io.github.flemmli97.tenshilib.patreon.RenderLocation;
+import io.github.flemmli97.tenshilib.patreon.TenshiLibPatreonPlatform;
 import io.github.flemmli97.tenshilib.patreon.effects.GuiElement;
 import io.github.flemmli97.tenshilib.patreon.effects.PatreonEffectConfig;
 import io.github.flemmli97.tenshilib.patreon.effects.PatreonEffects;
@@ -74,7 +74,7 @@ public class PatreonGui extends Screen {
         name = CommonComponents.GUI_DONE;
         this.setting = TenshiLibPatreonPlatform.INSTANCE.playerSettings(this.minecraft.player);
         if (this.setting == null) {
-            this.addRenderableWidget(Button.builder(Component.translatable("tenshilib.patreon.save"), button -> TenshiLibNetworking.INSTANCE.sendToServer(new C2SEffectUpdatePkt(this.effect.id(), this.render, this.renderLocation, this.color)))
+            this.addRenderableWidget(Button.builder(Component.translatable("tenshilib.patreon.save"), button -> LoaderNetwork.INSTANCE.sendToServer(new C2SEffectUpdatePkt(this.effect.id(), this.render, this.renderLocation, this.color)))
                     .pos(this.width / 2 - 100, this.height / 8 + 24 * 7).size(200, 20).build());
             this.addRenderableWidget(Button.builder(name, button -> this.minecraft.setScreen(this.parent))
                     .pos(this.width / 2 - 100, this.height / 8 + 24 * 8).size(200, 20).build());
@@ -157,7 +157,7 @@ public class PatreonGui extends Screen {
         }
         this.addRenderableWidget(Button.builder(Component.translatable("tenshilib.patreon.save"), button -> {
                     if (this.effect != null)
-                        TenshiLibNetworking.INSTANCE.sendToServer(new C2SEffectUpdatePkt(this.effect.id(), this.render, this.renderLocation, this.color));
+                        LoaderNetwork.INSTANCE.sendToServer(new C2SEffectUpdatePkt(this.effect.id(), this.render, this.renderLocation, this.color));
                 })
                 .pos(this.width / 2 - 100, this.height / 8 + yOffset).size(200, 20).build());
         yOffset += 24;
@@ -218,6 +218,6 @@ public class PatreonGui extends Screen {
     public void removed() {
         super.removed();
         if (Minecraft.getInstance().getConnection() != null)
-            TenshiLibNetworking.INSTANCE.sendToServer(C2SRequestUpdateClientPkt.INSTANCE);
+            LoaderNetwork.INSTANCE.sendToServer(C2SRequestUpdateClientPkt.INSTANCE);
     }
 }

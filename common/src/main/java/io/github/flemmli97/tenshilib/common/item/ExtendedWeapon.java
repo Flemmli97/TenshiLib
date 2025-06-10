@@ -3,25 +3,24 @@ package io.github.flemmli97.tenshilib.common.item;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.HitResult;
 
-/**
- * Items with modified attack range
- */
-public interface IExtendedWeapon {
+// TODO
+public interface ExtendedWeapon {
 
-    default float getRange(LivingEntity entity, ItemStack stack) {
-        return 3;
+    default boolean shouldAttack(HitResult hitResult) {
+        return hitResult.getType() == HitResult.Type.ENTITY;
     }
 
     default boolean resetAttackStrength(LivingEntity entity, ItemStack stack) {
         return true;
     }
 
-    default boolean swingWeapon(LivingEntity entity, ItemStack stack) {
+    default boolean shouldSwingWeapon(LivingEntity entity, ItemStack stack) {
         return true;
     }
 
-    default boolean onServerSwing(LivingEntity entity, ItemStack stack) {
+    default boolean onTryAttackServer(LivingEntity entity, ItemStack stack) {
         return true;
     }
 

@@ -5,7 +5,7 @@ import io.github.flemmli97.tenshilib.client.render.RenderUtils;
 import io.github.flemmli97.tenshilib.common.entity.AnimatedAction;
 import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.network.C2SAnimationDebuggerUpdate;
-import io.github.flemmli97.tenshilib.loader.TenshiLibNetworking;
+import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -79,7 +79,7 @@ public class AnimationScreen<T extends LivingEntity & AnimatedEntity> extends Sc
         });
         yOff += 24;
         this.addRenderableWidget(Button.builder(Component.translatable("tenshilib.gui.save"), b -> {
-            TenshiLibNetworking.INSTANCE.sendToServer(new C2SAnimationDebuggerUpdate(this.hand, this.index));
+            LoaderNetwork.INSTANCE.sendToServer(new C2SAnimationDebuggerUpdate(this.hand, this.index));
             this.minecraft.setScreen(null);
         }).bounds(this.leftPos + this.sizeX / 2 - 50, this.topPos + yOff, 100, 20).build());
         this.addRenderableWidget(this.box);

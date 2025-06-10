@@ -12,14 +12,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public class VanillaRegistryHandler<T> implements LoaderRegistry<T> {
+public class VanillaRegisterHandler<T> implements LoaderRegister<T> {
 
     private final ResourceKey<? extends Registry<T>> key;
     private final String modid;
     private final Map<VanillaEntrySupplier<T, ? extends T>, Supplier<? extends T>> entries = new LinkedHashMap<>();
     private final Set<VanillaEntrySupplier<T, ? extends T>> entriesView = Collections.unmodifiableSet(this.entries.keySet());
 
-    public VanillaRegistryHandler(ResourceKey<? extends Registry<T>> key, String modid) {
+    public VanillaRegisterHandler(ResourceKey<? extends Registry<T>> key, String modid) {
         this.key = key;
         this.modid = modid;
     }
@@ -45,7 +45,7 @@ public class VanillaRegistryHandler<T> implements LoaderRegistry<T> {
     protected Registry<T> registryFrom() {
         Registry<?> reg = BuiltInRegistries.REGISTRY.get(this.key.location());
         if (reg == null)
-            throw new NullPointerException("Failed to get a corresponding registry for " + this.key);
+            throw new NullPointerException("Failed to get a corresponding register for " + this.key);
         return (Registry<T>) reg;
     }
 

@@ -1,6 +1,6 @@
 package io.github.flemmli97.tenshilib.fabric.mixin;
 
-import io.github.flemmli97.tenshilib.fabric.client.events.ClientEvents;
+import io.github.flemmli97.tenshilib.client.ClientHandlers;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,7 +12,7 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "startAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/HitResult;getType()Lnet/minecraft/world/phys/HitResult$Type;", shift = At.Shift.BY, by = -3), cancellable = true)
     private void leftClickAttack(CallbackInfoReturnable<Boolean> info) {
-        if (ClientEvents.clickSpecial()) {
+        if (ClientHandlers.emptyClick()) {
             info.setReturnValue(false);
             info.cancel();
         }

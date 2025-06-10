@@ -1,8 +1,8 @@
 package io.github.flemmli97.tenshilib.fabric.loader.patreon;
 
 import io.github.flemmli97.tenshilib.patreon.PatreonDataManager;
-import io.github.flemmli97.tenshilib.patreon.TenshiLibPatreonPlatform;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlayerSetting;
+import io.github.flemmli97.tenshilib.patreon.TenshiLibPatreonPlatform;
 import io.github.flemmli97.tenshilib.patreon.pkts.S2CEffectUpdatePkt;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;

@@ -1,9 +1,9 @@
 package io.github.flemmli97.tenshilib.patreon.client;
 
 import io.github.flemmli97.tenshilib.mixin.ScreenAccessor;
-import io.github.flemmli97.tenshilib.patreon.TenshiLibPatreonPlatform;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlayerSetting;
 import io.github.flemmli97.tenshilib.patreon.RenderLocation;
+import io.github.flemmli97.tenshilib.patreon.TenshiLibPatreonPlatform;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.SkinCustomizationScreen;
 import net.minecraft.world.entity.EquipmentSlot;

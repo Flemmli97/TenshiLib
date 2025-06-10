@@ -1,4 +1,4 @@
-package io.github.flemmli97.tenshilib.neoforge.loader.patreon;
+package io.github.flemmli97.tenshilib.neoforge.client.events;
 
 import io.github.flemmli97.tenshilib.patreon.client.PatreonClientUtil;
 import io.github.flemmli97.tenshilib.patreon.client.PatreonLayer;
@@ -14,10 +14,10 @@ import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.function.Consumer;
 
-public class NeoForgePatreonClientUtil {
+public class PatreonClientSetup {
 
     public static void setup(IEventBus modBus) {
-        modBus.addListener(NeoForgePatreonClientUtil::addLayerEvent);
+        modBus.addListener(PatreonClientSetup::addLayerEvent);
         Consumer<EntityRenderersEvent.RegisterLayerDefinitions> ml = event -> PatreonModelProvider.registerModelLayers(event::registerLayerDefinition);
         modBus.addListener(ml);
 
