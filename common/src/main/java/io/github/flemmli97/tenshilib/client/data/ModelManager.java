@@ -11,6 +11,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Stores Bedrock-Geo-Models. The files are read under assets/<modid>/model/entity and assigned the
@@ -48,6 +49,11 @@ public class ModelManager extends SimpleJsonResourceReloadListener {
     }
 
     public ReloadableCache<ModelPartsHolder> getModel(ResourceLocation res) {
-        return this.animations.computeIfAbsent(res, r -> new ReloadableCache<>());
+        return this.getModel(res, null);
+    }
+
+    public ReloadableCache<ModelPartsHolder> getModel(ResourceLocation res, Consumer<ModelPartsHolder> onChange) {
+        return this.animations.computeIfAbsent(res, r -> new ReloadableCache<>())
+                .onChange(onChange);
     }
 }
