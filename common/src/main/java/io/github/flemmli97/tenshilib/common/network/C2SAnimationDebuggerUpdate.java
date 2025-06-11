@@ -16,30 +16,28 @@ public class C2SAnimationDebuggerUpdate implements CustomPacketPayload {
     public static final StreamCodec<RegistryFriendlyByteBuf, C2SAnimationDebuggerUpdate> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public C2SAnimationDebuggerUpdate decode(RegistryFriendlyByteBuf buf) {
-            return new C2SAnimationDebuggerUpdate(buf.readEnum(InteractionHand.class), buf.readInt());
+            return new C2SAnimationDebuggerUpdate(buf.readEnum(InteractionHand.class), buf.readUtf());
         }
 
         @Override
         public void encode(RegistryFriendlyByteBuf buf, C2SAnimationDebuggerUpdate pkt) {
             buf.writeEnum(pkt.hand);
-            buf.writeInt(pkt.index);
+            buf.writeUtf(pkt.id);
         }
     };
 
     private final InteractionHand hand;
-    private final int index;
+    private final String id;
 
-    public C2SAnimationDebuggerUpdate(InteractionHand hand, int index) {
+    public C2SAnimationDebuggerUpdate(InteractionHand hand, String id) {
         this.hand = hand;
-        this.index = index;
+        this.id = id;
     }
 
     public static void handle(C2SAnimationDebuggerUpdate pkt, ServerPlayer sender) {
-        if (sender != null) {
-            ItemStack stack = sender.getItemInHand(pkt.hand);
-            if (stack.getItem() instanceof AnimationDebugger debug) {
-                debug.updateIndex(stack, pkt.index);
-            }
+        ItemStack stack = sender.getItemInHand(pkt.hand);
+        if (stack.getItem() instanceof AnimationDebugger debug) {
+            debug.updateId(stack, pkt.id);
         }
     }
 

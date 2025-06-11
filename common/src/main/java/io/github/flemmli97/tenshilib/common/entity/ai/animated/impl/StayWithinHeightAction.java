@@ -1,9 +1,9 @@
 package io.github.flemmli97.tenshilib.common.entity.ai.animated.impl;
 
-import io.github.flemmli97.tenshilib.common.entity.AnimatedAction;
-import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.ActionRun;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.AnimatedAttackGoal;
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimationState;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 
@@ -26,7 +26,7 @@ public class StayWithinHeightAction<T extends PathfinderMob & AnimatedEntity> im
     }
 
     @Override
-    public boolean run(AnimatedAttackGoal<T> goal, LivingEntity target, AnimatedAction anim) {
+    public boolean run(AnimatedAttackGoal<T> goal, LivingEntity target, AnimationState anim) {
         if (this.min != null && goal.attacker.getY() < (target.getY() - this.min))
             goal.attacker.setDeltaMovement(target.getDeltaMovement().add(0, 0.03, 0));
         else if (this.max != null && goal.attacker.getY() > (target.getY() + this.max))

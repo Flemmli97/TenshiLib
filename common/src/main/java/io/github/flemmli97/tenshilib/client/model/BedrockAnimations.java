@@ -8,8 +8,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.flemmli97.tenshilib.client.model.animation.Animation;
 import io.github.flemmli97.tenshilib.client.model.animation.AnimationBone;
 import io.github.flemmli97.tenshilib.client.model.animation.keyframe.BoneKeyFrame;
-import io.github.flemmli97.tenshilib.common.entity.AnimatedAction;
-import io.github.flemmli97.tenshilib.common.entity.AnimationHandler;
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimationHandler;
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimationState;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.VariableMap;
 import io.github.flemmli97.tenshilib.mixinhelper.EntityRenderDispatcherAccess;
 import net.minecraft.client.Minecraft;
@@ -109,17 +109,17 @@ public class BedrockAnimations {
         return this.doAnimation(model, handler, partialTicks, a -> mirror, null);
     }
 
-    public boolean doAnimation(ExtendedModel model, AnimationHandler<?> handler, float partialTicks, @Nullable Predicate<AnimatedAction> mirror, @Nullable Function<AnimatedAction, String> animationID) {
-        AnimatedAction current = handler.getAnimation();
-        AnimatedAction last = handler.getLastAnimation();
+    public boolean doAnimation(ExtendedModel model, AnimationHandler<?> handler, float partialTicks, @Nullable Predicate<AnimationState> mirror, @Nullable Function<AnimationState, String> animationID) {
+        AnimationState current = handler.getAnimation();
+        AnimationState last = handler.getLastAnimation();
         float interpolationLast = handler.getLastTransitionProgress(partialTicks);
         float interpolation = handler.getCurrentTransitionProgress(partialTicks);
         boolean changed = false;
         if (last != null && interpolationLast > 0) {
-            changed = this.doAnimation(model, animationID != null ? animationID.apply(last) : last.getClientIdentifier(), last.getTick(partialTicks), interpolationLast, mirror != null && mirror.test(last), false);
+            changed = this.doAnimation(model, animationID != null ? animationID.apply(last) : last.getAnimation(), last.getTick(partialTicks), interpolationLast, mirror != null && mirror.test(last), false);
         }
         if (current != null) {
-            if (this.doAnimation(model, animationID != null ? animationID.apply(current) : current.getClientIdentifier(), current.getTick(partialTicks), interpolation, mirror != null && mirror.test(last), false) && !changed) {
+            if (this.doAnimation(model, animationID != null ? animationID.apply(current) : current.getAnimation(), current.getTick(partialTicks), interpolation, mirror != null && mirror.test(last), false) && !changed) {
                 changed = true;
             }
         }

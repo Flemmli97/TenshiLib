@@ -1,9 +1,9 @@
 package io.github.flemmli97.tenshilib.common.entity.ai.animated.impl;
 
-import io.github.flemmli97.tenshilib.common.entity.AnimatedAction;
-import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.ActionRun;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.AnimatedAttackGoal;
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimationState;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.phys.Vec3;
@@ -22,7 +22,7 @@ public class CircleAroundRunner<T extends PathfinderMob & AnimatedEntity> implem
     }
 
     @Override
-    public boolean run(AnimatedAttackGoal<T> goal, LivingEntity target, AnimatedAction anim) {
+    public boolean run(AnimatedAttackGoal<T> goal, LivingEntity target, AnimationState anim) {
         if (!this.start) {
             this.start = true;
             this.clockWise = goal.attacker.getRandom().nextFloat() < this.clockWiseChance;

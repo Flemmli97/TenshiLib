@@ -1,8 +1,8 @@
 package io.github.flemmli97.tenshilib.client;
 
 import io.github.flemmli97.tenshilib.client.gui.AnimationScreen;
-import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.entity.OverlayEntityRender;
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.item.AOEWeapon;
 import io.github.flemmli97.tenshilib.common.item.AnimationDebugger;
 import io.github.flemmli97.tenshilib.common.item.ExtendedWeapon;
@@ -24,11 +24,11 @@ public class ClientHandlers {
 
     public static final Set<UUID> RIDING_RENDER_BLACKLIST = new HashSet<>();
 
-    public static void updateAnim(int entityID, int animID, int startTransition, int endTransition, float start) {
+    public static void updateAnim(int entityID, String animID, int startTransition, int endTransition, double start) {
         Minecraft mc = Minecraft.getInstance();
         Entity e = mc.level.getEntity(entityID);
         if (e instanceof AnimatedEntity anim) {
-            anim.getAnimationHandler().setAnimation(animID < 0 ? null : anim.getAnimationHandler().getAnimations()[animID],
+            anim.getAnimationHandler().setAnimation(animID.isEmpty() ? null : anim.getAnimationHandler().getAnimations().get(animID),
                     startTransition, endTransition, start);
         }
     }
@@ -75,7 +75,7 @@ public class ClientHandlers {
     public static <T extends LivingEntity & AnimatedEntity> void openAnimationGui(T entity, InteractionHand hand) {
         ItemStack stack = Minecraft.getInstance().player.getItemInHand(hand);
         if (stack.getItem() instanceof AnimationDebugger debug) {
-            Minecraft.getInstance().setScreen(new AnimationScreen<>(entity, hand, debug.getIndex(stack)));
+            Minecraft.getInstance().setScreen(new AnimationScreen<>(entity, hand, debug.getId(stack)));
         }
     }
 }

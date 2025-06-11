@@ -4,9 +4,25 @@
   "package": "io.github.flemmli97.tenshilib.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "LivingMixin"
+    "LivingMixin",
+    "PlayerListMixin"
   ],
-  "client": ["EntityRenderDispatcherMixin", "HumanoidArmorMixin", "LivingEntityRendererAccessor", "LivingOverlayMixin", "MinecraftMixin", "ModelPartAccessor", "OptionsScreenMixin", "OverlayTextureMixin", "PoseStackMixin", "ScreenAccessor", "dual.HumanoidModelMixin", "dual.ItemInHandRendererMixin", "dual.LivingEntityMixin", "dual.PlayerMixin"],
+  "client": [
+    "dual.HumanoidModelMixin",
+    "dual.ItemInHandRendererMixin",
+    "dual.LivingEntityMixin",
+    "dual.PlayerMixin",
+    "EntityRenderDispatcherMixin",
+    "HumanoidArmorMixin",
+    "LivingEntityRendererAccessor",
+    "LivingOverlayMixin",
+    "MinecraftMixin",
+    "ModelPartAccessor",
+    "OptionsScreenMixin",
+    "OverlayTextureMixin",
+    "PoseStackMixin",
+    "ScreenAccessor"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

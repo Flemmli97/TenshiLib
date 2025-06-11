@@ -1,6 +1,7 @@
 package io.github.flemmli97.tenshilib.neoforge;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
+import io.github.flemmli97.tenshilib.common.data.AnimationDataManager;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import io.github.flemmli97.tenshilib.neoforge.client.events.ClientEvents;
 import io.github.flemmli97.tenshilib.neoforge.client.events.PatreonClientSetup;
@@ -14,6 +15,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
 
 @Mod(value = TenshiLib.MODID)
 public class TenshiLibNeoForge {
@@ -43,5 +45,9 @@ public class TenshiLibNeoForge {
                 DispenserBlock.registerBehavior(egg, egg.dispenser());
             SpawnEgg.resolveEggs();
         });
+    }
+
+    public static void reloadListener(AddReloadListenerEvent event) {
+        event.addListener(AnimationDataManager.getInstance());
     }
 }

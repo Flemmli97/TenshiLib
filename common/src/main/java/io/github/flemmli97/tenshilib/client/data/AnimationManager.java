@@ -36,9 +36,8 @@ public class AnimationManager extends SimpleJsonResourceReloadListener {
     protected void apply(Map<ResourceLocation, JsonElement> object, ResourceManager resourceManager, ProfilerFiller profiler) {
         object.forEach((res, json) -> {
             try {
-                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(res.getNamespace(), res.getPath());
                 BedrockAnimations read = BedrockAnimations.GSON.fromJson(json, BedrockAnimations.class);
-                this.getAnimation(id).update(read);
+                this.getAnimation(res).update(read);
             } catch (Exception e) {
                 TenshiLib.LOGGER.error("Unable to parse animation file {}", res, e);
             }

@@ -1,11 +1,13 @@
 package io.github.flemmli97.tenshilib.loader;
 
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
+
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Loader agnostic network interface
@@ -28,6 +30,12 @@ public interface LoaderNetwork {
 
     void sendToAllIn(CustomPacketPayload message, ServerLevel level);
 
-    void sendToAll(CustomPacketPayload message, MinecraftServer server);
+    void sendToAll(CustomPacketPayload message, Collection<ServerPlayer> players);
+
+    default void sendToChecked(CustomPacketPayload message, ServerPlayer players) {
+        this.sendToChecked(message, Collections.singleton(players));
+    }
+
+    void sendToChecked(CustomPacketPayload message, Collection<ServerPlayer> players);
 
 }

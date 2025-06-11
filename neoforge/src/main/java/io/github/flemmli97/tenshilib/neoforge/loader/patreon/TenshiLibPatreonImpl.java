@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.neoforge.loader.patreon;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
-import io.github.flemmli97.tenshilib.neoforge.network.PacketHandler;
+import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
 import io.github.flemmli97.tenshilib.patreon.PatreonDataManager;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlayerSetting;
 import io.github.flemmli97.tenshilib.patreon.TenshiLibPatreonPlatform;
@@ -71,7 +71,7 @@ public class TenshiLibPatreonImpl implements TenshiLibPatreonPlatform {
         PatreonPlayerSetting setting = TenshiLibPatreonPlatform.INSTANCE.playerSettings(target);
         if (PatreonDataManager.get(target.getUUID().toString()).tier() < 1)
             setting.setEffect(null);
-        PacketHandler.sendToClientChecked(new S2CEffectUpdatePkt(target.getId(), setting.effect() != null ? setting.effect().id() : "", setting.shouldRender(), setting.getRenderLocation(), setting.getColor()), player);
+        LoaderNetwork.INSTANCE.sendToChecked(new S2CEffectUpdatePkt(target.getId(), setting.effect() != null ? setting.effect().id() : "", setting.shouldRender(), setting.getRenderLocation(), setting.getColor()), player);
     }
 
     public static class PlayerCap extends PatreonPlayerSetting implements INBTSerializable<CompoundTag> {

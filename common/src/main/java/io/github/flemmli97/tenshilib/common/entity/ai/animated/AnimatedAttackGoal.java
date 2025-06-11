@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.common.entity.ai.animated;
 
-import io.github.flemmli97.tenshilib.common.entity.AnimatedAction;
-import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimationState;
 import io.github.flemmli97.tenshilib.common.utils.math.MathUtils;
 import net.minecraft.util.Mth;
 import net.minecraft.util.random.WeightedEntry;
@@ -116,7 +116,7 @@ public class AnimatedAttackGoal<T extends PathfinderMob & AnimatedEntity> extend
         } else {
             this.idleTime = 20;
         }
-        List<WeightedEntry.Wrapper<GoalAttackAction<T>>> selectables = this.actions.stream().filter(d -> d.data().test(this, this.target, this.previous != null ? this.previous.anim().getID() : "")).toList();
+        List<WeightedEntry.Wrapper<GoalAttackAction<T>>> selectables = this.actions.stream().filter(d -> d.data().test(this, this.target, this.previous != null ? this.previous.anim().id() : "")).toList();
         GoalAttackAction<T> action = WeightedRandom.getRandomItem(this.attacker.getRandom(), selectables).map(WeightedEntry.Wrapper::data).orElse(null);
         this.current = action != null ? action.createActive() : null;
         if (action != null) {
@@ -133,10 +133,10 @@ public class AnimatedAttackGoal<T extends PathfinderMob & AnimatedEntity> extend
         if (this.attacker.getTarget() == null)
             return;
         this.setupValues();
-        AnimatedAction anim = this.attacker.getAnimationHandler().getAnimation();
+        AnimationState anim = this.attacker.getAnimationHandler().getAnimation();
         // This is handled in the entity
         if (anim != null) {
-            if (this.current != null && this.current.anim().is(anim))
+            if (this.current != null && this.current.anim().id().equals(anim.getID()))
                 this.current.runner().run(this, this.target, anim);
             return;
         } else if (this.reset) {

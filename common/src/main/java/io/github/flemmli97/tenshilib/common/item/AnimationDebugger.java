@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.common.item;
 
-import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.entity.EntityUtils;
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.network.S2CAnimationScreen;
 import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
 import net.minecraft.core.component.DataComponentType;
@@ -23,9 +23,9 @@ import java.util.function.Supplier;
 public class AnimationDebugger extends Item {
 
     private final Supplier<DataComponentType<UUID>> entityIDType;
-    private final Supplier<DataComponentType<Integer>> animationIdx;
+    private final Supplier<DataComponentType<String>> animationIdx;
 
-    public AnimationDebugger(Properties props, Supplier<DataComponentType<UUID>> entityIDType, Supplier<DataComponentType<Integer>> animationIdx) {
+    public AnimationDebugger(Properties props, Supplier<DataComponentType<UUID>> entityIDType, Supplier<DataComponentType<String>> animationIdx) {
         super(props);
         this.entityIDType = entityIDType;
         this.animationIdx = animationIdx;
@@ -36,7 +36,7 @@ public class AnimationDebugger extends Item {
         if (player instanceof ServerPlayer serverPlayer) {
             if (entity instanceof AnimatedEntity) {
                 stack.set(this.entityIDType.get(), entity.getUUID());
-                stack.set(this.animationIdx.get(), -1);
+                stack.remove(this.animationIdx.get());
                 player.setItemInHand(usedHand, stack);
                 serverPlayer.displayClientMessage(Component.translatable("tenshilib.item.animation.select", entity.getName()), true);
             }
@@ -55,9 +55,9 @@ public class AnimationDebugger extends Item {
                     if (player.isShiftKeyDown()) {
                         LoaderNetwork.INSTANCE.sendToPlayer(new S2CAnimationScreen(usedHand, (Mob) animated), serverPlayer);
                     } else {
-                        int idx = this.getIndex(stack);
-                        if (idx >= 0 && idx < animated.getAnimationHandler().getAnimations().length) {
-                            animated.getAnimationHandler().setAnimation(animated.getAnimationHandler().getAnimations()[idx]);
+                        String id = this.getId(stack);
+                        if (!id.isEmpty()) {
+                            animated.getAnimationHandler().setAnimation(animated.getAnimationHandler().getAnimations().get(id));
                         }
                     }
                 } else {
@@ -74,11 +74,11 @@ public class AnimationDebugger extends Item {
         return true;
     }
 
-    public void updateIndex(ItemStack stack, int idx) {
-        stack.set(this.animationIdx.get(), idx);
+    public void updateId(ItemStack stack, String id) {
+        stack.set(this.animationIdx.get(), id);
     }
 
-    public int getIndex(ItemStack stack) {
-        return stack.getOrDefault(this.animationIdx.get(), -1);
+    public String getId(ItemStack stack) {
+        return stack.getOrDefault(this.animationIdx.get(), "");
     }
 }

@@ -2,19 +2,16 @@ package io.github.flemmli97.tenshilib.client.gui;
 
 import io.github.flemmli97.tenshilib.client.gui.widget.SuggestionEditBox;
 import io.github.flemmli97.tenshilib.client.render.RenderUtils;
-import io.github.flemmli97.tenshilib.common.entity.AnimatedAction;
-import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.network.C2SAnimationDebuggerUpdate;
 import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class AnimationScreen<T extends LivingEntity & AnimatedEntity> extends Screen {
@@ -29,15 +26,15 @@ public class AnimationScreen<T extends LivingEntity & AnimatedEntity> extends Sc
 
     private SuggestionEditBox box;
 
-    private int index;
+    private String selected;
 
-    public AnimationScreen(T entity, InteractionHand hand, int index) {
+    public AnimationScreen(T entity, InteractionHand hand, String id) {
         super(Component.translatable("tenshilib.gui.animation"));
         this.entity = entity;
-        this.animations = Arrays.stream(entity.getAnimationHandler().getAnimations()).map(AnimatedAction::getID)
+        this.animations = entity.getAnimationHandler().getAnimations().all()
                 .toArray(String[]::new);
         this.hand = hand;
-        this.index = Mth.clamp(index, 0, this.animations.length - 1);
+        this.selected = id;
     }
 
     @Override
@@ -64,22 +61,21 @@ public class AnimationScreen<T extends LivingEntity & AnimatedEntity> extends Sc
 
         this.box = new SuggestionEditBox(this.minecraft.font, this.leftPos + this.sizeX / 2 - 70, this.topPos + yOff, 140, 20, Component.translatable("fateubw.gui.animation"),
                 5, true, SuggestionEditBox.ofString(List.of(this.animations)));
-        this.box.setValue(this.index >= 0 ? this.animations[this.index] : "");
+        this.box.setValue(this.selected);
         this.box.setResponder(s -> {
             s = s.trim();
             this.box.setTextColor(0xFF0000);
-            for (int i = 0; i < this.animations.length; i++) {
-                String str = this.animations[i];
+            for (String str : this.animations) {
                 if (s.equals(str)) {
                     this.box.setTextColor(0xE0E0E0);
-                    this.index = i;
+                    this.selected = s;
                     break;
                 }
             }
         });
         yOff += 24;
         this.addRenderableWidget(Button.builder(Component.translatable("tenshilib.gui.save"), b -> {
-            LoaderNetwork.INSTANCE.sendToServer(new C2SAnimationDebuggerUpdate(this.hand, this.index));
+            LoaderNetwork.INSTANCE.sendToServer(new C2SAnimationDebuggerUpdate(this.hand, this.selected));
             this.minecraft.setScreen(null);
         }).bounds(this.leftPos + this.sizeX / 2 - 50, this.topPos + yOff, 100, 20).build());
         this.addRenderableWidget(this.box);

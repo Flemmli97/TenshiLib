@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.neoforge.events;
 
-import io.github.flemmli97.tenshilib.common.entity.AnimatedAction;
-import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimationState;
 import io.github.flemmli97.tenshilib.common.item.AOEWeapon;
 import io.github.flemmli97.tenshilib.common.item.AOEWeaponHandler;
 import io.github.flemmli97.tenshilib.common.item.DualWeapon;
@@ -38,7 +38,7 @@ public class CommonEvents {
 
     public static void onTracking(PlayerEvent.StartTracking event) {
         if (event.getTarget() instanceof AnimatedEntity animated && animated.getAnimationHandler().hasAnimation()) {
-            AnimatedAction anim = animated.getAnimationHandler().getAnimation();
+            AnimationState anim = animated.getAnimationHandler().getAnimation();
             LoaderNetwork.INSTANCE.sendToPlayer(S2CEntityAnimation.create((Entity & AnimatedEntity) event.getTarget(),
                     anim.getStartTransition(), anim.getEndTransitionTime(), anim.getTick(1)), (ServerPlayer) event.getEntity());
         }

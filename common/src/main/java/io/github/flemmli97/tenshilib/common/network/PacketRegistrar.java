@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class PacketRegistrar {
 
@@ -21,9 +22,10 @@ public class PacketRegistrar {
     }
 
     public static void registerClientPackets(ClientPacketRegister register) {
-        register.register(S2CEntityAnimation.TYPE, S2CEntityAnimation.STREAM_CODEC, S2CEntityAnimation.Handler::handle);
-        register.register(S2CEffectUpdatePkt.TYPE, S2CEffectUpdatePkt.STREAM_CODEC, S2CEffectUpdatePkt.Handler::handle);
-        register.register(S2CAnimationScreen.TYPE, S2CAnimationScreen.STREAM_CODEC, S2CAnimationScreen.Handler::handle);
+        register.register(S2CEntityAnimation.TYPE, S2CEntityAnimation.STREAM_CODEC, S2CEntityAnimation::handle);
+        register.register(S2CEffectUpdatePkt.TYPE, S2CEffectUpdatePkt.STREAM_CODEC, S2CEffectUpdatePkt::handleClient);
+        register.register(S2CAnimationScreen.TYPE, S2CAnimationScreen.STREAM_CODEC, S2CAnimationScreen::handle);
+        register.register(S2CAnimationDataPacket.TYPE, S2CAnimationDataPacket.STREAM_CODEC, S2CAnimationDataPacket::handle);
     }
 
     public interface ServerPacketRegister {
@@ -31,6 +33,11 @@ public class PacketRegistrar {
     }
 
     public interface ClientPacketRegister {
+
+        default <P extends CustomPacketPayload> void register(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf, P> codec, Consumer<P> handler) {
+            this.register(type, codec, (pkt, p) -> handler.accept(pkt));
+        }
+
         <P extends CustomPacketPayload> void register(CustomPacketPayload.Type<P> type, StreamCodec<RegistryFriendlyByteBuf, P> codec, BiConsumer<P, Player> handler);
     }
 }

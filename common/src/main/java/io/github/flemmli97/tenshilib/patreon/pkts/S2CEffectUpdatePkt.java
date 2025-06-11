@@ -35,15 +35,13 @@ public class S2CEffectUpdatePkt extends C2SEffectUpdatePkt {
         this.entityID = entityID;
     }
 
-    public static class Handler {
-        public static void handle(S2CEffectUpdatePkt pkt, Player player) {
-            if (pkt.entityID != player.getId()) {
-                Entity e = player.level().getEntity(pkt.entityID);
-                if (e instanceof Player)
-                    player = (Player) e;
-            }
-            TenshiLibPatreonPlatform.INSTANCE.playerSettings(player).read(pkt, pkt.id);
+    public static void handleClient(S2CEffectUpdatePkt pkt, Player player) {
+        if (pkt.entityID != player.getId()) {
+            Entity e = player.level().getEntity(pkt.entityID);
+            if (e instanceof Player)
+                player = (Player) e;
         }
+        TenshiLibPatreonPlatform.INSTANCE.playerSettings(player).read(pkt, pkt.id);
     }
 
     @Override

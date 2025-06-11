@@ -1,11 +1,11 @@
 package io.github.flemmli97.tenshilib.fabric.loader.patreon;
 
+import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
 import io.github.flemmli97.tenshilib.patreon.PatreonDataManager;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlayerSetting;
 import io.github.flemmli97.tenshilib.patreon.TenshiLibPatreonPlatform;
 import io.github.flemmli97.tenshilib.patreon.pkts.S2CEffectUpdatePkt;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -35,9 +35,6 @@ public class TenshiLibPatreonImpl implements TenshiLibPatreonPlatform {
         PatreonPlayerSetting setting = TenshiLibPatreonPlatform.INSTANCE.playerSettings(target);
         if (PatreonDataManager.get(target.getUUID().toString()).tier() < 1)
             setting.setEffect(null);
-        if (ServerPlayNetworking.canSend(player, S2CEffectUpdatePkt.TYPE)) {
-            S2CEffectUpdatePkt pkt = new S2CEffectUpdatePkt(target.getId(), setting.effect() != null ? setting.effect().id() : "", setting.shouldRender(), setting.getRenderLocation(), setting.getColor());
-            ServerPlayNetworking.send(player, pkt);
-        }
+        LoaderNetwork.INSTANCE.sendToChecked(new S2CEffectUpdatePkt(target.getId(), setting.effect() != null ? setting.effect().id() : "", setting.shouldRender(), setting.getRenderLocation(), setting.getColor()), player);
     }
 }

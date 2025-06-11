@@ -5,12 +5,13 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Collection;
 
 public class LoaderNetworkImpl implements LoaderNetwork {
 
@@ -49,8 +50,16 @@ public class LoaderNetworkImpl implements LoaderNetwork {
     }
 
     @Override
-    public void sendToAll(CustomPacketPayload message, MinecraftServer server) {
-        PlayerLookup.all(server)
-                .forEach(player -> ServerPlayNetworking.send(player, message));
+    public void sendToAll(CustomPacketPayload message, Collection<ServerPlayer> players) {
+        players.forEach(player -> ServerPlayNetworking.send(player, message));
+    }
+
+    @Override
+    public void sendToChecked(CustomPacketPayload message, Collection<ServerPlayer> players) {
+        players.forEach(player -> {
+            if (ServerPlayNetworking.canSend(player, message.type())) {
+                ServerPlayNetworking.send(player, message);
+            }
+        });
     }
 }

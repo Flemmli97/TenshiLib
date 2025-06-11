@@ -1,9 +1,10 @@
 package io.github.flemmli97.tenshilib.common.entity;
 
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimationState;
 import io.github.flemmli97.tenshilib.common.utils.math.OrientedBoundingBox;
 import net.minecraft.world.entity.LivingEntity;
 
-public interface AoeAttackEntity {
+public interface AOEAttackEntity {
 
     /**
      * The bounding box from which if the target intersects it an attack is initiated
@@ -13,6 +14,6 @@ public interface AoeAttackEntity {
      * @param grow      A value to modify the AABB with
      * @param withDebug If true then the context in which this is called in should show a visual for the AABB
      */
-    OrientedBoundingBox prepareAttackBox(AnimatedAction anim, LivingEntity target, double grow, boolean withDebug);
+    OrientedBoundingBox prepareAttackBox(AnimationState anim, LivingEntity target, double grow, boolean withDebug);
 
 }

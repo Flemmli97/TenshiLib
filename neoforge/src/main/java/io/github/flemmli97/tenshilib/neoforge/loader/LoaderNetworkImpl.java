@@ -2,12 +2,13 @@ package io.github.flemmli97.tenshilib.neoforge.loader;
 
 import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
 import net.neoforged.neoforge.network.PacketDistributor;
+
+import java.util.Collection;
 
 public class LoaderNetworkImpl implements LoaderNetwork {
 
@@ -42,7 +43,15 @@ public class LoaderNetworkImpl implements LoaderNetwork {
     }
 
     @Override
-    public void sendToAll(CustomPacketPayload message, MinecraftServer server) {
-        PacketDistributor.sendToAllPlayers(message);
+    public void sendToAll(CustomPacketPayload message, Collection<ServerPlayer> players) {
+        players.forEach(player -> PacketDistributor.sendToPlayer(player, message));
+    }
+
+    @Override
+    public void sendToChecked(CustomPacketPayload message, Collection<ServerPlayer> players) {
+        players.forEach(player -> {
+            if (player.connection.hasChannel(message))
+                PacketDistributor.sendToPlayer(player, message);
+        });
     }
 }

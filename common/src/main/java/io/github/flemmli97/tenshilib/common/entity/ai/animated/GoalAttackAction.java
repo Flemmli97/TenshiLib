@@ -1,11 +1,11 @@
 package io.github.flemmli97.tenshilib.common.entity.ai.animated;
 
 import com.google.common.collect.ImmutableList;
-import io.github.flemmli97.tenshilib.common.entity.AnimatedAction;
-import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
-import io.github.flemmli97.tenshilib.common.entity.AnimationHandler;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.impl.DoNothingRunner;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.impl.WrappedRunner;
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimationDefinition;
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimationHandler;
 import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.world.entity.LivingEntity;
@@ -23,14 +23,14 @@ import java.util.function.Predicate;
  */
 public class GoalAttackAction<T extends PathfinderMob & AnimatedEntity> {
 
-    private final AnimatedAction action;
+    private final AnimationDefinition action;
     private Condition<T> condition = (executor, target, previous) -> true;
     private ActionStart.Factory<T> preparation = () -> new WrappedRunner<>(new DoNothingRunner<>());
     private ActionRun.Factory<T> runner = DoNothingRunner::new;
     private IntProvider<T> cooldown = e -> 20;
     private ChainedActions<T> chained;
 
-    public GoalAttackAction(AnimatedAction action) {
+    public GoalAttackAction(AnimationDefinition action) {
         this.action = action;
     }
 
@@ -106,7 +106,7 @@ public class GoalAttackAction<T extends PathfinderMob & AnimatedEntity> {
 
     }
 
-    public record ActiveAction<T extends PathfinderMob & AnimatedEntity>(AnimatedAction anim, ActionStart<T> start,
+    public record ActiveAction<T extends PathfinderMob & AnimatedEntity>(AnimationDefinition anim, ActionStart<T> start,
                                                                          ActionRun<T> runner) {
     }
 
@@ -133,7 +133,7 @@ public class GoalAttackAction<T extends PathfinderMob & AnimatedEntity> {
             private final List<ChainList.ChainListBuilder<T>> anims = new ArrayList<>();
             private float chance = 1;
 
-            private Builder(AnimatedAction anim, int transitionTime, float offset, int weight, Predicate<T> predicate) {
+            private Builder(AnimationDefinition anim, int transitionTime, float offset, int weight, Predicate<T> predicate) {
                 this.anims.add(new ChainList.ChainListBuilder<>(new ChainedAction(anim, transitionTime, offset * 20),
                         weight, predicate));
             }
@@ -143,7 +143,7 @@ public class GoalAttackAction<T extends PathfinderMob & AnimatedEntity> {
                 return this;
             }
 
-            public Builder<T> chain(AnimatedAction anim) {
+            public Builder<T> chain(AnimationDefinition anim) {
                 return this.chain(anim, AnimationHandler.FALLBACK_TRANSIT_TIME, 0);
             }
 
@@ -152,20 +152,20 @@ public class GoalAttackAction<T extends PathfinderMob & AnimatedEntity> {
              *
              * @param offset Offset in seconds
              */
-            public Builder<T> chain(AnimatedAction anim, int transitionTime, float offset) {
+            public Builder<T> chain(AnimationDefinition anim, int transitionTime, float offset) {
                 this.anims.get(this.anims.size() - 1).add(new ChainedAction(anim, transitionTime, offset * 20));
                 return this;
             }
 
-            public Builder<T> or(AnimatedAction anim) {
+            public Builder<T> or(AnimationDefinition anim) {
                 return this.or(anim, e -> true);
             }
 
-            public Builder<T> or(AnimatedAction anim, Predicate<T> predicate) {
+            public Builder<T> or(AnimationDefinition anim, Predicate<T> predicate) {
                 return this.or(anim, AnimationHandler.FALLBACK_TRANSIT_TIME, 0, 1, predicate);
             }
 
-            public Builder<T> or(AnimatedAction anim, int transitionTime, float offset, int weight) {
+            public Builder<T> or(AnimationDefinition anim, int transitionTime, float offset, int weight) {
                 return this.or(anim, AnimationHandler.FALLBACK_TRANSIT_TIME, 0, 1, e -> true);
             }
 
@@ -175,7 +175,7 @@ public class GoalAttackAction<T extends PathfinderMob & AnimatedEntity> {
              * @param offset    Offset in seconds
              * @param predicate Condition required
              */
-            public Builder<T> or(AnimatedAction anim, int transitionTime, float offset, int weight, Predicate<T> predicate) {
+            public Builder<T> or(AnimationDefinition anim, int transitionTime, float offset, int weight, Predicate<T> predicate) {
                 this.anims.add(new ChainList.ChainListBuilder<>(new ChainedAction(anim, transitionTime, offset * 20),
                         weight, predicate));
                 return this;
@@ -187,15 +187,15 @@ public class GoalAttackAction<T extends PathfinderMob & AnimatedEntity> {
         }
     }
 
-    public static <T extends PathfinderMob & AnimatedEntity> ChainedActions.Builder<T> chainBuilder(AnimatedAction anim) {
+    public static <T extends PathfinderMob & AnimatedEntity> ChainedActions.Builder<T> chainBuilder(AnimationDefinition anim) {
         return chainBuilder(anim, e -> true);
     }
 
-    public static <T extends PathfinderMob & AnimatedEntity> ChainedActions.Builder<T> chainBuilder(AnimatedAction anim, Predicate<T> delay) {
+    public static <T extends PathfinderMob & AnimatedEntity> ChainedActions.Builder<T> chainBuilder(AnimationDefinition anim, Predicate<T> delay) {
         return chainBuilder(anim, AnimationHandler.FALLBACK_TRANSIT_TIME, 0, 1, delay);
     }
 
-    public static <T extends PathfinderMob & AnimatedEntity> ChainedActions.Builder<T> chainBuilder(AnimatedAction anim, int transitionTime, float offset, int weight) {
+    public static <T extends PathfinderMob & AnimatedEntity> ChainedActions.Builder<T> chainBuilder(AnimationDefinition anim, int transitionTime, float offset, int weight) {
         return chainBuilder(anim, transitionTime, offset, weight, e -> true);
     }
 
@@ -205,7 +205,7 @@ public class GoalAttackAction<T extends PathfinderMob & AnimatedEntity> {
      * @param offset         Offset of the animation in seconds
      * @param predicate      Condition for this chain
      */
-    public static <T extends PathfinderMob & AnimatedEntity> ChainedActions.Builder<T> chainBuilder(AnimatedAction anim, int transitionTime, float offset, int weight, Predicate<T> predicate) {
+    public static <T extends PathfinderMob & AnimatedEntity> ChainedActions.Builder<T> chainBuilder(AnimationDefinition anim, int transitionTime, float offset, int weight, Predicate<T> predicate) {
         return new ChainedActions.Builder<>(anim, transitionTime, offset, weight, predicate);
     }
 
@@ -240,6 +240,6 @@ public class GoalAttackAction<T extends PathfinderMob & AnimatedEntity> {
      * @param anim   The animation to play
      * @param offset Offset tick of the chained animation
      */
-    public record ChainedAction(AnimatedAction anim, int transitionTime, float offset) {
+    public record ChainedAction(AnimationDefinition anim, int transitionTime, float offset) {
     }
 }

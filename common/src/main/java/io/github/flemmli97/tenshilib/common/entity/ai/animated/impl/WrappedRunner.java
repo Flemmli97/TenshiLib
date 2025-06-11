@@ -1,10 +1,10 @@
 package io.github.flemmli97.tenshilib.common.entity.ai.animated.impl;
 
-import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.ActionRun;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.ActionStart;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.AnimatedAttackGoal;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.GoalAttackAction;
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 
@@ -34,6 +34,6 @@ public class WrappedRunner<T extends PathfinderMob & AnimatedEntity> implements 
 
     @Override
     public boolean start(AnimatedAttackGoal<T> goal, LivingEntity target) {
-        return this.runner.run(goal, target, goal.current != null ? goal.current.anim() : null);
+        return this.runner.run(goal, target, null);
     }
 }

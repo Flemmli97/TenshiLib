@@ -1,9 +1,9 @@
 package io.github.flemmli97.tenshilib.common.entity.ai.animated.impl;
 
-import io.github.flemmli97.tenshilib.common.entity.AnimatedAction;
-import io.github.flemmli97.tenshilib.common.entity.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.ActionRun;
 import io.github.flemmli97.tenshilib.common.entity.ai.animated.AnimatedAttackGoal;
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimationState;
 import io.github.flemmli97.tenshilib.common.utils.math.MathUtils;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
@@ -27,7 +27,7 @@ public class JumpEvadeAction<T extends PathfinderMob & AnimatedEntity> implement
     }
 
     @Override
-    public boolean run(AnimatedAttackGoal<T> goal, LivingEntity target, AnimatedAction anim) {
+    public boolean run(AnimatedAttackGoal<T> goal, LivingEntity target, AnimationState anim) {
         if (!this.start || goal.attacker.getRandom().nextFloat() < this.chance) {
             this.start = true;
             if (goal.distanceToTargetSq < this.minDistSqr) {
