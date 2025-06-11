@@ -76,6 +76,10 @@ public class AnimationHandler<T extends Entity & AnimatedEntity> {
         return this;
     }
 
+    public T getEntity() {
+        return this.entity;
+    }
+
     @Nullable
     public AnimatedAction getAnimation() {
         return this.currentAnimation;

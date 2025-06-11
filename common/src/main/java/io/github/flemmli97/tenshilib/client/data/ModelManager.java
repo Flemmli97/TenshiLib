@@ -3,7 +3,7 @@ package io.github.flemmli97.tenshilib.client.data;
 import com.google.gson.JsonElement;
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.client.model.BedrockGeometryParser;
-import io.github.flemmli97.tenshilib.client.model.ModelPartsHolder;
+import io.github.flemmli97.tenshilib.client.model.ModelPartsContainer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
@@ -24,7 +24,7 @@ public class ModelManager extends SimpleJsonResourceReloadListener {
 
     private static final ModelManager INSTANCE = new ModelManager();
 
-    private final Map<ResourceLocation, ReloadableCache<ModelPartsHolder>> animations = new HashMap<>();
+    private final Map<ResourceLocation, ReloadableCache<ModelPartsContainer>> animations = new HashMap<>();
 
     private ModelManager() {
         super(BedrockGeometryParser.GSON, DIRECTORY);
@@ -38,21 +38,20 @@ public class ModelManager extends SimpleJsonResourceReloadListener {
     protected void apply(Map<ResourceLocation, JsonElement> map, ResourceManager manager, ProfilerFiller profiler) {
         map.forEach((res, json) -> {
             try {
-                ModelPartsHolder obj = BedrockGeometryParser.GSON.fromJson(json, ModelPartsHolder.class);
+                ModelPartsContainer read = BedrockGeometryParser.GSON.fromJson(json, ModelPartsContainer.class);
                 ResourceLocation id = ResourceLocation.fromNamespaceAndPath(res.getNamespace(), res.getPath().replace(".geo", ""));
-                this.getModel(id).update(obj);
+                this.getModel(id).update(read);
             } catch (Exception e) {
-                TenshiLib.LOGGER.error("Unable to parse geo model file {}", res);
-                TenshiLib.LOGGER.error(e);
+                TenshiLib.LOGGER.error("Unable to parse geo model file {}", res, e);
             }
         });
     }
 
-    public ReloadableCache<ModelPartsHolder> getModel(ResourceLocation res) {
+    public ReloadableCache<ModelPartsContainer> getModel(ResourceLocation res) {
         return this.getModel(res, null);
     }
 
-    public ReloadableCache<ModelPartsHolder> getModel(ResourceLocation res, Consumer<ModelPartsHolder> onChange) {
+    public ReloadableCache<ModelPartsContainer> getModel(ResourceLocation res, Consumer<ModelPartsContainer> onChange) {
         return this.animations.computeIfAbsent(res, r -> new ReloadableCache<>())
                 .onChange(onChange);
     }

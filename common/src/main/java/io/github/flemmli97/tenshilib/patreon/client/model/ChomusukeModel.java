@@ -8,7 +8,7 @@ import io.github.flemmli97.tenshilib.client.data.ModelManager;
 import io.github.flemmli97.tenshilib.client.data.ReloadableCache;
 import io.github.flemmli97.tenshilib.client.model.BedrockAnimations;
 import io.github.flemmli97.tenshilib.client.model.ExtendedModel;
-import io.github.flemmli97.tenshilib.client.model.ModelPartsHolder;
+import io.github.flemmli97.tenshilib.client.model.ModelPartsContainer;
 import io.github.flemmli97.tenshilib.client.render.RenderUtils;
 import io.github.flemmli97.tenshilib.patreon.RenderLocation;
 import net.minecraft.client.model.EntityModel;
@@ -20,8 +20,8 @@ public class ChomusukeModel extends EntityModel<Player> implements ExtendedModel
     public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "textures/model/chomusuke.png");
     public static final ResourceLocation TEXTURE_SLEEPY = ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "textures/model/chomusuke_sleepy.png");
 
-    protected final ReloadableCache<ModelPartsHolder> model;
-    protected final BedrockAnimations anim;
+    protected final ReloadableCache<ModelPartsContainer> model;
+    protected final ReloadableCache<BedrockAnimations> anim;
 
     private RenderLocation location;
 
@@ -35,9 +35,9 @@ public class ChomusukeModel extends EntityModel<Player> implements ExtendedModel
         this.model.get().resetPoses();
         float partialTicks = RenderUtils.getPartialTicks(entity);
         if (RenderLocation.isHead(this.location))
-            this.anim.doAnimation(this, "head", entity.tickCount, partialTicks);
+            this.anim.get().doAnimation(this, "head", entity.tickCount, partialTicks);
         else
-            this.anim.doAnimation(this, "idle", entity.tickCount, partialTicks);
+            this.anim.get().doAnimation(this, "idle", entity.tickCount, partialTicks);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class ChomusukeModel extends EntityModel<Player> implements ExtendedModel
     }
 
     @Override
-    public ModelPartsHolder getHandler() {
+    public ModelPartsContainer getModel() {
         return this.model.get();
     }
 

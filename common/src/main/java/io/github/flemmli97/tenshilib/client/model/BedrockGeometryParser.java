@@ -31,14 +31,13 @@ import java.util.stream.Collectors;
 
 public class BedrockGeometryParser {
 
-    public static final Vector3f ZERO = new Vector3f();
     public static final Gson GSON = new GsonBuilder().setLenient()
-            .registerTypeAdapter(ModelPartsHolder.class, deserializer())
+            .registerTypeAdapter(ModelPartsContainer.class, deserializer())
             .registerTypeAdapter(BedrockGeometry.class, BedrockGeometry.deserializer())
             .registerTypeAdapter(Bone.class, Bone.deserializer())
             .registerTypeAdapter(Cube.class, Cube.deserializer()).create();
 
-    private static JsonDeserializer<ModelPartsHolder> deserializer() {
+    private static JsonDeserializer<ModelPartsContainer> deserializer() {
         return (json, type, ctx) -> {
             BedrockGeometry geometry = ctx.deserialize(json, BedrockGeometry.class);
             return geometry.bake();
@@ -56,13 +55,13 @@ public class BedrockGeometryParser {
 
     private static Vector3f parseVec(JsonElement element) {
         if (element == null || element.isJsonNull())
-            return ZERO;
+            return new Vector3f();
         if (element.isJsonPrimitive()) {
             return new Vector3f(element.getAsFloat());
         } else if (element instanceof JsonArray arr) {
             return new Vector3f(arr.get(0).getAsFloat(), arr.get(1).getAsFloat(), arr.get(2).getAsFloat());
         }
-        return ZERO;
+        return new Vector3f();
     }
 
     public record BedrockGeometry(int textureWidth, int textureHeight, List<Bone> bones) {
@@ -79,21 +78,21 @@ public class BedrockGeometryParser {
             };
         }
 
-        public ModelPartsHolder bake() {
+        public ModelPartsContainer bake() {
             Map<String, Bone> boneMap = new HashMap<>();
             this.bones().forEach(b -> boneMap.put(b.name(), b));
 
             ModelPartBuilder root = new ModelPartBuilder();
             Map<String, ModelPartBuilder> parts = new HashMap<>();
             this.bones().forEach(bone -> this.bakeBone(bone, parts, boneMap, root));
-            return new ModelPartsHolder(root.bake(this.textureWidth, this.textureHeight));
+            return new ModelPartsContainer(root.bake(this.textureWidth, this.textureHeight));
         }
 
         private void bakeBone(Bone bone, Map<String, ModelPartBuilder> map, Map<String, Bone> boneMap, ModelPartBuilder root) {
             CubeListBuilder cubes = CubeListBuilder.create();
             Set<Bone> cubeRotations = new HashSet<>();
             bone.cubes().forEach(cube -> {
-                if (!cube.rotation().equals(ZERO)) {
+                if (!cube.rotation().equals(new Vector3f())) {
                     Bone newBone = cubeRotations.stream().filter(b -> b.rotation().equals(cube.rotation()) && b.pivot().equals(cube.pivot()))
                             .findFirst().orElse(null);
                     if (newBone == null) {
@@ -101,7 +100,7 @@ public class BedrockGeometryParser {
                                 bone.mirror(), bone.inflate(), cube.pivot(), cube.rotation(), new ArrayList<>());
                         cubeRotations.add(newBone);
                     }
-                    newBone.cubes().add(new Cube(cube.origin(), cube.size(), cube.pivot(), ZERO,
+                    newBone.cubes().add(new Cube(cube.origin(), cube.size(), cube.pivot(), new Vector3f(),
                             cube.mirror(), cube.inflate(), cube.uv()));
                 } else {
                     if (cube.uv != null)

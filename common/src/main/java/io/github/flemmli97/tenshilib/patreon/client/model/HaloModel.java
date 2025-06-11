@@ -6,7 +6,7 @@ import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.client.data.ModelManager;
 import io.github.flemmli97.tenshilib.client.data.ReloadableCache;
 import io.github.flemmli97.tenshilib.client.model.ExtendedModel;
-import io.github.flemmli97.tenshilib.client.model.ModelPartsHolder;
+import io.github.flemmli97.tenshilib.client.model.ModelPartsContainer;
 import io.github.flemmli97.tenshilib.patreon.RenderLocation;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.resources.ResourceLocation;
@@ -16,7 +16,7 @@ public class HaloModel extends EntityModel<Player> implements ExtendedModel, Pat
 
     public static ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "textures/model/halo.png");
 
-    protected final ReloadableCache<ModelPartsHolder> model;
+    protected final ReloadableCache<ModelPartsContainer> model;
 
     public HaloModel() {
         this.model = ModelManager.getInstance().getModel(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "halo"));
@@ -33,7 +33,7 @@ public class HaloModel extends EntityModel<Player> implements ExtendedModel, Pat
     }
 
     @Override
-    public ModelPartsHolder getHandler() {
+    public ModelPartsContainer getModel() {
         return this.model.get();
     }
 

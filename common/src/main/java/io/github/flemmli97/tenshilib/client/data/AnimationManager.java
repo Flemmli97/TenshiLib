@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.client.data;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.client.model.BedrockAnimations;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -18,15 +18,14 @@ import java.util.Map;
  */
 public class AnimationManager extends SimpleJsonResourceReloadListener {
 
-    private static final Gson GSON = new Gson();
     public static final String DIRECTORY = "animation/entity";
 
     private static final AnimationManager INSTANCE = new AnimationManager();
 
-    private final Map<ResourceLocation, BedrockAnimations> animations = new HashMap<>();
+    private final Map<ResourceLocation, ReloadableCache<BedrockAnimations>> animations = new HashMap<>();
 
     private AnimationManager() {
-        super(GSON, DIRECTORY);
+        super(BedrockAnimations.GSON, DIRECTORY);
     }
 
     public static AnimationManager getInstance() {
@@ -36,13 +35,17 @@ public class AnimationManager extends SimpleJsonResourceReloadListener {
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> object, ResourceManager resourceManager, ProfilerFiller profiler) {
         object.forEach((res, json) -> {
-            ResourceLocation id = ResourceLocation.fromNamespaceAndPath(res.getNamespace(), res.getPath());
-            BedrockAnimations anim = this.getAnimation(id);
-            anim.reload(json.getAsJsonObject());
+            try {
+                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(res.getNamespace(), res.getPath());
+                BedrockAnimations read = BedrockAnimations.GSON.fromJson(json, BedrockAnimations.class);
+                this.getAnimation(id).update(read);
+            } catch (Exception e) {
+                TenshiLib.LOGGER.error("Unable to parse animation file {}", res, e);
+            }
         });
     }
 
-    public BedrockAnimations getAnimation(ResourceLocation res) {
-        return this.animations.computeIfAbsent(res, r -> new BedrockAnimations());
+    public ReloadableCache<BedrockAnimations> getAnimation(ResourceLocation res) {
+        return this.animations.computeIfAbsent(res, r -> new ReloadableCache<>());
     }
 }

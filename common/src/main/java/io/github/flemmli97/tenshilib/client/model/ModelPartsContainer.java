@@ -7,6 +7,7 @@ import io.github.flemmli97.tenshilib.mixin.ModelPartAccessor;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,13 +15,13 @@ import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class ModelPartsHolder {
+public class ModelPartsContainer {
 
     private final ModelPartExtended mainPart;
     private final Map<String, ModelPartExtended> childrenToName = new HashMap<>();
 
-    public ModelPartsHolder(ModelPart main, String mainID) {
-        this.mainPart = new ModelPartExtended(main);
+    public ModelPartsContainer(ModelPart main, String mainID) {
+        this.mainPart = new ModelPartExtended(mainID, null, main);
         this.childrenToName.put(mainID, this.mainPart);
         this.mainPart.getMappedParts(this.childrenToName);
     }
@@ -28,8 +29,8 @@ public class ModelPartsHolder {
     /**
      * If you have multiple "main" parts
      */
-    public ModelPartsHolder(ModelPart root) {
-        this.mainPart = new ModelPartExtended(root);
+    public ModelPartsContainer(ModelPart root) {
+        this.mainPart = new ModelPartExtended("root", null, root);
         this.childrenToName.put("root", this.mainPart);
         this.mainPart.getMappedParts(this.childrenToName);
     }
@@ -60,6 +61,8 @@ public class ModelPartsHolder {
 
     public static class ModelPartExtended {
 
+        private final String name;
+        private final ModelPartExtended parent;
         public float x, y, z;
         public float xRot, yRot, zRot;
         public float xScale = 1, yScale = 1, zScale = 1;
@@ -69,10 +72,12 @@ public class ModelPartsHolder {
 
         private PoseExtended defaultPose;
 
-        public ModelPartExtended(ModelPart orig) {
+        public ModelPartExtended(String name, ModelPartExtended parent, ModelPart orig) {
+            this.name = name;
+            this.parent = parent;
             this.cubes = ((ModelPartAccessor) (Object) orig).getCubes();
             this.children = ((ModelPartAccessor) (Object) orig).getChildren()
-                    .entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new ModelPartExtended(e.getValue())));
+                    .entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new ModelPartExtended(e.getKey(), this, e.getValue())));
             this.updateDefaultPose(new PoseExtended(orig.storePose()));
         }
 
@@ -177,6 +182,19 @@ public class ModelPartsHolder {
             }
         }
 
+        public void translateAndRotateWithParents(PoseStack poseStack) {
+            ModelPartExtended part = this;
+            List<ModelPartExtended> parts = new ArrayList<>();
+            parts.add(part);
+            while (part.parent != null) {
+                part = part.parent;
+                parts.add(part);
+            }
+            for (int i = parts.size() - 1; i >= 0; i--) {
+                parts.get(i).translateAndRotate(poseStack);
+            }
+        }
+
         public void translateAndRotate(PoseStack poseStack) {
             poseStack.translate(this.x / 16.0F, this.y / 16.0F, this.z / 16.0F);
 
@@ -218,6 +236,12 @@ public class ModelPartsHolder {
 
         public void updateDefaultPose(PoseExtended defaultPose) {
             this.defaultPose = defaultPose;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("Part: %s, Pos:[%s,%s,%s] - Rot:[%s,%s,%s] - Scale[%s,%s,%s]", this.name,
+                    this.x, this.y, this.z, this.xRot, this.yRot, this.zRot, this.xScale, this.yScale, this.zScale);
         }
     }
 }
