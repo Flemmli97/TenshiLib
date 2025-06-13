@@ -59,6 +59,16 @@ public record AnimationDefinition(String id, String animation, double length, do
                 this.startTransition, this.endTransition, this.markers);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return obj == this || (obj instanceof AnimationDefinition other && this.id().equals(other.id()));
+    }
+
+    @Override
+    public int hashCode() {
+        return this.id().hashCode();
+    }
+
     /**
      * Without the id for de/serialization
      */

@@ -1,68 +1,61 @@
 package io.github.flemmli97.tenshilib.common.data.provider;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.JsonOps;
-import io.github.flemmli97.tenshilib.TenshiLib;
+import io.github.flemmli97.tenshilib.common.data.AnimationDataManager;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimationDefinitionContainer;
-import io.github.flemmli97.tenshilib.common.network.S2CAnimationDataPacket;
-import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
-import net.minecraft.core.registries.BuiltInRegistries;
+import io.github.flemmli97.tenshilib.loader.registry.RegistryEntrySupplier;
+import net.minecraft.core.Holder;
+import net.minecraft.data.CachedOutput;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.EntityType;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
+import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
-public class AnimationDataProvider extends SimpleJsonResourceReloadListener {
+public abstract class AnimationDataProvider implements DataProvider {
 
-    public static final String DIRECTORY = "animation/data";
+    private final Map<ResourceLocation, AnimationDefinitionContainer> data = new LinkedHashMap<>();
 
-    private static final AnimationDataProvider INSTANCE = new AnimationDataProvider();
+    private final PackOutput output;
 
-    private Map<ResourceLocation, AnimationDefinitionContainer> animations;
-
-    private AnimationDataProvider() {
-        super(new Gson(), DIRECTORY);
+    public AnimationDataProvider(PackOutput output) {
+        this.output = output;
     }
 
-    public static AnimationDataProvider getInstance() {
-        return INSTANCE;
-    }
+    protected abstract void add();
 
-    public void syncTo(Collection<ServerPlayer> server) {
-        LoaderNetwork.INSTANCE.sendToAll(new S2CAnimationDataPacket(this.animations), server);
+    @Override
+    public CompletableFuture<?> run(CachedOutput cache) {
+        this.add();
+        return CompletableFuture.allOf(this.data.entrySet().stream().map(entry -> {
+            ResourceLocation res = entry.getKey();
+            Path path = this.output.getOutputFolder(PackOutput.Target.DATA_PACK).resolve(res.getNamespace() + "/" + AnimationDataManager.ID.getPath() + "/" + res.getPath() + ".json");
+            JsonElement obj = AnimationDefinitionContainer.CODEC.encodeStart(JsonOps.INSTANCE, entry.getValue()).getOrThrow();
+            return DataProvider.saveStable(cache, obj, path);
+        }).toArray(CompletableFuture<?>[]::new));
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, JsonElement> object, ResourceManager resourceManager, ProfilerFiller profiler) {
-        ImmutableMap.Builder<ResourceLocation, AnimationDefinitionContainer> builder = new ImmutableMap.Builder<>();
-        object.forEach((res, json) -> {
-            try {
-                builder.put(res, AnimationDefinitionContainer.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow());
-            } catch (Exception e) {
-                TenshiLib.LOGGER.error("Unable to parse animation file {}", res, e);
-            }
-        });
-        this.animations = builder.build();
+    public String getName() {
+        return "Animation Definitions";
     }
 
-    public AnimationDefinitionContainer getAnimation(EntityType<?> type) {
-        return this.getAnimation(BuiltInRegistries.ENTITY_TYPE.getKey(type));
+    public void addDefinition(Holder<EntityType<?>> type, AnimationDefinitionContainer.Builder builder) {
+        this.addDefinition(type.unwrapKey().get().location(), builder);
     }
 
-    @Nullable
-    public AnimationDefinitionContainer getAnimation(ResourceLocation res) {
-        return this.animations.get(res);
+    public void addDefinition(RegistryEntrySupplier<EntityType<?>, ?> type, AnimationDefinitionContainer.Builder builder) {
+        this.addDefinition(type.getID(), builder);
     }
 
-    public void updateFrom(S2CAnimationDataPacket pkt) {
-        this.animations = Map.copyOf(pkt.content());
+    public void addDefinition(ResourceLocation res, AnimationDefinitionContainer.Builder builder) {
+        if (this.data.put(res, builder.build()) != null) {
+            throw new IllegalStateException("Animation definition already added for " + res);
+        }
     }
 }
