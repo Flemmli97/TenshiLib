@@ -5,7 +5,8 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "LivingMixin",
-    "PlayerListMixin"
+    "PlayerListMixin",
+    "PlayerMixin"
   ],
   "client": [
     "dual.HumanoidModelMixin",
@@ -16,7 +17,6 @@
     "HumanoidArmorMixin",
     "LivingEntityRendererAccessor",
     "LivingOverlayMixin",
-    "MinecraftMixin",
     "ModelPartAccessor",
     "OptionsScreenMixin",
     "OverlayTextureMixin",

@@ -12,7 +12,7 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "startAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/HitResult;getType()Lnet/minecraft/world/phys/HitResult$Type;", shift = At.Shift.BY, by = -3), cancellable = true)
     private void leftClickAttack(CallbackInfoReturnable<Boolean> info) {
-        if (ClientHandlers.emptyClick()) {
+        if (ClientHandlers.onClientClick()) {
             info.setReturnValue(false);
             info.cancel();
         }

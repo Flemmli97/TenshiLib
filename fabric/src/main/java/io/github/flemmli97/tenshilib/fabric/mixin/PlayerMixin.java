@@ -1,12 +1,17 @@
 package io.github.flemmli97.tenshilib.fabric.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import io.github.flemmli97.tenshilib.fabric.loader.patreon.PlayerPatreonData;
+import io.github.flemmli97.tenshilib.mixinhelper.PlayerAttackAccess;
 import io.github.flemmli97.tenshilib.patreon.PatreonPlayerSetting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.SwordItem;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -29,6 +34,11 @@ public abstract class PlayerMixin implements PlayerPatreonData {
     @Inject(method = "tick", at = @At("RETURN"))
     private void onTick(CallbackInfo info) {
         this.tenshilib$patreon_setting.tick((Player) (Object) this);
+    }
+
+    @WrapOperation(method = "attack", constant = @Constant(classValue = SwordItem.class))
+    private boolean modifySweeping(Object object, Operation<Boolean> original) {
+        return !((PlayerAttackAccess) this).tenshilib$IsSweepDisabled() && original.call(object);
     }
 
     @Override

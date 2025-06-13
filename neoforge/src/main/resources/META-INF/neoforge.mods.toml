@@ -4,6 +4,8 @@ license="All rights reserved"
 issueTrackerURL="https://github.com/Flemmli97/TenshiLib/issues"
 [[mixins]]
 config = "tenshilib.mixins.json"
+[[mixins]]
+config = "tenshilib.neoforge.mixins.json"
 [[mods]]
 modId="tenshilib"
 version="${version}"

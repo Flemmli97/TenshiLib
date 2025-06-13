@@ -11,7 +11,6 @@ import io.github.flemmli97.tenshilib.fabric.loader.patreon.TenshiLibPatreonImpl;
 import io.github.flemmli97.tenshilib.fabric.network.PacketHandler;
 import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
@@ -30,7 +29,6 @@ public class TenshiLibFabric implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        AttackBlockCallback.EVENT.register(CommonEvents::leftClickBlock);
         UseItemCallback.EVENT.register(CommonEvents::disableOffhand);
         EntityTrackingEvents.START_TRACKING.register(((entity, player) -> {
             if (entity instanceof AnimatedEntity animated && animated.getAnimationHandler().hasAnimation()) {

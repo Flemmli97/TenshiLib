@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "io.github.flemmli97.tenshilib.neoforge.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "NeoForgeSweepCheck"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

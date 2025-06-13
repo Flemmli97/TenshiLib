@@ -24,7 +24,7 @@ public class ClientEvents {
 
     public static void clickSpecial(InputEvent.InteractionKeyMappingTriggered event) {
         if (event.isAttack() && event.getHand() == InteractionHand.MAIN_HAND) {
-            boolean canceled = ClientHandlers.emptyClick();
+            boolean canceled = ClientHandlers.onClientClick();
             if (canceled) {
                 event.setSwingHand(false);
                 event.setCanceled(true);

@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 public class PacketRegistrar {
 
     public static void registerServerPackets(ServerPacketRegister register) {
-        register.register(C2SPacketHit.TYPE, C2SPacketHit.STREAM_CODEC, C2SPacketHit::handle);
+        register.register(C2SAttackPacket.TYPE, C2SAttackPacket.STREAM_CODEC, C2SAttackPacket::handle);
         register.register(C2SEffectUpdatePkt.TYPE, C2SEffectUpdatePkt.STREAM_CODEC, C2SEffectUpdatePkt::handle);
         register.register(C2SRequestUpdateClientPkt.TYPE, C2SRequestUpdateClientPkt.STREAM_CODEC, C2SRequestUpdateClientPkt::handle);
         register.register(C2SAnimationDebuggerUpdate.TYPE, C2SAnimationDebuggerUpdate.STREAM_CODEC, C2SAnimationDebuggerUpdate::handle);

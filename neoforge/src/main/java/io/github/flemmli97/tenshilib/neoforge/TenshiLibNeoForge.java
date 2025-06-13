@@ -24,7 +24,6 @@ public class TenshiLibNeoForge {
         IEventBus eventBus = NeoForge.EVENT_BUS;
         modBus.addListener(TenshiLibNeoForge::preInit);
         modBus.addListener(PacketHandler::register);
-        eventBus.addListener(CommonEvents::leftClickBlock);
         eventBus.addListener(CommonEvents::disableOffhand);
         eventBus.addListener(CommonEvents::disableOffhandBlock);
         eventBus.addListener(CommonEvents::onTracking);

@@ -1,27 +1,13 @@
 package io.github.flemmli97.tenshilib.fabric.events;
 
-import io.github.flemmli97.tenshilib.common.item.AOEWeapon;
-import io.github.flemmli97.tenshilib.common.item.AOEWeaponHandler;
 import io.github.flemmli97.tenshilib.common.item.DualWeapon;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 public class CommonEvents {
-
-    public static InteractionResult leftClickBlock(Player player, Level world, InteractionHand hand, BlockPos pos, Direction direction) {
-        ItemStack stack = player.getMainHandItem();
-        if (stack.getItem() instanceof AOEWeapon weapon) {
-            AOEWeaponHandler.onAOEWeaponSwing(player, stack, weapon);
-            player.resetAttackStrengthTicker();
-        }
-        return InteractionResult.PASS;
-    }
 
     public static InteractionResultHolder<ItemStack> disableOffhand(Player player, Level level, InteractionHand hand) {
         if (hand == InteractionHand.OFF_HAND && player.getMainHandItem().getItem() instanceof DualWeapon weapon && weapon.disableOffhand()) {

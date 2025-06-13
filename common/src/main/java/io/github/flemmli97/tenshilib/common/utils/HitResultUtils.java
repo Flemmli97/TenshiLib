@@ -31,11 +31,11 @@ public class HitResultUtils {
                 t -> t != entity && (pred == null || pred.test(t)) && !t.isAlliedTo(entity) && t.isPickable());
     }
 
-    public static EntityHitResult calculateEntityFromLook(LivingEntity entity, float reach) {
+    public static EntityHitResult calculateEntityFromLook(LivingEntity entity, double reach) {
         return calculateEntityFromLook(entity, entity.getEyePosition(1), entity.getViewVector(1), reach, null);
     }
 
-    public static EntityHitResult calculateEntityFromLook(LivingEntity entity, Vec3 pos, Vec3 dir, float reach,
+    public static EntityHitResult calculateEntityFromLook(LivingEntity entity, Vec3 pos, Vec3 dir, double reach,
                                                           @Nullable Predicate<Entity> pred) {
         Vec3 scaledDir = dir.scale(reach);
         EntityHitResult result = rayTraceEntities(entity, pos, pos.add(scaledDir), entity.getBoundingBox().expandTowards(scaledDir).inflate(1), (t) -> EntitySelector.NO_SPECTATORS.test(t) && t.isPickable()
@@ -49,7 +49,7 @@ public class HitResultUtils {
         return null;
     }
 
-    public static HitResult entityRayTrace(Entity e, float range, ClipContext.Block blockMode, ClipContext.Fluid fluidMode,
+    public static HitResult entityRayTrace(Entity e, double range, ClipContext.Block blockMode, ClipContext.Fluid fluidMode,
                                            boolean includeEntities, boolean getEntityHitVec, @Nullable Predicate<Entity> pred) {
         if (pred == null)
             pred = entity -> true;
