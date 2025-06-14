@@ -6,6 +6,8 @@ import com.google.gson.JsonElement;
 import com.mojang.serialization.JsonOps;
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimationDefinitionContainer;
+import io.github.flemmli97.tenshilib.common.entity.animated.AnimationsBuilder;
+import io.github.flemmli97.tenshilib.common.entity.animated.DefaultedAnimationContainer;
 import io.github.flemmli97.tenshilib.common.network.S2CAnimationDataPacket;
 import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -52,12 +54,24 @@ public class AnimationDataManager extends SimpleJsonResourceReloadListener imple
         ImmutableMap.Builder<ResourceLocation, AnimationDefinitionContainer> builder = new ImmutableMap.Builder<>();
         object.forEach((res, json) -> {
             try {
-                builder.put(res, AnimationDefinitionContainer.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow());
+                builder.put(res, AnimationsBuilder.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow().build());
             } catch (Exception e) {
                 TenshiLib.LOGGER.error("Unable to parse animation file {}", res, e);
             }
         });
         this.animations = builder.build();
+    }
+
+    public AnimationDefinitionContainer getAnimation(EntityType<?> type, AnimationDefinitionContainer defaulted) {
+        return this.getAnimation(BuiltInRegistries.ENTITY_TYPE.getKey(type), defaulted);
+    }
+
+    @Nullable
+    public AnimationDefinitionContainer getAnimation(ResourceLocation res, AnimationDefinitionContainer defaulted) {
+        AnimationDefinitionContainer container = this.getAnimation(res);
+        if (container == null)
+            return defaulted;
+        return new DefaultedAnimationContainer(defaulted, container);
     }
 
     public AnimationDefinitionContainer getAnimation(EntityType<?> type) {

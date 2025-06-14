@@ -3,6 +3,7 @@ package io.github.flemmli97.tenshilib.common.entity.animated;
 import io.github.flemmli97.tenshilib.common.data.AnimationDataManager;
 import io.github.flemmli97.tenshilib.common.network.S2CEntityAnimation;
 import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.ToFloatFunction;
 import net.minecraft.world.entity.Entity;
@@ -12,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -31,14 +31,14 @@ public class AnimationHandler<T extends Entity & AnimatedEntity> {
 
     private int timeSinceLastChange = -1;
 
-    public AnimationHandler(T entity) {
-        this(entity, AnimationDataManager.getInstance().getAnimation(entity.getType()));
+    public AnimationHandler(T entity, AnimationDefinitionContainer defaulted) {
+        this.entity = entity;
+        this.definitions = AnimationDataManager.getInstance().getAnimation(entity.getType(), defaulted);
     }
 
-    public AnimationHandler(T entity, AnimationDefinitionContainer definitions) {
+    public AnimationHandler(T entity, ResourceLocation id, AnimationDefinitionContainer defaulted) {
         this.entity = entity;
-        Objects.requireNonNull(definitions);
-        this.definitions = definitions;
+        this.definitions = AnimationDataManager.getInstance().getAnimation(id, defaulted);
     }
 
     public AnimationHandler<T> withChangeListener(Predicate<AnimationDefinition> onAnimationSet) {
@@ -87,6 +87,10 @@ public class AnimationHandler<T extends Entity & AnimatedEntity> {
         return this.currentAnimation != null;
     }
 
+    public void setAnimation(String anim) {
+        this.setAnimation(anim != null ? this.definitions.get(anim) : null);
+    }
+
     public void setAnimation(AnimationDefinition anim) {
         this.setAnimation(anim, AnimationHandler.FALLBACK_TRANSIT_TIME, AnimationHandler.FALLBACK_TRANSIT_TIME, 0);
     }
@@ -130,19 +134,13 @@ public class AnimationHandler<T extends Entity & AnimatedEntity> {
     public boolean isCurrent(AnimationDefinition... anims) {
         if (this.getAnimation() == null)
             return false;
-        for (AnimationDefinition action : anims)
-            if (this.getAnimation().getID().equals(action.id()))
-                return true;
-        return false;
+        return this.getAnimation().is(anims);
     }
 
     public boolean isCurrent(String... ids) {
         if (this.getAnimation() == null)
             return false;
-        for (String id : ids)
-            if (this.getAnimation().getID().equals(id))
-                return true;
-        return false;
+        return this.getAnimation().is(ids);
     }
 
     /**
@@ -164,7 +162,7 @@ public class AnimationHandler<T extends Entity & AnimatedEntity> {
         }
         if (this.hasAnimation()) {
             if (this.getAnimation().tick())
-                this.setAnimation(null);
+                this.setAnimation((AnimationDefinition) null);
         }
     }
 
@@ -177,7 +175,7 @@ public class AnimationHandler<T extends Entity & AnimatedEntity> {
             while (!anim.done(1))
                 anim.tick();
             if (anim.shouldRunOut()) {
-                this.setAnimation(null);
+                this.setAnimation((AnimationDefinition) null);
             } else {
                 this.timeSinceLastChange = Mth.ceil(anim.getLength());
             }

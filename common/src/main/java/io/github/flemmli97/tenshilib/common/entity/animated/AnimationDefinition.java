@@ -1,17 +1,9 @@
 package io.github.flemmli97.tenshilib.common.entity.animated;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.util.ExtraCodecs;
 
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.DoubleStream;
 
 public record AnimationDefinition(String id, String animation, double length, double speed, boolean shouldRunOut,
                                   int startTransition, int endTransition,
@@ -48,15 +40,18 @@ public record AnimationDefinition(String id, String animation, double length, do
         }
     };
 
-    private static Map<String, List<Double>> asListMap(Map<String, double[]> markers) {
-        Map<String, List<Double>> map = new LinkedHashMap<>();
-        markers.forEach((s, ds) -> map.put(s, DoubleStream.of(ds).boxed().toList()));
-        return map;
+    public boolean is(AnimationDefinition... definitions) {
+        for (AnimationDefinition other : definitions)
+            if (other != null && this.id().equals(other.id()))
+                return true;
+        return false;
     }
 
-    public PartialDefinition asPartial() {
-        return new PartialDefinition(this.animation.equals(this.id) ? "" : this.animation, this.length, this.speed, this.shouldRunOut,
-                this.startTransition, this.endTransition, this.markers);
+    public boolean is(String... definitions) {
+        for (String other : definitions)
+            if (this.id().equals(other))
+                return true;
+        return false;
     }
 
     @Override
@@ -67,35 +62,5 @@ public record AnimationDefinition(String id, String animation, double length, do
     @Override
     public int hashCode() {
         return this.id().hashCode();
-    }
-
-    /**
-     * Without the id for de/serialization
-     */
-    public record PartialDefinition(String animation, double length, double speed, boolean shouldRunOut,
-                                    int defaultStartTransition, int defaultEndTransition,
-                                    Map<String, double[]> markers) {
-
-        public static Codec<PartialDefinition> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-                Codec.STRING.optionalFieldOf("animation").forGetter(d -> d.animation.isEmpty() ? Optional.empty() : Optional.of(d.animation)),
-                Codec.DOUBLE.fieldOf("length").forGetter(d -> d.length),
-                Codec.DOUBLE.optionalFieldOf("speed").forGetter(d -> d.speed == 1 ? Optional.empty() : Optional.of(d.speed)),
-                Codec.BOOL.optionalFieldOf("should_run_out").forGetter(d -> d.shouldRunOut ? Optional.empty() : Optional.of(false)),
-                ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("start_transition").forGetter(d -> d.defaultStartTransition == 0 ? Optional.empty() : Optional.of(d.defaultStartTransition)),
-                ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("end_transition").forGetter(d -> d.defaultEndTransition == AnimationHandler.DEFAULT_TRANSIT_TIME ? Optional.empty() : Optional.of(d.defaultEndTransition)),
-                Codec.unboundedMap(Codec.STRING, Codec.DOUBLE.listOf()).optionalFieldOf("markers").forGetter(d -> d.markers.isEmpty() ? Optional.empty() : Optional.of(asListMap(d.markers)))
-        ).apply(inst, (animation, length, speed, runOut,
-                       startTrans, endTrans, markers) -> {
-            ImmutableMap.Builder<String, double[]> builder = ImmutableMap.builder();
-            markers.ifPresent(m -> m.forEach((s, ds) ->
-                    builder.put(s, ds.stream().mapToDouble(d -> d).toArray())));
-            return new PartialDefinition(animation.orElse(""), length, speed.orElse(1.), runOut.orElse(true),
-                    startTrans.orElse(0), endTrans.orElse(AnimationHandler.DEFAULT_TRANSIT_TIME), builder.build());
-        }));
-
-        public AnimationDefinition create(String id) {
-            return new AnimationDefinition(id, this.animation.isEmpty() ? id : this.animation, this.length, this.speed, this.shouldRunOut,
-                    this.defaultStartTransition, this.defaultEndTransition, this.markers);
-        }
     }
 }

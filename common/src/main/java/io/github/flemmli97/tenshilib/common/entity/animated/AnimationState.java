@@ -209,10 +209,11 @@ public class AnimationState {
     }
 
     public boolean is(AnimationDefinition... definitions) {
-        for (AnimationDefinition other : definitions)
-            if (other != null && this.getID().equals(other.id()))
-                return true;
-        return false;
+        return this.data.is(definitions);
+    }
+
+    public boolean is(String... ids) {
+        return this.data.is(ids);
     }
 
     public String getAnimation() {
