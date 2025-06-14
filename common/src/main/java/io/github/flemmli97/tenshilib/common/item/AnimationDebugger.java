@@ -57,7 +57,7 @@ public class AnimationDebugger extends Item {
                     } else {
                         String id = this.getId(stack);
                         if (!id.isEmpty()) {
-                            animated.getAnimationHandler().setAnimation(animated.getAnimationHandler().getAnimations().get(id));
+                            animated.getAnimationHandler().setAnimation(id);
                         }
                     }
                 } else {

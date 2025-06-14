@@ -245,19 +245,16 @@ public class BedrockAnimations {
                 float dZ = add ? 0 : modelPart.z - modelPart.getDefaultPose().z;
                 modelPart.z += (z - dZ) * interpolation;
             } else {
-                BoneKeyFrame posPrev = bone.translations().get(0);
-                BoneKeyFrame pos = posPrev;
-                for (int i = 1; i < bone.translations().size(); i++) {
-                    if (actualTick < pos.startTick) {
-                        break;
-                    }
-                    posPrev = pos;
-                    pos = bone.translations().get(i);
+                BoneKeyFrame current = bone.translations().get(0);
+                BoneKeyFrame next = current;
+                for (int i = 1; i < bone.translations().size() && actualTick >= next.startTick; i++) {
+                    current = next;
+                    next = bone.translations().get(i);
                 }
-                float prog = (float) Mth.clamp((actualTick - posPrev.startTick) / (pos.startTick - posPrev.startTick), 0F, 1F);
-                float x = this.interpolate(posPrev.getXVal(this.variables), pos.getXVal(this.variables), prog) * mirrorMult;
-                float y = this.interpolate(posPrev.getYVal(this.variables), pos.getYVal(this.variables), prog);
-                float z = this.interpolate(posPrev.getZVal(this.variables), pos.getZVal(this.variables), prog);
+                float prog = (float) Mth.clamp((actualTick - current.startTick) / (next.startTick - current.startTick), 0F, 1F);
+                float x = this.interpolate(current.getXVal(this.variables), next.getXVal(this.variables), prog) * mirrorMult;
+                float y = this.interpolate(current.getYVal(this.variables), next.getYVal(this.variables), prog);
+                float z = this.interpolate(current.getZVal(this.variables), next.getZVal(this.variables), prog);
                 float dX = add ? 0 : modelPart.x - modelPart.getDefaultPose().x;
                 modelPart.x += (x - dX) * interpolation;
                 float dY = add ? 0 : modelPart.y - modelPart.getDefaultPose().y;
@@ -278,19 +275,16 @@ public class BedrockAnimations {
                 float dZ = add ? 0 : wrapDegrees(Mth.RAD_TO_DEG * (modelPart.zRot - modelPart.getDefaultPose().zRot));
                 modelPart.zRot += Mth.DEG_TO_RAD * degreeDiff(dZ, z) * interpolation;
             } else {
-                BoneKeyFrame rotPrev = bone.translations().get(0);
-                BoneKeyFrame rot = rotPrev;
-                for (int i = 1; i < bone.translations().size(); i++) {
-                    if (actualTick < rot.startTick) {
-                        break;
-                    }
-                    rotPrev = rot;
-                    rot = bone.translations().get(i);
+                BoneKeyFrame current = bone.rotations().get(0);
+                BoneKeyFrame next = current;
+                for (int i = 1; i < bone.rotations().size() && actualTick >= next.startTick; i++) {
+                    current = next;
+                    next = bone.rotations().get(i);
                 }
-                float prog = (float) Mth.clamp((actualTick - rotPrev.startTick) / (rot.startTick - rotPrev.startTick), 0F, 1F);
-                float x = add ? 0 : wrapDegrees(this.interpolate(rotPrev.getXVal(this.variables), rot.getXVal(this.variables), prog));
-                float y = add ? 0 : wrapDegrees(this.interpolate(rotPrev.getYVal(this.variables), rot.getYVal(this.variables), prog)) * mirrorMult;
-                float z = add ? 0 : wrapDegrees(this.interpolate(rotPrev.getZVal(this.variables), rot.getZVal(this.variables), prog)) * mirrorMult;
+                float prog = (float) Mth.clamp((actualTick - current.startTick) / (next.startTick - current.startTick), 0F, 1F);
+                float x = add ? 0 : wrapDegrees(this.interpolate(current.getXVal(this.variables), next.getXVal(this.variables), prog));
+                float y = add ? 0 : wrapDegrees(this.interpolate(current.getYVal(this.variables), next.getYVal(this.variables), prog)) * mirrorMult;
+                float z = add ? 0 : wrapDegrees(this.interpolate(current.getZVal(this.variables), next.getZVal(this.variables), prog)) * mirrorMult;
                 float dX = wrapDegrees(Mth.RAD_TO_DEG * (modelPart.xRot - modelPart.getDefaultPose().xRot));
                 modelPart.xRot += Mth.DEG_TO_RAD * degreeDiff(dX, x) * interpolation;
                 float dY = wrapDegrees(Mth.RAD_TO_DEG * (modelPart.yRot - modelPart.getDefaultPose().yRot));
@@ -311,19 +305,16 @@ public class BedrockAnimations {
                 float dZ = add ? 0 : modelPart.zScale - modelPart.getDefaultPose().zScale;
                 modelPart.zScale += (z - dZ) * interpolation;
             } else {
-                BoneKeyFrame scalePrev = bone.translations().get(0);
-                BoneKeyFrame scale = scalePrev;
-                for (int i = 1; i < bone.translations().size(); i++) {
-                    if (actualTick < scale.startTick) {
-                        break;
-                    }
-                    scalePrev = scale;
-                    scale = bone.translations().get(i);
+                BoneKeyFrame current = bone.scales().get(0);
+                BoneKeyFrame next = current;
+                for (int i = 1; i < bone.scales().size() && actualTick >= next.startTick; i++) {
+                    current = next;
+                    next = bone.scales().get(i);
                 }
-                float prog = (float) Mth.clamp((actualTick - scalePrev.startTick) / (scale.startTick - scalePrev.startTick), 0F, 1F);
-                float x = this.interpolate(scalePrev.getXVal(this.variables), scale.getXVal(this.variables), prog) - modelPart.getDefaultPose().xScale;
-                float y = this.interpolate(scalePrev.getYVal(this.variables), scale.getYVal(this.variables), prog) - modelPart.getDefaultPose().yScale;
-                float z = this.interpolate(scalePrev.getZVal(this.variables), scale.getZVal(this.variables), prog) - modelPart.getDefaultPose().zScale;
+                float prog = (float) Mth.clamp((actualTick - current.startTick) / (next.startTick - current.startTick), 0F, 1F);
+                float x = this.interpolate(current.getXVal(this.variables), next.getXVal(this.variables), prog) - modelPart.getDefaultPose().xScale;
+                float y = this.interpolate(current.getYVal(this.variables), next.getYVal(this.variables), prog) - modelPart.getDefaultPose().yScale;
+                float z = this.interpolate(current.getZVal(this.variables), next.getZVal(this.variables), prog) - modelPart.getDefaultPose().zScale;
                 float dX = add ? 0 : modelPart.xScale - modelPart.getDefaultPose().xScale;
                 modelPart.xScale += (x - dX) * interpolation;
                 float dY = add ? 0 : modelPart.yScale - modelPart.getDefaultPose().yScale;

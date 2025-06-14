@@ -20,6 +20,7 @@ import net.minecraft.world.entity.EntityType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 public class AnimationDataManager extends SimpleJsonResourceReloadListener implements SyncableReloadListener {
@@ -28,7 +29,7 @@ public class AnimationDataManager extends SimpleJsonResourceReloadListener imple
 
     private static final AnimationDataManager INSTANCE = createInstance();
 
-    private Map<ResourceLocation, AnimationDefinitionContainer> animations;
+    private Map<ResourceLocation, AnimationDefinitionContainer> animations = new HashMap<>();
 
     private AnimationDataManager() {
         super(new Gson(), String.format("%s/%s", ID.getNamespace(), ID.getPath()));

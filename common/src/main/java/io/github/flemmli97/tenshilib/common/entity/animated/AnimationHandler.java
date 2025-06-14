@@ -88,10 +88,10 @@ public class AnimationHandler<T extends Entity & AnimatedEntity> {
     }
 
     public void setAnimation(String anim) {
-        this.setAnimation(anim != null ? this.definitions.get(anim) : null);
+        this.setAnimationDef(anim != null ? this.definitions.get(anim) : null);
     }
 
-    public void setAnimation(AnimationDefinition anim) {
+    public void setAnimationDef(AnimationDefinition anim) {
         this.setAnimation(anim, AnimationHandler.FALLBACK_TRANSIT_TIME, AnimationHandler.FALLBACK_TRANSIT_TIME, 0);
     }
 
@@ -162,7 +162,7 @@ public class AnimationHandler<T extends Entity & AnimatedEntity> {
         }
         if (this.hasAnimation()) {
             if (this.getAnimation().tick())
-                this.setAnimation((AnimationDefinition) null);
+                this.setAnimationDef(null);
         }
     }
 
@@ -175,7 +175,7 @@ public class AnimationHandler<T extends Entity & AnimatedEntity> {
             while (!anim.done(1))
                 anim.tick();
             if (anim.shouldRunOut()) {
-                this.setAnimation((AnimationDefinition) null);
+                this.setAnimationDef(null);
             } else {
                 this.timeSinceLastChange = Mth.ceil(anim.getLength());
             }

@@ -174,7 +174,7 @@ public class AnimatedAttackGoal<T extends PathfinderMob & AnimatedEntity> extend
             }
         }
         if (this.prepare == -1) {
-            this.attacker.getAnimationHandler().setAnimation(this.current.anim());
+            this.attacker.getAnimationHandler().setAnimationDef(this.current.anim());
             this.reset = true;
             this.previous = this.current;
         }

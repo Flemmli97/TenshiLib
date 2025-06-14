@@ -28,7 +28,7 @@ public class MoveToTargetAttackRunner<T extends PathfinderMob & AnimatedEntity &
     public boolean run(AnimatedAttackGoal<T> goal, LivingEntity target, AnimationState anim) {
         if (anim == null)
             return false;
-        OrientedBoundingBox aabb = goal.attacker.prepareAttackBox(anim, target, -0.15, true);
+        OrientedBoundingBox aabb = goal.attacker.prepareAttackBox(anim.getAnimation(), target, -0.15, true);
         goal.attacker.lookAt(target, 30.0F, 30.0F);
         if (aabb.intersects(target.getBoundingBox()) && (!this.needsLoS || goal.canSee)) {
             goal.attacker.getLookControl().setLookAt(target, 360, 90);

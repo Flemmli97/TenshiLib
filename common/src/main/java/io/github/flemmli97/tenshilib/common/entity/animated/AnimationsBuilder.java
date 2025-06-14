@@ -79,7 +79,7 @@ public class AnimationsBuilder {
 
         private final double length;
 
-        private String animation;
+        private String animation = "";
         private double speed = 1;
 
         private boolean shouldRunOut = true;

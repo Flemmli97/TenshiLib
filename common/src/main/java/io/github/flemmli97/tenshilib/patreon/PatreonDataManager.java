@@ -70,6 +70,6 @@ public class PatreonDataManager {
     public record PatreonPlayerInfo(int tier, String defaultEffect,
                                     RenderLocation defaultRenderLocation, int color) {
 
-        static PatreonPlayerInfo NON_PATREON = new PatreonPlayerInfo(5, "", RenderLocation.HAT, 0xFFFFFFFF);
+        static PatreonPlayerInfo NON_PATREON = new PatreonPlayerInfo(0, "", RenderLocation.HAT, 0xFFFFFFFF);
     }
 }
