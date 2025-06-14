@@ -18,14 +18,14 @@ import java.util.Map;
  */
 public class AnimationManager extends SimpleJsonResourceReloadListener {
 
-    public static final String DIRECTORY = "animation/entity";
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "animations");
 
     private static final AnimationManager INSTANCE = new AnimationManager();
 
     private final Map<ResourceLocation, ReloadableCache<BedrockAnimations>> animations = new HashMap<>();
 
     private AnimationManager() {
-        super(BedrockAnimations.GSON, DIRECTORY);
+        super(BedrockAnimations.GSON, String.format("%s/%s", ID.getNamespace(), ID.getPath()));
     }
 
     public static AnimationManager getInstance() {

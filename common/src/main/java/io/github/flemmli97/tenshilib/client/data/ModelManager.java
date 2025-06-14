@@ -20,14 +20,14 @@ import java.util.function.Consumer;
  */
 public class ModelManager extends SimpleJsonResourceReloadListener {
 
-    public static final String DIRECTORY = "model/entity";
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "models");
 
     private static final ModelManager INSTANCE = new ModelManager();
 
     private final Map<ResourceLocation, ReloadableCache<ModelPartsContainer>> animations = new HashMap<>();
 
     private ModelManager() {
-        super(BedrockGeometryParser.GSON, DIRECTORY);
+        super(BedrockGeometryParser.GSON, String.format("%s/%s", ID.getNamespace(), ID.getPath()));
     }
 
     public static ModelManager getInstance() {

@@ -24,14 +24,14 @@ import java.util.Map;
 
 public class AnimationDataManager extends SimpleJsonResourceReloadListener implements SyncableReloadListener {
 
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "animation/data");
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "animation_definitions");
 
     private static final AnimationDataManager INSTANCE = createInstance();
 
     private Map<ResourceLocation, AnimationDefinitionContainer> animations;
 
     private AnimationDataManager() {
-        super(new Gson(), ID.getPath());
+        super(new Gson(), String.format("%s/%s", ID.getNamespace(), ID.getPath()));
     }
 
     private static AnimationDataManager createInstance() {
