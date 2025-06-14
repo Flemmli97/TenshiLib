@@ -39,7 +39,7 @@ public class JsonConfig<T> {
                     this.save();
                 }
             } catch (IOException e) {
-                TenshiLib.LOGGER.error(e);
+                TenshiLib.LOGGER.error("Error creating file!", e);
             }
         }
         this.load();
@@ -57,7 +57,7 @@ public class JsonConfig<T> {
                     Files.copy(defaultConfig, file);
                 }
             } catch (IOException e) {
-                TenshiLib.LOGGER.error(e);
+                TenshiLib.LOGGER.error("Error creating file!", e);
             }
         }
         this.load();
@@ -130,10 +130,10 @@ public class JsonConfig<T> {
                 }
                 Files.copy(this.file, this.file.getParent().resolve(file));
             } catch (IOException ex) {
-                TenshiLib.LOGGER.error(ex);
+                TenshiLib.LOGGER.error("Error loading file!", ex);
             }
         } catch (IOException e) {
-            TenshiLib.LOGGER.error(e);
+            TenshiLib.LOGGER.error("Error loading file!", e);
         }
         this.save();
     }
@@ -147,7 +147,7 @@ public class JsonConfig<T> {
                 this.gson.toJson(this.element, writer);
             writer.close();
         } catch (JsonIOException | IOException e) {
-            TenshiLib.LOGGER.error(e);
+            TenshiLib.LOGGER.error("Error saving file!", e);
         }
     }
 }

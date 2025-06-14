@@ -5,11 +5,7 @@ loom {
 }
 
 repositories {
-    maven { url "https://maven.shedaniel.me/" }
 }
 
 dependencies {
-    modCompileOnlyApi("me.shedaniel.cloth:cloth-config-fabric:${cloth_config}") {
-        exclude(group: "net.fabricmc.fabric-api")
-    }
 }
