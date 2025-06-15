@@ -83,7 +83,7 @@ public class AnimationState {
     }
 
     public double getStartTransitionProgress(float partialTicks) {
-        if (this.startTransition == 0) {
+        if (this.getStartTransition() <= 0) {
             return 1;
         }
         double tick = Math.max(0, this.ticker - this.offset - 1 + partialTicks * this.speed);

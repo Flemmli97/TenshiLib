@@ -14,5 +14,4 @@ public interface ScreenAccessor {
 
     @Invoker("removeWidget")
     void removeWidgetFrom(GuiEventListener widget);
-
 }

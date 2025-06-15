@@ -14,7 +14,6 @@ import net.minecraft.util.Mth;
 
 import java.util.List;
 
-
 public class SelectableListWidget extends AbstractWidget {
 
     private final Font font;

@@ -190,7 +190,7 @@ public class AnimationHandler<T extends Entity & AnimatedEntity> {
     }
 
     public float getLastTransitionProgress(float partialTicks) {
-        if (this.lastAnimation == null) {
+        if (this.lastAnimation == null || this.lastAnimation.getEndTransitionTime() <= 0) {
             return 0;
         }
         return 1 - Mth.clamp((this.getTimeSinceLastChange() - 1 + partialTicks) / this.lastAnimation.getEndTransitionTime(), 0, 1);

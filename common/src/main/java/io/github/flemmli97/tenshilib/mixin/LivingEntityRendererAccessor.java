@@ -14,5 +14,4 @@ public interface LivingEntityRendererAccessor<T extends LivingEntity, M extends 
 
     @Accessor("layers")
     List<RenderLayer<T, M>> getLayers();
-
 }

@@ -54,5 +54,4 @@ public record Animation(double length, boolean loop, Map<String, AnimationBone> 
         });
         return map.build();
     }
-
 }

@@ -10,5 +10,4 @@ public interface LivingEntityRendererAccessor {
 
     @Invoker("addLayer")
     boolean add(RenderLayer layer);
-
 }

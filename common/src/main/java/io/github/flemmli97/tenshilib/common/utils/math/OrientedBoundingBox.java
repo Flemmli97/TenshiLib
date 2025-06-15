@@ -311,6 +311,7 @@ public class OrientedBoundingBox {
     }
 
     private record Projection(double min, double max) {
+
     }
 
     public static class BlockCollisionDetector {
@@ -327,7 +328,6 @@ public class OrientedBoundingBox {
             this.from = obb.getOffset();
             this.source = source;
         }
-
 
         /**
          * Check if entity is not behind blocks.

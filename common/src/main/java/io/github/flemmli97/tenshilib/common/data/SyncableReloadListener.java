@@ -7,5 +7,4 @@ import java.util.Collection;
 public interface SyncableReloadListener {
 
     void onSync(Collection<ServerPlayer> players);
-
 }

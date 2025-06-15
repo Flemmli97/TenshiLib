@@ -64,6 +64,7 @@ public class ParticleEffect extends PatreonEffectConfig {
     }
 
     public record Particle(Vec3 position, float chance, ParticleContainer container) {
+
     }
 
     public static class Builder {
@@ -156,6 +157,7 @@ public class ParticleEffect extends PatreonEffectConfig {
 
     private record ParticleContainer(ParticleOptions particle, Optional<ParticleVector> positionMod,
                                      Optional<ParticleVector> delta) {
+
     }
 
     public interface ParticleVector {

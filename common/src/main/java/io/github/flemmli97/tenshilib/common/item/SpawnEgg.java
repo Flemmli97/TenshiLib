@@ -270,5 +270,6 @@ public class SpawnEgg extends SpawnEggItem {
     }
 
     public record EntityTypeHolder<T extends Entity>(Class<T> clss, Supplier<? extends EntityType<? extends T>> type) {
+
     }
 }

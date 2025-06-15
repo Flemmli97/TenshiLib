@@ -15,5 +15,4 @@ public abstract class OptionsScreenMixin {
     private void onReposition(CallbackInfo ci) {
         PatreonClientUtil.addPatreonButton((Screen) (Object) this);
     }
-
 }

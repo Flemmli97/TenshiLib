@@ -15,5 +15,4 @@ public class AOEAttackHandlerImpl implements AOEAttackHandler {
         };
         NeoForge.EVENT_BUS.addListener(cons);
     }
-
 }

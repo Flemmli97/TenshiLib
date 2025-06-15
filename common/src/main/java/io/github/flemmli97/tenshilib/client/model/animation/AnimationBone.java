@@ -75,5 +75,4 @@ public record AnimationBone(String name, String mirroredName, List<BoneKeyFrame>
         }
         return null;
     }
-
 }

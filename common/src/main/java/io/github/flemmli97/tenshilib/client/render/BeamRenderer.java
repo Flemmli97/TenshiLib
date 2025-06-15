@@ -223,6 +223,7 @@ public abstract class BeamRenderer<T extends BeamEntity> extends EntityRenderer<
     }
 
     public record ResourcePair(ResourceLocation res, float size) {
+
     }
 
     public enum BeamPart {

@@ -37,5 +37,4 @@ public interface LoaderNetwork {
     }
 
     void sendToChecked(CustomPacketPayload message, Collection<ServerPlayer> players);
-
 }

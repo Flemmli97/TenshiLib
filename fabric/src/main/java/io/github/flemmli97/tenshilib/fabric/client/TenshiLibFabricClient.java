@@ -19,6 +19,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 public class TenshiLibFabricClient implements ClientModInitializer {
+
     @Override
     public void onInitializeClient() {
         ClientEvents.itemColors();
@@ -35,7 +36,6 @@ public class TenshiLibFabricClient implements ClientModInitializer {
             public ResourceLocation getFabricId() {
                 return ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "model_assets");
             }
-
         });
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new IdentifiableResourceReloadListener() {
 

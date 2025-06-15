@@ -1,6 +1,5 @@
 package io.github.flemmli97.tenshilib.fabric.mixin;
 
-
 import io.github.flemmli97.tenshilib.patreon.TenshiLibPatreonPlatform;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerPlayer;

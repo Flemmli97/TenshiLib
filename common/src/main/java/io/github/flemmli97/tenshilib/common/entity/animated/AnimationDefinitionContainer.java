@@ -39,5 +39,4 @@ public class AnimationDefinitionContainer {
     public Collection<String> all() {
         return this.animations.keySet();
     }
-
 }

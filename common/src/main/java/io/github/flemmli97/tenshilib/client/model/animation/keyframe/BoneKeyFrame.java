@@ -29,6 +29,6 @@ public class BoneKeyFrame extends KeyFrameValue {
 
     @Override
     public String toString() {
-        return String.format("Bone Keyframe [@:%s, {%s,%s,%s}", this.startTick, this.xVal, this.yVal, this.zVal);
+        return String.format("Bone Keyframe [@:%s, {%s, %s, %s}]", this.startTick, this.xVal, this.yVal, this.zVal);
     }
 }

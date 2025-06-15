@@ -1,6 +1,5 @@
 package io.github.flemmli97.tenshilib.client.render.layer;
 
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import io.github.flemmli97.tenshilib.client.model.ItemHolderModel;

@@ -45,5 +45,6 @@ public abstract class LoaderRegistryAccess {
      * @param registry The actual registry to access registered content with
      */
     public record CustomLoaderRegistry<T>(LoaderRegister<T> register, Registry<T> registry) {
+
     }
 }

@@ -11,5 +11,4 @@ public interface LivingMixin {
 
     @Invoker("getKnockback")
     float getKnockbackInv(Entity attacker, DamageSource damageSource);
-
 }

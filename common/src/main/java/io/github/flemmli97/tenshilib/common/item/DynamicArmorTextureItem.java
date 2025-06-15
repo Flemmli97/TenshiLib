@@ -9,5 +9,4 @@ import net.minecraft.world.item.ItemStack;
 public interface DynamicArmorTextureItem {
 
     ResourceLocation getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, ArmorMaterial.Layer layer, boolean innerModel);
-
 }

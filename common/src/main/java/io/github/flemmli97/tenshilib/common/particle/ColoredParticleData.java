@@ -38,7 +38,6 @@ public class ColoredParticleData implements ParticleOptions {
         };
     }
 
-
     private final ParticleType<? extends ColoredParticleData> type;
     private final float red;
     private final float green;

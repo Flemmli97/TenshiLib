@@ -21,5 +21,4 @@ public abstract class HumanoidArmorMixin<T extends LivingEntity, M extends Human
             info.cancel();
         }
     }
-
 }

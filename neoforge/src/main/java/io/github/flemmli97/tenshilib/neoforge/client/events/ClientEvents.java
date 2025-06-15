@@ -42,7 +42,6 @@ public class ClientEvents {
             event.setCanceled(true);
     }
 
-
     public static void registerShader(RegisterShadersEvent event) {
         TenshilibShaders.registerShader(((id, vertexFormat, onLoad) ->
                 event.registerShader(new ShaderInstance(event.getResourceProvider(), id, vertexFormat), onLoad)));

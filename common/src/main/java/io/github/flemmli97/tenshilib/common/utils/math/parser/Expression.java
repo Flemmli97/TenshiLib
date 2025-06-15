@@ -124,6 +124,7 @@ public class Expression {
     }
 
     record TokenHolder(Type type, String token) {
+
     }
 
     enum Type {

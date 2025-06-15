@@ -235,9 +235,9 @@ public class BedrockAnimations {
         float mirrorMult = (mirror ? -1 : 1);
         if (!bone.translations().isEmpty()) {
             if (bone.translations().size() == 1) {
-                float x = bone.translations().get(0).getXVal(this.variables) * mirrorMult;
-                float y = bone.translations().get(0).getYVal(this.variables);
-                float z = bone.translations().get(0).getZVal(this.variables);
+                float x = bone.translations().getFirst().getXVal(this.variables) * mirrorMult;
+                float y = bone.translations().getFirst().getYVal(this.variables);
+                float z = bone.translations().getFirst().getZVal(this.variables);
                 float dX = add ? 0 : modelPart.x - modelPart.getDefaultPose().x;
                 modelPart.x += (x - dX) * interpolation;
                 float dY = add ? 0 : modelPart.y - modelPart.getDefaultPose().y;
@@ -245,7 +245,7 @@ public class BedrockAnimations {
                 float dZ = add ? 0 : modelPart.z - modelPart.getDefaultPose().z;
                 modelPart.z += (z - dZ) * interpolation;
             } else {
-                BoneKeyFrame current = bone.translations().get(0);
+                BoneKeyFrame current = bone.translations().getFirst();
                 BoneKeyFrame next = current;
                 for (int i = 1; i < bone.translations().size() && actualTick >= next.startTick; i++) {
                     current = next;
@@ -265,9 +265,9 @@ public class BedrockAnimations {
         }
         if (!bone.rotations().isEmpty()) {
             if (bone.rotations().size() == 1) {
-                float x = wrapDegrees(bone.rotations().get(0).getXVal(this.variables));
-                float y = wrapDegrees(bone.rotations().get(0).getYVal(this.variables)) * mirrorMult;
-                float z = wrapDegrees(bone.rotations().get(0).getZVal(this.variables)) * mirrorMult;
+                float x = wrapDegrees(bone.rotations().getFirst().getXVal(this.variables));
+                float y = wrapDegrees(bone.rotations().getFirst().getYVal(this.variables)) * mirrorMult;
+                float z = wrapDegrees(bone.rotations().getFirst().getZVal(this.variables)) * mirrorMult;
                 float dX = add ? 0 : wrapDegrees(Mth.RAD_TO_DEG * (modelPart.xRot - modelPart.getDefaultPose().xRot));
                 modelPart.xRot += Mth.DEG_TO_RAD * degreeDiff(dX, x) * interpolation;
                 float dY = add ? 0 : wrapDegrees(Mth.RAD_TO_DEG * (modelPart.yRot - modelPart.getDefaultPose().yRot));
@@ -275,7 +275,7 @@ public class BedrockAnimations {
                 float dZ = add ? 0 : wrapDegrees(Mth.RAD_TO_DEG * (modelPart.zRot - modelPart.getDefaultPose().zRot));
                 modelPart.zRot += Mth.DEG_TO_RAD * degreeDiff(dZ, z) * interpolation;
             } else {
-                BoneKeyFrame current = bone.rotations().get(0);
+                BoneKeyFrame current = bone.rotations().getFirst();
                 BoneKeyFrame next = current;
                 for (int i = 1; i < bone.rotations().size() && actualTick >= next.startTick; i++) {
                     current = next;
@@ -295,9 +295,9 @@ public class BedrockAnimations {
         }
         if (!bone.scales().isEmpty()) {
             if (bone.scales().size() == 1) {
-                float x = bone.scales().get(0).getXVal(this.variables) - modelPart.getDefaultPose().xScale;
-                float y = bone.scales().get(0).getYVal(this.variables) - modelPart.getDefaultPose().yScale;
-                float z = bone.scales().get(0).getZVal(this.variables) - modelPart.getDefaultPose().zScale;
+                float x = bone.scales().getFirst().getXVal(this.variables) - modelPart.getDefaultPose().xScale;
+                float y = bone.scales().getFirst().getYVal(this.variables) - modelPart.getDefaultPose().yScale;
+                float z = bone.scales().getFirst().getZVal(this.variables) - modelPart.getDefaultPose().zScale;
                 float dX = add ? 0 : modelPart.xScale - modelPart.getDefaultPose().xScale;
                 modelPart.xScale += (x - dX) * interpolation;
                 float dY = add ? 0 : modelPart.yScale - modelPart.getDefaultPose().yScale;
@@ -305,7 +305,7 @@ public class BedrockAnimations {
                 float dZ = add ? 0 : modelPart.zScale - modelPart.getDefaultPose().zScale;
                 modelPart.zScale += (z - dZ) * interpolation;
             } else {
-                BoneKeyFrame current = bone.scales().get(0);
+                BoneKeyFrame current = bone.scales().getFirst();
                 BoneKeyFrame next = current;
                 for (int i = 1; i < bone.scales().size() && actualTick >= next.startTick; i++) {
                     current = next;
