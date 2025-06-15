@@ -5,7 +5,12 @@ loom {
 }
 
 repositories {
+    maven {
+        name = "SmartBrainLib (SBL) Maven Repo"
+        url = "https://dl.cloudsmith.io/public/tslat/sbl/maven/"
+    }
 }
 
 dependencies {
+    modCompileOnly "net.tslat.smartbrainlib:SmartBrainLib-common-${project.minecraft_version}:${project.sbl_version}"
 }

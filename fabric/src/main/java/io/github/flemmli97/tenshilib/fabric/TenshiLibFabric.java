@@ -2,6 +2,7 @@ package io.github.flemmli97.tenshilib.fabric;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.common.data.AnimationDataManager;
+import io.github.flemmli97.tenshilib.common.entity.ai.brain.memory.MoreMemoryModules;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimationState;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
@@ -29,6 +30,7 @@ public class TenshiLibFabric implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        MoreMemoryModules.MODULES.registerContent();
         UseItemCallback.EVENT.register(CommonEvents::disableOffhand);
         EntityTrackingEvents.START_TRACKING.register(((entity, player) -> {
             if (entity instanceof AnimatedEntity animated && animated.getAnimationHandler().hasAnimation()) {
