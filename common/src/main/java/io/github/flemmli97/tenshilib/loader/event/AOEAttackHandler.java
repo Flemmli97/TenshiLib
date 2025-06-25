@@ -18,6 +18,8 @@ public interface AOEAttackHandler {
      */
     void registerAOEEventHandler(AOEAttackEvent handler);
 
+    boolean trigger(Player player, ItemStack stack, List<Entity> list);
+
     interface AOEAttackEvent {
 
         /**

@@ -13,6 +13,6 @@ public interface BuiltinRegistryAccessor {
 
     @Accessor("LOADERS")
     static Map<ResourceLocation, Supplier<?>> getLoaders() {
-        throw new IllegalStateException();
+        throw new AssertionError();
     }
 }

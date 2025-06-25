@@ -4,11 +4,12 @@
   "package": "io.github.flemmli97.tenshilib.fabric.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "AttributeSupplierMixin",
     "BuiltinRegistryAccessor",
+    "DefaultAttributeSupplierAccessor",
     "PlayerMixin",
     "ServerPlayerGameModeMixin",
     "ServerPlayerMixin",
-    "SpawnEggMixin",
     "TrackingMixin"
   ],
   "client": [

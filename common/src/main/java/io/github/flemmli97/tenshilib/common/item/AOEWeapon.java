@@ -2,7 +2,7 @@ package io.github.flemmli97.tenshilib.common.item;
 
 import io.github.flemmli97.tenshilib.common.utils.HitResultUtils;
 import io.github.flemmli97.tenshilib.common.utils.math.OrientedBoundingBox;
-import io.github.flemmli97.tenshilib.loader.TenshiLibEventCalls;
+import io.github.flemmli97.tenshilib.loader.event.AOEAttackHandler;
 import io.github.flemmli97.tenshilib.mixinhelper.PlayerAttackAccess;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -42,7 +42,7 @@ public interface AOEWeapon extends ExtendedWeapon {
         } else {
             list = HitResultUtils.getEntities(player, obb, EntityTypeTest.forClass(Entity.class), null);
         }
-        if (TenshiLibEventCalls.INSTANCE.aoeAttackCall(player, stack, list) || list.isEmpty())
+        if (AOEAttackHandler.INSTANCE.trigger(player, stack, list) || list.isEmpty())
             return;
         ((PlayerAttackAccess) player).tenshilib$SetNoSweeping(!this.doSweepingAttack());
         for (int i = 0; i < list.size(); i++) {
