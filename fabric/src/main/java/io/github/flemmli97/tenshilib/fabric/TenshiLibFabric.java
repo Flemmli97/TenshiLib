@@ -1,5 +1,6 @@
 package io.github.flemmli97.tenshilib.fabric;
 
+import com.mojang.datafixers.util.Pair;
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.common.data.AnimationDataManager;
 import io.github.flemmli97.tenshilib.common.entity.ai.brain.memory.MoreMemoryModules;
@@ -8,9 +9,12 @@ import io.github.flemmli97.tenshilib.common.entity.animated.AnimationState;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import io.github.flemmli97.tenshilib.common.network.S2CEntityAnimation;
 import io.github.flemmli97.tenshilib.fabric.events.CommonEvents;
+import io.github.flemmli97.tenshilib.fabric.events.CommonSetupEvent;
 import io.github.flemmli97.tenshilib.fabric.loader.patreon.TenshiLibPatreonImpl;
+import io.github.flemmli97.tenshilib.fabric.loader.registry.DeferredRegistrationHandler;
 import io.github.flemmli97.tenshilib.fabric.network.PacketHandler;
 import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
+import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
@@ -23,10 +27,12 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.DispenserBlock;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-public class TenshiLibFabric implements ModInitializer {
+public class TenshiLibFabric implements ModInitializer, DedicatedServerModInitializer {
 
     @Override
     public void onInitialize() {
@@ -51,8 +57,30 @@ public class TenshiLibFabric implements ModInitializer {
             }
         });
         PacketHandler.register();
+        TenshiLibPatreonImpl.initPatreonData();
+    }
+
+    /**
+     * Runs after {@link ModInitializer#onInitialize()}
+     */
+    public static void postInit() {
+        DeferredRegistrationHandler.finalizeRegister();
         for (SpawnEgg egg : SpawnEgg.getEggs())
             DispenserBlock.registerBehavior(egg, egg.dispenser());
-        TenshiLibPatreonImpl.initPatreonData();
+        SpawnEgg.resolveEggs();
+        List<Pair<String, Runnable>> runnables = new ArrayList<>();
+        CommonSetupEvent.COMMON_SETUP.invoker().handle((modid, runnable) -> runnables.add(Pair.of(modid, runnable)));
+        runnables.forEach(pair -> {
+            try {
+                pair.getSecond().run();
+            } catch (Exception exception) {
+                TenshiLib.LOGGER.error("Error running common setup work for {}", pair.getFirst(), exception);
+            }
+        });
+    }
+
+    @Override
+    public void onInitializeServer() {
+        postInit();
     }
 }

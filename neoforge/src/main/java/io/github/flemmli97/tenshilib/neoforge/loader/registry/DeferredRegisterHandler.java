@@ -2,6 +2,7 @@ package io.github.flemmli97.tenshilib.neoforge.loader.registry;
 
 import io.github.flemmli97.tenshilib.loader.registry.LoaderRegister;
 import io.github.flemmli97.tenshilib.loader.registry.RegistryEntrySupplier;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -9,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class DeferredRegisterHandler<T> implements LoaderRegister<T> {
@@ -24,7 +26,12 @@ public class DeferredRegisterHandler<T> implements LoaderRegister<T> {
 
     @Override
     public <I extends T> RegistryEntrySupplier<T, I> register(String name, Supplier<I> sup) {
-        RegistryObjectWrapper<T, I> entry = new RegistryObjectWrapper<>(this.deferredRegister.register(name, sup));
+        return this.register(name, res -> sup.get());
+    }
+
+    @Override
+    public <I extends T> RegistryEntrySupplier<T, I> register(String name, Function<ResourceLocation, I> func) {
+        RegistryObjectWrapper<T, I> entry = new RegistryObjectWrapper<>(this.deferredRegister.register(name, func));
         this.entries.add(entry);
         return entry;
     }

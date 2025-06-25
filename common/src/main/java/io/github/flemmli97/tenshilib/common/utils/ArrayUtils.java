@@ -4,15 +4,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
 public class ArrayUtils {
-
-    public static <T> String arrayToString(T[] t) {
-        return arrayToString(t, null);
-    }
 
     public static <T> String arrayToString(T[] t, @Nullable Function<T, String> parser) {
         if (t == null || t.length == 0)
@@ -25,57 +20,6 @@ public class ArrayUtils {
         for (int i = 1; i < t.length; i++)
             s.append(",").append(t[i] == null ? "NULL" : parser.apply(t[i]));
         return s.toString();
-    }
-
-    public static <T> String arrayToString(int[] t) {
-        if (t == null || t.length == 0)
-            return "";
-        StringBuilder s = new StringBuilder("" + t[0]);
-        if (t.length == 1)
-            return s.toString();
-        for (int i = 1; i < t.length; i++)
-            s.append(",").append(t[i]);
-        return s.toString();
-    }
-
-    public static <T> String arrayToString(float[] t) {
-        if (t == null || t.length == 0)
-            return "";
-        StringBuilder s = new StringBuilder("" + t[0]);
-        if (t.length == 1)
-            return s.toString();
-        for (int i = 1; i < t.length; i++)
-            s.append(",").append(t[i]);
-        return s.toString();
-    }
-
-    public static <T> String arrayToString(double[] t) {
-        if (t == null || t.length == 0)
-            return "";
-        StringBuilder s = new StringBuilder("" + t[0]);
-        if (t.length == 1)
-            return s.toString();
-        for (int i = 1; i < t.length; i++)
-            s.append(",").append(t[i]);
-        return s.toString();
-    }
-
-    public static <T> String[] arrayToStringArr(T[] ts) {
-        if (ts == null)
-            return new String[0];
-        String[] arr = new String[ts.length];
-        for (int i = 0; i < ts.length; i++)
-            arr[i] = ts[i] != null ? ts[i].toString() : "";
-        return arr;
-    }
-
-    public static String[] arrayToStringArr(int[] ts) {
-        if (ts == null)
-            return new String[0];
-        String[] arr = new String[ts.length];
-        for (int i = 0; i < ts.length; i++)
-            arr[i] = "" + ts[i];
-        return arr;
     }
 
     public static <T, M> M[] arrayConverter(T[] ts, Function<T, M> parser, Class<M> clss) {
@@ -99,22 +43,5 @@ public class ArrayUtils {
         for (int i = 0; i < ms.length; i++)
             ms[i] = list.get(i);
         return ms;
-    }
-
-    public static int[] intArrFromStringArr(String[] ts) {
-        if (ts == null)
-            return new int[0];
-        int[] arr = new int[ts.length];
-        for (int i = 0; i < ts.length; i++)
-            arr[i] = Integer.parseInt(ts[i]);
-        return arr;
-    }
-
-    public static <T> T[] combine(T[] array, T[][] toAdd) {
-        List<T> list = new ArrayList<>(Arrays.asList(array));
-        for (T[] a : toAdd) {
-            list.addAll(Arrays.asList(a));
-        }
-        return list.toArray(array);
     }
 }

@@ -6,7 +6,6 @@ import io.github.flemmli97.tenshilib.common.entity.ai.brain.behaviour.SetAnimati
 import io.github.flemmli97.tenshilib.common.entity.ai.brain.data.AnimationPlayHolder;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.behavior.Behavior;
 import net.tslat.smartbrainlib.api.core.behaviour.AllApplicableBehaviours;
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour;
@@ -16,8 +15,8 @@ import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.Idle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  * Eases creating of attack sequences
@@ -63,7 +62,7 @@ public class AttackBehaviourBuilder<E extends Mob & AnimatedEntity> {
     }
 
     @SuppressWarnings("unchecked")
-    public Behavior<E> build() {
+    public ExtendedBehaviour<E> build() {
         return new OneRandomBehaviour<>(this.behaviors.toArray(Pair[]::new));
     }
 
@@ -111,25 +110,26 @@ public class AttackBehaviourBuilder<E extends Mob & AnimatedEntity> {
         }
 
         public AttackBehaviourBuilder<E> end(int weight) {
-            return this.end(weight, e -> true);
+            return this.end(weight, null);
         }
 
         @SuppressWarnings("unchecked")
-        public AttackBehaviourBuilder<E> end(int weight, Predicate<E> condition) {
+        public AttackBehaviourBuilder<E> end(int weight, Consumer<ExtendedBehaviour<E>> finalize) {
             List<ExtendedBehaviour<E>> behaviours = new ArrayList<>();
             behaviours.add(this.setToPlay);
             ExtendedBehaviour<E> actuallyPlay = new PlayAnimation<E>().replaceRunner(AttackBehaviourBuilder.this.universalHandler);
             if (this.windupTime != null) {
                 ExtendedBehaviour<E> preparation = this.seqOf(this.preparations);
                 ExtendedBehaviour<E> attack = new SequentialBehaviour<>(new Idle<E>().runFor(this.windupTime),
-                        actuallyPlay).startCondition(condition);
+                        actuallyPlay);
                 behaviours.add(new AllApplicableBehaviours<>(preparation, attack));
             } else {
                 behaviours.addAll(this.preparations);
                 behaviours.add(actuallyPlay);
             }
-            ExtendedBehaviour<E> attackBehaviour = new SequentialBehaviour<E>(behaviours.toArray(ExtendedBehaviour[]::new))
-                    .startCondition(condition);
+            ExtendedBehaviour<E> attackBehaviour = new SequentialBehaviour<E>(behaviours.toArray(ExtendedBehaviour[]::new));
+            if (finalize != null)
+                finalize.accept(attackBehaviour);
             AttackBehaviourBuilder.this.behaviors.add(new Pair<>(attackBehaviour, weight));
             return AttackBehaviourBuilder.this;
         }

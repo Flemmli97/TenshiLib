@@ -4,6 +4,7 @@
   "package": "io.github.flemmli97.tenshilib.fabric.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "BuiltinRegistryAccessor",
     "PlayerMixin",
     "ServerPlayerGameModeMixin",
     "ServerPlayerMixin",

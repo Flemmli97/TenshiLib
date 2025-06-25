@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class LivingEntityMixin implements LastSwungHand {
 
     @Unique
-    private InteractionHand prevSwungHand = InteractionHand.OFF_HAND;
+    private InteractionHand tenshilib$prevSwungHand = InteractionHand.OFF_HAND;
 
     @Inject(method = "getOffhandItem", at = @At(value = "HEAD"), cancellable = true)
     private void offhandItem(CallbackInfoReturnable<ItemStack> info) {
@@ -37,16 +37,16 @@ public abstract class LivingEntityMixin implements LastSwungHand {
 
     @ModifyVariable(method = "swing(Lnet/minecraft/world/InteractionHand;Z)V", at = @At(value = "HEAD"), argsOnly = true)
     private InteractionHand swingHook(InteractionHand hand) {
-        return MixinUtils.get(((LivingEntity) (Object) this), hand, this.prevSwungHand, v -> this.prevSwungHand = v);
+        return MixinUtils.get(((LivingEntity) (Object) this), hand, this.tenshilib$prevSwungHand, v -> this.tenshilib$prevSwungHand = v);
     }
 
     @Override
     public InteractionHand tenshilib$lastSwungHand() {
-        return this.prevSwungHand;
+        return this.tenshilib$prevSwungHand;
     }
 
     @Override
     public void tenshilib$SetLastSwungHand(InteractionHand hand) {
-        this.prevSwungHand = hand;
+        this.tenshilib$prevSwungHand = hand;
     }
 }

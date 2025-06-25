@@ -3,8 +3,8 @@ package io.github.flemmli97.tenshilib.patreon.client.model;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.flemmli97.tenshilib.TenshiLib;
-import io.github.flemmli97.tenshilib.client.data.AnimationManager;
-import io.github.flemmli97.tenshilib.client.data.ModelManager;
+import io.github.flemmli97.tenshilib.client.data.GeoAnimationManager;
+import io.github.flemmli97.tenshilib.client.data.GeoModelManager;
 import io.github.flemmli97.tenshilib.client.data.ReloadableCache;
 import io.github.flemmli97.tenshilib.client.model.BedrockAnimations;
 import io.github.flemmli97.tenshilib.client.model.ExtendedModel;
@@ -26,8 +26,8 @@ public class ChomusukeModel extends EntityModel<Player> implements ExtendedModel
     private RenderLocation location;
 
     public ChomusukeModel() {
-        this.model = ModelManager.getInstance().getModel(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "chomusuke"));
-        this.anim = AnimationManager.getInstance().getAnimation(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "chomusuke"));
+        this.model = GeoModelManager.getInstance().getModel(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "chomusuke"));
+        this.anim = GeoAnimationManager.getInstance().getAnimation(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "chomusuke"));
     }
 
     @Override

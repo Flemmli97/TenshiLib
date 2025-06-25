@@ -3,8 +3,9 @@ package io.github.flemmli97.tenshilib.fabric.client;
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.client.CustomRiderRendererManager;
 import io.github.flemmli97.tenshilib.client.TenshilibShaders;
-import io.github.flemmli97.tenshilib.client.data.AnimationManager;
-import io.github.flemmli97.tenshilib.client.data.ModelManager;
+import io.github.flemmli97.tenshilib.client.data.GeoAnimationManager;
+import io.github.flemmli97.tenshilib.client.data.GeoModelManager;
+import io.github.flemmli97.tenshilib.fabric.TenshiLibFabric;
 import io.github.flemmli97.tenshilib.fabric.client.events.ClientEvents;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
@@ -22,14 +23,14 @@ public class TenshiLibFabricClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        TenshiLibFabric.postInit();
         ClientEvents.itemColors();
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new IdentifiableResourceReloadListener() {
-
             @Override
             public CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
                 return CompletableFuture.allOf(
-                        ModelManager.getInstance().reload(preparationBarrier, resourceManager, preparationsProfiler, reloadProfiler, backgroundExecutor, gameExecutor),
-                        AnimationManager.getInstance().reload(preparationBarrier, resourceManager, preparationsProfiler, reloadProfiler, backgroundExecutor, gameExecutor));
+                        GeoModelManager.getInstance().reload(preparationBarrier, resourceManager, preparationsProfiler, reloadProfiler, backgroundExecutor, gameExecutor),
+                        GeoAnimationManager.getInstance().reload(preparationBarrier, resourceManager, preparationsProfiler, reloadProfiler, backgroundExecutor, gameExecutor));
             }
 
             @Override
@@ -38,7 +39,6 @@ public class TenshiLibFabricClient implements ClientModInitializer {
             }
         });
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new IdentifiableResourceReloadListener() {
-
             @Override
             public CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
                 return CustomRiderRendererManager.getInstance().reload(preparationBarrier, resourceManager, preparationsProfiler, reloadProfiler, backgroundExecutor, gameExecutor);

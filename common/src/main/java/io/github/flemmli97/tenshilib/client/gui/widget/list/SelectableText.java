@@ -8,7 +8,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 
@@ -50,7 +49,7 @@ public class SelectableText implements SelectableEntry {
         return this;
     }
 
-    public SelectableText withTexture(ResourceLocation background, Pair<TextureLocation, TextureLocation> entryTexture) {
+    public SelectableText withTexture(Pair<TextureLocation, TextureLocation> entryTexture) {
         this.entryTexture = entryTexture;
         return this;
     }

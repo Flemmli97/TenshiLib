@@ -13,6 +13,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
+/**
+ * Renders an item as a layer.
+ * More configurable than vanillas {@link net.minecraft.client.renderer.entity.layers.ItemInHandLayer}
+ */
 public class ItemLayer<T extends LivingEntity, M extends EntityModel<T> & ItemHolderModel> extends RenderLayer<T, M> {
 
     private final ItemInHandRenderer itemInHandRenderer;

@@ -8,16 +8,11 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-public class LoaderRegistryAccessImpl extends LoaderRegistryAccess {
+public class LoaderRegistryAccessImpl implements LoaderRegistryAccess {
 
     @Override
     public <T> LoaderRegister<T> of(ResourceKey<? extends Registry<T>> key, String modid) {
         return new DeferredRegisterHandler<>(DeferredRegister.create(key, modid));
-    }
-
-    @Override
-    public <T> LoaderRegister<T> customRegistry(ResourceKey<? extends Registry<T>> registryKey, String modid) {
-        return new DeferredRegisterHandler<>(DeferredRegister.create(registryKey, modid));
     }
 
     @Override

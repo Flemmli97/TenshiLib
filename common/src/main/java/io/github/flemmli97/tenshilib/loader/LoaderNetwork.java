@@ -1,6 +1,7 @@
 package io.github.flemmli97.tenshilib.loader;
 
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -29,6 +30,10 @@ public interface LoaderNetwork {
     void sendToAround(CustomPacketPayload message, ServerLevel level, double x, double y, double z, double radius);
 
     void sendToAllIn(CustomPacketPayload message, ServerLevel level);
+
+    default void sendToAll(CustomPacketPayload message, MinecraftServer server) {
+        this.sendToAll(message, server.getPlayerList().getPlayers());
+    }
 
     void sendToAll(CustomPacketPayload message, Collection<ServerPlayer> players);
 

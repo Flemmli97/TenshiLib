@@ -15,29 +15,29 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class PlayerMixin implements OffHandStrength {
 
     @Unique
-    private int attackStrengthOffhand;
+    private int tenshilib$attackStrengthOffhand;
 
     @Inject(method = "tick", at = @At(value = "RETURN"))
     private void tickStrength(CallbackInfo info) {
-        ++this.attackStrengthOffhand;
+        ++this.tenshilib$attackStrengthOffhand;
     }
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;resetAttackStrengthTicker()V"))
     private void onSwapItem(CallbackInfo info) {
-        this.attackStrengthOffhand = 0;
+        this.tenshilib$attackStrengthOffhand = 0;
         ((LastSwungHand) this).tenshilib$SetLastSwungHand(InteractionHand.OFF_HAND);
     }
 
     @Inject(method = "resetAttackStrengthTicker", at = @At(value = "HEAD"), cancellable = true)
     private void resetOffhand(CallbackInfo info) {
         if (((LastSwungHand) this).tenshilib$lastSwungHand() == InteractionHand.MAIN_HAND) {
-            this.attackStrengthOffhand = 0;
+            this.tenshilib$attackStrengthOffhand = 0;
             info.cancel();
         }
     }
 
     @Override
     public float tenshilib$GetOffhandStrengthScale(float f) {
-        return Mth.clamp(((float) this.attackStrengthOffhand + f) / ((Player) (Object) this).getCurrentItemAttackStrengthDelay(), 0.0F, 1.0F);
+        return Mth.clamp(((float) this.tenshilib$attackStrengthOffhand + f) / ((Player) (Object) this).getCurrentItemAttackStrengthDelay(), 0.0F, 1.0F);
     }
 }

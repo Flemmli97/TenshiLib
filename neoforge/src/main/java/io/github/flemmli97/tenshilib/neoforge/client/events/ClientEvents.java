@@ -3,10 +3,11 @@ package io.github.flemmli97.tenshilib.neoforge.client.events;
 import io.github.flemmli97.tenshilib.client.ClientHandlers;
 import io.github.flemmli97.tenshilib.client.CustomRiderRendererManager;
 import io.github.flemmli97.tenshilib.client.TenshilibShaders;
-import io.github.flemmli97.tenshilib.client.data.AnimationManager;
-import io.github.flemmli97.tenshilib.client.data.ModelManager;
+import io.github.flemmli97.tenshilib.client.data.GeoAnimationManager;
+import io.github.flemmli97.tenshilib.client.data.GeoModelManager;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import net.minecraft.client.renderer.ShaderInstance;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.InteractionHand;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
@@ -17,9 +18,9 @@ import net.neoforged.neoforge.client.event.RenderLivingEvent;
 public class ClientEvents {
 
     public static void reloadListener(RegisterClientReloadListenersEvent event) {
-        event.registerReloadListener(AnimationManager.getInstance());
+        event.registerReloadListener(GeoAnimationManager.getInstance());
         event.registerReloadListener(CustomRiderRendererManager.getInstance());
-        event.registerReloadListener(ModelManager.getInstance());
+        event.registerReloadListener(GeoModelManager.getInstance());
     }
 
     public static void clickSpecial(InputEvent.InteractionKeyMappingTriggered event) {
@@ -34,7 +35,7 @@ public class ClientEvents {
 
     public static void itemColors(RegisterColorHandlersEvent.Item event) {
         for (SpawnEgg egg : SpawnEgg.getEggs())
-            event.register(egg::getColor, egg);
+            event.register((stack, i) -> FastColor.ARGB32.opaque(egg.getColor(stack, i)), egg);
     }
 
     public static void onEntityRender(RenderLivingEvent.Pre<?, ?> event) {

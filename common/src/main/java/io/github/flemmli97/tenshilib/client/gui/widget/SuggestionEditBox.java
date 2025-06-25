@@ -15,6 +15,9 @@ import java.util.function.Consumer;
 
 public class SuggestionEditBox extends EditBox {
 
+    /**
+     * Sorted ids but with default namespace first
+     */
     public static final Comparator<ResourceLocation> ID_SORT = (r1, r2) -> {
         if (r1.getNamespace().equals("minecraft")) {
             if (r2.getNamespace().equals("minecraft"))

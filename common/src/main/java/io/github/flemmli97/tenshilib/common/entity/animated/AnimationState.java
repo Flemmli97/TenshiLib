@@ -185,8 +185,18 @@ public class AnimationState {
         this.ticker = 0;
     }
 
+    /**
+     * @return Returns the id of this state
+     */
     public String getID() {
         return this.data.id();
+    }
+
+    /**
+     * @return Returns the animation name of this state used to animate this on the client
+     */
+    public String getAnimation() {
+        return this.data.animation();
     }
 
     /**
@@ -214,10 +224,6 @@ public class AnimationState {
 
     public boolean is(String... ids) {
         return this.data.is(ids);
-    }
-
-    public String getAnimation() {
-        return this.data.animation();
     }
 
     /**

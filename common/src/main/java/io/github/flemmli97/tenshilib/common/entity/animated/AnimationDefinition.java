@@ -47,11 +47,18 @@ public record AnimationDefinition(String id, String animation, double length, do
         return false;
     }
 
-    public boolean is(String... definitions) {
-        for (String other : definitions)
+    public boolean is(String... ids) {
+        for (String other : ids)
             if (this.id().equals(other))
                 return true;
         return false;
+    }
+
+    public double marker(String marker, int idx) {
+        double[] times = this.markers().get(marker);
+        if (times == null || idx >= times.length)
+            return -1;
+        return times[idx];
     }
 
     @Override

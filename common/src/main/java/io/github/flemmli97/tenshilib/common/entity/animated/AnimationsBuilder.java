@@ -5,6 +5,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.ExtraCodecs;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,14 +86,14 @@ public class AnimationsBuilder {
         private boolean shouldRunOut = true;
         private int defaultStartTransition;
         private int defaultEndTransition = AnimationHandler.DEFAULT_TRANSIT_TIME;
-        private final Map<String, double[]> marker = new LinkedHashMap<>();
+        private final Map<String, double[]> marker = new HashMap<>();
 
         private DefinitionBuilder(double length) {
             this.length = Math.max(1, length);
         }
 
         private static Map<String, List<Double>> asListMap(Map<String, double[]> markers) {
-            Map<String, List<Double>> map = new LinkedHashMap<>();
+            Map<String, List<Double>> map = new HashMap<>();
             markers.forEach((s, ds) -> map.put(s, DoubleStream.of(ds).boxed().toList()));
             return map;
         }

@@ -72,56 +72,69 @@ public class AnimationHandler<T extends Entity & AnimatedEntity> {
         return this.currentAnimation;
     }
 
-    public void runIfAnimation(String id, Consumer<AnimationState> anim) {
+    public void runIfAnimation(String id, Consumer<AnimationState> consumer) {
         if (this.isCurrent(id)) {
-            anim.accept(this.getAnimation());
+            consumer.accept(this.getAnimation());
         }
     }
 
-    public void runIfNotNull(Consumer<AnimationState> cons) {
+    public void runIfNotNull(Consumer<AnimationState> consumer) {
         if (this.currentAnimation != null)
-            cons.accept(this.currentAnimation);
+            consumer.accept(this.currentAnimation);
     }
 
     public boolean hasAnimation() {
         return this.currentAnimation != null;
     }
 
-    public void setAnimation(String anim) {
-        this.setAnimationDef(anim != null ? this.definitions.get(anim) : null);
+    public AnimationDefinition get(@Nullable String name) {
+        if (name == null)
+            return null;
+        AnimationDefinition definition = this.definitions.get(name);
+        if (definition == null)
+            throw new IllegalStateException("No such animation definition " + name);
+        return definition;
     }
 
-    public void setAnimationDef(AnimationDefinition anim) {
-        this.setAnimation(anim, AnimationHandler.FALLBACK_TRANSIT_TIME, AnimationHandler.FALLBACK_TRANSIT_TIME, 0);
+    public AnimationState createDefaulted(String name) {
+        return AnimationState.create(this.get(name));
+    }
+
+    public void setAnimation(@Nullable String name) {
+        this.setAnimationDef(this.get(name));
+    }
+
+    public void setAnimationDef(@Nullable AnimationDefinition animation) {
+        this.setAnimation(animation, AnimationHandler.FALLBACK_TRANSIT_TIME, AnimationHandler.FALLBACK_TRANSIT_TIME, 0);
     }
 
     /**
-     * @param anim            The animation to set. Or null for no animation
+     * @param animation       The animation to set. Or null for no animation
      * @param startTransition Duration in ticks to transition INTO this animation. -1 for fallback
      * @param endTransition   Duration in ticks to transition OUT of this animation. -1 for fallback
      * @param offset          Start the animation with the given offset
      */
-    public void setAnimation(AnimationDefinition anim, int startTransition, int endTransition, double offset) {
+    public void setAnimation(@Nullable AnimationDefinition animation, int startTransition, int endTransition, double offset) {
         for (PriorityEntry<Predicate<AnimationDefinition>> listener : this.animationChangeListener) {
-            if (listener.val().test(anim))
+            if (listener.val().test(animation))
                 return;
         }
         if (this.currentAnimation != null) {
             this.lastAnimation = this.currentAnimation;
             this.timeSinceLastChange = 0;
-            if (anim != null) {
+            if (animation != null) {
                 startTransition = startTransition > 0 ? startTransition : this.lastAnimation.getEndTransitionTime();
-                this.lastAnimation = AnimationState.create(anim, this.currentAnimation.getStartTransition(),
+                this.lastAnimation = AnimationState.create(animation, this.currentAnimation.getStartTransition(),
                         startTransition, this.currentAnimation.getTick(1),
                         this.currentAnimation.getSpeed());
             }
-        } else if (this.lastAnimation != null && anim != null) {
-            this.lastAnimation = AnimationState.create(anim, this.lastAnimation.getStartTransition(),
+        } else if (this.lastAnimation != null && animation != null) {
+            this.lastAnimation = AnimationState.create(animation, this.lastAnimation.getStartTransition(),
                     startTransition + this.timeSinceLastChange, this.lastAnimation.getTick(1),
                     this.lastAnimation.getSpeed());
         }
-        this.currentAnimation = anim == null ? null : AnimationState.create(anim, startTransition, endTransition,
-                offset, this.animationSpeedHandler == null ? 1 : this.animationSpeedHandler.apply(anim));
+        this.currentAnimation = animation == null ? null : AnimationState.create(animation, startTransition, endTransition,
+                offset, this.animationSpeedHandler == null ? 1 : this.animationSpeedHandler.apply(animation));
         if (!this.entity.level().isClientSide) {
             LoaderNetwork.INSTANCE.sendToTracking(S2CEntityAnimation.create(this.entity, startTransition, endTransition, offset), this.entity);
         }
@@ -131,16 +144,16 @@ public class AnimationHandler<T extends Entity & AnimatedEntity> {
         return this.definitions;
     }
 
-    public boolean isCurrent(AnimationDefinition... anims) {
+    public boolean isCurrent(AnimationDefinition... others) {
         if (this.getAnimation() == null)
             return false;
-        return this.getAnimation().is(anims);
+        return this.getAnimation().is(others);
     }
 
-    public boolean isCurrent(String... ids) {
+    public boolean isCurrent(String... others) {
         if (this.getAnimation() == null)
             return false;
-        return this.getAnimation().is(ids);
+        return this.getAnimation().is(others);
     }
 
     /**

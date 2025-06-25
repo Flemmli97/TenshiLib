@@ -3,6 +3,7 @@ package io.github.flemmli97.tenshilib.client.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import io.github.flemmli97.tenshilib.common.utils.math.OrientedBoundingBox;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -102,6 +103,42 @@ public class RenderUtils {
         LevelRenderer.renderLineBox(poseStack, buffer.getBuffer(renderType), aabb.inflate(0.002).move(-vec.x, -vec.y, -vec.z), red, green, blue, alpha);
         if (drawImmediately && buffer instanceof MultiBufferSource.BufferSource)
             ((MultiBufferSource.BufferSource) buffer).endBatch();
+    }
+
+    /**
+     * Renders the given oriented bounding box
+     *
+     * @param drawImmediately If true draws the content immediately to the buffer
+     */
+    public static void renderOBB(PoseStack stack, MultiBufferSource buffer, OrientedBoundingBox obb, float red, float green, float blue, float alpha,
+                                 boolean drawImmediately) {
+        Vec3 vec = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        stack.pushPose();
+        stack.translate(-vec.x, -vec.y, -vec.z);
+        RenderType renderType = RenderType.lines();
+        VertexConsumer consumer = buffer.getBuffer(renderType);
+        PoseStack.Pose pose = stack.last();
+        for (int b = 0; b < 4; b++) {
+            Vec3 first = obb.getVertices()[b];
+            Vec3 second = obb.getVertices()[(b + 1) % 4];
+            consumer.addVertex(pose, (float) first.x(), (float) first.y(), (float) first.z()).setColor(red, green, blue, alpha).setNormal(pose, 1.0F, 0.0F, 0.0F);
+            consumer.addVertex(pose, (float) second.x(), (float) second.y(), (float) second.z()).setColor(red, green, blue, alpha).setNormal(pose, 1.0F, 0.0F, 0.0F);
+
+            // Vertical lines
+            Vec3 top = obb.getVertices()[4 + b];
+            consumer.addVertex(pose, (float) first.x(), (float) first.y(), (float) first.z()).setColor(red, green, blue, alpha).setNormal(pose, 1.0F, 0.0F, 0.0F);
+            consumer.addVertex(pose, (float) top.x(), (float) top.y(), (float) top.z()).setColor(red, green, blue, alpha).setNormal(pose, 1.0F, 0.0F, 0.0F);
+        }
+
+        for (int b = 4; b < 8; b++) {
+            Vec3 first = obb.getVertices()[b];
+            Vec3 second = obb.getVertices()[4 + (b + 1) % 4];
+            consumer.addVertex(pose, (float) first.x(), (float) first.y(), (float) first.z()).setColor(red, green, blue, alpha).setNormal(pose, 1.0F, 0.0F, 0.0F);
+            consumer.addVertex(pose, (float) second.x(), (float) second.y(), (float) second.z()).setColor(red, green, blue, alpha).setNormal(pose, 1.0F, 0.0F, 0.0F);
+        }
+        if (drawImmediately && buffer instanceof MultiBufferSource.BufferSource)
+            ((MultiBufferSource.BufferSource) buffer).endBatch();
+        stack.popPose();
     }
 
     public static void applyYawPitch(PoseStack stack, float yaw, float pitch) {

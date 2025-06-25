@@ -1,9 +1,9 @@
 package io.github.flemmli97.tenshilib.fabric.loader;
 
 import com.mojang.serialization.Lifecycle;
+import io.github.flemmli97.tenshilib.fabric.loader.registry.VanillaRegisterHandler;
 import io.github.flemmli97.tenshilib.loader.LoaderRegistryAccess;
 import io.github.flemmli97.tenshilib.loader.registry.LoaderRegister;
-import io.github.flemmli97.tenshilib.loader.registry.VanillaRegisterHandler;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.minecraft.core.DefaultedMappedRegistry;
@@ -12,11 +12,11 @@ import net.minecraft.core.WritableRegistry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
-public class LoaderRegistryAccessImpl extends LoaderRegistryAccess {
+public class LoaderRegistryAccessImpl implements LoaderRegistryAccess {
 
     @Override
-    public <T> LoaderRegister<T> customRegistry(ResourceKey<? extends Registry<T>> registryKey, String modid) {
-        return new VanillaRegisterHandler<>(registryKey, modid);
+    public <T> LoaderRegister<T> of(ResourceKey<? extends Registry<T>> key, String modid) {
+        return new VanillaRegisterHandler<>(key, modid);
     }
 
     @Override

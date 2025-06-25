@@ -5,8 +5,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.Pair;
-import org.joml.AxisAngle4f;
-import org.joml.Quaternionf;
+import org.joml.Vector3d;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -44,38 +43,6 @@ public class MathUtils {
     }
 
     /**
-     * Rotates a vector around a rotation axis with the given angle
-     *
-     * @param rotAxis Rotation axis vector. needs to be normalized.
-     * @param vec     The vector to rotate
-     * @param angle   Angle in radians
-     * @return The rotated vector
-     */
-    public static Vec3 rotate(Vec3 rotAxis, Vec3 vec, float angle) {
-        double[] res = rotate(rotAxis.x, rotAxis.y, rotAxis.z, vec.x, vec.y, vec.z, angle);
-        return new Vec3(res[0], res[1], res[2]);
-    }
-
-    /**
-     * Rotates a vector around a rotation axis with the given angle
-     */
-    public static double[] rotate(double axisX, double axisY, double axisZ, double vecX, double vecY, double vecZ, float angle) {
-        double rot = axisX * vecX + axisY * vecY + axisZ * vecZ;
-        double x = axisX * rot * (1 - Mth.cos(angle)) + vecX * Mth.cos(angle) + (-axisZ * vecY + axisY * vecZ) * Mth.sin(angle);
-        double y = axisY * rot * (1 - Mth.cos(angle)) + vecY * Mth.cos(angle) + (axisZ * vecX - axisX * vecZ) * Mth.sin(angle);
-        double z = axisZ * rot * (1 - Mth.cos(angle)) + vecZ * Mth.cos(angle) + (-axisY * vecX + axisX * vecY) * Mth.sin(angle);
-        return new double[]{x, y, z};
-    }
-
-    public static float[] rotate(float axisX, float axisY, float axisZ, float vecX, float vecY, float vecZ, float angle) {
-        float rot = axisX * vecX + axisY * vecY + axisZ * vecZ;
-        float x = axisX * rot * (1 - Mth.cos(angle)) + vecX * Mth.cos(angle) + (-axisZ * vecY + axisY * vecZ) * Mth.sin(angle);
-        float y = axisY * rot * (1 - Mth.cos(angle)) + vecY * Mth.cos(angle) + (axisZ * vecX - axisX * vecZ) * Mth.sin(angle);
-        float z = axisZ * rot * (1 - Mth.cos(angle)) + vecZ * Mth.cos(angle) + (-axisY * vecX + axisX * vecY) * Mth.sin(angle);
-        return new float[]{x, y, z};
-    }
-
-    /**
      * Gets a list of vectors rotated around the given axis by the given angles
      *
      * @param dir    The vector to rotate
@@ -84,24 +51,28 @@ public class MathUtils {
      * @param maxDeg Maximum rotation in degrees
      * @param step   Angle change per rotation in degrees
      */
-    public static List<Vector3f> rotatedVecs(Vec3 dir, Vec3 axis, float minDeg, float maxDeg, float step) {
+    public static List<Vector3f> rotatedVecs(Vector3f dir, Vector3f axis, float minDeg, float maxDeg, float step) {
         List<Vector3f> list = new ArrayList<>();
-        Vector3f axisf = new Vector3f((float) axis.x, (float) axis.y, (float) axis.z);
-        list.add(new Vector3f((float) dir.x, (float) dir.y, (float) dir.z));
+        list.add(new Vector3f(dir));
         for (float y = step; y <= maxDeg; y += step) {
-            list.add(rotatedAround(dir, axisf, y));
+            list.add(dir.rotateAxis(y * Mth.DEG_TO_RAD, axis.x(), axis.y(), axis.z(), new Vector3f()));
         }
         for (float y = minDeg; y <= -step; y += step) {
-            list.add(rotatedAround(dir, axisf, y));
+            list.add(dir.rotateAxis(y * Mth.DEG_TO_RAD, axis.x(), axis.y(), axis.z(), new Vector3f()));
         }
         return list;
     }
 
-    public static Vector3f rotatedAround(Vec3 dir, Vector3f axis, float deg) {
-        Quaternionf quaternion = new Quaternionf(new AxisAngle4f(Mth.DEG_TO_RAD * deg, axis));
-        Vector3f newDir = new Vector3f((float) dir.x, (float) dir.y, (float) dir.z);
-        newDir.rotate(quaternion);
-        return newDir;
+    public static List<Vector3d> rotatedVecs(Vector3d dir, Vector3d axis, float minDeg, float maxDeg, float step) {
+        List<Vector3d> list = new ArrayList<>();
+        list.add(new Vector3d(dir));
+        for (float y = step; y <= maxDeg; y += step) {
+            list.add(dir.rotateAxis(y * Mth.DEG_TO_RAD, axis.x(), axis.y(), axis.z(), new Vector3d()));
+        }
+        for (float y = minDeg; y <= -step; y += step) {
+            list.add(dir.rotateAxis(y * Mth.DEG_TO_RAD, axis.x(), axis.y(), axis.z(), new Vector3d()));
+        }
+        return list;
     }
 
     public static Vec3 closestPointToLine(Vec3 point, Vec3 from, Vec3 dir) {
@@ -127,17 +98,17 @@ public class MathUtils {
         if (shape <= 2)
             throw new IllegalArgumentException("Can't create a polygon with 2 or less corners!");
         double[][] res = new double[shape][];
-        Vec3 base = new Vec3(width, 0, 0);
+        Vector3d base = new Vector3d(width, 0, 0);
         float rotatePer = 360 / (float) shape;
         Vec3 axis = new Vec3(0, 0, 1);
         if (shape % 2 == 0)
-            base = MathUtils.rotate(axis, base, rotatePer * 0.5f * Mth.DEG_TO_RAD);
+            base = base.rotateAxis(rotatePer * 0.5f * Mth.DEG_TO_RAD, axis.x(), axis.y(), axis.z());
         res[0] = new double[]{base.x, base.y};
         float angle = rotatePer;
         for (int i = 1; i < shape; i++) {
-            Vec3 rotated = MathUtils.rotate(axis, base, angle * Mth.DEG_TO_RAD);
+            Vector3d rotated = base.rotateAxis(angle * 0.5f * Mth.DEG_TO_RAD, axis.x(), axis.y(), axis.z(), new Vector3d());
             angle += rotatePer;
-            res[i] = new double[]{rotated.x, rotated.y, rotated.z};
+            res[i] = new double[]{rotated.x, rotated.y};
         }
         return res;
     }
@@ -146,31 +117,19 @@ public class MathUtils {
         if (shape <= 2)
             throw new IllegalArgumentException("Can't create a polygon with 2 or less corners!");
         float[][] res = new float[shape][];
-        Vec3 base = new Vec3(width, 0, 0);
+        Vector3f base = new Vector3f(width, 0, 0);
         float rotatePer = 360 / (float) shape;
-        Vec3 axis = new Vec3(0, 0, 1);
+        Vector3f axis = new Vector3f(0, 0, 1);
         if (shape % 2 == 0)
-            base = MathUtils.rotate(axis, base, rotatePer * 0.5f * Mth.DEG_TO_RAD);
-        res[0] = new float[]{(float) base.x, (float) base.y};
+            base = base.rotateAxis(rotatePer * 0.5f * Mth.DEG_TO_RAD, axis.x(), axis.y(), axis.z());
+        res[0] = new float[]{base.x, base.y};
         float angle = rotatePer;
         for (int i = 1; i < shape; i++) {
-            Vec3 rotated = MathUtils.rotate(axis, base, angle * Mth.DEG_TO_RAD);
+            Vector3f rotated = base.rotateAxis(angle * 0.5f * Mth.DEG_TO_RAD, axis.x(), axis.y(), axis.z(), new Vector3f());
             angle += rotatePer;
-            res[i] = new float[]{(float) rotated.x, (float) rotated.y};
+            res[i] = new float[]{rotated.x, rotated.y};
         }
         return res;
-    }
-
-    /**
-     * Checks if the given point is in front of the line.
-     * The line here is assumed to be a finite line with the given starting point.
-     *
-     * @param pos  The given point
-     * @param from The starting point of the line
-     * @param dir  The direction vector of the line.
-     */
-    public static boolean isInFront(Vec3 pos, Vec3 from, Vec3 dir) {
-        return from.add(dir).distanceToSqr(pos) < from.subtract(dir).distanceToSqr(pos);
     }
 
     /**

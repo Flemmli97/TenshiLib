@@ -3,7 +3,7 @@ package io.github.flemmli97.tenshilib.patreon.client.model;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.flemmli97.tenshilib.TenshiLib;
-import io.github.flemmli97.tenshilib.client.data.ModelManager;
+import io.github.flemmli97.tenshilib.client.data.GeoModelManager;
 import io.github.flemmli97.tenshilib.client.data.ReloadableCache;
 import io.github.flemmli97.tenshilib.client.model.ExtendedModel;
 import io.github.flemmli97.tenshilib.client.model.ModelPartsContainer;
@@ -19,7 +19,7 @@ public class HaloModel extends EntityModel<Player> implements ExtendedModel, Pat
     protected final ReloadableCache<ModelPartsContainer> model;
 
     public HaloModel() {
-        this.model = ModelManager.getInstance().getModel(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "halo"));
+        this.model = GeoModelManager.getInstance().getModel(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "halo"));
     }
 
     @Override

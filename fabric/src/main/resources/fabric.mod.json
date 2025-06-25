@@ -21,6 +21,9 @@
     ],
     "client": [
       "io.github.flemmli97.tenshilib.fabric.client.TenshiLibFabricClient"
+    ],
+    "server": [
+      "io.github.flemmli97.tenshilib.fabric.TenshiLibFabric"
     ]
   },
   "mixins": [

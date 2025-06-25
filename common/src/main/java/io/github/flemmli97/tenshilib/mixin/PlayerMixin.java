@@ -12,26 +12,26 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class PlayerMixin implements PlayerAttackAccess {
 
     @Unique
-    private boolean tenshilib$NoSweep, tenshilib$NoCooldownReset;
+    private boolean tenshilib$noSweep, tenshilib$noCooldownReset;
 
     @Inject(method = "resetAttackStrengthTicker", at = @At("HEAD"), cancellable = true)
     private void onReset(CallbackInfo info) {
-        if (this.tenshilib$NoCooldownReset)
+        if (this.tenshilib$noCooldownReset)
             info.cancel();
     }
 
     @Override
     public void tenshilib$SetNoStrengthResetState(boolean noReset) {
-        this.tenshilib$NoCooldownReset = noReset;
+        this.tenshilib$noCooldownReset = noReset;
     }
 
     @Override
     public void tenshilib$SetNoSweeping(boolean noSweeping) {
-        this.tenshilib$NoSweep = noSweeping;
+        this.tenshilib$noSweep = noSweeping;
     }
 
     @Override
     public boolean tenshilib$IsSweepDisabled() {
-        return this.tenshilib$NoSweep;
+        return this.tenshilib$noSweep;
     }
 }

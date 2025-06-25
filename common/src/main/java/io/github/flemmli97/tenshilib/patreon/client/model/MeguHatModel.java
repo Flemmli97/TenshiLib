@@ -3,8 +3,8 @@ package io.github.flemmli97.tenshilib.patreon.client.model;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.flemmli97.tenshilib.TenshiLib;
-import io.github.flemmli97.tenshilib.client.data.AnimationManager;
-import io.github.flemmli97.tenshilib.client.data.ModelManager;
+import io.github.flemmli97.tenshilib.client.data.GeoAnimationManager;
+import io.github.flemmli97.tenshilib.client.data.GeoModelManager;
 import io.github.flemmli97.tenshilib.client.data.ReloadableCache;
 import io.github.flemmli97.tenshilib.client.model.BedrockAnimations;
 import io.github.flemmli97.tenshilib.client.model.ExtendedModel;
@@ -27,8 +27,8 @@ public class MeguHatModel extends EntityModel<Player> implements ExtendedModel, 
     private Player player;
 
     public MeguHatModel() {
-        this.model = ModelManager.getInstance().getModel(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "megumin_hat"));
-        this.anim = AnimationManager.getInstance().getAnimation(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "megumin_hat"));
+        this.model = GeoModelManager.getInstance().getModel(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "megumin_hat"));
+        this.anim = GeoAnimationManager.getInstance().getAnimation(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "megumin_hat"));
     }
 
     @Override

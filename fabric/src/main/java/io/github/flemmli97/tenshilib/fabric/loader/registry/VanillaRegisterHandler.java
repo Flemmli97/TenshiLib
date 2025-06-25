@@ -1,5 +1,7 @@
-package io.github.flemmli97.tenshilib.loader.registry;
+package io.github.flemmli97.tenshilib.fabric.loader.registry;
 
+import io.github.flemmli97.tenshilib.loader.registry.LoaderRegister;
+import io.github.flemmli97.tenshilib.loader.registry.RegistryEntrySupplier;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -10,6 +12,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class VanillaRegisterHandler<T> implements LoaderRegister<T> {
@@ -27,18 +30,22 @@ public class VanillaRegisterHandler<T> implements LoaderRegister<T> {
     @Override
     public <I extends T> RegistryEntrySupplier<T, I> register(String name, Supplier<I> sup) {
         ResourceLocation id = ResourceLocation.fromNamespaceAndPath(this.modid, name);
-        VanillaEntrySupplier<T, I> v = new VanillaEntrySupplier<>(id);
+        VanillaEntrySupplier<T, I> v = new VanillaEntrySupplier<>(ResourceKey.create(this.key, id));
         this.entries.putIfAbsent(v, sup);
         return v;
     }
 
     @Override
+    public <I extends T> RegistryEntrySupplier<T, I> register(String name, Function<ResourceLocation, I> func) {
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(this.modid, name);
+        VanillaEntrySupplier<T, I> v = new VanillaEntrySupplier<>(ResourceKey.create(this.key, id));
+        this.entries.putIfAbsent(v, () -> func.apply(id));
+        return v;
+    }
+
+    @Override
     public void registerContent() {
-        Registry<T> registry = this.registryFrom();
-        this.entries.forEach((v, s) -> {
-            Registry.register(registry, v.getID(), s.get());
-            v.updateValue(registry);
-        });
+        DeferredRegistrationHandler.add(this.key.location(), this);
     }
 
     @SuppressWarnings("unchecked")
@@ -49,8 +56,21 @@ public class VanillaRegisterHandler<T> implements LoaderRegister<T> {
         return (Registry<T>) reg;
     }
 
+    void finalizeRegister() {
+        Registry<T> registry = this.registryFrom();
+        this.entries.forEach((v, s) -> {
+            Registry.register(registry, v.getID(), s.get());
+            v.updateValue(registry);
+        });
+    }
+
     @Override
     public Collection<? extends RegistryEntrySupplier<T, ? extends T>> getEntries() {
         return this.entriesView;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Registration handler for %s for %s", this.key, this.modid);
     }
 }

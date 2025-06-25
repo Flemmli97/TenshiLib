@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -42,6 +43,10 @@ public class ModelPartsContainer {
         } else {
             return modelPart;
         }
+    }
+
+    public Optional<ModelPartExtended> getOptionalPart(String name) {
+        return Optional.ofNullable(this.childrenToName.get(name));
     }
 
     /**
