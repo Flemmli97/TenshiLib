@@ -42,7 +42,7 @@ public class MeguHatModel extends EntityModel<Player> implements ExtendedModel, 
     public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
         if (RenderLocation.isHead(this.location))
             poseStack.translate(0, 0.1, 0.0);
-        this.model.get().getMainPart().render(poseStack, buffer, packedLight, packedOverlay, color);
+        this.model.get().getRoot().render(poseStack, buffer, packedLight, packedOverlay, color);
     }
 
     @Override

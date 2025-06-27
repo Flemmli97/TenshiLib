@@ -43,7 +43,7 @@ public class CatModel extends EntityModel<Player> implements ExtendedModel, Patr
     public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
         poseStack.translate(0, 0.45, 0);
         poseStack.scale(0.7f, 0.7f, 0.7f);
-        this.model.get().getMainPart().render(poseStack, buffer, packedLight, packedOverlay, color);
+        this.model.get().getRoot().render(poseStack, buffer, packedLight, packedOverlay, color);
     }
 
     @Override

@@ -6,7 +6,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.ExtraCodecs;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +20,7 @@ public class AnimationsBuilder {
                 return builder;
             }, builder -> builder.definitions);
 
-    private final Map<String, DefinitionBuilder> definitions = new LinkedHashMap<>();
+    private final Map<String, DefinitionBuilder> definitions = new HashMap<>();
     private boolean built;
 
     public static DefinitionBuilder definition(double length) {

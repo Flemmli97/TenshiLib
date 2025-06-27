@@ -49,8 +49,9 @@ public class AnimationScreen<T extends LivingEntity & AnimatedEntity> extends Sc
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         graphics.fillGradient(this.leftPos, this.topPos, this.leftPos + this.sizeX, this.topPos + this.sizeY, 0xc0101010, 0xc0101010);
         int padding = 16;
-        RenderUtils.renderScaledEntityGui(graphics, this.leftPos + this.sizeX - padding - (3 * 32), this.topPos + padding,
-                32, 3, 3, 0, mouseX, mouseY, this.entity);
+        float scale = 32;
+        RenderUtils.renderScaledEntityGui(graphics, this.leftPos + this.sizeX - padding - (3 * scale), this.topPos + padding,
+                3 * scale, 3 * scale, scale, 0, mouseX, mouseY, this.entity);
         graphics.drawString(this.font, this.getTitle(), this.leftPos + 16, this.topPos + 16, 0xffffff);
         super.render(graphics, mouseX, mouseY, partialTick);
     }

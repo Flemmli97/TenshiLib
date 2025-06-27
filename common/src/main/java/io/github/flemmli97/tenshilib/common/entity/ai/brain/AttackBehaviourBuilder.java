@@ -127,7 +127,7 @@ public class AttackBehaviourBuilder<E extends Mob & AnimatedEntity> {
                 behaviours.addAll(this.preparations);
                 behaviours.add(actuallyPlay);
             }
-            ExtendedBehaviour<E> attackBehaviour = new SequentialBehaviour<E>(behaviours.toArray(ExtendedBehaviour[]::new));
+            ExtendedBehaviour<E> attackBehaviour = new SequentialBehaviour<>(behaviours.toArray(ExtendedBehaviour[]::new));
             if (finalize != null)
                 finalize.accept(attackBehaviour);
             AttackBehaviourBuilder.this.behaviors.add(new Pair<>(attackBehaviour, weight));

@@ -45,4 +45,8 @@ public class PoseExtended {
     public PoseExtended withScale(float xScale, float yScale, float zScale) {
         return new PoseExtended(this.x, this.y, this.z, this.xRot, this.yRot, this.zRot, xScale, yScale, zScale);
     }
+
+    public PartPose asPartPose() {
+        return PartPose.offsetAndRotation(this.x, this.y, this.z, this.xRot, this.yRot, this.zRot);
+    }
 }

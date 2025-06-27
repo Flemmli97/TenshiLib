@@ -238,31 +238,31 @@ public class RenderUtils {
      * Improved version of {@link InventoryScreen#renderEntityInInventory}.
      * Automatically scales the entity if its too big
      *
-     * @param x         Top left x position
-     * @param y         Top left y positon
-     * @param maxWidth  Width in blocks. E.g. width of 1 = entity that are 1 block wide
-     * @param maxHeight Height in blocks
+     * @param x     Top left x position
+     * @param y     Top left y positon
+     * @param sizeX X Size of the render area
+     * @param sizeY Y Size of the render area
      */
-    // TODO better impl
-    public static void renderScaledEntityGui(GuiGraphics guiGraphics, int x, int y, int scale, float maxWidth, float maxHeight,
+    public static void renderScaledEntityGui(GuiGraphics guiGraphics, float x, float y, float sizeX, float sizeY, float scale,
                                              float yOffset, float mouseX, float mouseY, LivingEntity entity) {
-        int sizeX = (int) (maxWidth * scale);
-        int sizeY = (int) (maxHeight * scale);
+        float entityScale = entity.getScale();
+        float maxSizeWidth = (sizeX / scale) * entityScale;
+        float maxSizeHeight = (sizeY / scale) * entityScale;
         float scaleMult = 1;
-        if (entity.getBbWidth() > maxWidth) {
-            scaleMult = maxWidth / entity.getBbWidth();
+        if (entity.getBbWidth() > maxSizeWidth) {
+            scaleMult = maxSizeWidth / entity.getBbWidth();
         }
-        if (entity.getBbHeight() > maxHeight) {
-            scaleMult = Math.min(scaleMult, maxHeight / entity.getBbHeight());
+        if (entity.getBbHeight() > maxSizeHeight) {
+            scaleMult = Math.min(scaleMult, maxSizeHeight / entity.getBbHeight());
         }
         renderEntityMouseNoClip(guiGraphics,
                 x, y, x + sizeX, y + sizeY,
-                (int) (scale * scaleMult), yOffset, mouseX, mouseY, entity);
+                scale * scaleMult, yOffset, mouseX, mouseY, entity);
     }
 
-    private static void renderEntityMouseNoClip(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2, float scale, float yOffset, float mouseX, float mouseY, LivingEntity entity) {
-        float xM = (float) (x1 + x2) / 2.0f;
-        float yM = (float) (y1 + y2) / 2.0f;
+    private static void renderEntityMouseNoClip(GuiGraphics guiGraphics, float x1, float y1, float x2, float y2, float scale, float yOffset, float mouseX, float mouseY, LivingEntity entity) {
+        float xM = (x1 + x2) / 2.0f;
+        float yM = (y1 + y2) / 2.0f;
         float yRot = (float) Math.atan((xM - mouseX) / 40.0f);
         float xRot = (float) Math.atan((yM - mouseY) / 40.0f);
         Quaternionf quaternionf = new Quaternionf().rotateZ((float) Math.PI);

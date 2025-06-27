@@ -18,22 +18,13 @@ import java.util.stream.Collectors;
 
 public class ModelPartsContainer {
 
-    private final ModelPartExtended mainPart;
+    private final ModelPartExtended root;
     private final Map<String, ModelPartExtended> childrenToName = new HashMap<>();
 
-    public ModelPartsContainer(ModelPart main, String mainID) {
-        this.mainPart = new ModelPartExtended(mainID, null, main);
-        this.childrenToName.put(mainID, this.mainPart);
-        this.mainPart.getMappedParts(this.childrenToName);
-    }
-
-    /**
-     * If you have multiple "main" parts
-     */
     public ModelPartsContainer(ModelPart root) {
-        this.mainPart = new ModelPartExtended("root", null, root);
-        this.childrenToName.put("root", this.mainPart);
-        this.mainPart.getMappedParts(this.childrenToName);
+        this.root = new ModelPartExtended("model_root", null, root);
+        this.childrenToName.put("model_root", this.root);
+        this.root.getMappedParts(this.childrenToName);
     }
 
     public ModelPartExtended getPart(String name) {
@@ -57,11 +48,14 @@ public class ModelPartsContainer {
     }
 
     public void resetPoses() {
-        this.mainPart.resetAll();
+        this.root.resetAll();
     }
 
-    public ModelPartExtended getMainPart() {
-        return this.mainPart;
+    /**
+     * @return The root part containing all other parts. This part usually does not have any transformations applied!
+     */
+    public ModelPartExtended getRoot() {
+        return this.root;
     }
 
     public static class ModelPartExtended {
@@ -88,6 +82,10 @@ public class ModelPartsContainer {
 
         public PartPose storePose() {
             return PartPose.offsetAndRotation(this.x, this.y, this.z, this.xRot, this.yRot, this.zRot);
+        }
+
+        public PoseExtended extendedPose() {
+            return new PoseExtended(this.x, this.y, this.z, this.xRot, this.yRot, this.zRot, this.xScale, this.yScale, this.zScale);
         }
 
         public void loadPose(PartPose partPose) {
@@ -230,6 +228,8 @@ public class ModelPartsContainer {
 
         public void getMappedParts(Map<String, ModelPartExtended> map) {
             this.children.forEach((key, value) -> {
+                if (map.containsKey(key))
+                    throw new IllegalStateException("Part with name " + key + " already exists!");
                 map.put(key, value);
                 value.getMappedParts(map);
             });

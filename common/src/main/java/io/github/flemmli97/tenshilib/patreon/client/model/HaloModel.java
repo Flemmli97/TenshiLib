@@ -29,7 +29,7 @@ public class HaloModel extends EntityModel<Player> implements ExtendedModel, Pat
 
     @Override
     public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
-        this.model.get().getMainPart().render(poseStack, buffer, packedLight, packedOverlay, color);
+        this.model.get().getRoot().render(poseStack, buffer, packedLight, packedOverlay, color);
     }
 
     @Override
