@@ -67,8 +67,4 @@ public class MoveControllerPlus extends MoveControl {
             this.mob.setXxa(0);
         }
     }
-
-    public Operation currentAction() {
-        return this.operation;
-    }
 }

@@ -46,21 +46,25 @@ public class AnimationScreen<T extends LivingEntity & AnimatedEntity> extends Sc
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderBlurredBackground(float partialTick) {
+    }
+
+    @Override
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.renderBackground(graphics, mouseX, mouseY, partialTick);
         graphics.fillGradient(this.leftPos, this.topPos, this.leftPos + this.sizeX, this.topPos + this.sizeY, 0xc0101010, 0xc0101010);
         int padding = 16;
         float scale = 32;
         RenderUtils.renderScaledEntityGui(graphics, this.leftPos + this.sizeX - padding - (3 * scale), this.topPos + padding,
                 3 * scale, 3 * scale, scale, 0, mouseX, mouseY, this.entity);
         graphics.drawString(this.font, this.getTitle(), this.leftPos + 16, this.topPos + 16, 0xffffff);
-        super.render(graphics, mouseX, mouseY, partialTick);
     }
 
     protected void buttons() {
         int padding = 16;
         int yOff = padding + 12 + 20 * 4;
 
-        this.box = new SuggestionEditBox(this.minecraft.font, this.leftPos + this.sizeX / 2 - 70, this.topPos + yOff, 140, 20, Component.translatable("fateubw.gui.animation"),
+        this.box = new SuggestionEditBox(this.minecraft.font, this.leftPos + this.sizeX / 2 - 70, this.topPos + yOff, 140, 20, Component.empty(),
                 5, true, SuggestionEditBox.ofString(List.of(this.animations)));
         this.box.setValue(this.selected);
         this.box.setResponder(s -> {
@@ -94,5 +98,13 @@ public class AnimationScreen<T extends LivingEntity & AnimatedEntity> extends Sc
             return true;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        boolean click = super.mouseClicked(mouseX, mouseY, button);
+        if (!click)
+            this.setFocused(null);
+        return click;
     }
 }

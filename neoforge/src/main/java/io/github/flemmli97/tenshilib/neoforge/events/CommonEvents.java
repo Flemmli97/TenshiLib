@@ -26,8 +26,8 @@ public class CommonEvents {
     }
 
     public static void onTracking(PlayerEvent.StartTracking event) {
-        if (event.getTarget() instanceof AnimatedEntity animated && animated.getAnimationHandler().hasAnimation()) {
-            AnimationState anim = animated.getAnimationHandler().getAnimation();
+        AnimationState anim;
+        if (event.getTarget() instanceof AnimatedEntity animated && (anim = animated.getAnimationHandler().getAnimation()) != null) {
             LoaderNetwork.INSTANCE.sendToPlayer(S2CEntityAnimation.create((Entity & AnimatedEntity) event.getTarget(),
                     anim.getStartTransition(), anim.getEndTransitionTime(), anim.getTick(1)), (ServerPlayer) event.getEntity());
         }

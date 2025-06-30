@@ -44,7 +44,7 @@ public class VoxelUtils {
                     }
                     return Block.box(s.x1, s.y1, s.z1, s.x2, s.y2, s.z2);
                 })
-                .reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get();
+                .reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).orElseThrow();
     }
 
     public record ShapeBuilder(double x1, double y1, double z1, double x2, double y2, double z2) {

@@ -18,7 +18,7 @@ public abstract class AnimationDataProvider extends CodecBasedProvider<Animation
     }
 
     public void addDefinition(Holder<EntityType<?>> type, AnimationsBuilder animationsBuilder) {
-        this.addDefinition(type.unwrapKey().get().location(), animationsBuilder);
+        this.addDefinition(type.unwrapKey().orElseThrow().location(), animationsBuilder);
     }
 
     public void addDefinition(RegistryEntrySupplier<EntityType<?>, ?> type, AnimationsBuilder animationsBuilder) {

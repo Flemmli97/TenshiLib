@@ -95,7 +95,7 @@ public class TenshiLibFabric implements ModInitializer, DedicatedServerModInitia
             } else {
                 // Self note: Map is modifiable cause fabric changes it to an IdentityHashMap
                 DefaultAttributeSupplierAccessor.getDefaults()
-                        .put(type, ((EntityAttributeModifierEvent.AttributeSupplierMerger) sup).mergeWith(contents));
+                        .put(type, ((EntityAttributeModifierEvent.AttributeSupplierMerger) sup).tenshilib$mergeWith(contents));
             }
         });
     }

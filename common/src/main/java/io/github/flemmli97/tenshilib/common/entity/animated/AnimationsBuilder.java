@@ -23,6 +23,15 @@ public class AnimationsBuilder {
     private final Map<String, DefinitionBuilder> definitions = new HashMap<>();
     private boolean built;
 
+    public AnimationsBuilder() {
+    }
+
+    public AnimationsBuilder(AnimationsBuilder source, String... include) {
+        for (String id : include) {
+            this.add(source, id);
+        }
+    }
+
     public static DefinitionBuilder definition(double length) {
         return definition(length, true);
     }
@@ -42,6 +51,16 @@ public class AnimationsBuilder {
         if (this.built)
             throw new IllegalStateException("Builder has already been built!");
         this.definitions.put(id, this.definitions.get(copyOf).copyWith(copyOf));
+        return id;
+    }
+
+    public String add(AnimationsBuilder source, String id) {
+        if (this.built)
+            throw new IllegalStateException("Builder has already been built!");
+        DefinitionBuilder definition = source.definitions.get(id);
+        if (definition == null)
+            throw new IllegalStateException("Source has no definition with id " + id);
+        this.definitions.put(id, definition);
         return id;
     }
 

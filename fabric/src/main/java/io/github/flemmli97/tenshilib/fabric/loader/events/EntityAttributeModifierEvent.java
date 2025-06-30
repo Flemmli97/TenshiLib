@@ -78,6 +78,6 @@ public interface EntityAttributeModifierEvent {
 
     interface AttributeSupplierMerger {
 
-        AttributeSupplier mergeWith(Map<Holder<Attribute>, OptionalDouble> other);
+        AttributeSupplier tenshilib$mergeWith(Map<Holder<Attribute>, OptionalDouble> other);
     }
 }

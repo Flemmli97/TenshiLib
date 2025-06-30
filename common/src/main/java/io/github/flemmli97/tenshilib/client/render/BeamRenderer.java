@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import io.github.flemmli97.tenshilib.common.entity.BeamEntity;
 import io.github.flemmli97.tenshilib.common.utils.math.MathUtils;
-import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -71,8 +70,7 @@ public abstract class BeamRenderer<T extends BeamEntity> extends EntityRenderer<
         poseStack.pushPose();
         poseStack.mulPose(Axis.YN.rotationDegrees(Mth.lerp(partialTicks, entity.yRotO, entity.getYRot()) + 90));
         poseStack.mulPose(Axis.ZP.rotationDegrees(-Mth.lerp(partialTicks, entity.xRotO, entity.getXRot())));
-        boolean playerView = !entity.firstPerson3d(Minecraft.getInstance().cameraEntity)
-                && Minecraft.getInstance().options.getCameraType() != CameraType.THIRD_PERSON_BACK;
+        boolean playerView = !entity.shouldRender3d(Minecraft.getInstance().cameraEntity, Minecraft.getInstance().options.getCameraType().ordinal());
         if (playerView) {
             poseStack.mulPose(Axis.XP.rotationDegrees(30));
             poseStack.translate(0, -0.1, 0);

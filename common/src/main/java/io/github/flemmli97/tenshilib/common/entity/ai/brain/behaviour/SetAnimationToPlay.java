@@ -14,12 +14,16 @@ import net.tslat.smartbrainlib.util.BrainUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiPredicate;
 
 public class SetAnimationToPlay<E extends Mob & AnimatedEntity> extends ExtendedBehaviour<E> {
 
     private static final MemoryTest MEMORIES = MemoryTest.builder(1).usesMemory(MoreMemoryModules.ANIMATION_TO_PLAY.get());
 
     private final List<AnimationPlayHolder<E>> animations;
+    private List<AnimationPlayHolder<E>> selectable;
+
+    private BiPredicate<String, E> filter;
 
     public SetAnimationToPlay(String... animations) {
         this.animations = Arrays.stream(animations).map(s -> new AnimationPlayHolder<E>(s)).toList();
@@ -30,6 +34,11 @@ public class SetAnimationToPlay<E extends Mob & AnimatedEntity> extends Extended
         this.animations = List.of(animations);
     }
 
+    public SetAnimationToPlay<E> filter(BiPredicate<String, E> filter) {
+        this.filter = filter;
+        return this;
+    }
+
     @Override
     protected List<Pair<MemoryModuleType<?>, MemoryStatus>> getMemoryRequirements() {
         return MEMORIES;
@@ -37,12 +46,16 @@ public class SetAnimationToPlay<E extends Mob & AnimatedEntity> extends Extended
 
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
-        return !this.animations.isEmpty() && !entity.getAnimationHandler().hasAnimation();
+        if (entity.getAnimationHandler().hasAnimation())
+            return false;
+        this.selectable = this.filter == null ? this.animations : this.animations.stream().filter(h -> this.filter.test(h.animation(), entity))
+                .toList();
+        return !this.selectable.isEmpty();
     }
 
     @Override
     protected void start(E entity) {
-        AnimationPlayHolder<E> selected = this.animations.get(entity.getRandom().nextInt(this.animations.size()));
+        AnimationPlayHolder<E> selected = this.selectable.get(entity.getRandom().nextInt(this.selectable.size()));
         BrainUtils.setMemory(entity, MoreMemoryModules.ANIMATION_TO_PLAY.get(), selected);
     }
 }

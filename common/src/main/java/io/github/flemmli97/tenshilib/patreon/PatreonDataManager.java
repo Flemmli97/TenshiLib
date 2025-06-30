@@ -11,7 +11,7 @@ import net.minecraft.util.GsonHelper;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URL;
+import java.net.URI;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ public class PatreonDataManager {
             new Thread(() -> {
                 JsonArray arr = null;
                 try {
-                    URLConnection conn = new URL(URL).openConnection();
+                    URLConnection conn = URI.create(URL).toURL().openConnection();
                     Reader reader = new InputStreamReader(conn.getInputStream());
                     arr = GSON.fromJson(reader, JsonArray.class);
                     reader.close();

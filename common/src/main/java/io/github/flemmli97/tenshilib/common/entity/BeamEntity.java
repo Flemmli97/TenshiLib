@@ -235,7 +235,14 @@ public abstract class BeamEntity extends Entity implements TraceableEntity {
         return this.shooter;
     }
 
-    public boolean firstPerson3d(@Nullable Entity entity) {
+    /**
+     * Whether the beam should be rendered in 3d if using the builtin {@link io.github.flemmli97.tenshilib.client.render.BeamRenderer}
+     *
+     * @param cameraState The ordinal of the {@link net.minecraft.client.CameraType} since the class is client only
+     */
+    public boolean shouldRender3d(@Nullable Entity entity, int cameraState) {
+        if (cameraState == 2)
+            return true;
         return this.getOwner() == null || entity == null || !this.getOwner().getUUID().equals(entity.getUUID());
     }
 }

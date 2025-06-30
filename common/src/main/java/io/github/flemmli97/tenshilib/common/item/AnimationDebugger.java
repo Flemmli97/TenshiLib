@@ -4,6 +4,7 @@ import io.github.flemmli97.tenshilib.common.entity.EntityUtils;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.network.S2CAnimationScreen;
 import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -38,7 +39,7 @@ public class AnimationDebugger extends Item {
                 stack.set(this.entityIDType.get(), entity.getUUID());
                 stack.remove(this.animationIdx.get());
                 player.setItemInHand(usedHand, stack);
-                serverPlayer.displayClientMessage(Component.translatable("tenshilib.item.animation.select", entity.getName()), true);
+                serverPlayer.displayClientMessage(Component.translatable("tenshilib.item.animation.select", entity.getName()).withStyle(ChatFormatting.AQUA), true);
             }
         }
         return InteractionResult.sidedSuccess(player.level().isClientSide);

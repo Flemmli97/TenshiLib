@@ -50,7 +50,7 @@ public class SetCircleTarget<E extends Mob> extends ExtendedBehaviour<E> {
     }
 
     public SetCircleTarget<E> speed(BiFunction<E, LivingEntity, Float> speed) {
-        this.radius = speed;
+        this.speed = speed;
         return this;
     }
 
@@ -66,6 +66,6 @@ public class SetCircleTarget<E extends Mob> extends ExtendedBehaviour<E> {
                 new CircleData(this.tracker.apply(entity, target),
                         this.clockWise.test(entity, target),
                         this.radius.apply(entity, target),
-                        this.radius.apply(entity, target)));
+                        this.speed.apply(entity, target)));
     }
 }

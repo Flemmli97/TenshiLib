@@ -24,8 +24,6 @@ public class MeguHatModel extends EntityModel<Player> implements ExtendedModel, 
 
     private RenderLocation location;
 
-    private Player player;
-
     public MeguHatModel() {
         this.model = GeoModelManager.getInstance().getModel(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "megumin_hat"));
         this.anim = GeoAnimationManager.getInstance().getAnimation(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "megumin_hat"));
@@ -35,7 +33,6 @@ public class MeguHatModel extends EntityModel<Player> implements ExtendedModel, 
     public void setupAnim(Player entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.model.get().resetPoses();
         this.anim.get().doAnimation(this, "idle", entity.tickCount, RenderUtils.getPartialTicks(entity));
-        this.player = entity;
     }
 
     @Override

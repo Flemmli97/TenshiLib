@@ -16,6 +16,7 @@ import net.tslat.smartbrainlib.util.BrainUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 
 public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehaviour<E> {
 
@@ -26,6 +27,8 @@ public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehav
     private List<AnimationPlayHolder.AnimationHolder> chainedAnimations;
     private int chainedIndex;
     private String currentPlaying;
+
+    private BiConsumer<String, E> onStartCallback;
 
     public PlayAnimation<E> withRunner(AnimationTickHandler<E> onAnimating) {
         this.onAnimating = onAnimating;
@@ -38,18 +41,14 @@ public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehav
         return this;
     }
 
-    @Override
-    protected List<Pair<MemoryModuleType<?>, MemoryStatus>> getMemoryRequirements() {
-        return MEMORIES;
+    public PlayAnimation<E> withCallback(BiConsumer<String, E> onStartCallback) {
+        this.onStartCallback = onStartCallback;
+        return this;
     }
 
     @Override
-    protected boolean shouldKeepRunning(E entity) {
-        if (this.currentPlaying == null)
-            return false;
-        if (entity.getAnimationHandler().isCurrent(this.currentPlaying))
-            return true;
-        return this.chainedAnimations != null && this.chainedIndex < this.chainedAnimations.size();
+    protected List<Pair<MemoryModuleType<?>, MemoryStatus>> getMemoryRequirements() {
+        return MEMORIES;
     }
 
     @SuppressWarnings("unchecked")
@@ -59,8 +58,19 @@ public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehav
             this.currentPlaying = selected.animation();
             this.chainedAnimations = ((AnimationPlayHolder<E>) selected).get(entity);
             entity.getAnimationHandler().setAnimation(this.currentPlaying);
+            if (this.onStartCallback != null)
+                this.onStartCallback.accept(this.currentPlaying, entity);
         });
         BrainUtils.clearMemory(entity, MoreMemoryModules.ANIMATION_TO_PLAY.get());
+    }
+
+    @Override
+    protected boolean shouldKeepRunning(E entity) {
+        if (this.currentPlaying == null)
+            return false;
+        if (entity.getAnimationHandler().isCurrent(this.currentPlaying))
+            return true;
+        return this.chainedAnimations != null && this.chainedIndex < this.chainedAnimations.size();
     }
 
     @Override

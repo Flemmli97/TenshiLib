@@ -20,7 +20,7 @@ public class AttributeSupplierMixin implements EntityAttributeModifierEvent.Attr
     private Map<Holder<Attribute>, AttributeInstance> instances;
 
     @Override
-    public AttributeSupplier mergeWith(Map<Holder<Attribute>, OptionalDouble> other) {
+    public AttributeSupplier tenshilib$mergeWith(Map<Holder<Attribute>, OptionalDouble> other) {
         AttributeSupplier.Builder builder = AttributeSupplier.builder();
         this.instances.forEach((att, inst) -> builder.add(att, inst.getBaseValue()));
         other.forEach((att, val) -> val.ifPresentOrElse(d -> builder.add(att, d), () -> builder.add(att)));

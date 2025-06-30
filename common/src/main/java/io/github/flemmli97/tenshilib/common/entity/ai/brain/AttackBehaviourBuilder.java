@@ -1,6 +1,7 @@
 package io.github.flemmli97.tenshilib.common.entity.ai.brain;
 
 import com.mojang.datafixers.util.Pair;
+import io.github.flemmli97.tenshilib.common.entity.ai.brain.behaviour.DummyBehaviour;
 import io.github.flemmli97.tenshilib.common.entity.ai.brain.behaviour.PlayAnimation;
 import io.github.flemmli97.tenshilib.common.entity.ai.brain.behaviour.SetAnimationToPlay;
 import io.github.flemmli97.tenshilib.common.entity.ai.brain.data.AnimationPlayHolder;
@@ -71,6 +72,7 @@ public class AttackBehaviourBuilder<E extends Mob & AnimatedEntity> {
         private final SetAnimationToPlay<E> setToPlay;
         private final List<ExtendedBehaviour<E>> preparations = new ArrayList<>();
         private Function<E, Integer> windupTime;
+        private PlayAnimation<E> actuallyPlay = new PlayAnimation<>();
 
         private SingleAttack(SetAnimationToPlay<E> behavior) {
             this.setToPlay = behavior;
@@ -85,6 +87,14 @@ public class AttackBehaviourBuilder<E extends Mob & AnimatedEntity> {
             return this;
         }
 
+        @SafeVarargs
+        public final SingleAttack prepareOptional(ExtendedBehaviour<E>... behaviors) {
+            for (ExtendedBehaviour<E> behaviour : behaviors) {
+                this.preparations.add(DummyBehaviour.opt(behaviour, false));
+            }
+            return this;
+        }
+
         /**
          * Using this makes preparation behaviours run in parallel instead of sequential.
          * This makes it possible to e.g. walk while playing the animation
@@ -96,13 +106,9 @@ public class AttackBehaviourBuilder<E extends Mob & AnimatedEntity> {
             return this;
         }
 
-        @SuppressWarnings("unchecked")
-        private ExtendedBehaviour<E> seqOf(List<ExtendedBehaviour<E>> list) {
-            if (list.isEmpty())
-                return new Idle<E>().runFor(e -> 1);
-            if (list.size() == 1)
-                return list.getFirst();
-            return new SequentialBehaviour<>(list.toArray(ExtendedBehaviour[]::new));
+        public SingleAttack play(PlayAnimation<E> actuallyPlay) {
+            this.actuallyPlay = actuallyPlay;
+            return this;
         }
 
         public AttackBehaviourBuilder<E> end() {
@@ -117,7 +123,8 @@ public class AttackBehaviourBuilder<E extends Mob & AnimatedEntity> {
         public AttackBehaviourBuilder<E> end(int weight, Consumer<ExtendedBehaviour<E>> finalize) {
             List<ExtendedBehaviour<E>> behaviours = new ArrayList<>();
             behaviours.add(this.setToPlay);
-            ExtendedBehaviour<E> actuallyPlay = new PlayAnimation<E>().replaceRunner(AttackBehaviourBuilder.this.universalHandler);
+            PlayAnimation<E> actuallyPlay = this.actuallyPlay
+                    .replaceRunner(AttackBehaviourBuilder.this.universalHandler);
             if (this.windupTime != null) {
                 ExtendedBehaviour<E> preparation = this.seqOf(this.preparations);
                 ExtendedBehaviour<E> attack = new SequentialBehaviour<>(new Idle<E>().runFor(this.windupTime),
@@ -132,6 +139,15 @@ public class AttackBehaviourBuilder<E extends Mob & AnimatedEntity> {
                 finalize.accept(attackBehaviour);
             AttackBehaviourBuilder.this.behaviors.add(new Pair<>(attackBehaviour, weight));
             return AttackBehaviourBuilder.this;
+        }
+
+        @SuppressWarnings("unchecked")
+        private ExtendedBehaviour<E> seqOf(List<ExtendedBehaviour<E>> list) {
+            if (list.isEmpty())
+                return new Idle<E>().runFor(e -> 1);
+            if (list.size() == 1)
+                return list.getFirst();
+            return new SequentialBehaviour<>(list.toArray(ExtendedBehaviour[]::new));
         }
     }
 }

@@ -27,10 +27,6 @@ public class MathUtils {
         return new double[]{x / d0 * radius + centerX, y / d0 * radius + centerY};
     }
 
-    public static double phiFromPoint(double centerX, double centerY, double pointX, double pointY) {
-        return Math.atan2(pointY - centerY, pointX - centerX);
-    }
-
     public static List<float[]> pointsOfCircle(float radius, int density) {
         float rad = density * Mth.DEG_TO_RAD;
         float i = -rad;

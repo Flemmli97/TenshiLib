@@ -119,7 +119,7 @@ public class BedrockAnimations {
             changed = this.doAnimation(model, animationID != null ? animationID.apply(last) : last.getAnimation(), last.getTick(partialTicks), interpolationLast, mirror != null && mirror.test(last), false);
         }
         if (current != null) {
-            if (this.doAnimation(model, animationID != null ? animationID.apply(current) : current.getAnimation(), current.getTick(partialTicks), interpolation, mirror != null && mirror.test(last), false) && !changed) {
+            if (this.doAnimation(model, animationID != null ? animationID.apply(current) : current.getAnimation(), current.getTick(partialTicks), interpolation, mirror != null && mirror.test(current), false) && !changed) {
                 changed = true;
             }
         }

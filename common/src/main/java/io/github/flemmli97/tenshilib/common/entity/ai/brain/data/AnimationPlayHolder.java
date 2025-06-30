@@ -51,6 +51,11 @@ public class AnimationPlayHolder<T extends Mob & AnimatedEntity> {
         return WeightedRandom.getRandomItem(mob.getRandom(), filtered).map(ChainedAnimations::chains).orElse(null);
     }
 
+    @Override
+    public String toString() {
+        return this.animation;
+    }
+
     public static class Builder<T extends Mob & AnimatedEntity> {
 
         private final String animation;

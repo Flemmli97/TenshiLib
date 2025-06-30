@@ -1,6 +1,7 @@
 package io.github.flemmli97.tenshilib.common.entity.ai.brain.behaviour;
 
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
@@ -27,7 +28,7 @@ public class LeapInDirection<E extends LivingEntity> extends ExtendedBehaviour<E
     public static Vec3 createSidewaysVec(Vec3 from, Vec3 to, boolean left) {
         Vec3 dir = to.subtract(from);
         dir = new Vec3(dir.x(), 0, dir.z()).normalize();
-        return dir.yRot(left ? -90 : 90);
+        return dir.yRot((left ? -90 : 90) * Mth.DEG_TO_RAD);
     }
 
     public static Vec3 createBackwardsVec(Vec3 from, Vec3 to) {
@@ -59,7 +60,7 @@ public class LeapInDirection<E extends LivingEntity> extends ExtendedBehaviour<E
     }
 
     public LeapInDirection<E> strength(BiFunction<E, LivingEntity, Double> strength) {
-        this.verticalStrength = strength;
+        this.leapStrength = strength;
         return this;
     }
 

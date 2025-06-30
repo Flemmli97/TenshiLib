@@ -44,7 +44,6 @@ public class PatreonGui extends Screen {
 
     private int tier;
 
-    private CycleButton<RenderLocation> locationButton;
     private PatreonPlayerSetting setting;
 
     public PatreonGui(Screen screen) {
@@ -185,7 +184,7 @@ public class PatreonGui extends Screen {
         if (allowed.isEmpty())
             return 0;
         Function<RenderLocation, Component> f = loc -> Component.translatable("tenshilib.patreon.location." + loc.toString());
-        this.addRenderableWidget(this.locationButton = CycleButton.builder(f).withValues(allowed)
+        this.addRenderableWidget(CycleButton.builder(f).withValues(allowed)
                 .withInitialValue(this.renderLocation)
                 .create(this.width / 2 - 125, this.height / 8 + 24 * 2, 250, 20,
                         Component.translatable("tenshilib.patreon.location"), (cycleButton, loc) -> {
