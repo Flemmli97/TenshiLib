@@ -11,8 +11,11 @@ public class ReloadableCache<T> {
     private T cache;
 
     ReloadableCache<T> onChange(Consumer<T> consumer) {
-        if (consumer != null)
+        if (consumer != null) {
             this.listeners.add(consumer);
+            if (this.cache != null)
+                consumer.accept(this.cache);
+        }
         return this;
     }
 

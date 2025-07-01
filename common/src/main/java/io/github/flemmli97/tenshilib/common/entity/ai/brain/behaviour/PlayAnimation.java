@@ -16,7 +16,6 @@ import net.tslat.smartbrainlib.util.BrainUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.function.BiConsumer;
 
 public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehaviour<E> {
 
@@ -28,7 +27,7 @@ public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehav
     private int chainedIndex;
     private String currentPlaying;
 
-    private BiConsumer<String, E> onStartCallback;
+    private OnStart<E> onStartCallback;
 
     public PlayAnimation<E> withRunner(AnimationTickHandler<E> onAnimating) {
         this.onAnimating = onAnimating;
@@ -41,7 +40,7 @@ public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehav
         return this;
     }
 
-    public PlayAnimation<E> withCallback(BiConsumer<String, E> onStartCallback) {
+    public PlayAnimation<E> withCallback(OnStart<E> onStartCallback) {
         this.onStartCallback = onStartCallback;
         return this;
     }
@@ -59,7 +58,7 @@ public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehav
             this.chainedAnimations = ((AnimationPlayHolder<E>) selected).get(entity);
             entity.getAnimationHandler().setAnimation(this.currentPlaying);
             if (this.onStartCallback != null)
-                this.onStartCallback.accept(this.currentPlaying, entity);
+                this.onStartCallback.onStart(this.currentPlaying, this.chainedAnimations, entity);
         });
         BrainUtils.clearMemory(entity, MoreMemoryModules.ANIMATION_TO_PLAY.get());
     }
@@ -101,5 +100,10 @@ public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehav
     public interface AnimationTickHandler<E> {
 
         void onTick(E entity, @Nullable LivingEntity target, AnimationState state);
+    }
+
+    public interface OnStart<E> {
+
+        void onStart(String animation, @Nullable List<AnimationPlayHolder.AnimationHolder> chained, E entity);
     }
 }

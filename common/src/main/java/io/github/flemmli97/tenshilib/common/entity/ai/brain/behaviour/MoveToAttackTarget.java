@@ -48,7 +48,7 @@ public class MoveToAttackTarget<E extends PathfinderMob & AOEAttackEntity & Anim
             return true;
         if (target.getTarget() instanceof EntityTracker entityTracker) {
             Entity targetEntity = entityTracker.getEntity();
-            OrientedBoundingBox aabb = entity.prepareAttackBox(animation.animation(), targetEntity, -0.15, true);
+            OrientedBoundingBox aabb = entity.prepareAttackBox(animation.animation(), targetEntity, -0.15, target.getCloseEnoughDist() <= 1);
             if (aabb.intersects(targetEntity.getBoundingBox())) {
                 return true;
             }

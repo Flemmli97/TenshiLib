@@ -50,7 +50,7 @@ public class AnimationsBuilder {
     public String add(String id, String copyOf) {
         if (this.built)
             throw new IllegalStateException("Builder has already been built!");
-        this.definitions.put(id, this.definitions.get(copyOf).copyWith(copyOf));
+        this.definitions.put(id, this.definitions.get(copyOf).copy(copyOf));
         return id;
     }
 
@@ -142,9 +142,9 @@ public class AnimationsBuilder {
             return this;
         }
 
-        public DefinitionBuilder copyWith(String animation) {
+        public DefinitionBuilder copy(String animation) {
             DefinitionBuilder copy = new DefinitionBuilder(this.length)
-                    .animationId(animation)
+                    .animationId(this.animation.isEmpty() ? animation : this.animation)
                     .speed(this.speed).withTransitionTime(this.defaultStartTransition, this.defaultEndTransition);
             copy.shouldRunOut = this.shouldRunOut;
             copy.marker.putAll(this.marker);

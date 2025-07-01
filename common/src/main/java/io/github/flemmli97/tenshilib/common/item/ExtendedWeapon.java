@@ -26,7 +26,7 @@ public interface ExtendedWeapon {
             ((PlayerAttackAccess) player).tenshilib$SetNoSweeping(false);
         }
         if (this.shouldSwingWeapon(player, stack))
-            player.swing(InteractionHand.MAIN_HAND);
+            player.swing(InteractionHand.MAIN_HAND, true);
     }
 
     /**

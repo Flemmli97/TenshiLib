@@ -186,7 +186,13 @@ public class ModelPartsContainer {
         }
 
         public void translateAndRotateWithParents(PoseStack poseStack) {
-            ModelPartExtended part = this;
+            this.translateAndRotateWithParents(poseStack, false);
+        }
+
+        public void translateAndRotateWithParents(PoseStack poseStack, boolean excludeSelf) {
+            ModelPartExtended part = excludeSelf ? this.parent : this;
+            if (part == null)
+                return;
             List<ModelPartExtended> parts = new ArrayList<>();
             parts.add(part);
             while (part.parent != null) {

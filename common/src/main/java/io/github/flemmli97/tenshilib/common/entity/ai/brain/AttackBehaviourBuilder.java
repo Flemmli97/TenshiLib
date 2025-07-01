@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Eases creating of attack sequences
@@ -28,6 +29,8 @@ public class AttackBehaviourBuilder<E extends Mob & AnimatedEntity> {
 
     private PlayAnimation.AnimationTickHandler<E> universalHandler;
 
+    private Function<E, Integer> universalTimeout = entity -> entity.getRandom().nextInt(40) + 80;
+
     public static <E extends Mob & AnimatedEntity> AttackBehaviourBuilder<E> create() {
         return new AttackBehaviourBuilder<>();
     }
@@ -37,6 +40,16 @@ public class AttackBehaviourBuilder<E extends Mob & AnimatedEntity> {
      */
     public AttackBehaviourBuilder<E> universalHandler(PlayAnimation.AnimationTickHandler<E> animationTickHandler) {
         this.universalHandler = animationTickHandler;
+        return this;
+    }
+
+    /**
+     * Use a universal timeout for all attacks.
+     * Set to null to have no timeout.
+     * Use {@link SingleAttack#end(int, Consumer)} to configure for individual attacks
+     */
+    public AttackBehaviourBuilder<E> universalTimeout(Function<E, Integer> universalTimeout) {
+        this.universalTimeout = universalTimeout;
         return this;
     }
 
@@ -111,6 +124,11 @@ public class AttackBehaviourBuilder<E extends Mob & AnimatedEntity> {
             return this;
         }
 
+        public SingleAttack condition(Predicate<E> condition) {
+            this.setToPlay.startCondition(condition);
+            return this;
+        }
+
         public AttackBehaviourBuilder<E> end() {
             return this.end(1);
         }
@@ -135,8 +153,12 @@ public class AttackBehaviourBuilder<E extends Mob & AnimatedEntity> {
                 behaviours.add(actuallyPlay);
             }
             ExtendedBehaviour<E> attackBehaviour = new SequentialBehaviour<>(behaviours.toArray(ExtendedBehaviour[]::new));
-            if (finalize != null)
+            if (AttackBehaviourBuilder.this.universalTimeout != null) {
+                attackBehaviour.runFor(AttackBehaviourBuilder.this.universalTimeout);
+            }
+            if (finalize != null) {
                 finalize.accept(attackBehaviour);
+            }
             AttackBehaviourBuilder.this.behaviors.add(new Pair<>(attackBehaviour, weight));
             return AttackBehaviourBuilder.this;
         }
