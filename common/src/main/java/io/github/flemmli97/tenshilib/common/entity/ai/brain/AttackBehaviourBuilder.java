@@ -103,7 +103,7 @@ public class AttackBehaviourBuilder<E extends Mob & AnimatedEntity> {
         @SafeVarargs
         public final SingleAttack prepareOptional(ExtendedBehaviour<E>... behaviors) {
             for (ExtendedBehaviour<E> behaviour : behaviors) {
-                this.preparations.add(DummyBehaviour.opt(behaviour, false));
+                this.preparations.add(DummyBehaviour.opt(behaviour));
             }
             return this;
         }

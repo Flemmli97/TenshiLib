@@ -1,10 +1,10 @@
 package io.github.flemmli97.tenshilib.common.entity.ai.brain;
 
 import com.mojang.datafixers.util.Pair;
-import io.github.flemmli97.tenshilib.common.entity.ai.brain.behaviour.DummyBehaviour;
 import net.minecraft.world.entity.LivingEntity;
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour;
+import net.tslat.smartbrainlib.api.core.behaviour.RepeatingBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.SequentialBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.Idle;
 
@@ -38,13 +38,13 @@ public class SelectableBehaviourBuilder<E extends LivingEntity> {
         if (behaviours.length == 1 && behaviours[0] instanceof Idle<E>) {
             this.behaviors.add(Pair.of(behaviours[0], weight));
         } else {
-            this.behaviors.add(Pair.of(DummyBehaviour.opt(new SequentialBehaviour<>(behaviours)), weight));
+            this.behaviors.add(Pair.of(new RepeatingBehaviour<>(new SequentialBehaviour<>(behaviours)), weight));
         }
         return this;
     }
 
     public SelectableBehaviourBuilder<E> addOpt(int weight, ExtendedBehaviour<E> behaviour) {
-        this.behaviors.add(Pair.of(DummyBehaviour.opt(behaviour), weight));
+        this.behaviors.add(Pair.of(new RepeatingBehaviour<>(behaviour), weight));
         return this;
     }
 

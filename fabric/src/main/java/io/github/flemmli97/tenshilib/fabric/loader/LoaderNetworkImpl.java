@@ -29,6 +29,8 @@ public class LoaderNetworkImpl implements LoaderNetwork {
     public void sendToTracking(CustomPacketPayload message, Entity entity) {
         PlayerLookup.tracking(entity)
                 .forEach(player -> ServerPlayNetworking.send(player, message));
+        if (entity instanceof ServerPlayer player)
+            ServerPlayNetworking.send(player, message);
     }
 
     @Override

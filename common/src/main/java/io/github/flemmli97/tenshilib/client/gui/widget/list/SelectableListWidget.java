@@ -23,6 +23,7 @@ public class SelectableListWidget extends AbstractWidget {
 
     private ResourceLocation background;
     private int paddingY = 4;
+    private Scrollbar scrollbar;
 
     private boolean canSelectMultiple;
     private int offset;
@@ -41,7 +42,7 @@ public class SelectableListWidget extends AbstractWidget {
     public SelectableListWidget withPadding(int paddingY) {
         this.paddingY = paddingY;
         this.entryHeight = this.font.lineHeight + 3 + this.paddingY;
-        this.entries.forEach(e -> e.updateDimensions(this.width, this.entryHeight));
+        this.entries.forEach(e -> e.updateDimensions(this.getEntryWidth(), this.entryHeight));
         this.limit = this.height / this.entryHeight;
         return this;
     }
@@ -56,12 +57,22 @@ public class SelectableListWidget extends AbstractWidget {
         return this;
     }
 
+    public SelectableListWidget scrollbar(Scrollbar scrollbar) {
+        this.scrollbar = scrollbar;
+        this.entries.forEach(e -> e.updateDimensions(this.getEntryWidth(), this.entryHeight));
+        return this;
+    }
+
+    protected int getEntryWidth() {
+        return this.getWidth() - (this.scrollbar != null ? this.scrollbar.totalWidth() : 0);
+    }
+
     @Override
     public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         if (this.background != null) {
             graphics.blit(this.background, this.getX(), this.getY(), 0, 0, this.width, this.height);
         }
-        this.hoverOver(this.isHovered ? this.indexFromMouse(mouseY) : -1);
+        this.hoverOver(this.isHovered ? this.indexFromMouse(mouseX, mouseY) : -1);
         for (int i = 0; i < this.entries.size(); i++) {
             int idxx = (this.offset + i) % this.entries.size();
             if (i >= this.limit || idxx >= this.entries.size())
@@ -72,6 +83,20 @@ public class SelectableListWidget extends AbstractWidget {
             int entryY = this.getY() + i * this.entryHeight;
             entry.render(this, graphics, mouseX, mouseY, partialTick, this.getX(), entryY, selected, hovered);
         }
+        if (this.scrollbar != null) {
+            int scrollbarX = this.getX() + this.getWidth() - this.scrollbar.totalWidth() + this.scrollbar.leftPadding();
+            if (this.entries.size() <= this.limit) {
+                graphics.blitSprite(this.scrollbar.disabled(),
+                        scrollbarX, this.getY() + this.scrollbar.topPadding(),
+                        this.scrollbar.width(), this.scrollbar.height());
+            } else {
+                float relative = (float) this.offset / Math.max(0, this.entries.size() - this.limit);
+                int y = this.getY() + (int) ((this.getHeight() - this.scrollbar.totalHeight()) * relative);
+                graphics.blitSprite(this.scrollbar.texture(),
+                        scrollbarX, y + this.scrollbar.topPadding(),
+                        this.scrollbar.width(), this.scrollbar.height());
+            }
+        }
     }
 
     @Override
@@ -79,23 +104,14 @@ public class SelectableListWidget extends AbstractWidget {
         if (!super.mouseClicked(mouseX, mouseY, button)) {
             return false;
         }
-        int i = this.indexFromMouse(mouseY);
+        int i = this.indexFromMouse(mouseX, mouseY);
         if (i != -1) {
             this.hoverOver(i);
             int entryX = this.getX();
             int entryY = this.getY() + i * this.entryHeight;
             double relMouseX = mouseX - entryX;
             double relMouseY = mouseY - entryY;
-            if (!this.canSelectMultiple && this.lastSelect != this.hovered) {
-                this.selected[this.lastSelect] = false;
-                this.entries.get(this.lastSelect).unSelect();
-            }
-            this.lastSelect = this.hovered;
-            boolean selected = this.selected[this.hovered];
-            this.selected[this.hovered] = !this.selected[this.hovered];
-            SelectableEntry entry = this.entries.get(this.hovered);
-            if (selected && !this.selected[this.hovered])
-                entry.unSelect();
+            SelectableEntry entry = this.select(this.hovered, true);
             if (!entry.onClick(relMouseX, relMouseY, this.selected[this.hovered]))
                 this.selected[this.hovered] = false;
             else {
@@ -107,7 +123,7 @@ public class SelectableListWidget extends AbstractWidget {
 
     @Override
     protected boolean clicked(double mouseX, double mouseY) {
-        return super.clicked(mouseX, mouseY) && this.indexFromMouse(mouseY) != -1;
+        return super.clicked(mouseX, mouseY) && this.indexFromMouse(mouseX, mouseY) != -1;
     }
 
     @Override
@@ -118,7 +134,9 @@ public class SelectableListWidget extends AbstractWidget {
     protected void updateWidgetNarration(NarrationElementOutput output) {
     }
 
-    private int indexFromMouse(double mouseY) {
+    private int indexFromMouse(double mouseX, double mouseY) {
+        if (mouseX >= this.getX() + this.getEntryWidth())
+            return -1;
         double relativePos = mouseY - this.getY();
         if (relativePos < 0 || relativePos > this.getY() + this.height)
             return -1;
@@ -150,7 +168,44 @@ public class SelectableListWidget extends AbstractWidget {
         }
     }
 
+    public SelectableEntry select(int select, boolean toggle) {
+        if (select < 0 || select >= this.entries.size())
+            return null;
+        if (!this.canSelectMultiple && this.lastSelect != select) {
+            this.selected[this.lastSelect] = false;
+            this.entries.get(this.lastSelect).unSelect();
+        }
+        this.lastSelect = select;
+        boolean previous = this.selected[select];
+        this.selected[select] = !toggle || !this.selected[select];
+        SelectableEntry entry = this.entries.get(this.hovered);
+        if (previous && !this.selected[this.hovered])
+            entry.unSelect();
+        return entry;
+    }
+
     public Font getFont() {
         return this.font;
+    }
+
+    public record Scrollbar(ResourceLocation texture, ResourceLocation disabled,
+                            int width, int height, int leftPadding, int rightPadding, int topPadding,
+                            int bottomPadding) {
+
+        public Scrollbar(ResourceLocation texture, ResourceLocation disabled, int width, int height) {
+            this(texture, disabled, width, height, 0, 0, 0, 0);
+        }
+
+        public Scrollbar(ResourceLocation texture, ResourceLocation disabled, int width, int height, int leftPadding, int topPadding) {
+            this(texture, disabled, width, height, leftPadding, 0, topPadding, 0);
+        }
+
+        public int totalWidth() {
+            return this.width() + this.leftPadding() + this.rightPadding();
+        }
+
+        public int totalHeight() {
+            return this.height() + this.topPadding() + this.bottomPadding();
+        }
     }
 }

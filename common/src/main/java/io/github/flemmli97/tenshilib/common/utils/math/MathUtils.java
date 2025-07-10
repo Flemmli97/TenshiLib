@@ -95,34 +95,35 @@ public class MathUtils {
             throw new IllegalArgumentException("Can't create a polygon with 2 or less corners!");
         double[][] res = new double[shape][];
         Vector3d base = new Vector3d(width, 0, 0);
-        float rotatePer = 360 / (float) shape;
-        Vec3 axis = new Vec3(0, 0, 1);
+        float rotatePer = 360f / shape;
         if (shape % 2 == 0)
-            base = base.rotateAxis(rotatePer * 0.5f * Mth.DEG_TO_RAD, axis.x(), axis.y(), axis.z());
+            base = base.rotateAxis(rotatePer * 0.5f * Mth.DEG_TO_RAD, 0, 0, 1);
         res[0] = new double[]{base.x, base.y};
-        float angle = rotatePer;
         for (int i = 1; i < shape; i++) {
-            Vector3d rotated = base.rotateAxis(angle * 0.5f * Mth.DEG_TO_RAD, axis.x(), axis.y(), axis.z(), new Vector3d());
-            angle += rotatePer;
+            Vector3d rotated = base.rotateAxis((rotatePer * i) * Mth.DEG_TO_RAD, 0, 0, 1, new Vector3d());
             res[i] = new double[]{rotated.x, rotated.y};
         }
         return res;
     }
 
+    /**
+     * Creates an array of all corner points of a regular polygon
+     *
+     * @param shape The number of corners of the polygon. E.g. 3 for a triangle
+     * @param width The width of the outer circle
+     * @return Array of pairs of (x, y) coords
+     */
     public static float[][] createRegularPolygonPointsF(int shape, float width) {
         if (shape <= 2)
             throw new IllegalArgumentException("Can't create a polygon with 2 or less corners!");
         float[][] res = new float[shape][];
         Vector3f base = new Vector3f(width, 0, 0);
-        float rotatePer = 360 / (float) shape;
-        Vector3f axis = new Vector3f(0, 0, 1);
+        float rotatePer = 360f / shape;
         if (shape % 2 == 0)
-            base = base.rotateAxis(rotatePer * 0.5f * Mth.DEG_TO_RAD, axis.x(), axis.y(), axis.z());
+            base = base.rotateAxis(rotatePer * 0.5f * Mth.DEG_TO_RAD, 0, 0, 1);
         res[0] = new float[]{base.x, base.y};
-        float angle = rotatePer;
         for (int i = 1; i < shape; i++) {
-            Vector3f rotated = base.rotateAxis(angle * 0.5f * Mth.DEG_TO_RAD, axis.x(), axis.y(), axis.z(), new Vector3f());
-            angle += rotatePer;
+            Vector3f rotated = base.rotateAxis((rotatePer * i) * Mth.DEG_TO_RAD, 0, 0, 1, new Vector3f());
             res[i] = new float[]{rotated.x, rotated.y};
         }
         return res;

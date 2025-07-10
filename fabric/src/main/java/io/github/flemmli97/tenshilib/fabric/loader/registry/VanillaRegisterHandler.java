@@ -60,7 +60,7 @@ public class VanillaRegisterHandler<T> implements LoaderRegister<T> {
         Registry<T> registry = this.registryFrom();
         this.entries.forEach((v, s) -> {
             Registry.register(registry, v.getID(), s.get());
-            v.updateValue(registry);
+            v.bind(registry);
         });
     }
 

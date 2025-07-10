@@ -72,7 +72,6 @@ public class TenshiLibFabric implements ModInitializer, DedicatedServerModInitia
         for (SpawnEgg egg : SpawnEgg.getEggs())
             DispenserBlock.registerBehavior(egg, egg.dispenser());
         SpawnEgg.resolveEggs();
-        modifyEntityAttributes();
         List<Pair<String, Runnable>> runnables = new ArrayList<>();
         CommonSetupEvent.EVENT.invoker().handle((modid, runnable) -> runnables.add(Pair.of(modid, runnable)));
         runnables.forEach(pair -> {
@@ -82,6 +81,7 @@ public class TenshiLibFabric implements ModInitializer, DedicatedServerModInitia
                 TenshiLib.LOGGER.error("Error running common setup work for {}", pair.getFirst(), exception);
             }
         });
+        modifyEntityAttributes();
     }
 
     private static void modifyEntityAttributes() {

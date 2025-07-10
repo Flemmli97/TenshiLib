@@ -11,6 +11,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -19,11 +20,16 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-public class TenshiLibFabricClient implements ClientModInitializer {
+public class TenshiLibFabricClient implements ClientModInitializer, ClientSetupModInitializer {
 
     @Override
     public void onInitializeClient() {
         TenshiLibFabric.postInit();
+        FabricLoader.getInstance().invokeEntrypoints("tenshilib_client", ClientSetupModInitializer.class, ClientSetupModInitializer::clientSetup);
+    }
+
+    @Override
+    public void clientSetup() {
         ClientEvents.itemColors();
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new IdentifiableResourceReloadListener() {
             @Override

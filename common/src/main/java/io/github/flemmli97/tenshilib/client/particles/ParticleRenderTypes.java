@@ -10,14 +10,12 @@ import org.lwjgl.opengl.GL11;
 
 public class ParticleRenderTypes {
 
-    /**
-     * TODO: needs testing
-     */
+    @SuppressWarnings("deprecation")
     public static final ParticleRenderType TRANSLUCENTADD = (tesselator, manager) -> {
-        RenderSystem.setShader(TenshilibShaders::getBlurredParticleShader);
         RenderSystem.depthMask(false);
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+        RenderSystem.setShader(TenshilibShaders::getBlurredParticleShader);
         RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES);
         return tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
     };

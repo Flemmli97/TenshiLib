@@ -245,9 +245,8 @@ public class RenderUtils {
      */
     public static void renderScaledEntityGui(GuiGraphics guiGraphics, float x, float y, float sizeX, float sizeY, float scale,
                                              float yOffset, float mouseX, float mouseY, LivingEntity entity) {
-        float entityScale = entity.getScale();
-        float maxSizeWidth = (sizeX / scale) * entityScale;
-        float maxSizeHeight = (sizeY / scale) * entityScale;
+        float maxSizeWidth = sizeX / scale;
+        float maxSizeHeight = sizeY / scale;
         float scaleMult = 1;
         if (entity.getBbWidth() > maxSizeWidth) {
             scaleMult = maxSizeWidth / entity.getBbWidth();
@@ -280,7 +279,6 @@ public class RenderUtils {
         entity.yHeadRotO = entity.getYRot();
         float entityScale = entity.getScale();
         Vector3f offset = new Vector3f(0.0f, entity.getBbHeight() / 2.0f + yOffset * entityScale, 0.0f);
-        scale = scale / entityScale;
         InventoryScreen.renderEntityInInventory(guiGraphics, xM, yM, scale, offset, quaternionf, quaternionf2, entity);
         entity.yBodyRot = preYBody;
         entity.setYRot(preYRot);

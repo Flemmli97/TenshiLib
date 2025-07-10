@@ -22,6 +22,9 @@
     "client": [
       "io.github.flemmli97.tenshilib.fabric.client.TenshiLibFabricClient"
     ],
+    "tenshilib_client": [
+      "io.github.flemmli97.tenshilib.fabric.client.TenshiLibFabricClient"
+    ],
     "server": [
       "io.github.flemmli97.tenshilib.fabric.TenshiLibFabric"
     ]

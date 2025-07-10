@@ -37,7 +37,8 @@ public class DeferredRegistrationHandler {
             Set<ResourceLocation> keys = getRegistrationOrder();
             for (ResourceLocation key : keys) {
                 List<VanillaRegisterHandler<?>> deferred = DEFERRED.get(key);
-                deferred.forEach(VanillaRegisterHandler::finalizeRegister);
+                if (deferred != null)
+                    deferred.forEach(VanillaRegisterHandler::finalizeRegister);
             }
             DEFERRED.clear();
             REGISTERED = true;
