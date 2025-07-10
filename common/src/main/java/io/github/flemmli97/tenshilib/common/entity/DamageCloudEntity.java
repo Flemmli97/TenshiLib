@@ -1,5 +1,6 @@
 package io.github.flemmli97.tenshilib.common.entity;
 
+import io.github.flemmli97.tenshilib.loader.TenshiLibCrossPlat;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -130,7 +131,7 @@ public abstract class DamageCloudEntity extends Entity implements TraceableEntit
         Entity entity = this.getOwner();
         if (entity == null)
             return true;
-        if (EntityUtils.isSameMultipart(target, this.getOwner()))
+        if (TenshiLibCrossPlat.INSTANCE.isSameMultipart(target, this.getOwner()))
             return false;
         return !target.equals(this.getOwner()) || !entity.isPassengerOfSameVehicle(target) || (this.canHitShooter() && this.tickCount >= 3);
     }

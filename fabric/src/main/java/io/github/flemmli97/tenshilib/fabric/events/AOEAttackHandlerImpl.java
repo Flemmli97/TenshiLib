@@ -18,9 +18,9 @@ public class AOEAttackHandlerImpl implements AOEAttackHandler {
             (listeners) -> (player, stack, list) -> {
                 for (AOEAttackEvent event : listeners) {
                     if (event.preventAttack(player, stack, list))
-                        return false;
+                        return true;
                 }
-                return true;
+                return false;
             }
     );
 

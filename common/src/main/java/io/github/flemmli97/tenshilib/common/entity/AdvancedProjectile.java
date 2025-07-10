@@ -2,7 +2,7 @@ package io.github.flemmli97.tenshilib.common.entity;
 
 import io.github.flemmli97.tenshilib.common.utils.HitResultUtils;
 import io.github.flemmli97.tenshilib.common.utils.math.OrientedBoundingBox;
-import io.github.flemmli97.tenshilib.loader.TenshiLibEventCalls;
+import io.github.flemmli97.tenshilib.loader.TenshiLibCrossPlat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -278,7 +278,7 @@ public abstract class AdvancedProjectile extends Projectile {
         }
 
         if (raytraceresult.getType() == HitResult.Type.BLOCK) {
-            if (!TenshiLibEventCalls.INSTANCE.projectileHitCall(this, raytraceresult)) {
+            if (!TenshiLibCrossPlat.INSTANCE.projectileImpactEvent(this, raytraceresult)) {
                 this.onHitBlock(raytraceresult);
                 BlockPos blockPos = raytraceresult.getBlockPos();
                 this.level().gameEvent(GameEvent.PROJECTILE_LAND, blockPos, GameEvent.Context.of(this, this.level().getBlockState(blockPos)));
@@ -287,7 +287,7 @@ public abstract class AdvancedProjectile extends Projectile {
             EntityHitResult res;
             while ((res = this.getEntityHit(pos, to)) != null && this.isAlive()) {
                 this.checkedEntities.add(res.getEntity().getUUID());
-                if (!TenshiLibEventCalls.INSTANCE.projectileHitCall(this, res) && !this.attackedEntities.contains(res.getEntity().getUUID()) && this.entityRayTraceHit(res)) {
+                if (!TenshiLibCrossPlat.INSTANCE.projectileImpactEvent(this, res) && !this.attackedEntities.contains(res.getEntity().getUUID()) && this.entityRayTraceHit(res)) {
                     this.attackedEntities.add(res.getEntity().getUUID());
                     if (this.maxPierceAmount() != -1 && this.attackedEntities.size() > this.maxPierceAmount())
                         this.onReachMaxPierce();
@@ -323,7 +323,7 @@ public abstract class AdvancedProjectile extends Projectile {
         Entity entity = this.getOwner();
         if (entity == null)
             return true;
-        if (entity.isPassengerOfSameVehicle(target) || EntityUtils.isSameMultipart(target, this.getOwner()))
+        if (entity.isPassengerOfSameVehicle(target) || TenshiLibCrossPlat.INSTANCE.isSameMultipart(target, this.getOwner()))
             return false;
         if (target.equals(this.getOwner()) && (!this.canHitShooter() || this.tickCount < 5)) {
             return false;

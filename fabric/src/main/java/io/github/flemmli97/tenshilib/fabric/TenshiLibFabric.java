@@ -9,6 +9,7 @@ import io.github.flemmli97.tenshilib.common.entity.animated.AnimationState;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import io.github.flemmli97.tenshilib.common.network.S2CEntityAnimation;
 import io.github.flemmli97.tenshilib.fabric.events.CommonEvents;
+import io.github.flemmli97.tenshilib.fabric.loader.TenshiLibCrossPlatImpl;
 import io.github.flemmli97.tenshilib.fabric.loader.events.CommonSetupEvent;
 import io.github.flemmli97.tenshilib.fabric.loader.events.EntityAttributeModifierEvent;
 import io.github.flemmli97.tenshilib.fabric.loader.patreon.TenshiLibPatreonImpl;
@@ -18,6 +19,7 @@ import io.github.flemmli97.tenshilib.fabric.network.PacketHandler;
 import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
@@ -60,6 +62,9 @@ public class TenshiLibFabric implements ModInitializer, DedicatedServerModInitia
                 return AnimationDataManager.getInstance().reload(preparationBarrier, resourceManager, preparationsProfiler, reloadProfiler, backgroundExecutor, gameExecutor);
             }
         });
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> TenshiLibCrossPlatImpl.CURRENT_SERVER = server);
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> TenshiLibCrossPlatImpl.CURRENT_SERVER = null);
+
         PacketHandler.register();
         TenshiLibPatreonImpl.initPatreonData();
     }

@@ -2,7 +2,7 @@ package io.github.flemmli97.tenshilib.common.entity;
 
 import io.github.flemmli97.tenshilib.common.utils.HitResultUtils;
 import io.github.flemmli97.tenshilib.common.utils.math.OrientedBoundingBox;
-import io.github.flemmli97.tenshilib.loader.TenshiLibEventCalls;
+import io.github.flemmli97.tenshilib.loader.TenshiLibCrossPlat;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -164,7 +164,7 @@ public abstract class BeamEntity extends Entity implements TraceableEntity {
                 for (Entity entity : list) {
                     if (!entity.equals(this.getOwner()) && this.canHitEntity(entity) && this.check(entity, collisionCheck)) {
                         EntityHitResult raytraceresult = new EntityHitResult(entity);
-                        if (!TenshiLibEventCalls.INSTANCE.beamHitCall(this, raytraceresult)) {
+                        if (!TenshiLibCrossPlat.INSTANCE.beamHitEvent(this, raytraceresult)) {
                             this.onImpact(raytraceresult);
                             if (!this.piercing())
                                 return;
@@ -182,7 +182,7 @@ public abstract class BeamEntity extends Entity implements TraceableEntity {
         Entity entity = this.getOwner();
         if (entity == null)
             return true;
-        return target != entity && !EntityUtils.isSameMultipart(target, entity) && !entity.isPassengerOfSameVehicle(target);
+        return target != entity && !TenshiLibCrossPlat.INSTANCE.isSameMultipart(target, entity) && !entity.isPassengerOfSameVehicle(target);
     }
 
     public HitResult getHitRay() {
