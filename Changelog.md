@@ -1,3 +1,18 @@
+TenshiLib 2.0.0
+================
+- Added all changes from 1.18 branch v 1.9.0+
+- Big refactoring of the codebase
+- Mods using past versions will NOT WORK using this!
+- Removed json config system. (Use some config mod now like forge config api port)
+- Implement bedrock geo model files
+  - Models are now defined via json files and thus changeable via resource pack
+- Updated animation file parsing
+  - Now supports particle and sound keyframes
+- Serverside animated action now datadriven
+- Removed animated goal attack system and replaced it with brains using Smart Brain Lib
+- Fabric registration is now deferred
+- Added CommonSetupEvent on fabric mimicking neo's
+
 TenshiLib 1.8.2.b
 ================
 - Fix fabric packets
