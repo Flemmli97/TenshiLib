@@ -29,7 +29,7 @@ public class AttackBehaviourBuilder<E extends Mob & AnimatedEntity> {
 
     private PlayAnimation.AnimationTickHandler<E> universalHandler;
 
-    private Function<E, Integer> universalTimeout = entity -> entity.getRandom().nextInt(40) + 80;
+    private Function<E, Integer> universalTimeout = entity -> entity.getRandom().nextInt(30) + 50;
 
     public static <E extends Mob & AnimatedEntity> AttackBehaviourBuilder<E> create() {
         return new AttackBehaviourBuilder<>();
