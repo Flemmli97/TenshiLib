@@ -28,6 +28,11 @@ public class TenshiLibCrossPlatImpl implements TenshiLibCrossPlat {
     }
 
     @Override
+    public boolean isModLoaded(String modid) {
+        return FabricLoader.getInstance().isModLoaded(modid);
+    }
+
+    @Override
     public MinecraftServer getCurrentServer() {
         return CURRENT_SERVER;
     }

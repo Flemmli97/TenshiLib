@@ -30,6 +30,11 @@ public interface TenshiLibCrossPlat {
     boolean isPhysicalClient();
 
     /**
+     * Returns true if the given mod is present
+     */
+    boolean isModLoaded(String modid);
+
+    /**
      * Returns the current server instance.
      */
     @Nullable
