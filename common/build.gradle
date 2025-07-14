@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    modCompileOnly "net.tslat.smartbrainlib:SmartBrainLib-common-${project.minecraft_version}:${project.sbl_version}"
+    modCompileOnly "net.tslat.smartbrainlib:SmartBrainLib-common-${minecraft_version}:${sbl_version}"
 }
 
 sourceSets.main.resources {
