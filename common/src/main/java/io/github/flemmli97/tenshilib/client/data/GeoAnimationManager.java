@@ -8,8 +8,10 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,11 +50,15 @@ public class GeoAnimationManager extends SimpleJsonResourceReloadListener {
             }
         });
         this.reloaded = true;
+        List<ResourceLocation> missing = new ArrayList<>();
         this.animations.keySet().forEach(id -> {
             if (!present.contains(id)) {
-                TenshiLib.LOGGER.error("Unable to locate animation {}!", id);
+                missing.add(id);
             }
         });
+        if (!missing.isEmpty()) {
+            throw new IllegalStateException("Following animations could not be found! " + missing);
+        }
     }
 
     public ReloadableCache<BedrockAnimations> getAnimation(ResourceLocation id) {

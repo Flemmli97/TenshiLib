@@ -9,8 +9,10 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -51,11 +53,15 @@ public class GeoModelManager extends SimpleJsonResourceReloadListener {
             }
         });
         this.reloaded = true;
+        List<ResourceLocation> missing = new ArrayList<>();
         this.models.keySet().forEach(id -> {
             if (!present.contains(id)) {
-                TenshiLib.LOGGER.error("Unable to locate model {}!", id);
+                missing.add(id);
             }
         });
+        if (!missing.isEmpty()) {
+            throw new IllegalStateException("Following models could not be found! " + missing);
+        }
     }
 
     public ReloadableCache<ModelPartsContainer> getModel(ResourceLocation id) {
