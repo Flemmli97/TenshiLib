@@ -6,6 +6,10 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Math parser able to create a math expression from a string.
+ * Just call {@link Expression#of}
+ */
 public class Expression {
 
     private static final String NUMBER = "\\d+(?:\\.\\d+)?";
@@ -22,13 +26,27 @@ public class Expression {
 
     public static ExpValue of(String exp) {
         exp = exp.replace(" ", "");
+        try {
+            // Quick resolve
+            double val = Double.parseDouble(exp);
+            if (val == 0)
+                return ExpValue.DEFAULT;
+            return new BuiltinValues.ConstantValue(val);
+        } catch (NumberFormatException ignored) {
+        }
         Stack<TokenHolder> output = shuntingYard(exp);
 
         Stack<ExpValue> vars = new Stack<>();
         for (TokenHolder op : output) {
             switch (op.type) {
-                case NUMBER -> vars.push(new BuiltinValues.ConstantValue(Float.parseFloat(op.token)));
-                case VAR -> vars.push(new BuiltinValues.VariableValue(variableEquivalent(op.token)));
+                case NUMBER -> vars.push(new BuiltinValues.ConstantValue(Double.parseDouble(op.token)));
+                case VAR -> {
+                    if (op.token.equals("pi") || op.token.equals("PI")) {
+                        vars.push(new BuiltinValues.ConstantValue(Math.PI));
+                    } else {
+                        vars.push(new BuiltinValues.VariableValue(variableEquivalent(op.token)));
+                    }
+                }
                 case SUB_UNARY -> {
                     ExpValue value = vars.pop();
                     vars.push(new BuiltinValues.NegativeValue(value));
@@ -61,7 +79,7 @@ public class Expression {
             }
         }
         if (vars.size() > 1)
-            throw new IllegalStateException("Not all tokens processed!");
+            throw new IllegalStateException("Not all tokens processed! Unable to parse expression " + exp);
         return vars.pop();
     }
 
@@ -75,8 +93,11 @@ public class Expression {
         Matcher matcher = PATTERN.matcher(exp);
         Type lastType = null;
         while (matcher.find()) {
-            String token = matcher.group();
+            String token = stripPrefix(matcher.group());
             Type type = Type.type(token, lastType);
+            if (lastType == Type.VAR && type == Type.BRACKETOPEN) {
+                throw new IllegalStateException("Unknown function '" + output.getLast().token + "'");
+            }
             switch (type) {
                 case NUMBER, VAR -> output.add(new TokenHolder(type, token));
                 case FUNC, BRACKETOPEN -> operators.add(new TokenHolder(type, token));
@@ -123,6 +144,12 @@ public class Expression {
         return output;
     }
 
+    private static String stripPrefix(String token) {
+        if (token.startsWith("math."))
+            return token.replaceFirst("math.", "");
+        return token;
+    }
+
     record TokenHolder(Type type, String token) {
 
     }
@@ -155,6 +182,8 @@ public class Expression {
         }
 
         public static Type type(String s, Type last) {
+            if (FunctionRegistry.has(s))
+                return Type.FUNC;
             return switch (s) {
                 case "," -> Type.DELIMITER;
                 case "+" -> {
@@ -173,10 +202,8 @@ public class Expression {
                 case "/" -> Type.DIV;
                 case "(" -> Type.BRACKETOPEN;
                 case ")" -> Type.BRACKETCLOSE;
-                case "math.sin", "sin", "math.cos", "cos", "math.abs", "abs" -> Type.FUNC;
-                case "math.pi" -> Type.VAR;
+                case "pi", "PI" -> Type.VAR;
                 default -> {
-
                     try {
                         Double.parseDouble(s);
                         yield Type.NUMBER;
@@ -201,6 +228,9 @@ public class Expression {
         ExpValue exp7 = of("math.sin(time*180)-17.5");
 
         ExpValue exp8 = of("math.sin(query.anim_time * 1200) * 6 * query.above_top_solid");
+        ExpValue exp9 = of("log(5) * sqrt(16) * pow(3,6) * pi");
+        ExpValue exp10 = of("rand(3,8)");
+        ExpValue exp11 = of("randInt(3,8)");
 
         System.out.println("Expression 0: " + exp0);
         verify(exp0.get(new VariableMap()), 15);
@@ -212,22 +242,28 @@ public class Expression {
         verify(exp3.get(new VariableMap()), -15);
 
         System.out.println("Expression 4: " + exp4);
-        verify(roundDecimal(exp4.get(new VariableMap().setVariable("query.anim_time", () -> 5)), 5), -0.49543);
+        verify(roundDecimal(exp4.get(new VariableMap().setVariable("query.anim_time", 5)), 5), -0.49543);
         System.out.println("Expression 5: " + exp5);
         verify(roundDecimal(exp5.get(new VariableMap()), 5), 98.98492);
         System.out.println("Expression 6: " + exp6);
-        verify(exp6.get(new VariableMap().setVariable("query.anim_time", () -> 0)), 17.5);
+        verify(exp6.get(new VariableMap().setVariable("query.anim_time", 0)), 17.5);
         System.out.println("Expression 7: " + exp7);
-        verify(exp7.get(new VariableMap().setVariable("query.anim_time", () -> 0)), -17.5);
+        verify(exp7.get(new VariableMap().setVariable("query.anim_time", 0)), -17.5);
 
         System.out.println("Expression 8: " + exp8);
-        verify(roundDecimal(exp8.get(new VariableMap().setVariable("query.anim_time", () -> 4)
-                .setVariable("query.above_top_solid", () -> 9)), 3), 46.765);
+        verify(roundDecimal(exp8.get(new VariableMap().setVariable("query.anim_time", 4)
+                .setVariable("query.above_top_solid", 9)), 3), 46.765);
+
+        System.out.println("Expression 9: " + exp9);
+        verify(roundDecimal(exp9.get(new VariableMap()), 3), 14743.874);
+
+        System.out.println("Expression 10: " + exp10 + " res " + exp10.get(new VariableMap()));
+        System.out.println("Expression 11: " + exp11 + " res " + exp11.get(new VariableMap()));
     }
 
     private static void verify(double value, double truth) {
         if (value != truth)
-            throw new IllegalStateException(String.format("Wrong value. Expected %s but was %s", truth, value));
+            throw new IllegalStateException(String.format("Wrong min. Expected %s but was %s", truth, value));
     }
 
     private static double roundDecimal(double value, int decimals) {

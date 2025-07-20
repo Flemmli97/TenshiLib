@@ -200,6 +200,10 @@ public class BedrockAnimations {
         return animation != null ? animation.length() : 0;
     }
 
+    public void setVariable(String variable, double value) {
+        this.variables.setVariable(variable, value);
+    }
+
     public void setVariable(String variable, DoubleSupplier value) {
         this.variables.setVariable(variable, value);
     }
@@ -231,7 +235,7 @@ public class BedrockAnimations {
         }
         if (modelPart == null)
             return;
-        this.variables.setVariable("query.anim_time", () -> actualTick * 0.05);
+        this.variables.setVariable("query.anim_time", actualTick * 0.05);
         float mirrorMult = (mirror ? -1 : 1);
         if (!bone.translations().isEmpty()) {
             if (bone.translations().size() == 1) {

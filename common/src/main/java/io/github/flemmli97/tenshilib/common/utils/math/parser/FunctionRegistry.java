@@ -24,9 +24,47 @@ public class FunctionRegistry {
             ExpValue value = stack.pop();
             return new BuiltinFunctions.Abs(value);
         });
+        builtin.put("min", stack -> {
+            ExpValue second = stack.pop();
+            ExpValue first = stack.pop();
+            return new BuiltinFunctions.Min(first, second);
+        });
+        builtin.put("max", stack -> {
+            ExpValue second = stack.pop();
+            ExpValue first = stack.pop();
+            return new BuiltinFunctions.Max(first, second);
+        });
+        builtin.put("sqrt", stack -> {
+            ExpValue value = stack.pop();
+            return new BuiltinFunctions.Sqrt(value);
+        });
+        builtin.put("log", stack -> {
+            ExpValue value = stack.pop();
+            return new BuiltinFunctions.Log(value);
+        });
+        builtin.put("pow", stack -> {
+            ExpValue exponent = stack.pop();
+            ExpValue base = stack.pop();
+            return new BuiltinFunctions.Power(base, exponent);
+        });
+        builtin.put("rand", stack -> {
+            ExpValue second = stack.pop();
+            ExpValue first = stack.pop();
+            return new BuiltinFunctions.Random(first, second);
+        });
+        builtin.put("randInt", stack -> {
+            ExpValue second = stack.pop();
+            ExpValue first = stack.pop();
+            return new BuiltinFunctions.RandomInt(first, second);
+        });
         return builtin;
     }
 
+    /**
+     * Registers a new function
+     * Use the provided stack to get access to the functions arguments
+     * Note that the stack is in reversed order so if you have a multi arg function popping the value returns the LAST arg
+     */
     public static synchronized void register(String identifier, Function<Stack<ExpValue>, ExpValue> func) {
         if (PARSER.put(identifier, func) != null) {
             throw new IllegalStateException("Function already registered: " + identifier);
