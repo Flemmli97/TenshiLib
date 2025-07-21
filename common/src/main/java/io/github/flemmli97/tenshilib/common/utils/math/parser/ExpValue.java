@@ -11,6 +11,10 @@ public interface ExpValue {
      */
     double get(VariableMap variables);
 
+    /**
+     * Computes the boolean value using the given variables
+     * Internally all booleans are represented as 1 (true) and 0 (false)
+     */
     default boolean asBool(VariableMap variables) {
         return this.get(variables) == 1;
     }

@@ -15,6 +15,11 @@ public class VariableMap {
 
     private RandomSource random = RandomSource.createNewThreadLocalInstance();
 
+    public VariableMap setVariable(String variable, boolean value) {
+        this.variables.put(variable, value ? 1 : 0);
+        return this;
+    }
+
     public VariableMap setVariable(String variable, double value) {
         this.variables.put(variable, value);
         return this;

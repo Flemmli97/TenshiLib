@@ -2,6 +2,7 @@ package io.github.flemmli97.tenshilib.common.utils.math.parser.impl.operators;
 
 import io.github.flemmli97.tenshilib.common.utils.math.parser.ExpValue;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.operators.logic.And;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.operators.logic.Condition;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.operators.logic.Equals;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.operators.logic.Greater;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.operators.logic.GreaterThan;
@@ -95,6 +96,11 @@ public class Operators {
             ExpValue sec = vars.pop();
             ExpValue first = vars.pop();
             vars.push(new Or(first, sec));
+        });
+        builtin.put("?:", vars -> {
+            ExpValue then = vars.pop();
+            ExpValue condition = vars.pop();
+            vars.push(new Condition(condition, then));
         });
         return builtin;
     }

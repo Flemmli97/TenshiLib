@@ -4,7 +4,6 @@ import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.common.data.AnimationDataManager;
 import io.github.flemmli97.tenshilib.common.entity.ai.brain.memory.MoreMemoryModules;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
-import io.github.flemmli97.tenshilib.common.utils.math.parser.Expression;
 import io.github.flemmli97.tenshilib.neoforge.client.events.ClientEvents;
 import io.github.flemmli97.tenshilib.neoforge.client.events.PatreonClientSetup;
 import io.github.flemmli97.tenshilib.neoforge.events.CommonEvents;
@@ -23,7 +22,6 @@ import net.neoforged.neoforge.event.AddReloadListenerEvent;
 public class TenshiLibNeoForge {
 
     public TenshiLibNeoForge(IEventBus modBus) {
-        Expression.test();
         IEventBus eventBus = NeoForge.EVENT_BUS;
         modBus.addListener(TenshiLibNeoForge::preInit);
         modBus.addListener(PacketHandler::register);
