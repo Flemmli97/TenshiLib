@@ -1,5 +1,20 @@
 package io.github.flemmli97.tenshilib.common.utils.math.parser;
 
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.ACos;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.ASin;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.ATan;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.ATan2;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Abs;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Cos;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Log;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Max;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Min;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Random;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.RandomInt;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Sin;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Sqrt;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Tan;
+
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,48 +29,64 @@ public class FunctionRegistry {
         Map<String, Function<Stack<ExpValue>, ExpValue>> builtin = new HashMap<>();
         builtin.put("sin", stack -> {
             ExpValue value = stack.pop();
-            return new BuiltinFunctions.Sin(value);
+            return new Sin(value);
+        });
+        builtin.put("asin", stack -> {
+            ExpValue value = stack.pop();
+            return new ASin(value);
         });
         builtin.put("cos", stack -> {
             ExpValue value = stack.pop();
-            return new BuiltinFunctions.Cos(value);
+            return new Cos(value);
+        });
+        builtin.put("acos", stack -> {
+            ExpValue value = stack.pop();
+            return new ACos(value);
+        });
+        builtin.put("tan", stack -> {
+            ExpValue value = stack.pop();
+            return new Tan(value);
+        });
+        builtin.put("atan", stack -> {
+            ExpValue value = stack.pop();
+            return new ATan(value);
+        });
+        builtin.put("atan2", stack -> {
+            ExpValue b = stack.pop();
+            ExpValue a = stack.pop();
+            return new ATan2(a, b);
         });
         builtin.put("abs", stack -> {
             ExpValue value = stack.pop();
-            return new BuiltinFunctions.Abs(value);
+            return new Abs(value);
         });
         builtin.put("min", stack -> {
             ExpValue second = stack.pop();
             ExpValue first = stack.pop();
-            return new BuiltinFunctions.Min(first, second);
+            return new Min(first, second);
         });
         builtin.put("max", stack -> {
             ExpValue second = stack.pop();
             ExpValue first = stack.pop();
-            return new BuiltinFunctions.Max(first, second);
+            return new Max(first, second);
         });
         builtin.put("sqrt", stack -> {
             ExpValue value = stack.pop();
-            return new BuiltinFunctions.Sqrt(value);
+            return new Sqrt(value);
         });
-        builtin.put("log", stack -> {
+        builtin.put("ln", stack -> {
             ExpValue value = stack.pop();
-            return new BuiltinFunctions.Log(value);
+            return new Log(value);
         });
-        builtin.put("pow", stack -> {
-            ExpValue exponent = stack.pop();
-            ExpValue base = stack.pop();
-            return new BuiltinFunctions.Power(base, exponent);
-        });
-        builtin.put("rand", stack -> {
+        builtin.put("random", stack -> {
             ExpValue second = stack.pop();
             ExpValue first = stack.pop();
-            return new BuiltinFunctions.Random(first, second);
+            return new Random(first, second);
         });
-        builtin.put("randInt", stack -> {
+        builtin.put("random_integer", stack -> {
             ExpValue second = stack.pop();
             ExpValue first = stack.pop();
-            return new BuiltinFunctions.RandomInt(first, second);
+            return new RandomInt(first, second);
         });
         return builtin;
     }

@@ -1,8 +1,12 @@
 package io.github.flemmli97.tenshilib.common.utils.math.parser;
 
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.BuiltinValues;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.operators.Operators;
 import org.jetbrains.annotations.TestOnly;
 
+import java.util.Random;
 import java.util.Stack;
+import java.util.function.BiPredicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,9 +18,9 @@ public class Expression {
 
     private static final String NUMBER = "\\d+(?:\\.\\d+)?";
     private static final String VARIABLE = "(?<!\\.)[A-z][A-z._]*";
-    private static final String OPERATOR = "[*/+\\-%()]";
+    private static final String OPERATOR = Operators.regex() + "|[()]";
 
-    private static final Pattern PATTERN = Pattern.compile(String.format("(?:%1$s)|(?:%2$s)|(?:%3$s)|,", NUMBER, VARIABLE, OPERATOR));
+    private static final Pattern PATTERN = Pattern.compile(String.format("(?:%1$s)|(?:%2$s)|%3$s|,", NUMBER, VARIABLE, OPERATOR));
 
     private static String variableEquivalent(String variable) {
         if (variable.equals("anim_time") || variable.equals("time"))
@@ -47,30 +51,23 @@ public class Expression {
                         vars.push(new BuiltinValues.VariableValue(variableEquivalent(op.token)));
                     }
                 }
-                case SUB_UNARY -> {
-                    ExpValue value = vars.pop();
-                    vars.push(new BuiltinValues.NegativeValue(value));
+                case UNARY_OP -> {
+                    switch (op.token) {
+                        case "-" -> {
+                            ExpValue value = vars.pop();
+                            vars.push(new BuiltinValues.NegativeValue(value));
+                        }
+                        case "+" -> {
+                            ExpValue value = vars.pop();
+                            vars.push(value);
+                        }
+                        case "!" -> {
+                            ExpValue value = vars.pop();
+                            vars.push(new BuiltinValues.NegatedValue(value));
+                        }
+                    }
                 }
-                case ADD -> {
-                    ExpValue sec = vars.pop();
-                    ExpValue first = vars.pop();
-                    vars.push(new BuiltinValues.Addition(first, sec));
-                }
-                case SUB -> {
-                    ExpValue sec = vars.pop();
-                    ExpValue first = vars.pop();
-                    vars.push(new BuiltinValues.Substraction(first, sec));
-                }
-                case MULT -> {
-                    ExpValue sec = vars.pop();
-                    ExpValue first = vars.pop();
-                    vars.push(new BuiltinValues.Multiplication(first, sec));
-                }
-                case DIV -> {
-                    ExpValue sec = vars.pop();
-                    ExpValue first = vars.pop();
-                    vars.push(new BuiltinValues.Division(first, sec));
-                }
+                case BINARY_OP -> Operators.get(op.token, vars);
                 case FUNC -> {
                     ExpValue value = FunctionRegistry.tryConstruct(op.token, vars);
                     if (value != null)
@@ -91,16 +88,16 @@ public class Expression {
         Stack<TokenHolder> operators = new Stack<>();
 
         Matcher matcher = PATTERN.matcher(exp);
-        Type lastType = null;
+        TokenHolder lastType = null;
         while (matcher.find()) {
             String token = stripPrefix(matcher.group());
-            Type type = Type.type(token, lastType);
-            if (lastType == Type.VAR && type == Type.BRACKETOPEN) {
+            TokenHolder holder = TokenHolder.of(token, lastType);
+            if (lastType != null && lastType.type() == Type.VAR && holder.type() == Type.BRACKETOPEN) {
                 throw new IllegalStateException("Unknown function '" + output.getLast().token + "'");
             }
-            switch (type) {
-                case NUMBER, VAR -> output.add(new TokenHolder(type, token));
-                case FUNC, BRACKETOPEN -> operators.add(new TokenHolder(type, token));
+            switch (holder.type()) {
+                case NUMBER, VAR -> output.add(holder);
+                case FUNC, BRACKETOPEN -> operators.add(holder);
                 case DELIMITER -> {
                     while (!operators.empty() && operators.peek().type != Type.BRACKETOPEN) {
                         output.add(operators.pop());
@@ -111,33 +108,33 @@ public class Expression {
                         output.add(operators.pop());
                     }
                     if (operators.empty()) {
-                        throw new IllegalArgumentException("Mismatched brackets!");
+                        throw new IllegalStateException("Mismatched brackets!");
                     }
                     operators.pop();
                     if (operators.peek().type == Type.FUNC) {
                         output.add(operators.pop());
                     }
                 }
-                case MULT, DIV, ADD, SUB, ADD_UNARY, SUB_UNARY -> {
+                case UNARY_OP, BINARY_OP -> {
                     TokenHolder op;
                     while (!operators.empty() && (op = operators.peek()).type.isOp()) {
-                        if (type.args == 1 && op.type.args == 2) {
+                        if (holder.type().args == 1 && op.type().args == 2) {
                             break;
-                        } else if (type.priority <= op.type.priority) {
+                        } else if (holder.precedence() <= op.precedence()) {
                             output.add(operators.pop());
                         } else {
                             break;
                         }
                     }
-                    operators.add(new TokenHolder(type, token));
+                    operators.add(holder);
                 }
             }
-            lastType = type;
+            lastType = holder;
         }
         while (!operators.empty()) {
             TokenHolder op = operators.pop();
             if (op.type == Type.BRACKETOPEN || op.type == Type.BRACKETCLOSE) {
-                throw new IllegalArgumentException("Mismatched brackets!");
+                throw new IllegalStateException("Mismatched brackets!");
             }
             output.push(op);
         }
@@ -150,115 +147,117 @@ public class Expression {
         return token;
     }
 
-    record TokenHolder(Type type, String token) {
+    record TokenHolder(Type type, int precedence, String token) {
 
-    }
-
-    enum Type {
-        NUMBER(0, 0),
-        VAR(0, 0),
-        MULT(10, 2),
-        DIV(10, 2),
-        ADD(5, 2),
-        SUB(5, 2),
-        SUB_UNARY(100, 1),
-        ADD_UNARY(100, 1),
-        FUNC(0, -1),
-        BRACKETOPEN(999, 0),
-        BRACKETCLOSE(999, 0),
-        DELIMITER(0, 0);
-
-        public final int priority;
-        public final int args;
-
-        Type(int priority, int args) {
-            this.priority = priority;
-            this.args = args;
-        }
-
-        public boolean isOp() {
-            return this == MULT || this == DIV || this == ADD || this == SUB ||
-                    this == SUB_UNARY || this == ADD_UNARY;
-        }
-
-        public static Type type(String s, Type last) {
-            if (FunctionRegistry.has(s))
-                return Type.FUNC;
-            return switch (s) {
-                case "," -> Type.DELIMITER;
-                case "+" -> {
-                    if (last == null || last.args == 2 || last == Type.BRACKETOPEN || last == Type.DELIMITER) {
-                        yield Type.ADD_UNARY;
+        public static TokenHolder of(String token, TokenHolder last) {
+            if (FunctionRegistry.has(token))
+                return new TokenHolder(Type.FUNC, 100, token);
+            return switch (token) {
+                case "," -> new TokenHolder(Type.DELIMITER, 0, token);
+                case "^" -> new TokenHolder(Type.BINARY_OP, 12, token);
+                case "*", "/", "%" -> new TokenHolder(Type.BINARY_OP, 11, token);
+                case "+", "-", "!" -> {
+                    if (last == null || last.type().args == 2 || last.type() == Type.BRACKETOPEN || last.type() == Type.DELIMITER) {
+                        yield new TokenHolder(Type.UNARY_OP, 100, token);
                     }
-                    yield Type.ADD;
+                    yield new TokenHolder(Type.BINARY_OP, 10, token);
                 }
-                case "-" -> {
-                    if (last == null || last.args == 2 || last == Type.BRACKETOPEN || last == Type.DELIMITER) {
-                        yield Type.SUB_UNARY;
-                    }
-                    yield Type.SUB;
-                }
-                case "*" -> Type.MULT;
-                case "/" -> Type.DIV;
-                case "(" -> Type.BRACKETOPEN;
-                case ")" -> Type.BRACKETCLOSE;
-                case "pi", "PI" -> Type.VAR;
+                case "<", "<=", ">", ">=" -> new TokenHolder(Type.BINARY_OP, 9, token);
+                case "==", "!=" -> new TokenHolder(Type.BINARY_OP, 8, token);
+                case "&&" -> new TokenHolder(Type.BINARY_OP, 7, token);
+                case "||" -> new TokenHolder(Type.BINARY_OP, 6, token);
+                case "?", ":" -> new TokenHolder(Type.TERNARY_OP, 5, token);
+
+                case "(" -> new TokenHolder(Type.BRACKETOPEN, 0, token);
+                case ")" -> new TokenHolder(Type.BRACKETCLOSE, 0, token);
+                case "pi", "PI" -> new TokenHolder(Type.VAR, 0, token);
                 default -> {
                     try {
-                        Double.parseDouble(s);
-                        yield Type.NUMBER;
+                        Double.parseDouble(token);
+                        yield new TokenHolder(Type.NUMBER, 0, token);
                     } catch (NumberFormatException ignored) {
                     }
-                    yield Type.VAR;
+                    yield new TokenHolder(Type.VAR, 0, token);
                 }
             };
         }
     }
 
+    enum Type {
+        NUMBER(0),
+        VAR(0),
+        UNARY_OP(1),
+        BINARY_OP(2),
+        TERNARY_OP(3),
+        FUNC(-1),
+        BRACKETOPEN(0),
+        BRACKETCLOSE(0),
+        DELIMITER(0);
+
+        public final int args;
+
+        Type(int args) {
+            this.args = args;
+        }
+
+        public boolean isOp() {
+            return this == UNARY_OP || this == BINARY_OP || this == TERNARY_OP;
+        }
+    }
+
     @TestOnly
     public static void test() {
-        ExpValue exp0 = of("2*4+7");
-        ExpValue exp1 = of("5+7+3+1*6*3+9");
-        ExpValue exp2 = of("5+(44+1)*4*1/6+99");
-        ExpValue exp3 = of("-5+5+(-3*5)");
+        verify("2*4+7", new VariableMap(), 0, 15);
+        verify("5+7+3+1*6*3+9", new VariableMap(), 0, 42);
+        verify("5+(44+1)*4*1/6+99", new VariableMap(), 0, 134);
+        verify("-5+5+(-3*5)", new VariableMap(), 0, -15);
 
-        ExpValue exp4 = of("math.sin(time*(44+1)+3)*4*1/6");
-        ExpValue exp5 = of("99*math.cos(1)");
-        ExpValue exp6 = of("-math.sin(time*180)+17.5");
-        ExpValue exp7 = of("math.sin(time*180)-17.5");
+        verify("math.sin(time*(44+1)+3)*4*1/6", new VariableMap().setVariable("query.anim_time", 5), 5, -0.49543);
+        verify("99*math.cos(1)", new VariableMap(), 5, 98.98492);
+        verify("-math.sin(time*180)+17.5", new VariableMap().setVariable("query.anim_time", 0), 0, 17.5);
+        verify("math.sin(time*180)-17.5", new VariableMap().setVariable("query.anim_time", 0), 0, -17.5);
 
-        ExpValue exp8 = of("math.sin(query.anim_time * 1200) * 6 * query.above_top_solid");
-        ExpValue exp9 = of("log(5) * sqrt(16) * pow(3,6) * pi");
-        ExpValue exp10 = of("rand(3,8)");
-        ExpValue exp11 = of("randInt(3,8)");
+        verify("math.sin(query.anim_time * 1200) * 6 * query.above_top_solid", new VariableMap().setVariable("query.anim_time", 4)
+                .setVariable("query.above_top_solid", 9), 3, 46.765);
+        verify("ln(5) * sqrt(16) * 3^6 * pi", new VariableMap(), 3, 14743.874);
+        verify("5 % 3", new VariableMap(), 0, 2);
+        verify("5 % 7", new VariableMap(), 0, 5);
 
-        System.out.println("Expression 0: " + exp0);
-        verify(exp0.get(new VariableMap()), 15);
-        System.out.println("Expression 1: " + exp1);
-        verify(exp1.get(new VariableMap()), 42);
-        System.out.println("Expression 2: " + exp2);
-        verify(exp2.get(new VariableMap()), 134);
-        System.out.println("Expression 3: " + exp3);
-        verify(exp3.get(new VariableMap()), -15);
-
-        System.out.println("Expression 4: " + exp4);
-        verify(roundDecimal(exp4.get(new VariableMap().setVariable("query.anim_time", 5)), 5), -0.49543);
-        System.out.println("Expression 5: " + exp5);
-        verify(roundDecimal(exp5.get(new VariableMap()), 5), 98.98492);
-        System.out.println("Expression 6: " + exp6);
-        verify(exp6.get(new VariableMap().setVariable("query.anim_time", 0)), 17.5);
-        System.out.println("Expression 7: " + exp7);
-        verify(exp7.get(new VariableMap().setVariable("query.anim_time", 0)), -17.5);
-
-        System.out.println("Expression 8: " + exp8);
-        verify(roundDecimal(exp8.get(new VariableMap().setVariable("query.anim_time", 4)
-                .setVariable("query.above_top_solid", 9)), 3), 46.765);
-
-        System.out.println("Expression 9: " + exp9);
-        verify(roundDecimal(exp9.get(new VariableMap()), 3), 14743.874);
-
+        ExpValue exp10 = of("random(3,8)");
         System.out.println("Expression 10: " + exp10 + " res " + exp10.get(new VariableMap()));
+        ExpValue exp11 = of("random_integer(3,8)");
         System.out.println("Expression 11: " + exp11 + " res " + exp11.get(new VariableMap()));
+
+        verify("5 == 5", new VariableMap(), 0, 1);
+        verify("5 == 6", new VariableMap(), 0, 0);
+        verify("5 != 6", new VariableMap(), 0, 1);
+        verifyBool("<", new VariableMap(), 1000, 20, (f, s) -> f < s);
+        verifyBool("<=", new VariableMap(), 10, 40, (f, s) -> f <= s);
+        verifyBool(">", new VariableMap(), 1000, 20, (f, s) -> f > s);
+        verifyBool(">=", new VariableMap(), 10, 40, (f, s) -> f >= s);
+        verify("5 == 6 || 5 == 5", new VariableMap(), 0, 1);
+        verify("5 == 6 || 5 == 7", new VariableMap(), 0, 0);
+        verify("5 == 6 && 5 == 5", new VariableMap(), 0, 0);
+        verify("5 == 5 && 3 <= 3", new VariableMap(), 0, 1);
+    }
+
+    private static void verifyBool(String op, VariableMap vars, int bounds, int amount, BiPredicate<Integer, Integer> check) {
+        for (int i = 0; i < amount; i++) {
+            int first = new Random().nextInt(bounds);
+            int second = new Random().nextInt(bounds);
+            ExpValue expression = Expression.of(first + op + second);
+            System.out.println("Evaluating expression: " + first + op + second + "\nParsed: " + expression);
+            verify(expression.get(vars), check.test(first, second) ? 1 : 0);
+        }
+    }
+
+    private static void verify(String input, VariableMap vars, int decimals, double truth) {
+        ExpValue expression = Expression.of(input);
+        System.out.println("Evaluating expression: " + input + "\nParsed: " + expression);
+        if (decimals == 0)
+            verify(expression.get(vars), truth);
+        else
+            verify(roundDecimal(expression.get(vars), decimals), truth);
     }
 
     private static void verify(double value, double truth) {
