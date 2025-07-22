@@ -1,3 +1,7 @@
+TenshiLib 2.1.0
+================
+- Adding a whole bunch more to the math parser
+
 TenshiLib 2.0.0
 ================
 - Added all changes from 1.18 branch v 1.9.0+
