@@ -1,12 +1,13 @@
 package io.github.flemmli97.tenshilib.common.utils;
 
-import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Inventory;
@@ -43,20 +44,41 @@ public class ItemUtils {
         return d1 > d2;
     }
 
-    public static double damageRaw(ItemStack stack) {
-        AttributeInstance m = new AttributeInstance(Attributes.ATTACK_DAMAGE, (inst) -> {
+    @SuppressWarnings("deprecation")
+    public static double attribute(ItemAttributeModifiers modifiers, Holder<Attribute> attribute, double base, EquipmentSlotGroup... groups) {
+        AttributeInstance instance = new AttributeInstance(attribute, i -> {
         });
-        ItemAttributeModifiers stackMod = stack.get(DataComponents.ATTRIBUTE_MODIFIERS);
-        if (stackMod != null)
-            stackMod.forEach(EquipmentSlot.MAINHAND, (attr, mod) -> {
-                if (attr.equals(Attributes.ATTACK_DAMAGE))
-                    m.addTransientModifier(mod);
-            });
-        return Attributes.ATTACK_DAMAGE.value().sanitizeValue(m.getValue());
+        instance.setBaseValue(base);
+        if (modifiers != null) {
+            for (EquipmentSlotGroup group : groups) {
+                modifiers.forEach(group, (attr, mod) -> {
+                    if (attr.is(attribute))
+                        instance.addTransientModifier(mod);
+                });
+            }
+        }
+        return attribute.value().sanitizeValue(instance.getValue());
+    }
+
+    @SuppressWarnings("deprecation")
+    public static double attribute(ItemStack stack, Holder<Attribute> attribute, double base, EquipmentSlotGroup... groups) {
+        AttributeInstance instance = new AttributeInstance(attribute, i -> {
+        });
+        instance.setBaseValue(base);
+        if (stack != null) {
+            for (EquipmentSlotGroup group : groups) {
+                stack.forEachModifier(group, (attr, mod) -> {
+                    if (attr.is(attribute))
+                        instance.addTransientModifier(mod);
+                });
+            }
+        }
+        return attribute.value().sanitizeValue(instance.getValue());
     }
 
     public static double damage(LivingEntity holder, @Nullable LivingEntity target, ItemStack stack) {
-        double dmg = damageRaw(stack);
+        AttributeInstance attribute = holder.getAttribute(Attributes.ATTACK_DAMAGE);
+        double dmg = attribute(stack, Attributes.ATTACK_DAMAGE, attribute != null ? attribute.getValue() : 1, EquipmentSlotGroup.MAINHAND);
         DamageSource damageSource = holder.damageSources().mobAttack(holder);
         if (stack.getItem() instanceof BowItem)
             damageSource = holder.damageSources().arrow(EntityType.ARROW.create(holder.level()), holder);
