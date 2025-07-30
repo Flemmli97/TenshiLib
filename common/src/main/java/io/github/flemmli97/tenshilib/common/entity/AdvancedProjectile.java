@@ -317,7 +317,7 @@ public abstract class AdvancedProjectile extends Projectile {
     }
 
     protected boolean canHit(Entity target) {
-        if (target.isSpectator() || !target.isAlive() || !target.isPickable()) {
+        if (target.isSpectator() || !target.isAlive() || !target.isPickable() || this.checkedEntities.contains(target.getUUID())) {
             return false;
         }
         Entity entity = this.getOwner();
@@ -325,10 +325,7 @@ public abstract class AdvancedProjectile extends Projectile {
             return true;
         if (entity.isPassengerOfSameVehicle(target) || TenshiLibCrossPlat.INSTANCE.isSameMultipart(target, this.getOwner()))
             return false;
-        if (target.equals(this.getOwner()) && (!this.canHitShooter() || this.tickCount < 5)) {
-            return false;
-        }
-        return !this.checkedEntities.contains(target.getUUID());
+        return !target.equals(this.getOwner()) || (this.canHitShooter() && this.tickCount >= 5);
     }
 
     protected EntityHitResult getEntityHit(Vec3 from, Vec3 to) {
