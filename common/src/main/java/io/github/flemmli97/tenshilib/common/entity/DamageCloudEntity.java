@@ -27,17 +27,17 @@ public abstract class DamageCloudEntity extends Entity implements TraceableEntit
     protected int livingTicks;
     private int attackedEntities = 0;
 
-    public DamageCloudEntity(EntityType<? extends DamageCloudEntity> type, Level world) {
-        super(type, world);
+    public DamageCloudEntity(EntityType<? extends DamageCloudEntity> type, Level level) {
+        super(type, level);
     }
 
-    public DamageCloudEntity(EntityType<? extends DamageCloudEntity> type, Level world, double x, double y, double z) {
-        this(type, world);
+    public DamageCloudEntity(EntityType<? extends DamageCloudEntity> type, Level level, double x, double y, double z) {
+        this(type, level);
         this.setPos(x, y, z);
     }
 
-    public DamageCloudEntity(EntityType<? extends DamageCloudEntity> type, Level world, LivingEntity shooter) {
-        this(type, world, shooter.getX(), shooter.getY(), shooter.getZ());
+    public DamageCloudEntity(EntityType<? extends DamageCloudEntity> type, Level level, LivingEntity shooter) {
+        this(type, level, shooter.getX(), shooter.getY(), shooter.getZ());
         this.shooter = shooter;
         this.entityData.set(SHOOTER_UUID, Optional.of(shooter.getUUID()));
         this.setRot(shooter.getYRot(), shooter.getXRot());

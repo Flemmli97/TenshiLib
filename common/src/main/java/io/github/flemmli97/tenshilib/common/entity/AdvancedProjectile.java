@@ -49,17 +49,17 @@ public abstract class AdvancedProjectile extends Projectile {
     protected BlockState groundState;
     protected BlockPos groundPos;
 
-    public AdvancedProjectile(EntityType<? extends AdvancedProjectile> type, Level world) {
-        super(type, world);
+    public AdvancedProjectile(EntityType<? extends AdvancedProjectile> type, Level level) {
+        super(type, level);
     }
 
-    public AdvancedProjectile(EntityType<? extends AdvancedProjectile> type, Level world, double x, double y, double z) {
-        this(type, world);
+    public AdvancedProjectile(EntityType<? extends AdvancedProjectile> type, Level level, double x, double y, double z) {
+        this(type, level);
         this.setPos(x, y, z);
     }
 
-    public AdvancedProjectile(EntityType<? extends AdvancedProjectile> type, Level world, LivingEntity shooter) {
-        this(type, world, shooter.getX(), shooter.getY() + shooter.getEyeHeight() - 0.1, shooter.getZ());
+    public AdvancedProjectile(EntityType<? extends AdvancedProjectile> type, Level level, LivingEntity shooter) {
+        this(type, level, shooter.getX(), shooter.getY() + shooter.getEyeHeight() - 0.1, shooter.getZ());
         this.shooter = shooter;
         this.entityData.set(SHOOTER_UUID, Optional.of(shooter.getUUID()));
         this.setRot(shooter.getYRot(), shooter.getXRot());

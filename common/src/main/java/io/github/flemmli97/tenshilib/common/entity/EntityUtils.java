@@ -20,19 +20,19 @@ import java.util.function.Predicate;
 public class EntityUtils {
 
     @Nullable
-    public static <T extends Entity> T findFromUUID(Class<T> clss, Level world, UUID uuid) {
-        return findFromUUID(clss, world, uuid, t -> true);
+    public static <T extends Entity> T findFromUUID(Class<T> clss, Level level, UUID uuid) {
+        return findFromUUID(clss, level, uuid, t -> true);
     }
 
     @SuppressWarnings("unchecked")
     @Nullable
-    public static <T extends Entity> T findFromUUID(Class<T> clss, Level world, UUID uuid, Predicate<T> pred) {
-        if (world instanceof ServerLevel) {
-            Entity e = ((ServerLevel) world).getEntity(uuid);
+    public static <T extends Entity> T findFromUUID(Class<T> clss, Level level, UUID uuid, Predicate<T> pred) {
+        if (level instanceof ServerLevel) {
+            Entity e = ((ServerLevel) level).getEntity(uuid);
             if (e != null && clss.isAssignableFrom(e.getClass()) && pred.test((T) e))
                 return (T) e;
         } else {
-            for (Entity e : ((ClientLevel) world).entitiesForRendering()) {
+            for (Entity e : ((ClientLevel) level).entitiesForRendering()) {
                 if (e.getUUID().equals(uuid) && clss.isAssignableFrom(e.getClass()) && pred.test((T) e))
                     return (T) e;
             }
@@ -69,26 +69,26 @@ public class EntityUtils {
      * Null if it was not possible
      */
     @Nullable
-    public static BlockPos randomPosAround(Level world, Entity e, BlockPos pos, int range, boolean grounded, Random rand) {
+    public static BlockPos randomPosAround(Level level, Entity entity, BlockPos pos, int range, boolean grounded, Random rand) {
         int randX = pos.getX() + rand.nextInt(2 * range) - range;
         int randY = pos.getY() + rand.nextInt(2 * range) - range;
         int randZ = pos.getZ() + rand.nextInt(2 * range) - range;
         if (!grounded) {
             BlockPos pos1 = new BlockPos(randX, randY, randZ);
-            while (Math.abs(randY - pos1.getY()) < range && !world.noCollision(e.getBoundingBox().move(pos1))) {
+            while (Math.abs(randY - pos1.getY()) < range && !level.noCollision(entity.getBoundingBox().move(pos1))) {
                 pos1 = pos1.above();
             }
-            if (!world.noCollision(e.getBoundingBox().move(pos1)))
+            if (!level.noCollision(entity.getBoundingBox().move(pos1)))
                 return null;
             return pos1;
         }
         int y = pos.getY() - range;
         BlockPos pos1 = new BlockPos(randX, y, randZ);
-        while (pos1.getY() - y < range && (!world.getBlockState(pos1.below()).entityCanStandOnFace(world, pos1.below(), e, Direction.UP)
-                || !world.noCollision(e.getBoundingBox().move(pos1)))) {
+        while (pos1.getY() - y < range && (!level.getBlockState(pos1.below()).entityCanStandOnFace(level, pos1.below(), entity, Direction.UP)
+                || !level.noCollision(entity.getBoundingBox().move(pos1)))) {
             pos1 = pos1.above();
         }
-        if (!world.noCollision(e.getBoundingBox().move(pos1)))
+        if (!level.noCollision(entity.getBoundingBox().move(pos1)))
             return null;
         return pos1;
     }

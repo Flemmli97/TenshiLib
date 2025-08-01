@@ -36,18 +36,18 @@ public abstract class BeamEntity extends Entity implements TraceableEntity {
 
     protected OrientedBoundingBox hitObb;
 
-    public BeamEntity(EntityType<? extends BeamEntity> type, Level world) {
-        super(type, world);
+    public BeamEntity(EntityType<? extends BeamEntity> type, Level level) {
+        super(type, level);
         this.noCulling = true;
     }
 
-    public BeamEntity(EntityType<? extends BeamEntity> type, Level world, double x, double y, double z) {
-        this(type, world);
+    public BeamEntity(EntityType<? extends BeamEntity> type, Level level, double x, double y, double z) {
+        this(type, level);
         this.setPos(x, y, z);
     }
 
-    public BeamEntity(EntityType<? extends BeamEntity> type, Level world, LivingEntity shooter) {
-        this(type, world, shooter.getX(), shooter.getY() + shooter.getEyeHeight() - 0.1, shooter.getZ());
+    public BeamEntity(EntityType<? extends BeamEntity> type, Level level, LivingEntity shooter) {
+        this(type, level, shooter.getX(), shooter.getY() + shooter.getEyeHeight() - 0.1, shooter.getZ());
         this.shooter = shooter;
         this.entityData.set(SHOOTER_UUID, Optional.of(shooter.getUUID()));
         this.setRot(shooter.yHeadRot, shooter.getXRot());
