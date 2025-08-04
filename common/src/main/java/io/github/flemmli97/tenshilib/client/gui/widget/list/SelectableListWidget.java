@@ -34,16 +34,18 @@ public class SelectableListWidget extends AbstractWidget {
         this.font = font;
         this.entries = entries;
         this.selected = new boolean[this.entries.size()];
-        this.entryHeight = this.font.lineHeight + 3 + this.paddingY;
-        this.entries.forEach(e -> e.updateDimensions(this.width, this.entryHeight));
-        this.limit = height / this.entryHeight;
+        this.setEntryHeight(this.font.lineHeight + 3, this.paddingY);
+    }
+
+    public SelectableListWidget setEntryHeight(int height, int paddingY) {
+        this.entryHeight = height;
+        this.entries.forEach(e -> e.updateDimensions(this.getEntryWidth(), this.entryHeight));
+        return this.withPadding(paddingY);
     }
 
     public SelectableListWidget withPadding(int paddingY) {
         this.paddingY = paddingY;
-        this.entryHeight = this.font.lineHeight + 3 + this.paddingY;
-        this.entries.forEach(e -> e.updateDimensions(this.getEntryWidth(), this.entryHeight));
-        this.limit = this.height / this.entryHeight;
+        this.limit = (this.height + this.paddingY) / (this.entryHeight + this.paddingY);
         return this;
     }
 
@@ -70,7 +72,7 @@ public class SelectableListWidget extends AbstractWidget {
     @Override
     public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         if (this.background != null) {
-            graphics.blit(this.background, this.getX(), this.getY(), 0, 0, this.width, this.height);
+            graphics.blitSprite(this.background, this.getX(), this.getY(), this.width, this.height);
         }
         this.hoverOver(this.isHovered ? this.indexFromMouse(mouseX, mouseY) : -1);
         for (int i = 0; i < this.entries.size(); i++) {
@@ -80,7 +82,7 @@ public class SelectableListWidget extends AbstractWidget {
             SelectableEntry entry = this.entries.get(idxx);
             boolean selected = this.selected[idxx];
             boolean hovered = this.hovered == idxx;
-            int entryY = this.getY() + i * this.entryHeight;
+            int entryY = this.getY() + i * (this.entryHeight + this.paddingY);
             entry.render(this, graphics, mouseX, mouseY, partialTick, this.getX(), entryY, selected, hovered);
         }
         if (this.scrollbar != null) {
@@ -108,7 +110,7 @@ public class SelectableListWidget extends AbstractWidget {
         if (i != -1) {
             this.hoverOver(i);
             int entryX = this.getX();
-            int entryY = this.getY() + i * this.entryHeight;
+            int entryY = this.getY() + i * (this.entryHeight + this.paddingY);
             double relMouseX = mouseX - entryX;
             double relMouseY = mouseY - entryY;
             SelectableEntry entry = this.select(this.hovered, true);
@@ -140,8 +142,12 @@ public class SelectableListWidget extends AbstractWidget {
         double relativePos = mouseY - this.getY();
         if (relativePos < 0 || relativePos > this.getY() + this.height)
             return -1;
-        int idx = (int) (relativePos / this.entryHeight + this.offset);
+        int idx = (int) (relativePos / (this.entryHeight + this.paddingY) + this.offset);
         if (idx >= this.entries.size() || idx >= this.offset + this.limit)
+            return -1;
+        // Ignore padding space
+        int entryY = (idx - this.offset) * (this.entryHeight + this.paddingY);
+        if (relativePos < entryY || relativePos > entryY + this.entryHeight)
             return -1;
         return idx;
     }
@@ -182,6 +188,14 @@ public class SelectableListWidget extends AbstractWidget {
         if (previous && !this.selected[this.hovered])
             entry.unSelect();
         return entry;
+    }
+
+    public void scrollTo(int offset) {
+        this.offset = Mth.clamp(offset, 0, Math.max(this.entries.size() - this.limit, 0));
+    }
+
+    public int getScrollValue() {
+        return this.offset;
     }
 
     public Font getFont() {
