@@ -23,11 +23,13 @@ public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehav
 
     private AnimationTickHandler<E> onAnimating;
 
+    private OnStart<E> onStartCallback;
+    private OnContinue<E> onContinueCallback;
+
+    private AnimationPlayHolder<E> selected;
     private List<AnimationPlayHolder.AnimationHolder> chainedAnimations;
     private int chainedIndex;
     private String currentPlaying;
-
-    private OnStart<E> onStartCallback;
 
     public PlayAnimation<E> withRunner(AnimationTickHandler<E> onAnimating) {
         this.onAnimating = onAnimating;
@@ -45,6 +47,11 @@ public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehav
         return this;
     }
 
+    public PlayAnimation<E> withCallback(OnContinue<E> onContinueCallback) {
+        this.onContinueCallback = onContinueCallback;
+        return this;
+    }
+
     @Override
     protected List<Pair<MemoryModuleType<?>, MemoryStatus>> getMemoryRequirements() {
         return MEMORIES;
@@ -54,11 +61,12 @@ public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehav
     @Override
     protected void start(E entity) {
         BrainUtils.withMemory(entity, MoreMemoryModules.ANIMATION_TO_PLAY.get(), selected -> {
-            this.currentPlaying = selected.animation();
-            this.chainedAnimations = ((AnimationPlayHolder<E>) selected).get(entity);
+            this.selected = (AnimationPlayHolder<E>) selected;
+            this.chainedIndex = -1;
+            this.currentPlaying = this.selected.animation();
             entity.getAnimationHandler().setAnimation(this.currentPlaying);
             if (this.onStartCallback != null)
-                this.onStartCallback.onStart(this.currentPlaying, this.chainedAnimations, entity);
+                this.onStartCallback.onStart(this.currentPlaying, entity);
         });
         BrainUtils.clearMemory(entity, MoreMemoryModules.ANIMATION_TO_PLAY.get());
     }
@@ -69,12 +77,19 @@ public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehav
             return false;
         if (entity.getAnimationHandler().isCurrent(this.currentPlaying))
             return true;
-        return this.chainedAnimations != null && this.chainedIndex < this.chainedAnimations.size();
+        return this.chainedIndex == -1 || (this.chainedAnimations != null && this.chainedIndex < this.chainedAnimations.size());
     }
 
     @Override
     protected void tick(E entity) {
         if (!entity.getAnimationHandler().isCurrent(this.currentPlaying)) {
+            if (this.chainedIndex == -1) {
+                this.chainedAnimations = this.selected.get(entity);
+                this.chainedIndex = 0;
+                if (this.chainedAnimations != null && this.onContinueCallback != null) {
+                    this.onContinueCallback.onContinue(this.selected.animation(), this.chainedAnimations, entity);
+                }
+            }
             if (this.chainedAnimations != null && this.chainedIndex < this.chainedAnimations.size()) {
                 AnimationPlayHolder.AnimationHolder selected = this.chainedAnimations.get(this.chainedIndex);
                 this.chainedIndex++;
@@ -92,6 +107,7 @@ public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehav
     protected void stop(E entity) {
         super.stop(entity);
         BrainUtils.clearMemory(entity, MoreMemoryModules.ANIMATION_TO_PLAY.get());
+        this.selected = null;
         this.chainedIndex = 0;
         this.currentPlaying = null;
         this.chainedAnimations = null;
@@ -104,6 +120,11 @@ public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehav
 
     public interface OnStart<E> {
 
-        void onStart(String animation, @Nullable List<AnimationPlayHolder.AnimationHolder> chained, E entity);
+        void onStart(String animation, E entity);
+    }
+
+    public interface OnContinue<E> {
+
+        void onContinue(String start, @Nullable List<AnimationPlayHolder.AnimationHolder> chained, E entity);
     }
 }
