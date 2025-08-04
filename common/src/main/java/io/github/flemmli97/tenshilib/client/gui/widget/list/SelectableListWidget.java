@@ -184,8 +184,8 @@ public class SelectableListWidget extends AbstractWidget {
         this.lastSelect = select;
         boolean previous = this.selected[select];
         this.selected[select] = !toggle || !this.selected[select];
-        SelectableEntry entry = this.entries.get(this.hovered);
-        if (previous && !this.selected[this.hovered])
+        SelectableEntry entry = this.entries.get(select);
+        if (previous && !this.selected[select])
             entry.unSelect();
         return entry;
     }
