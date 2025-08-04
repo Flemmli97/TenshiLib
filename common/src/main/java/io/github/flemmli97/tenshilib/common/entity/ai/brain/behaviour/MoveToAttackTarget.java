@@ -24,6 +24,13 @@ public class MoveToAttackTarget<E extends PathfinderMob & AOEAttackEntity & Anim
     private static final MemoryTest MEMORIES = MemoryTest.builder(4).hasMemories(MoreMemoryModules.ANIMATION_TO_PLAY.get())
             .hasMemory(MemoryModuleType.WALK_TARGET).noMemory(MemoryModuleType.PATH).usesMemory(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
 
+    private boolean stopIfTouching;
+
+    public MoveToAttackTarget<E> ignoreTouch(boolean ignoreTouch) {
+        this.stopIfTouching = !ignoreTouch;
+        return this;
+    }
+
     @Override
     protected List<Pair<MemoryModuleType<?>, MemoryStatus>> getMemoryRequirements() {
         return MEMORIES;
@@ -50,6 +57,9 @@ public class MoveToAttackTarget<E extends PathfinderMob & AOEAttackEntity & Anim
             Entity targetEntity = entityTracker.getEntity();
             OrientedBoundingBox aabb = entity.prepareAttackBox(animation.animation(), targetEntity, -0.15, target.getCloseEnoughDist() <= 1);
             if (aabb.intersects(targetEntity.getBoundingBox())) {
+                return true;
+            }
+            if (this.stopIfTouching && entity.getBoundingBox().inflate(0.5).intersects(targetEntity.getBoundingBox())) {
                 return true;
             }
         }
