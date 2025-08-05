@@ -29,6 +29,8 @@ public class SelectableListWidget extends AbstractWidget {
     private int offset;
     private int hovered, lastSelect;
 
+    private boolean mouseScrollDragging;
+
     public SelectableListWidget(int x, int y, int width, int height, Font font, List<SelectableEntry> entries) {
         super(x, y, width, height, Component.empty());
         this.font = font;
@@ -86,7 +88,7 @@ public class SelectableListWidget extends AbstractWidget {
             entry.render(this, graphics, mouseX, mouseY, partialTick, this.getX(), entryY, selected, hovered);
         }
         if (this.scrollbar != null) {
-            int scrollbarX = this.getX() + this.getWidth() - this.scrollbar.totalWidth() + this.scrollbar.leftPadding();
+            int scrollbarX = this.scrollbarDims()[0];
             if (this.entries.size() <= this.limit) {
                 graphics.blitSprite(this.scrollbar.disabled(),
                         scrollbarX, this.getY() + this.scrollbar.topPadding(),
@@ -101,10 +103,31 @@ public class SelectableListWidget extends AbstractWidget {
         }
     }
 
+    protected int[] scrollbarDims() {
+        if (this.scrollbar == null)
+            return null;
+        int minX = this.getX() + this.getWidth() - this.scrollbar.totalWidth() + this.scrollbar.leftPadding();
+        int maxX = minX + this.scrollbar.width();
+        int minY = this.getY() + this.scrollbar.topPadding();
+        int maxY = minY + this.getHeight() - this.scrollbar.bottomPadding();
+        return new int[]{minX, minY, maxX, maxY};
+    }
+
+    protected boolean inScrollBar(double mouseX, double mouseY) {
+        if (this.scrollbar == null)
+            return false;
+        int[] dim = this.scrollbarDims();
+        return mouseX >= dim[0] && mouseY >= dim[1] && mouseX < dim[2] && mouseY < dim[3];
+    }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (!super.mouseClicked(mouseX, mouseY, button)) {
             return false;
+        }
+        if (this.inScrollBar(mouseX, mouseY)) {
+            this.mouseScrollDragging = true;
+            return true;
         }
         int i = this.indexFromMouse(mouseX, mouseY);
         if (i != -1) {
@@ -125,7 +148,43 @@ public class SelectableListWidget extends AbstractWidget {
 
     @Override
     protected boolean clicked(double mouseX, double mouseY) {
-        return super.clicked(mouseX, mouseY) && this.indexFromMouse(mouseX, mouseY) != -1;
+        return super.clicked(mouseX, mouseY) && (this.indexFromMouse(mouseX, mouseY) != -1 || this.inScrollBar(mouseX, mouseY));
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (button == 0) {
+            this.mouseScrollDragging = false;
+        }
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (this.mouseScrollDragging) {
+            int[] dims = this.scrollbarDims();
+            double relativePos = mouseY - dims[1];
+            int height = dims[3] - dims[1];
+            double relative = relativePos / height;
+            int max = Math.max(this.entries.size() - this.limit, 0);
+            this.offset = Mth.clamp((int) Math.round(relative * max), 0, max);
+            return true;
+        }
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
+    public boolean isMouseDragging() {
+        return this.mouseScrollDragging;
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        if (this.isHovered) {
+            this.offset = Mth.clamp((int) (this.offset - scrollY), 0, Math.max(this.entries.size() - this.limit, 0));
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -150,16 +209,6 @@ public class SelectableListWidget extends AbstractWidget {
         if (relativePos < entryY || relativePos > entryY + this.entryHeight)
             return -1;
         return idx;
-    }
-
-    @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
-        if (this.isHovered) {
-            this.offset = Mth.clamp((int) (this.offset - scrollY), 0, Math.max(this.entries.size() - this.limit, 0));
-            return true;
-        }
-        return false;
     }
 
     public void hoverOver(int index) {
