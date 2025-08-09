@@ -1,3 +1,9 @@
+TenshiLib 2.1.1
+================
+- Attack chain behaviour resolves chain only when needed. Fixes some incorrect states
+- MoveToAttackTarget stops if entity is touching target now
+- Fix list widget incorrectly calculating padding
+
 TenshiLib 2.1.0
 ================
 - Adding a whole bunch more to the math parser
