@@ -1,11 +1,10 @@
 package io.github.flemmli97.tenshilib.client.gui.widget.list;
 
-import com.mojang.datafixers.util.Pair;
-import io.github.flemmli97.tenshilib.client.gui.widget.TextureLocation;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -19,7 +18,7 @@ public class SelectableText implements SelectableEntry {
 
     private int paddingX = 4;
     private SelectButton[] button;
-    private Pair<TextureLocation, TextureLocation> entryTexture;
+    private WidgetSprites entryTexture;
     private boolean selectable = true;
 
     private FormattedCharSequence sequence;
@@ -49,7 +48,7 @@ public class SelectableText implements SelectableEntry {
         return this;
     }
 
-    public SelectableText withTexture(Pair<TextureLocation, TextureLocation> entryTexture) {
+    public SelectableText withTexture(WidgetSprites entryTexture) {
         this.entryTexture = entryTexture;
         return this;
     }
@@ -69,8 +68,7 @@ public class SelectableText implements SelectableEntry {
     public void render(SelectableListWidget widget, GuiGraphics graphics, int mouseX, int mouseY, float partialTick,
                        int x, int y, boolean selected, boolean hovered) {
         if (this.entryTexture != null) {
-            TextureLocation location = hovered ? this.entryTexture.getSecond() : this.entryTexture.getFirst();
-            graphics.blit(location.texture(), x, y, location.uOffset(), location.vOffset(), this.width, this.height);
+            graphics.blitSprite(this.entryTexture.get(true, hovered), x, y, this.width, this.height);
         } else if (selected || hovered) {
             graphics.fill(x, y, x + this.width, y + this.height, 0xa0101010);
         }
@@ -89,7 +87,7 @@ public class SelectableText implements SelectableEntry {
                 int bY = xY[1] + y;
                 textWidth = xY[0] - 2;
                 boolean over = mouseX >= bX && mouseY >= bY && mouseX < bX + 12 && mouseY < bY + 12;
-                graphics.blit(btn.texture().texture(), bX, bY, btn.texture().uOffset(), btn.texture().vOffset() + (over ? 12 : 0), 12, 12);
+                graphics.blitSprite(btn.texture().get(true, over), bX, bY, 12, 12);
             }
         }
         graphics.drawString(widget.getFont(), this.getText(widget.getFont(), textWidth - this.paddingX, selected || hovered),
@@ -137,12 +135,12 @@ public class SelectableText implements SelectableEntry {
         return new int[]{btnX, btnY};
     }
 
-    public record SelectButton(TextureLocation texture, Runnable onClick,
+    public record SelectButton(WidgetSprites texture, Runnable onClick,
                                BooleanSupplier shouldRender) {
 
         private static final BooleanSupplier ALWAYS = () -> true;
 
-        public SelectButton(TextureLocation texture, Runnable onClick) {
+        public SelectButton(WidgetSprites texture, Runnable onClick) {
             this(texture, onClick, ALWAYS);
         }
     }
