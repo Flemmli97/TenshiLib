@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class DeferredRegisterHandler<T> implements LoaderRegister<T> {
 
@@ -22,11 +21,6 @@ public class DeferredRegisterHandler<T> implements LoaderRegister<T> {
 
     public DeferredRegisterHandler(DeferredRegister<T> deferredRegister) {
         this.deferredRegister = deferredRegister;
-    }
-
-    @Override
-    public <I extends T> RegistryEntrySupplier<T, I> register(String name, Supplier<I> sup) {
-        return this.register(name, res -> sup.get());
     }
 
     @Override

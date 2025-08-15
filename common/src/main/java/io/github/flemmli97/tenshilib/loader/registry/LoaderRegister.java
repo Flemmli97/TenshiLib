@@ -8,7 +8,9 @@ import java.util.function.Supplier;
 
 public interface LoaderRegister<T> {
 
-    <I extends T> RegistryEntrySupplier<T, I> register(String name, Supplier<I> sup);
+    default <I extends T> RegistryEntrySupplier<T, I> register(String name, Supplier<I> sup) {
+        return this.register(name, res -> sup.get());
+    }
 
     <I extends T> RegistryEntrySupplier<T, I> register(String name, Function<ResourceLocation, I> func);
 

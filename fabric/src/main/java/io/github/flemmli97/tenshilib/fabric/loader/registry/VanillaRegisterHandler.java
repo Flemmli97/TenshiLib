@@ -28,14 +28,6 @@ public class VanillaRegisterHandler<T> implements LoaderRegister<T> {
     }
 
     @Override
-    public <I extends T> RegistryEntrySupplier<T, I> register(String name, Supplier<I> sup) {
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(this.modid, name);
-        VanillaEntrySupplier<T, I> v = new VanillaEntrySupplier<>(ResourceKey.create(this.key, id));
-        this.entries.putIfAbsent(v, sup);
-        return v;
-    }
-
-    @Override
     public <I extends T> RegistryEntrySupplier<T, I> register(String name, Function<ResourceLocation, I> func) {
         ResourceLocation id = ResourceLocation.fromNamespaceAndPath(this.modid, name);
         VanillaEntrySupplier<T, I> v = new VanillaEntrySupplier<>(ResourceKey.create(this.key, id));

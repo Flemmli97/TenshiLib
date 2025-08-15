@@ -16,12 +16,4 @@ public interface ItemHolderModel {
      * Transform to the bones pivot point
      */
     void transform(HumanoidArm hand, PoseStack stack);
-
-    /**
-     * Apply any other post transforms.
-     * Default implementation applies to the vanilla HumanoidModel
-     */
-    default void postTransform(boolean leftSide, PoseStack stack) {
-        stack.translate((leftSide ? -ONE_PIXEL : ONE_PIXEL), -10 * ONE_PIXEL, -2 * ONE_PIXEL);
-    }
 }
