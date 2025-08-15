@@ -19,7 +19,7 @@ public class VertexUtils {
      * Format using a single float. The actual usage depends on the context this is used in.
      * As supplier to not register it unneccessarily
      */
-    public static final Supplier<VertexFormatElement> SINGLE_FLOAT = Suppliers.memoize(()->register(VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.GENERIC, 1));
+    public static final Supplier<VertexFormatElement> SINGLE_FLOAT = Suppliers.memoize(() -> register(VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.GENERIC, 1));
 
     /**
      * Registers a new {@link VertexFormatElement}
@@ -41,36 +41,36 @@ public class VertexUtils {
     }
 
     public static VertexConsumer addVertexData(VertexConsumer consumer, VertexFormatElement element, byte... data) {
-        if(!(consumer instanceof BufferBuilder builder))
+        if (!(consumer instanceof BufferBuilder builder))
             return consumer;
         if (data.length != element.count() || element.type() != VertexFormatElement.Type.BYTE)
             return consumer;
-        long l = ((BufferBuilderAccessor)builder).doBeginElement(element);
-        for(int i = 0; i < data.length; i++) {
+        long l = ((BufferBuilderAccessor) builder).doBeginElement(element);
+        for (int i = 0; i < data.length; i++) {
             MemoryUtil.memPutByte(l + i, data[i]);
         }
         return consumer;
     }
 
     public static VertexConsumer addVertexData(VertexConsumer consumer, VertexFormatElement element, int... data) {
-        if(!(consumer instanceof BufferBuilder builder))
+        if (!(consumer instanceof BufferBuilder builder))
             return consumer;
         if (data.length != element.count() || element.type() != VertexFormatElement.Type.INT)
             return consumer;
-        long l = ((BufferBuilderAccessor)builder).doBeginElement(element);
-        for(int i = 0; i < data.length; i++) {
+        long l = ((BufferBuilderAccessor) builder).doBeginElement(element);
+        for (int i = 0; i < data.length; i++) {
             MemoryUtil.memPutInt(l + i, data[i]);
         }
         return consumer;
     }
 
     public static VertexConsumer addVertexData(VertexConsumer consumer, VertexFormatElement element, float... data) {
-        if(!(consumer instanceof BufferBuilder builder))
+        if (!(consumer instanceof BufferBuilder builder))
             return consumer;
         if (data.length != element.count() || element.type() != VertexFormatElement.Type.FLOAT)
             return consumer;
-        long l = ((BufferBuilderAccessor)builder).doBeginElement(element);
-        for(int i = 0; i < data.length; i++) {
+        long l = ((BufferBuilderAccessor) builder).doBeginElement(element);
+        for (int i = 0; i < data.length; i++) {
             MemoryUtil.memPutFloat(l + i, data[i]);
         }
         return consumer;
