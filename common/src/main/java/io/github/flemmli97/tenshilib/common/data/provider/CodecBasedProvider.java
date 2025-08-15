@@ -8,7 +8,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 
 import java.nio.file.Path;
@@ -48,7 +47,7 @@ public abstract class CodecBasedProvider<T> implements DataProvider {
             this.add(provider);
             return provider;
         }).thenCompose(provider -> {
-            DynamicOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, provider);
+            DynamicOps<JsonElement> ops = provider.createSerializationContext(JsonOps.INSTANCE);
             return CompletableFuture.allOf(this.contents.entrySet().stream().map(entry ->
                     CompletableFuture.supplyAsync(() -> this.encode(ops, entry.getValue()))
                             .thenCompose(element -> DataProvider.saveStable(cache, element, this.getPath(entry.getKey())))
