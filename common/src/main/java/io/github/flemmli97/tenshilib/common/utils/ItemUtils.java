@@ -3,6 +3,7 @@ package io.github.flemmli97.tenshilib.common.utils;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
@@ -22,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ItemUtils {
 
-    public static boolean isItemBetter(LivingEntity holder, @Nullable LivingEntity target, ItemStack stack, ItemStack currentEquipped) {
+    public static boolean isItemBetter(LivingEntity holder, @Nullable Entity target, ItemStack stack, ItemStack currentEquipped) {
         if (target == null) {
             target = holder instanceof Mob mob && mob.getTarget() != null ? mob.getTarget() : holder;
         }
@@ -76,7 +77,7 @@ public class ItemUtils {
         return attribute.value().sanitizeValue(instance.getValue());
     }
 
-    public static double damage(LivingEntity holder, @Nullable LivingEntity target, ItemStack stack) {
+    public static double damage(LivingEntity holder, @Nullable Entity target, ItemStack stack) {
         AttributeInstance attribute = holder.getAttribute(Attributes.ATTACK_DAMAGE);
         double dmg = attribute(stack, Attributes.ATTACK_DAMAGE, attribute != null ? attribute.getValue() : 1, EquipmentSlotGroup.MAINHAND);
         DamageSource damageSource = holder.damageSources().mobAttack(holder);
