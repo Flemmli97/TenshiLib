@@ -12,6 +12,7 @@
     "dual.ItemInHandRendererMixin",
     "dual.LivingEntityMixin",
     "dual.PlayerMixin",
+    "BufferBuilderAccessor",
     "EntityRenderDispatcherMixin",
     "HumanoidArmorMixin",
     "LivingEntityRendererAccessor",
@@ -19,7 +20,8 @@
     "ModelPartAccessor",
     "OptionsScreenMixin",
     "OverlayTextureMixin",
-    "ScreenAccessor"
+    "ScreenAccessor",
+    "VertexFormatElementMixin"
   ],
   "injectors": {
     "defaultRequire": 1

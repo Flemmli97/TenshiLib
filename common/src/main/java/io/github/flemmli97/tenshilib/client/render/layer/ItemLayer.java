@@ -54,7 +54,6 @@ public class ItemLayer<T extends LivingEntity, M extends EntityModel<T> & ItemHo
             poseStack.pushPose();
             this.getParentModel().transform(hand, poseStack);
             boolean flag = hand == HumanoidArm.LEFT;
-            this.getParentModel().postTransform(flag, poseStack);
             poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F));
             poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
             this.itemInHandRenderer.renderItem(entity, stack, displayContext, flag, poseStack, buffer, light);
