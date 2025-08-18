@@ -200,6 +200,10 @@ public class BedrockAnimations {
         return animation != null ? animation.length() : 0;
     }
 
+    public boolean has(String name) {
+        return this.animations.containsKey(name);
+    }
+
     public void setVariable(String variable, double value) {
         this.variables.setVariable(variable, value);
     }

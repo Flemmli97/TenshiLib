@@ -6,6 +6,7 @@ import io.github.flemmli97.tenshilib.common.data.AnimationDataManager;
 import io.github.flemmli97.tenshilib.common.entity.ai.brain.memory.MoreMemoryModules;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimationState;
+import io.github.flemmli97.tenshilib.common.entity.data.SyncedMobDataHandler;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import io.github.flemmli97.tenshilib.common.network.S2CEntityAnimation;
 import io.github.flemmli97.tenshilib.fabric.events.CommonEvents;
@@ -49,6 +50,9 @@ public class TenshiLibFabric implements ModInitializer, DedicatedServerModInitia
                 AnimationState anim = animated.getAnimationHandler().getAnimation();
                 LoaderNetwork.INSTANCE.sendToPlayer(S2CEntityAnimation.create((Entity & AnimatedEntity) entity,
                         anim.getStartTransition(), anim.getEndTransitionTime(), anim.getTick(1)), player);
+            }
+            if (entity instanceof SyncedMobDataHandler handler) {
+                handler.getDataContainer().sendEntriesTo(player);
             }
         }));
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new IdentifiableResourceReloadListener() {

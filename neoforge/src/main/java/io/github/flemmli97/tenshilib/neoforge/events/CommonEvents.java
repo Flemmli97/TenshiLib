@@ -2,6 +2,7 @@ package io.github.flemmli97.tenshilib.neoforge.events;
 
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimationState;
+import io.github.flemmli97.tenshilib.common.entity.data.SyncedMobDataHandler;
 import io.github.flemmli97.tenshilib.common.item.DualWeapon;
 import io.github.flemmli97.tenshilib.common.network.S2CEntityAnimation;
 import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
@@ -30,6 +31,9 @@ public class CommonEvents {
         if (event.getTarget() instanceof AnimatedEntity animated && (anim = animated.getAnimationHandler().getAnimation()) != null) {
             LoaderNetwork.INSTANCE.sendToPlayer(S2CEntityAnimation.create((Entity & AnimatedEntity) event.getTarget(),
                     anim.getStartTransition(), anim.getEndTransitionTime(), anim.getTick(1)), (ServerPlayer) event.getEntity());
+        }
+        if (event.getTarget() instanceof SyncedMobDataHandler handler) {
+            handler.getDataContainer().sendEntriesTo((ServerPlayer) event.getEntity());
         }
     }
 }

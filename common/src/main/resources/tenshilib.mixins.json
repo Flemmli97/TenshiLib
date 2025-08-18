@@ -5,23 +5,14 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "PlayerListMixin",
-    "PlayerMixin"
+    "PlayerMixin",
+    "ServerEntityMixin"
   ],
   "client": [
-    "dual.HumanoidModelMixin",
-    "dual.ItemInHandRendererMixin",
-    "dual.LivingEntityMixin",
-    "dual.PlayerMixin",
-    "BufferBuilderAccessor",
-    "EntityRenderDispatcherMixin",
-    "HumanoidArmorMixin",
-    "LivingEntityRendererAccessor",
-    "LivingOverlayMixin",
-    "ModelPartAccessor",
-    "OptionsScreenMixin",
-    "OverlayTextureMixin",
-    "ScreenAccessor",
-    "VertexFormatElementMixin"
+    "BufferBuilderAccessor", "EntityRenderDispatcherMixin", "HumanoidArmorMixin", "LivingEntityRendererAccessor",
+    "LivingOverlayMixin", "ModelPartAccessor", "OptionsScreenMixin", "OverlayTextureMixin", "ScreenAccessor",
+    "VertexFormatElementMixin", "dual.HumanoidModelMixin", "dual.ItemInHandRendererMixin", "dual.LivingEntityMixin",
+    "dual.PlayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
