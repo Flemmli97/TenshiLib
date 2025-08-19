@@ -10,6 +10,7 @@ import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.Idle;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Helper in building a selectable behaviour sequence
@@ -33,18 +34,23 @@ public class SelectableBehaviourBuilder<E extends LivingEntity> {
 
     @SafeVarargs
     public final SelectableBehaviourBuilder<E> add(int weight, ExtendedBehaviour<E>... behaviours) {
-        if (behaviours.length == 0)
-            return this;
-        if (behaviours.length == 1 && behaviours[0] instanceof Idle<E>) {
-            this.behaviors.add(Pair.of(behaviours[0], weight));
-        } else {
-            this.behaviors.add(Pair.of(new RepeatingBehaviour<>(new SequentialBehaviour<>(behaviours)), weight));
-        }
-        return this;
+        return this.add(weight, null, behaviours);
     }
 
-    public SelectableBehaviourBuilder<E> addOpt(int weight, ExtendedBehaviour<E> behaviour) {
-        this.behaviors.add(Pair.of(new RepeatingBehaviour<>(behaviour), weight));
+    @SafeVarargs
+    public final SelectableBehaviourBuilder<E> add(int weight, Predicate<E> condition, ExtendedBehaviour<E>... behaviours) {
+        if (behaviours.length == 0)
+            return this;
+        ExtendedBehaviour<E> behaviour;
+        if (behaviours.length == 1 && behaviours[0] instanceof Idle<E>) {
+            behaviour = behaviours[0];
+        } else {
+            behaviour = new RepeatingBehaviour<>(new SequentialBehaviour<>(behaviours));
+        }
+        if (condition != null) {
+            behaviour.startCondition(condition);
+        }
+        this.behaviors.add(Pair.of(behaviour, weight));
         return this;
     }
 

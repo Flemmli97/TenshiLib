@@ -13,13 +13,12 @@ import net.minecraft.world.entity.ai.behavior.EntityTracker;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.ai.memory.WalkTarget;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.move.WalkOrRunToWalkTarget;
 import net.tslat.smartbrainlib.object.MemoryTest;
 import net.tslat.smartbrainlib.util.BrainUtils;
 
 import java.util.List;
 
-public class MoveToAttackTarget<E extends PathfinderMob & AOEAttackEntity & AnimatedEntity> extends WalkOrRunToWalkTarget<E> {
+public class MoveToAttackTarget<E extends PathfinderMob & AOEAttackEntity & AnimatedEntity> extends MoveToWalkTargetWithSight<E> {
 
     private static final MemoryTest MEMORIES = MemoryTest.builder(4).hasMemories(MoreMemoryModules.ANIMATION_TO_PLAY.get())
             .hasMemory(MemoryModuleType.WALK_TARGET).noMemory(MemoryModuleType.PATH).usesMemory(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
