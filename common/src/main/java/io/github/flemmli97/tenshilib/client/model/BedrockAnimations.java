@@ -290,14 +290,14 @@ public class BedrockAnimations {
                     next = bone.rotations().get(i);
                 }
                 float prog = (float) Mth.clamp((actualTick - current.startTick) / (next.startTick - current.startTick), 0F, 1F);
-                float x = add ? 0 : wrapDegrees(this.interpolate(current.getXVal(this.variables), next.getXVal(this.variables), prog));
-                float y = add ? 0 : wrapDegrees(this.interpolate(current.getYVal(this.variables), next.getYVal(this.variables), prog)) * mirrorMult;
-                float z = add ? 0 : wrapDegrees(this.interpolate(current.getZVal(this.variables), next.getZVal(this.variables), prog)) * mirrorMult;
-                float dX = wrapDegrees(Mth.RAD_TO_DEG * (modelPart.xRot - modelPart.getDefaultPose().xRot));
+                float x = wrapDegrees(this.interpolate(current.getXVal(this.variables), next.getXVal(this.variables), prog));
+                float y = wrapDegrees(this.interpolate(current.getYVal(this.variables), next.getYVal(this.variables), prog)) * mirrorMult;
+                float z = wrapDegrees(this.interpolate(current.getZVal(this.variables), next.getZVal(this.variables), prog)) * mirrorMult;
+                float dX = add ? 0 : wrapDegrees(Mth.RAD_TO_DEG * (modelPart.xRot - modelPart.getDefaultPose().xRot));
                 modelPart.xRot += Mth.DEG_TO_RAD * degreeDiff(dX, x) * interpolation;
-                float dY = wrapDegrees(Mth.RAD_TO_DEG * (modelPart.yRot - modelPart.getDefaultPose().yRot));
+                float dY = add ? 0 : wrapDegrees(Mth.RAD_TO_DEG * (modelPart.yRot - modelPart.getDefaultPose().yRot));
                 modelPart.yRot += Mth.DEG_TO_RAD * degreeDiff(dY, y) * interpolation;
-                float dZ = wrapDegrees(Mth.RAD_TO_DEG * (modelPart.zRot - modelPart.getDefaultPose().zRot));
+                float dZ = add ? 0 : wrapDegrees(Mth.RAD_TO_DEG * (modelPart.zRot - modelPart.getDefaultPose().zRot));
                 modelPart.zRot += Mth.DEG_TO_RAD * degreeDiff(dZ, z) * interpolation;
             }
         }
