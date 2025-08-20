@@ -6,7 +6,6 @@ import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.RepeatingBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.SequentialBehaviour;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.Idle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,8 +41,8 @@ public class SelectableBehaviourBuilder<E extends LivingEntity> {
         if (behaviours.length == 0)
             return this;
         ExtendedBehaviour<E> behaviour;
-        if (behaviours.length == 1 && behaviours[0] instanceof Idle<E>) {
-            behaviour = behaviours[0];
+        if (behaviours.length == 1) {
+            behaviour = new RepeatingBehaviour<>(behaviours[0]);
         } else {
             behaviour = new RepeatingBehaviour<>(new SequentialBehaviour<>(behaviours));
         }
