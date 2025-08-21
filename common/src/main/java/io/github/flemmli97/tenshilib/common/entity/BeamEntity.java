@@ -186,8 +186,16 @@ public abstract class BeamEntity extends Entity implements TraceableEntity {
     }
 
     public HitResult getHitRay() {
-        return HitResultUtils.entityRayTrace(this, this.getRange(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,
+        HitResult result = HitResultUtils.entityRayTrace(this, this.getRange(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,
                 !this.piercing(), true, this::canHitEntity);
+        if (result instanceof EntityHitResult entityHitResult) { // Make the beam go a bit deeper instead of stopping at entity bounds
+            Vec3 dir = entityHitResult.getLocation().subtract(this.getEyePosition());
+            double len = dir.length();
+            double bounds = Math.min(entityHitResult.getEntity().getBbWidth(), entityHitResult.getEntity().getBbHeight());
+            double inc = Math.min(len + bounds, this.getRange()) - len;
+            return new EntityHitResult(entityHitResult.getEntity(), entityHitResult.getLocation().add(dir.normalize().scale(inc)));
+        }
+        return result;
     }
 
     protected boolean check(Entity e, Predicate<AABB> intersects) {

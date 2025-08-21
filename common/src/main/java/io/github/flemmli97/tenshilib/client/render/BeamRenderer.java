@@ -184,7 +184,8 @@ public abstract class BeamRenderer<T extends BeamEntity> extends EntityRenderer<
     public abstract ResourcePair endTexture(T entity);
 
     public float widthFunc(T entity) {
-        return (float) (entity.radius() * 2 * (Math.sin(Math.sqrt(entity.tickCount / (float) entity.livingTickMax()) * Math.PI)));
+        float prog = Math.min(entity.livingTicks() / (float) entity.livingTickMax(), 1);
+        return (float) (entity.radius() * 2 * (Math.sin(Math.sqrt(prog) * Math.PI)));
     }
 
     public float segmentLength() {
