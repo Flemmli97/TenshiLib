@@ -1,3 +1,9 @@
+TenshiLib 2.1.2
+================
+- Add some things for extending VertexFormatElement for shaders
+- Fix using wrong registry ops for datapack stuff
+- Add syncable entity data system cause vanillas is limited
+
 TenshiLib 2.1.1
 ================
 - Attack chain behaviour resolves chain only when needed. Fixes some incorrect states
