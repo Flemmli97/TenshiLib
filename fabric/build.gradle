@@ -2,4 +2,9 @@ apply from: "https://raw.githubusercontent.com/Flemmli97/GradleScripts/arch-loom
 
 loom {
     accessWidenerPath.set file("src/main/resources/tenshilib.accesswidener")
+    runs {
+        client {
+            vmArgs "-XX:+AllowEnhancedClassRedefinition"
+        }
+    }
 }

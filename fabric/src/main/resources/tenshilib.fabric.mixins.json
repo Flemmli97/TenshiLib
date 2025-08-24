@@ -13,12 +13,8 @@
     "TrackingMixin"
   ],
   "client": [
-    "EntityRendererDispatcherMixin",
-    "HumanoidArmorLayerMixin",
-    "LivingEntityRendererAccessor",
-    "LivingRendererMixin",
-    "MinecraftMixin",
-    "ParticleEngineMixin"
+    "BlockModelAccessor", "BlockModelDeserializerMixin", "EntityRendererDispatcherMixin", "HumanoidArmorLayerMixin",
+    "ItemRendererMixin", "LivingEntityRendererAccessor", "LivingRendererMixin", "MinecraftMixin", "ParticleEngineMixin"
   ],
   "injectors": {
     "defaultRequire": 1
