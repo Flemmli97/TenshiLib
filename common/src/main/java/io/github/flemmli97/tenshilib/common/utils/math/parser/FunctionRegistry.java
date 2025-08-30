@@ -5,7 +5,11 @@ import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.ASi
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.ATan;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.ATan2;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Abs;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Ceil;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Clamp;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Cos;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Exp;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Floor;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Log;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Max;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Min;
@@ -70,6 +74,12 @@ public class FunctionRegistry {
             ExpValue first = stack.pop();
             return new Max(first, second);
         });
+        builtin.put("clamp", stack -> {
+            ExpValue max = stack.pop();
+            ExpValue min = stack.pop();
+            ExpValue val = stack.pop();
+            return new Clamp(val, min, max);
+        });
         builtin.put("sqrt", stack -> {
             ExpValue value = stack.pop();
             return new Sqrt(value);
@@ -77,6 +87,18 @@ public class FunctionRegistry {
         builtin.put("ln", stack -> {
             ExpValue value = stack.pop();
             return new Log(value);
+        });
+        builtin.put("exp", stack -> {
+            ExpValue value = stack.pop();
+            return new Exp(value);
+        });
+        builtin.put("floor", stack -> {
+            ExpValue value = stack.pop();
+            return new Floor(value);
+        });
+        builtin.put("ceil", stack -> {
+            ExpValue value = stack.pop();
+            return new Ceil(value);
         });
         builtin.put("random", stack -> {
             ExpValue second = stack.pop();
