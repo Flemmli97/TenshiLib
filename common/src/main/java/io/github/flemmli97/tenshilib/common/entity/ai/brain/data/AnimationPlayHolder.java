@@ -80,7 +80,7 @@ public class AnimationPlayHolder<T extends Mob & AnimatedEntity> {
         }
 
         public Builder<T> start(String anim, int transitionTime, float offset, int weight) {
-            return this.start(anim, AnimationHandler.FALLBACK_TRANSIT_TIME, 0, 1, e -> true);
+            return this.start(anim, transitionTime, offset, weight, e -> true);
         }
 
         /**
