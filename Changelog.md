@@ -1,3 +1,8 @@
+TenshiLib 2.1.3
+================
+- Add neos separate transform model for fabric
+- Add clamp, exp, floor, ceil func
+
 TenshiLib 2.1.2
 ================
 - Add some things for extending VertexFormatElement for shaders
