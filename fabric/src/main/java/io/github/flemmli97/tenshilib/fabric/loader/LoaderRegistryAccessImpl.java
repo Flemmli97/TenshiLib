@@ -7,6 +7,7 @@ import io.github.flemmli97.tenshilib.loader.registry.LoaderRegister;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.minecraft.core.DefaultedMappedRegistry;
+import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.resources.ResourceKey;
@@ -21,7 +22,9 @@ public class LoaderRegistryAccessImpl implements LoaderRegistryAccess {
 
     @Override
     public <T> CustomLoaderRegistry<T> newRegistry(ResourceKey<? extends Registry<T>> registryKey, ResourceLocation defaultVal, boolean saveToDisk, boolean sync) {
-        FabricRegistryBuilder<T, WritableRegistry<T>> builder = FabricRegistryBuilder.from(new DefaultedMappedRegistry<>(defaultVal.toString(), registryKey, Lifecycle.stable(), false));
+        FabricRegistryBuilder<T, WritableRegistry<T>> builder = FabricRegistryBuilder.from(defaultVal == null
+                ? new MappedRegistry<>(registryKey, Lifecycle.stable(), false)
+                : new DefaultedMappedRegistry<>(defaultVal.toString(), registryKey, Lifecycle.stable(), false));
         if (saveToDisk)
             builder.attribute(RegistryAttribute.SYNCED);
         if (sync)

@@ -4,6 +4,7 @@ import io.github.flemmli97.tenshilib.loader.registry.LoaderRegister;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Loader agnostic registry interface
@@ -24,7 +25,7 @@ public interface LoaderRegistryAccess {
      * On fabric the registry is created immediately
      * On (neo)forge the registry is created on RegistryEvent.NewRegistry
      */
-    <T> CustomLoaderRegistry<T> newRegistry(ResourceKey<? extends Registry<T>> registryKey, ResourceLocation defaultVal, boolean saveToDisk, boolean sync);
+    <T> CustomLoaderRegistry<T> newRegistry(ResourceKey<? extends Registry<T>> registryKey, @Nullable ResourceLocation defaultVal, boolean saveToDisk, boolean sync);
 
     /**
      * A pair of a {@link LoaderRegister} used to register new content and the underlying {@link Registry}

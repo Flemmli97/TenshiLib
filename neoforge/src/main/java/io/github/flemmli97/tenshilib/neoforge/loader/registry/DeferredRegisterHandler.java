@@ -4,6 +4,8 @@ import io.github.flemmli97.tenshilib.loader.registry.LoaderRegister;
 import io.github.flemmli97.tenshilib.loader.registry.RegistryEntrySupplier;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.Collection;
@@ -31,14 +33,13 @@ public class DeferredRegisterHandler<T> implements LoaderRegister<T> {
     }
 
     @Override
-    public void registerContent(Object eventBus) {
-        if (eventBus instanceof IEventBus bus)
-            this.deferredRegister.register(bus);
-    }
-
-    @Override
     public void registerContent() {
-        throw new UnsupportedOperationException("Use the one accepting an object");
+        IEventBus bus = ModList.get().getModContainerById(this.deferredRegister.getNamespace())
+                .map(ModContainer::getEventBus).orElse(null);
+        if (bus == null) {
+            throw new IllegalStateException("Unable to get mod eventbus for modid " + this.deferredRegister.getNamespace());
+        }
+        this.deferredRegister.register(bus);
     }
 
     @Override

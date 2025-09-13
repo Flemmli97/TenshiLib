@@ -14,15 +14,6 @@ public interface LoaderRegister<T> {
 
     <I extends T> RegistryEntrySupplier<T, I> register(String name, Function<ResourceLocation, I> func);
 
-    /**
-     * Impl only for neoforge
-     *
-     * @param r The ModEventbus to pass
-     */
-    default void registerContent(Object r) {
-        this.registerContent();
-    }
-
     void registerContent();
 
     Collection<? extends RegistryEntrySupplier<T, ? extends T>> getEntries();
