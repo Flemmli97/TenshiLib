@@ -2,7 +2,7 @@ package io.github.flemmli97.tenshilib.common.entity.ai.brain.behaviour;
 
 import com.mojang.datafixers.util.Pair;
 import io.github.flemmli97.tenshilib.common.entity.ai.brain.data.CircleData;
-import io.github.flemmli97.tenshilib.common.entity.ai.brain.memory.MoreMemoryModules;
+import io.github.flemmli97.tenshilib.common.registry.TenshilibMemoryModules;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Mob;
@@ -18,7 +18,7 @@ import java.util.List;
 
 public class CircleAround<E extends Mob> extends ExtendedBehaviour<E> {
 
-    private static final List<Pair<MemoryModuleType<?>, MemoryStatus>> MEMORIES = MemoryTest.builder(1).hasMemory(MoreMemoryModules.CIRCLE_DATA.get());
+    private static final List<Pair<MemoryModuleType<?>, MemoryStatus>> MEMORIES = MemoryTest.builder(1).hasMemory(TenshilibMemoryModules.CIRCLE_DATA.get());
 
     @Override
     protected List<Pair<MemoryModuleType<?>, MemoryStatus>> getMemoryRequirements() {
@@ -37,7 +37,7 @@ public class CircleAround<E extends Mob> extends ExtendedBehaviour<E> {
 
     @Override
     protected void tick(E entity) {
-        BrainUtils.withMemory(entity, MoreMemoryModules.CIRCLE_DATA.get(), data -> this.circleAround(entity, data));
+        BrainUtils.withMemory(entity, TenshilibMemoryModules.CIRCLE_DATA.get(), data -> this.circleAround(entity, data));
     }
 
     public void circleAround(E entity, CircleData data) {
@@ -49,10 +49,10 @@ public class CircleAround<E extends Mob> extends ExtendedBehaviour<E> {
     }
 
     protected boolean verifyTracker(E entity) {
-        CircleData center = BrainUtils.getMemory(entity, MoreMemoryModules.CIRCLE_DATA.get());
+        CircleData center = BrainUtils.getMemory(entity, TenshilibMemoryModules.CIRCLE_DATA.get());
         if (center == null || (center.position() instanceof EntityTracker entityTracker && !entityTracker.getEntity().isAlive())) {
             if (center == null)
-                BrainUtils.clearMemory(entity, MoreMemoryModules.CIRCLE_DATA.get());
+                BrainUtils.clearMemory(entity, TenshilibMemoryModules.CIRCLE_DATA.get());
             return false;
         }
         return true;

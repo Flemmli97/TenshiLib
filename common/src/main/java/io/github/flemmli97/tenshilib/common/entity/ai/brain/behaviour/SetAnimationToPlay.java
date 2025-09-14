@@ -2,8 +2,8 @@ package io.github.flemmli97.tenshilib.common.entity.ai.brain.behaviour;
 
 import com.mojang.datafixers.util.Pair;
 import io.github.flemmli97.tenshilib.common.entity.ai.brain.data.AnimationPlayHolder;
-import io.github.flemmli97.tenshilib.common.entity.ai.brain.memory.MoreMemoryModules;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
+import io.github.flemmli97.tenshilib.common.registry.TenshilibMemoryModules;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -18,7 +18,7 @@ import java.util.function.BiPredicate;
 
 public class SetAnimationToPlay<E extends Mob & AnimatedEntity> extends ExtendedBehaviour<E> {
 
-    private static final MemoryTest MEMORIES = MemoryTest.builder(1).usesMemory(MoreMemoryModules.ANIMATION_TO_PLAY.get());
+    private static final MemoryTest MEMORIES = MemoryTest.builder(1).usesMemory(TenshilibMemoryModules.ANIMATION_TO_PLAY.get());
 
     private final List<AnimationPlayHolder<E>> animations;
     private List<AnimationPlayHolder<E>> selectable;
@@ -56,6 +56,6 @@ public class SetAnimationToPlay<E extends Mob & AnimatedEntity> extends Extended
     @Override
     protected void start(E entity) {
         AnimationPlayHolder<E> selected = this.selectable.get(entity.getRandom().nextInt(this.selectable.size()));
-        BrainUtils.setMemory(entity, MoreMemoryModules.ANIMATION_TO_PLAY.get(), selected);
+        BrainUtils.setMemory(entity, TenshilibMemoryModules.ANIMATION_TO_PLAY.get(), selected);
     }
 }

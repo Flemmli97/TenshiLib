@@ -2,10 +2,10 @@ package io.github.flemmli97.tenshilib.common.entity.ai.brain.behaviour;
 
 import com.mojang.datafixers.util.Pair;
 import io.github.flemmli97.tenshilib.common.entity.ai.brain.data.AnimationPlayHolder;
-import io.github.flemmli97.tenshilib.common.entity.ai.brain.memory.MoreMemoryModules;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimationHandler;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimationState;
+import io.github.flemmli97.tenshilib.common.registry.TenshilibMemoryModules;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -19,7 +19,7 @@ import java.util.List;
 
 public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehaviour<E> {
 
-    private static final MemoryTest MEMORIES = MemoryTest.builder(1).hasMemories(MoreMemoryModules.ANIMATION_TO_PLAY.get());
+    private static final MemoryTest MEMORIES = MemoryTest.builder(1).hasMemories(TenshilibMemoryModules.ANIMATION_TO_PLAY.get());
 
     private AnimationTickHandler<E> onAnimating;
 
@@ -60,7 +60,7 @@ public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehav
     @SuppressWarnings("unchecked")
     @Override
     protected void start(E entity) {
-        BrainUtils.withMemory(entity, MoreMemoryModules.ANIMATION_TO_PLAY.get(), selected -> {
+        BrainUtils.withMemory(entity, TenshilibMemoryModules.ANIMATION_TO_PLAY.get(), selected -> {
             this.selected = (AnimationPlayHolder<E>) selected;
             this.chainedIndex = -1;
             this.currentPlaying = this.selected.animation();
@@ -68,7 +68,7 @@ public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehav
             if (this.onStartCallback != null)
                 this.onStartCallback.onStart(this.currentPlaying, entity);
         });
-        BrainUtils.clearMemory(entity, MoreMemoryModules.ANIMATION_TO_PLAY.get());
+        BrainUtils.clearMemory(entity, TenshilibMemoryModules.ANIMATION_TO_PLAY.get());
     }
 
     @Override
@@ -106,7 +106,7 @@ public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehav
     @Override
     protected void stop(E entity) {
         super.stop(entity);
-        BrainUtils.clearMemory(entity, MoreMemoryModules.ANIMATION_TO_PLAY.get());
+        BrainUtils.clearMemory(entity, TenshilibMemoryModules.ANIMATION_TO_PLAY.get());
         this.selected = null;
         this.chainedIndex = 0;
         this.currentPlaying = null;

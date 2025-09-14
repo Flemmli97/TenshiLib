@@ -5,10 +5,12 @@ import io.github.flemmli97.tenshilib.client.CustomRiderRendererManager;
 import io.github.flemmli97.tenshilib.client.TenshilibShaders;
 import io.github.flemmli97.tenshilib.client.data.GeoAnimationManager;
 import io.github.flemmli97.tenshilib.client.data.GeoModelManager;
+import io.github.flemmli97.tenshilib.client.particles.advanced.AdvancedParticleRegistry;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.InteractionHand;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
@@ -16,6 +18,11 @@ import net.neoforged.neoforge.client.event.RegisterShadersEvent;
 import net.neoforged.neoforge.client.event.RenderLivingEvent;
 
 public class ClientEvents {
+
+    public static void clientSetup(FMLClientSetupEvent event) {
+        AdvancedParticleRegistry.init();
+        event.enqueueWork(AdvancedParticleRegistry::verify);
+    }
 
     public static void reloadListener(RegisterClientReloadListenersEvent event) {
         event.registerReloadListener(GeoAnimationManager.getInstance());

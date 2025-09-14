@@ -2,7 +2,7 @@ package io.github.flemmli97.tenshilib.common.entity.ai.brain.behaviour;
 
 import com.mojang.datafixers.util.Pair;
 import io.github.flemmli97.tenshilib.common.entity.ai.brain.data.CircleData;
-import io.github.flemmli97.tenshilib.common.entity.ai.brain.memory.MoreMemoryModules;
+import io.github.flemmli97.tenshilib.common.registry.TenshilibMemoryModules;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.behavior.BlockPosTracker;
@@ -19,7 +19,7 @@ import java.util.function.BiPredicate;
 
 public class SetCircleTarget<E extends Mob> extends ExtendedBehaviour<E> {
 
-    private static final MemoryTest MEMORIES = MemoryTest.builder(2).hasMemory(MemoryModuleType.ATTACK_TARGET).usesMemories(MoreMemoryModules.CIRCLE_DATA.get());
+    private static final MemoryTest MEMORIES = MemoryTest.builder(2).hasMemory(MemoryModuleType.ATTACK_TARGET).usesMemories(TenshilibMemoryModules.CIRCLE_DATA.get());
 
     protected BiFunction<E, LivingEntity, PositionTracker> tracker = (owner, target) -> new BlockPosTracker(target.position());
     protected BiPredicate<E, LivingEntity> clockWise = (owner, target) -> owner.getRandom().nextBoolean();
@@ -62,7 +62,7 @@ public class SetCircleTarget<E extends Mob> extends ExtendedBehaviour<E> {
     @Override
     protected void start(E entity) {
         LivingEntity target = BrainUtils.getTargetOfEntity(entity);
-        BrainUtils.setMemory(entity, MoreMemoryModules.CIRCLE_DATA.get(),
+        BrainUtils.setMemory(entity, TenshilibMemoryModules.CIRCLE_DATA.get(),
                 new CircleData(this.tracker.apply(entity, target),
                         this.clockWise.test(entity, target),
                         this.radius.apply(entity, target),

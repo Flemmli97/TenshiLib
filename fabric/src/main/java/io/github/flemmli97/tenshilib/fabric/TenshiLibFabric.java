@@ -3,7 +3,6 @@ package io.github.flemmli97.tenshilib.fabric;
 import com.mojang.datafixers.util.Pair;
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.common.data.AnimationDataManager;
-import io.github.flemmli97.tenshilib.common.entity.ai.brain.memory.MoreMemoryModules;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimationState;
 import io.github.flemmli97.tenshilib.common.entity.data.SyncedMobDataHandler;
@@ -43,7 +42,7 @@ public class TenshiLibFabric implements ModInitializer, DedicatedServerModInitia
 
     @Override
     public void onInitialize() {
-        MoreMemoryModules.MODULES.registerContent();
+        TenshiLib.registerRegistry();
         UseItemCallback.EVENT.register(CommonEvents::disableOffhand);
         EntityTrackingEvents.START_TRACKING.register(((entity, player) -> {
             if (entity instanceof AnimatedEntity animated && animated.getAnimationHandler().hasAnimation()) {

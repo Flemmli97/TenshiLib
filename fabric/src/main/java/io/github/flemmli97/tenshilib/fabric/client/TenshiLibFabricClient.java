@@ -5,6 +5,7 @@ import io.github.flemmli97.tenshilib.client.CustomRiderRendererManager;
 import io.github.flemmli97.tenshilib.client.TenshilibShaders;
 import io.github.flemmli97.tenshilib.client.data.GeoAnimationManager;
 import io.github.flemmli97.tenshilib.client.data.GeoModelManager;
+import io.github.flemmli97.tenshilib.client.particles.advanced.AdvancedParticleRegistry;
 import io.github.flemmli97.tenshilib.fabric.TenshiLibFabric;
 import io.github.flemmli97.tenshilib.fabric.client.events.ClientEvents;
 import net.fabricmc.api.ClientModInitializer;
@@ -26,10 +27,12 @@ public class TenshiLibFabricClient implements ClientModInitializer, ClientSetupM
     public void onInitializeClient() {
         TenshiLibFabric.postInit();
         FabricLoader.getInstance().invokeEntrypoints("tenshilib_client", ClientSetupModInitializer.class, ClientSetupModInitializer::clientSetup);
+        AdvancedParticleRegistry.verify();
     }
 
     @Override
     public void clientSetup() {
+        AdvancedParticleRegistry.init();
         ClientEvents.itemColors();
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new IdentifiableResourceReloadListener() {
             @Override

@@ -1,4 +1,4 @@
-package io.github.flemmli97.tenshilib.common.entity.ai.brain.memory;
+package io.github.flemmli97.tenshilib.common.registry;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.common.entity.ai.brain.data.AnimationPlayHolder;
@@ -11,7 +11,7 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 
 import java.util.Optional;
 
-public class MoreMemoryModules {
+public class TenshilibMemoryModules {
 
     public static final LoaderRegister<MemoryModuleType<?>> MODULES = LoaderRegistryAccess.INSTANCE.of(Registries.MEMORY_MODULE_TYPE, TenshiLib.MODID);
 

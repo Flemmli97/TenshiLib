@@ -2,7 +2,6 @@ package io.github.flemmli97.tenshilib.neoforge;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.common.data.AnimationDataManager;
-import io.github.flemmli97.tenshilib.common.entity.ai.brain.memory.MoreMemoryModules;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import io.github.flemmli97.tenshilib.neoforge.client.events.ClientEvents;
 import io.github.flemmli97.tenshilib.neoforge.client.events.PatreonClientSetup;
@@ -29,9 +28,10 @@ public class TenshiLibNeoForge {
         eventBus.addListener(CommonEvents::disableOffhandBlock);
         eventBus.addListener(CommonEvents::onTracking);
         eventBus.addListener(TenshiLibNeoForge::reloadListener);
-        MoreMemoryModules.MODULES.registerContent(modBus);
+        TenshiLib.registerRegistry();
         TenshiLibPatreonImpl.initPatreonData(modBus);
         if (FMLEnvironment.dist == Dist.CLIENT) {
+            modBus.addListener(ClientEvents::clientSetup);
             modBus.addListener(ClientEvents::reloadListener);
             modBus.addListener(ClientEvents::itemColors);
             modBus.addListener(ClientEvents::registerShader);

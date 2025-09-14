@@ -10,9 +10,9 @@
   ],
   "client": [
     "BufferBuilderAccessor", "EntityRenderDispatcherMixin", "HumanoidArmorMixin", "LivingEntityRendererAccessor",
-    "LivingOverlayMixin", "ModelPartAccessor", "OptionsScreenMixin", "OverlayTextureMixin", "ScreenAccessor",
-    "VertexFormatElementMixin", "dual.HumanoidModelMixin", "dual.ItemInHandRendererMixin", "dual.LivingEntityMixin",
-    "dual.PlayerMixin"
+    "LivingOverlayMixin", "ModelPartAccessor", "OptionsScreenMixin", "OverlayTextureMixin", "ParticleAccessor",
+    "ParticleEngineAccessor", "ScreenAccessor", "VertexFormatElementMixin", "dual.HumanoidModelMixin",
+    "dual.ItemInHandRendererMixin", "dual.LivingEntityMixin", "dual.PlayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

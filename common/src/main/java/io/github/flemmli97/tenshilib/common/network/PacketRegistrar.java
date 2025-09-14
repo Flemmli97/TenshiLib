@@ -27,6 +27,7 @@ public class PacketRegistrar {
         register.register(S2CAnimationScreen.TYPE, S2CAnimationScreen.STREAM_CODEC, S2CAnimationScreen::handle);
         register.register(S2CAnimationDataPacket.TYPE, S2CAnimationDataPacket.STREAM_CODEC, S2CAnimationDataPacket::handle);
         register.register(S2CSyncedMobData.TYPE, S2CSyncedMobData.STREAM_CODEC, S2CSyncedMobData::handle);
+        register.register(S2CAdvancedParticle.TYPE, S2CAdvancedParticle.STREAM_CODEC, S2CAdvancedParticle::handle);
     }
 
     public interface ServerPacketRegister {
