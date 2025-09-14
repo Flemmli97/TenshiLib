@@ -14,7 +14,7 @@ import net.minecraft.world.entity.player.Player;
 
 public class HaloModel extends EntityModel<Player> implements ExtendedModel, PatreonModelData<Player> {
 
-    public static ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "textures/model/halo.png");
+    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "textures/model/halo.png");
 
     protected final ReloadableCache<ModelPartsContainer> model;
 

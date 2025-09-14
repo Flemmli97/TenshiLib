@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(LivingEntityRenderer.class)
 public interface LivingEntityRendererAccessor {
 
+    @SuppressWarnings("rawtypes")
     @Invoker("addLayer")
     boolean add(RenderLayer layer);
 }

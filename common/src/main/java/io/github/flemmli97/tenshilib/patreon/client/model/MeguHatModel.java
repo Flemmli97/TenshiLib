@@ -17,7 +17,7 @@ import net.minecraft.world.entity.player.Player;
 
 public class MeguHatModel extends EntityModel<Player> implements ExtendedModel, PatreonModelData<Player> {
 
-    public static ResourceLocation MEGU_TEXTURE = ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "textures/model/megumin_hat.png");
+    public static final ResourceLocation MEGU_TEXTURE = ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "textures/model/megumin_hat.png");
 
     protected final ReloadableCache<ModelPartsContainer> model;
     protected final ReloadableCache<BedrockAnimations> anim;

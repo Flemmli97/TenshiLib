@@ -17,9 +17,8 @@ public class DummyBehaviour {
      * as a behaviour failing to start there causes the whole chain to be aborted
      * <p>
      * Notable affected behaviour are e.g. {@link net.tslat.smartbrainlib.api.core.behaviour.custom.move.MoveToWalkTarget}
-     * where if the mob is already at target it wont start
+     * where if the mob is already at target it won't start
      */
-    @SuppressWarnings("unchecked")
     public static <E extends LivingEntity> ExtendedBehaviour<E> opt(ExtendedBehaviour<E> wrapped) {
         return new FirstApplicableBehaviour<>(wrapped, new Idle<>().stopIf(IMMEDIATE));
     }

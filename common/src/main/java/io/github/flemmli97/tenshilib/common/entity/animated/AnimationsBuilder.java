@@ -76,7 +76,7 @@ public class AnimationsBuilder {
 
     public static class DefinitionBuilder {
 
-        public static Codec<DefinitionBuilder> CODEC = RecordCodecBuilder.create(inst -> inst.group(
+        public static final Codec<DefinitionBuilder> CODEC = RecordCodecBuilder.create(inst -> inst.group(
                 Codec.STRING.optionalFieldOf("animation").forGetter(d -> d.animation.isEmpty() ? Optional.empty() : Optional.of(d.animation)),
                 Codec.DOUBLE.fieldOf("length").forGetter(d -> d.length),
                 Codec.DOUBLE.optionalFieldOf("speed").forGetter(d -> d.speed == 1 ? Optional.empty() : Optional.of(d.speed)),

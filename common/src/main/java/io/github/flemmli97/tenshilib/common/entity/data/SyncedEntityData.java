@@ -7,7 +7,7 @@ import net.minecraft.network.codec.StreamCodec;
 
 public record SyncedEntityData<T>(StreamCodec<RegistryFriendlyByteBuf, T> serializer) {
 
-    public static StreamCodec<RegistryFriendlyByteBuf, SyncedEntityData<?>> STREAM_CODEC = ByteBufCodecs.registry(TenshilibSyncableEntityDatas.SYNCABLE_ENTITY_DATA_KEY);
+    public static final StreamCodec<RegistryFriendlyByteBuf, SyncedEntityData<?>> STREAM_CODEC = ByteBufCodecs.registry(TenshilibSyncableEntityDatas.SYNCABLE_ENTITY_DATA_KEY);
 
     @Override
     public String toString() {
