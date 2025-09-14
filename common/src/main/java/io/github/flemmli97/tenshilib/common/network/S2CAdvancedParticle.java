@@ -25,7 +25,7 @@ public record S2CAdvancedParticle(AdvancedParticleContainer container, double x,
             AdvancedParticleContainer.STREAM_CODEC.encode(buf, pkt.container());
             buf.writeDouble(pkt.x());
             buf.writeDouble(pkt.y());
-            buf.writeDouble(pkt.x());
+            buf.writeDouble(pkt.z());
         }
     };
 

@@ -3,6 +3,7 @@ package io.github.flemmli97.tenshilib.client.particles.advanced.handler;
 import io.github.flemmli97.tenshilib.client.particles.advanced.AdvancedParticleHandler;
 import io.github.flemmli97.tenshilib.common.particle.data.ScaleData;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.util.Mth;
 
 public class ScaleHandler implements AdvancedParticleHandler {
@@ -12,7 +13,7 @@ public class ScaleHandler implements AdvancedParticleHandler {
 
     public ScaleHandler(ScaleData data, Particle particle) {
         this.data = data;
-        particle.scale(data.start());
+        this.setScaleParticle(particle, data.start());
     }
 
     @Override
@@ -21,6 +22,14 @@ public class ScaleHandler implements AdvancedParticleHandler {
             return;
         this.tick++;
         float prog = Mth.clamp((float) this.tick / this.data.duration(), 0, 1);
-        particle.scale(Mth.lerp(prog, this.data.start(), this.data.end()));
+        this.setScaleParticle(particle, Mth.lerp(prog, this.data.start(), this.data.end()));
+    }
+
+    protected void setScaleParticle(Particle particle, float scale) {
+        if (particle instanceof SingleQuadParticle quad) {
+            float current = quad.getQuadSize(1);
+            scale = scale / current;
+        }
+        particle.scale(scale);
     }
 }
