@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.flemmli97.tenshilib.common.particle.AdvancedParticleData;
 import io.github.flemmli97.tenshilib.common.particle.ParticleHandlerType;
 import io.github.flemmli97.tenshilib.common.registry.TenshilibParticleHandlerTypes;
+import io.github.flemmli97.tenshilib.common.utils.StreamCodecs;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -23,7 +24,7 @@ public record CirclingData(float radius, float radiusIncrease, float angle, floa
             ).apply(inst, CirclingData::new));
     public static final StreamCodec<ByteBuf, CirclingData> STREAM_CODEC = StreamCodec.composite(ByteBufCodecs.FLOAT, CirclingData::radius,
             ByteBufCodecs.FLOAT, CirclingData::radiusIncrease, ByteBufCodecs.FLOAT, CirclingData::angle,
-            ByteBufCodecs.FLOAT, CirclingData::angleIncrease, AdvancedParticleData.VEC3, CirclingData::rotationAxis, CirclingData::new);
+            ByteBufCodecs.FLOAT, CirclingData::angleIncrease, StreamCodecs.VEC3, CirclingData::rotationAxis, CirclingData::new);
 
     @Override
     public ParticleHandlerType<?> getType() {

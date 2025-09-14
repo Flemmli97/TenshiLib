@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import io.github.flemmli97.tenshilib.common.network.S2CSyncedMobData;
 import io.github.flemmli97.tenshilib.common.utils.TypedResource;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
@@ -62,7 +61,7 @@ public class SyncedDataContainer<T extends Entity & SyncedMobDataHandler> {
     }
 
     public boolean isDirty() {
-        return isDirty;
+        return this.isDirty;
     }
 
     public void sendDirtyEntriesToTracking() {
@@ -108,7 +107,7 @@ public class SyncedDataContainer<T extends Entity & SyncedMobDataHandler> {
             this.entity = entity;
         }
 
-        public <D> Builder<T> define(TypedResource<D> id, SyncableEntityData.SyncedEntityData<D> type, D initialValue) {
+        public <D> Builder<T> define(TypedResource<D> id, SyncedEntityData<D> type, D initialValue) {
             this.map.put(id, new SyncedContainer<>(id, type, initialValue));
             return this;
         }
@@ -121,11 +120,11 @@ public class SyncedDataContainer<T extends Entity & SyncedMobDataHandler> {
     public static class SyncedContainer<T> {
 
         private final TypedResource<T> id;
-        private final SyncableEntityData.SyncedEntityData<T> syncedEntityData;
+        private final SyncedEntityData<T> syncedEntityData;
         private T value;
         private boolean dirty;
 
-        public SyncedContainer(TypedResource<T> id, SyncableEntityData.SyncedEntityData<T> syncedEntityData, T initialValue) {
+        public SyncedContainer(TypedResource<T> id, SyncedEntityData<T> syncedEntityData, T initialValue) {
             this.id = id;
             this.syncedEntityData = syncedEntityData;
             this.value = initialValue;
@@ -134,15 +133,14 @@ public class SyncedDataContainer<T extends Entity & SyncedMobDataHandler> {
         @SuppressWarnings("unchecked")
         public static <T> SyncedContainer<T> from(RegistryFriendlyByteBuf buf) {
             TypedResource<T> id = (TypedResource<T>) TypedResource.STREAM_CODEC.decode(buf);
-            ResourceLocation typeId = buf.readResourceLocation();
-            SyncableEntityData.SyncedEntityData<T> data = SyncableEntityData.get(typeId);
+            SyncedEntityData<T> data = (SyncedEntityData<T>) SyncedEntityData.STREAM_CODEC.decode(buf);
             boolean none = buf.readBoolean();
             return new SyncedContainer<>(id, data, none ? data.serializer().decode(buf) : null);
         }
 
         public void write(RegistryFriendlyByteBuf buf) {
             TypedResource.STREAM_CODEC.encode(buf, this.id);
-            buf.writeResourceLocation(this.syncedEntityData.id());
+            SyncedEntityData.STREAM_CODEC.encode(buf, this.syncedEntityData);
             buf.writeBoolean(this.value != null);
             if (this.value != null)
                 this.syncedEntityData.serializer().encode(buf, this.value);
@@ -153,11 +151,11 @@ public class SyncedDataContainer<T extends Entity & SyncedMobDataHandler> {
         }
 
         public TypedResource<T> id() {
-            return id;
+            return this.id;
         }
 
         public T value() {
-            return value;
+            return this.value;
         }
     }
 }

@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.flemmli97.tenshilib.common.particle.AdvancedParticleData;
 import io.github.flemmli97.tenshilib.common.particle.ParticleHandlerType;
 import io.github.flemmli97.tenshilib.common.registry.TenshilibParticleHandlerTypes;
+import io.github.flemmli97.tenshilib.common.utils.StreamCodecs;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -17,7 +18,7 @@ public record MoveToData(Vec3 target, int duration) implements AdvancedParticleD
             inst.group(Vec3.CODEC.fieldOf("target").forGetter(MoveToData::target),
                     Codec.INT.fieldOf("duration").forGetter(MoveToData::duration)
             ).apply(inst, MoveToData::new));
-    public static final StreamCodec<ByteBuf, MoveToData> STREAM_CODEC = StreamCodec.composite(AdvancedParticleData.VEC3, MoveToData::target,
+    public static final StreamCodec<ByteBuf, MoveToData> STREAM_CODEC = StreamCodec.composite(StreamCodecs.VEC3, MoveToData::target,
             ByteBufCodecs.INT, MoveToData::duration, MoveToData::new);
 
     @Override

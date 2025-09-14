@@ -2,6 +2,7 @@ package io.github.flemmli97.tenshilib;
 
 import io.github.flemmli97.tenshilib.common.registry.TenshilibMemoryModules;
 import io.github.flemmli97.tenshilib.common.registry.TenshilibParticleHandlerTypes;
+import io.github.flemmli97.tenshilib.common.registry.TenshilibSyncableEntityDatas;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -37,5 +38,6 @@ public class TenshiLib {
             return;
         registered = true;
         TenshilibParticleHandlerTypes.PARTICLE_HANDLER_TYPES.register().registerContent();
+        TenshilibSyncableEntityDatas.SYCABLE_ENTITY_DATAS.register().registerContent();
     }
 }

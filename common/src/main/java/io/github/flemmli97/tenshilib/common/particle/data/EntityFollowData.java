@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.flemmli97.tenshilib.common.particle.AdvancedParticleData;
 import io.github.flemmli97.tenshilib.common.particle.ParticleHandlerType;
 import io.github.flemmli97.tenshilib.common.registry.TenshilibParticleHandlerTypes;
+import io.github.flemmli97.tenshilib.common.utils.StreamCodecs;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -22,7 +23,7 @@ public record EntityFollowData(int entity, Optional<Vec3> offset) implements Adv
             ).apply(inst, EntityFollowData::new));
     public static final StreamCodec<ByteBuf, EntityFollowData> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT, EntityFollowData::entity,
-            ByteBufCodecs.optional(AdvancedParticleData.VEC3), EntityFollowData::offset, EntityFollowData::new);
+            ByteBufCodecs.optional(StreamCodecs.VEC3), EntityFollowData::offset, EntityFollowData::new);
 
     public EntityFollowData(Entity entity) {
         this(entity.getId(), Optional.empty());

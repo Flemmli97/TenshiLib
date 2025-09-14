@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.flemmli97.tenshilib.common.particle.AdvancedParticleData;
 import io.github.flemmli97.tenshilib.common.particle.ParticleHandlerType;
 import io.github.flemmli97.tenshilib.common.registry.TenshilibParticleHandlerTypes;
+import io.github.flemmli97.tenshilib.common.utils.StreamCodecs;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -22,8 +23,8 @@ public record ColorData(Vector4f start, Optional<Vector4f> end, int duration) im
                     Codec.INT.fieldOf("duration").forGetter(ColorData::duration)
             ).apply(inst, ColorData::new));
     public static final StreamCodec<ByteBuf, ColorData> STREAM_CODEC = StreamCodec.composite(
-            AdvancedParticleData.VECTOR_4F_STREAM, ColorData::start,
-            ByteBufCodecs.optional(AdvancedParticleData.VECTOR_4F_STREAM), ColorData::end,
+            StreamCodecs.VECTOR_4F_STREAM, ColorData::start,
+            ByteBufCodecs.optional(StreamCodecs.VECTOR_4F_STREAM), ColorData::end,
             ByteBufCodecs.INT, ColorData::duration, ColorData::new);
 
     public ColorData(float r, float g, float b) {
