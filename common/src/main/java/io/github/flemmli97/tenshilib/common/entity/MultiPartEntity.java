@@ -109,6 +109,10 @@ public class MultiPartEntity extends Entity implements OwnableEntity {
         }
     }
 
+    protected MultipartPosition relativePosition() {
+        return this.relativePosition;
+    }
+
     @Override
     public EntityDimensions getDimensions(Pose pose) {
         return this.getDefaultDimensions().scale(this.getOwner() != null ? this.getOwner().getScale() : 1);
@@ -121,7 +125,8 @@ public class MultiPartEntity extends Entity implements OwnableEntity {
 
     @Override
     public Component getName() {
-        return this.parent.getName();
+        LivingEntity owner = this.getOwner();
+        return owner != null ? owner.getName() : super.getName();
     }
 
     @Override
@@ -136,7 +141,7 @@ public class MultiPartEntity extends Entity implements OwnableEntity {
     public void tick() {
         if (!this.level().isClientSide) {
             if (this.getOwner() == null || !this.getOwner().isAlive()) {
-                this.remove(RemovalReason.KILLED);
+                this.remove(Entity.RemovalReason.KILLED);
                 return;
             }
         }
@@ -156,11 +161,16 @@ public class MultiPartEntity extends Entity implements OwnableEntity {
         }
         this.checkBelowWorld();
         if (!this.level().isClientSide) {
-            Vec3 newPos = this.getOwner().position().add(this.relativePosition.getPosition(this.getOwner()));
-            this.moveTo(newPos.x(), newPos.y(), newPos.z(), this.relativePosition.noPhysics());
+            this.updatePosition();
         }
         this.handleLerp();
+        this.firstTick = false;
         this.level().getProfiler().pop();
+    }
+
+    protected void updatePosition() {
+        Vec3 newPos = this.getOwner().position().add(this.relativePosition.getPosition(this.getOwner()));
+        this.moveTo(newPos.x(), newPos.y(), newPos.z(), this.relativePosition.noPhysics());
     }
 
     protected void handleLerp() {
@@ -205,7 +215,7 @@ public class MultiPartEntity extends Entity implements OwnableEntity {
         return this.lerpSteps > 0 ? (float) this.lerpYRot : this.getYRot();
     }
 
-    private void moveTo(double x, double y, double z, boolean simple) {
+    protected void moveTo(double x, double y, double z, boolean simple) {
         if (this.getOwner() != null && !this.isEntityAddedToLevel()) {
             this.setPos(x, y, z);
             this.level().addFreshEntity(this);
@@ -230,11 +240,13 @@ public class MultiPartEntity extends Entity implements OwnableEntity {
     /**
      * Spawns this part entity if not spawned. Call this in parent tick
      */
-    public void parentTick() {
+    public boolean parentTick() {
         if (this.getOwner() != null && !this.getOwner().level().isClientSide && !this.isEntityAddedToLevel()) {
             this.setPos(this.getOwner().position());
             this.level().addFreshEntity(this);
+            return true;
         }
+        return false;
     }
 
     @Override
