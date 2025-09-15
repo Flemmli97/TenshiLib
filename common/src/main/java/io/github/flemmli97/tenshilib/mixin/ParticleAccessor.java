@@ -16,6 +16,15 @@ public interface ParticleAccessor {
     @Accessor("gravity")
     void setGravity(float gravity);
 
+    @Accessor("xo")
+    void setXo(double xo);
+
+    @Accessor("yo")
+    void setYo(double yo);
+
+    @Accessor("zo")
+    void setZo(double zo);
+
     @Accessor("x")
     double getX();
 
@@ -25,12 +34,12 @@ public interface ParticleAccessor {
     @Accessor("z")
     double getZ();
 
-    @Accessor("xo")
-    void setXo(double xo);
+    @Accessor("xd")
+    double getXD();
 
-    @Accessor("yo")
-    void setYo(double yo);
+    @Accessor("yd")
+    double getYD();
 
-    @Accessor("zo")
-    void setZo(double zo);
+    @Accessor("zd")
+    double getZD();
 }

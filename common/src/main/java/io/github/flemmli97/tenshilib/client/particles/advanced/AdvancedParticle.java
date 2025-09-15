@@ -18,9 +18,10 @@ public class AdvancedParticle extends Particle {
     public AdvancedParticle(Particle wrapped, List<AdvancedParticleHandler> handlers, ClientLevel level, double x, double y, double z) {
         super(level, x, y, z);
         this.wrapped = wrapped;
-        ((ParticleAccessor) wrapped).setXo(((ParticleAccessor) wrapped).getX());
-        ((ParticleAccessor) wrapped).setYo(((ParticleAccessor) wrapped).getY());
-        ((ParticleAccessor) wrapped).setZo(((ParticleAccessor) wrapped).getZ());
+        ParticleAccessor acc = (ParticleAccessor) wrapped;
+        acc.setXo(acc.getX());
+        acc.setYo(acc.getY());
+        acc.setZo(acc.getZ());
         this.handlers = handlers;
     }
 
@@ -31,8 +32,8 @@ public class AdvancedParticle extends Particle {
 
     @Override
     public void tick() {
-        this.wrapped.tick();
         this.handlers.forEach(d -> d.tick(this.wrapped));
+        this.wrapped.tick();
     }
 
     @Override

@@ -28,7 +28,7 @@ public class CirclingHandler implements AdvancedParticleHandler {
         this.centerX = ((ParticleAccessor) particle).getX();
         this.centerY = ((ParticleAccessor) particle).getY();
         this.centerZ = ((ParticleAccessor) particle).getZ();
-        this.last = offset.add(this.centerX, this.centerY, this.centerZ);
+        this.last = new Vector3d(this.centerX, this.centerY, this.centerZ);
         this.moveParticle(particle);
     }
 

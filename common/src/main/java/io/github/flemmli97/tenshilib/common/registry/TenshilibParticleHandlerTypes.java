@@ -10,6 +10,7 @@ import io.github.flemmli97.tenshilib.common.particle.data.MotionData;
 import io.github.flemmli97.tenshilib.common.particle.data.MoveToData;
 import io.github.flemmli97.tenshilib.common.particle.data.ParticleMetaData;
 import io.github.flemmli97.tenshilib.common.particle.data.ScaleData;
+import io.github.flemmli97.tenshilib.common.particle.data.SinMotionData;
 import io.github.flemmli97.tenshilib.loader.LoaderRegistryAccess;
 import io.github.flemmli97.tenshilib.loader.registry.RegistryEntrySupplier;
 import net.minecraft.core.Registry;
@@ -31,6 +32,7 @@ public class TenshilibParticleHandlerTypes {
     public static final RegistryEntrySupplier<ParticleHandlerType<?>, ParticleHandlerType<ColorData>> COLOR = register("color", () -> new ParticleHandlerType<>(ColorData.CODEC, ColorData.STREAM_CODEC));
     public static final RegistryEntrySupplier<ParticleHandlerType<?>, ParticleHandlerType<EntityFollowData>> ENTITY_FOLLOW = register("entity_follow", () -> new ParticleHandlerType<>(EntityFollowData.CODEC, EntityFollowData.STREAM_CODEC));
     public static final RegistryEntrySupplier<ParticleHandlerType<?>, ParticleHandlerType<MotionData>> MOTION = register("motion", () -> new ParticleHandlerType<>(MotionData.CODEC, MotionData.STREAM_CODEC));
+    public static final RegistryEntrySupplier<ParticleHandlerType<?>, ParticleHandlerType<SinMotionData>> SIN_MOTION = register("sin_motion", () -> new ParticleHandlerType<>(SinMotionData.CODEC, SinMotionData.STREAM_CODEC));
     public static final RegistryEntrySupplier<ParticleHandlerType<?>, ParticleHandlerType<MoveToData>> MOVE_TO = register("move_to", () -> new ParticleHandlerType<>(MoveToData.CODEC, MoveToData.STREAM_CODEC));
     public static final RegistryEntrySupplier<ParticleHandlerType<?>, ParticleHandlerType<ParticleMetaData>> PARTICLE_META = register("particle_meta", () -> new ParticleHandlerType<>(ParticleMetaData.CODEC, ParticleMetaData.STREAM_CODEC));
     public static final RegistryEntrySupplier<ParticleHandlerType<?>, ParticleHandlerType<ScaleData>> SCALE = register("scale", () -> new ParticleHandlerType<>(ScaleData.CODEC, ScaleData.STREAM_CODEC));

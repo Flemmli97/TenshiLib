@@ -8,6 +8,7 @@ import io.github.flemmli97.tenshilib.client.particles.advanced.handler.MotionHan
 import io.github.flemmli97.tenshilib.client.particles.advanced.handler.MoveToHandler;
 import io.github.flemmli97.tenshilib.client.particles.advanced.handler.ParticleMetaHandler;
 import io.github.flemmli97.tenshilib.client.particles.advanced.handler.ScaleHandler;
+import io.github.flemmli97.tenshilib.client.particles.advanced.handler.SinMotionHandler;
 import io.github.flemmli97.tenshilib.common.particle.AdvancedParticleContainer;
 import io.github.flemmli97.tenshilib.common.particle.AdvancedParticleData;
 import io.github.flemmli97.tenshilib.common.particle.ParticleHandlerType;
@@ -32,6 +33,7 @@ public class AdvancedParticleRegistry {
         register(TenshilibParticleHandlerTypes.COLOR.get(), ColorHandler::new);
         register(TenshilibParticleHandlerTypes.ENTITY_FOLLOW.get(), EntityFollowHandler::new);
         register(TenshilibParticleHandlerTypes.MOTION.get(), MotionHandler::new);
+        register(TenshilibParticleHandlerTypes.SIN_MOTION.get(), SinMotionHandler::new);
         register(TenshilibParticleHandlerTypes.MOVE_TO.get(), MoveToHandler::new);
         register(TenshilibParticleHandlerTypes.PARTICLE_META.get(), ParticleMetaHandler::new);
         register(TenshilibParticleHandlerTypes.SCALE.get(), ScaleHandler::new);
