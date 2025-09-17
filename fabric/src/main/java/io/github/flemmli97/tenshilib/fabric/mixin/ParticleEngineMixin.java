@@ -2,6 +2,8 @@ package io.github.flemmli97.tenshilib.fabric.mixin;
 
 import com.google.common.collect.ImmutableList;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.blaze3d.vertex.MeshData;
 import io.github.flemmli97.tenshilib.client.particles.AdvancedParticleType;
 import io.github.flemmli97.tenshilib.client.particles.ParticleRenderTypes;
@@ -46,15 +48,17 @@ public abstract class ParticleEngineMixin {
     }
 
     @ModifyVariable(method = "render", at = @At(value = "INVOKE_ASSIGN", target = "Lcom/mojang/blaze3d/vertex/BufferBuilder;build()Lcom/mojang/blaze3d/vertex/MeshData;"))
-    private MeshData onEnd(MeshData value, @Local ParticleRenderType type) {
+    private MeshData onEnd(MeshData value, @Local ParticleRenderType type, @Share("tenshilib_render_type") LocalRef<ParticleRenderType> capture) {
         if (value == null && type instanceof AdvancedParticleType adv)
             adv.end(this.textureManager);
+        capture.set(type);
         return value;
     }
 
+    // For some reason the rendertype is not in the lvt here so we do it this way
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferUploader;drawWithShader(Lcom/mojang/blaze3d/vertex/MeshData;)V", shift = At.Shift.AFTER))
-    private void onEnd(LightTexture lightTexture, Camera camera, float partialTick, CallbackInfo info, @Local ParticleRenderType type) {
-        if (type instanceof AdvancedParticleType adv)
+    private void onEnd(LightTexture lightTexture, Camera camera, float partialTick, CallbackInfo info, @Share("tenshilib_render_type") LocalRef<ParticleRenderType> type) {
+        if (type.get() instanceof AdvancedParticleType adv)
             adv.end(this.textureManager);
     }
 }
