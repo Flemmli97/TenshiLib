@@ -8,6 +8,7 @@
     "BuiltinRegistryAccessor",
     "DefaultAttributeSupplierAccessor",
     "PlayerMixin",
+    "ServerEntityMixin",
     "ServerPlayerGameModeMixin",
     "ServerPlayerMixin",
     "TrackingMixin"

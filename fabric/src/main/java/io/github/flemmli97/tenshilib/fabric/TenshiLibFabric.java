@@ -9,6 +9,7 @@ import io.github.flemmli97.tenshilib.common.entity.data.SyncedMobDataHandler;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import io.github.flemmli97.tenshilib.common.network.S2CEntityAnimation;
 import io.github.flemmli97.tenshilib.fabric.events.CommonEvents;
+import io.github.flemmli97.tenshilib.fabric.events.EntityStartTrackEvent;
 import io.github.flemmli97.tenshilib.fabric.loader.TenshiLibCrossPlatImpl;
 import io.github.flemmli97.tenshilib.fabric.loader.events.CommonSetupEvent;
 import io.github.flemmli97.tenshilib.fabric.loader.events.EntityAttributeModifierEvent;
@@ -21,7 +22,6 @@ import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
-import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -44,7 +44,7 @@ public class TenshiLibFabric implements ModInitializer, DedicatedServerModInitia
     public void onInitialize() {
         TenshiLib.registerRegistry();
         UseItemCallback.EVENT.register(CommonEvents::disableOffhand);
-        EntityTrackingEvents.START_TRACKING.register(((entity, player) -> {
+        EntityStartTrackEvent.START_TRACKING.register(((entity, player) -> {
             if (entity instanceof AnimatedEntity animated && animated.getAnimationHandler().hasAnimation()) {
                 AnimationState anim = animated.getAnimationHandler().getAnimation();
                 LoaderNetwork.INSTANCE.sendToPlayer(S2CEntityAnimation.create((Entity & AnimatedEntity) entity,
