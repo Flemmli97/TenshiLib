@@ -34,7 +34,6 @@ public class TenshiLibNeoForge {
             modBus.addListener(ClientEvents::clientSetup);
             modBus.addListener(ClientEvents::reloadListener);
             modBus.addListener(ClientEvents::itemColors);
-            modBus.addListener(ClientEvents::registerShader);
             PatreonClientSetup.setup(modBus);
             eventBus.addListener(ClientEvents::clickSpecial);
             eventBus.addListener(ClientEvents::onEntityRender);

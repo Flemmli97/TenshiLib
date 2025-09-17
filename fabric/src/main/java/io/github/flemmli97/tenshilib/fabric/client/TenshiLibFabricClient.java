@@ -2,14 +2,12 @@ package io.github.flemmli97.tenshilib.fabric.client;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.client.CustomRiderRendererManager;
-import io.github.flemmli97.tenshilib.client.TenshilibShaders;
 import io.github.flemmli97.tenshilib.client.data.GeoAnimationManager;
 import io.github.flemmli97.tenshilib.client.data.GeoModelManager;
 import io.github.flemmli97.tenshilib.client.particles.advanced.AdvancedParticleRegistry;
 import io.github.flemmli97.tenshilib.fabric.TenshiLibFabric;
 import io.github.flemmli97.tenshilib.fabric.client.events.ClientEvents;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
@@ -58,6 +56,5 @@ public class TenshiLibFabricClient implements ClientModInitializer, ClientSetupM
                 return ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "rider_layer_manager");
             }
         });
-        CoreShaderRegistrationCallback.EVENT.register(reg -> TenshilibShaders.registerShader(reg::register));
     }
 }

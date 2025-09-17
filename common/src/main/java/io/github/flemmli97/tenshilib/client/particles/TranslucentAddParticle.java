@@ -29,7 +29,7 @@ public class TranslucentAddParticle extends TextureSheetParticle {
 
     @Override
     public ParticleRenderType getRenderType() {
-        return ParticleRenderTypes.TRANSLUCENTADD;
+        return ParticleRenderTypes.TRANSLUCENT_ADD_BLURRED;
     }
 
     @Override
