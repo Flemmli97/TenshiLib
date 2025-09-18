@@ -16,6 +16,7 @@
   "client": [
     "BlockModelAccessor",
     "BlockModelDeserializerMixin",
+    "CameraMixin",
     "EntityRendererDispatcherMixin",
     "GameRendererMixin",
     "HumanoidArmorLayerMixin",
