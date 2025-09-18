@@ -5,15 +5,17 @@ import io.github.flemmli97.tenshilib.client.CustomRiderRendererManager;
 import io.github.flemmli97.tenshilib.client.data.GeoAnimationManager;
 import io.github.flemmli97.tenshilib.client.data.GeoModelManager;
 import io.github.flemmli97.tenshilib.client.particles.advanced.AdvancedParticleRegistry;
+import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import io.github.flemmli97.tenshilib.fabric.TenshiLibFabric;
-import io.github.flemmli97.tenshilib.fabric.client.events.ClientEvents;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.concurrent.CompletableFuture;
@@ -31,7 +33,7 @@ public class TenshiLibFabricClient implements ClientModInitializer, ClientSetupM
     @Override
     public void clientSetup() {
         AdvancedParticleRegistry.init();
-        ClientEvents.itemColors();
+        itemColors();
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new IdentifiableResourceReloadListener() {
             @Override
             public CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
@@ -56,5 +58,10 @@ public class TenshiLibFabricClient implements ClientModInitializer, ClientSetupM
                 return ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "rider_layer_manager");
             }
         });
+    }
+
+    public static void itemColors() {
+        for (SpawnEgg egg : SpawnEgg.getEggs())
+            ColorProviderRegistry.ITEM.register((stack, i) -> FastColor.ARGB32.opaque(egg.getColor(stack, i)), egg);
     }
 }

@@ -33,6 +33,8 @@ public class BlockModelHandler {
             name = ResourceLocation.parse(GsonHelper.getAsString(obj, "loader"));
         }
         if (name.equals(SEPARATE_ID)) {
+            obj.remove("loader");
+            BlockModel root = context.deserialize(obj, BlockModel.class);
             BlockModel baseModel = context.deserialize(GsonHelper.getAsJsonObject(obj, "base"), BlockModel.class);
             JsonObject perspectiveData = GsonHelper.getAsJsonObject(obj, "perspectives");
             Map<ItemDisplayContext, BlockModel> perspectives = new HashMap<>();
@@ -42,7 +44,7 @@ public class BlockModelHandler {
                     perspectives.put(transform, perspectiveModel);
                 }
             }
-            return new SeparateTransformsModel(baseModel, ImmutableMap.copyOf(perspectives));
+            return new SeparateTransformsModel(root, baseModel, ImmutableMap.copyOf(perspectives));
         }
         return null;
     }

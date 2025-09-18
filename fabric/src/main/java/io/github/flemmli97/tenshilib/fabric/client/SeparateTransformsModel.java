@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -38,9 +39,9 @@ public class SeparateTransformsModel extends BlockModel {
     private final BlockModel base;
     private final ImmutableMap<ItemDisplayContext, BlockModel> perspectives;
 
-    public SeparateTransformsModel(BlockModel base, ImmutableMap<ItemDisplayContext, BlockModel> perspectives) {
-        super(((BlockModelAccessor) base).tenshilib$getParentLocation(), ((BlockModelAccessor) base).tenshilib$getElements(), ((BlockModelAccessor) base).tenshilib$getTextureMap(),
-                base.hasAmbientOcclusion(), base.getGuiLight(), base.getTransforms(), base.getOverrides());
+    public SeparateTransformsModel(BlockModel root, BlockModel base, ImmutableMap<ItemDisplayContext, BlockModel> perspectives) {
+        super(null, List.of(), ((BlockModelAccessor) root).tenshilib$getTextureMap(),
+                root.hasAmbientOcclusion(), root.getGuiLight(), root.getTransforms(), root.getOverrides());
         this.base = base;
         this.perspectives = perspectives;
     }
@@ -59,6 +60,7 @@ public class SeparateTransformsModel extends BlockModel {
     @Override
     public Collection<ResourceLocation> getDependencies() {
         Set<ResourceLocation> set = Sets.newHashSet();
+        set.addAll(super.getDependencies());
         set.addAll(this.base.getDependencies());
         this.perspectives.values().forEach(model -> set.addAll(model.getDependencies()));
         return set;
@@ -66,6 +68,12 @@ public class SeparateTransformsModel extends BlockModel {
 
     @Override
     public void resolveParents(Function<ResourceLocation, UnbakedModel> resolver) {
+        this.getOverrides().forEach((itemOverride) -> {
+            UnbakedModel unbakedModel = resolver.apply(itemOverride.getModel());
+            if (!Objects.equals(unbakedModel, this)) {
+                unbakedModel.resolveParents(resolver);
+            }
+        });
         this.base.resolveParents(resolver);
         this.perspectives.values().forEach(model -> model.resolveParents(resolver));
     }
@@ -73,16 +81,32 @@ public class SeparateTransformsModel extends BlockModel {
     @Override
     public BakedModel bake(ModelBaker baker, BlockModel model, Function<Material, TextureAtlasSprite> spriteGetter, ModelState state, boolean guiLight3d) {
         BakedModel base = bake(this.base, baker, this.base, spriteGetter, state, guiLight3d);
-        return new Baked(base, ImmutableMap.copyOf(Maps.transformValues(this.perspectives,
+        return new Baked(this.hasAmbientOcclusion(), guiLight3d, this.getGuiLight().lightLikeBlock(),
+                spriteGetter.apply(this.getMaterial("particle")), this.getItemOverrides(baker, model),
+                base, ImmutableMap.copyOf(Maps.transformValues(this.perspectives,
                 value -> bake(value, baker, value, spriteGetter, state, guiLight3d))));
+    }
+
+    private ItemOverrides getItemOverrides(ModelBaker baker, BlockModel model) {
+        return this.getOverrides().isEmpty() ? ItemOverrides.EMPTY : new ItemOverrides(baker, model, this.getOverrides());
     }
 
     public static class Baked implements BakedModel {
 
+        private final boolean isAmbientOcclusion;
+        private final boolean isGui3d;
+        private final boolean usesBlockLight;
+        private final TextureAtlasSprite particle;
+        private final ItemOverrides overrides;
         private final BakedModel baseModel;
         private final ImmutableMap<ItemDisplayContext, BakedModel> perspectives;
 
-        public Baked(BakedModel baseModel, ImmutableMap<ItemDisplayContext, BakedModel> perspectives) {
+        public Baked(boolean isAmbientOcclusion, boolean isGui3d, boolean usesBlockLight, TextureAtlasSprite particle, ItemOverrides overrides, BakedModel baseModel, ImmutableMap<ItemDisplayContext, BakedModel> perspectives) {
+            this.isAmbientOcclusion = isAmbientOcclusion;
+            this.isGui3d = isGui3d;
+            this.usesBlockLight = usesBlockLight;
+            this.particle = particle;
+            this.overrides = overrides;
             this.baseModel = baseModel;
             this.perspectives = perspectives;
         }
@@ -94,17 +118,17 @@ public class SeparateTransformsModel extends BlockModel {
 
         @Override
         public boolean useAmbientOcclusion() {
-            return this.baseModel.useAmbientOcclusion();
+            return this.isAmbientOcclusion;
         }
 
         @Override
         public boolean isGui3d() {
-            return this.baseModel.isGui3d();
+            return this.isGui3d;
         }
 
         @Override
         public boolean usesBlockLight() {
-            return this.baseModel.usesBlockLight();
+            return this.usesBlockLight;
         }
 
         @Override
@@ -114,17 +138,17 @@ public class SeparateTransformsModel extends BlockModel {
 
         @Override
         public TextureAtlasSprite getParticleIcon() {
-            return this.baseModel.getParticleIcon();
+            return this.particle;
         }
 
         @Override
         public ItemTransforms getTransforms() {
-            return this.baseModel.getTransforms();
+            return ItemTransforms.NO_TRANSFORMS;
         }
 
         @Override
         public ItemOverrides getOverrides() {
-            return this.baseModel.getOverrides();
+            return this.overrides;
         }
 
         public BakedModel getContextModel(ItemDisplayContext context) {
