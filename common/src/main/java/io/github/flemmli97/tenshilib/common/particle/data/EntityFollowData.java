@@ -15,22 +15,34 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.Optional;
 
-public record EntityFollowData(int entity, Optional<Vec3> offset) implements AdvancedParticleData {
+/**
+ * Makes the particle follow the given entity
+ *
+ * @param offset         The offset to the entity. Ignored if differenceOnly is true
+ * @param differenceOnly If true the particle only moves the amount the entity moved between the last tick
+ */
+public record EntityFollowData(int entity, Optional<Vec3> offset,
+                               boolean differenceOnly) implements AdvancedParticleData {
 
     public static final MapCodec<EntityFollowData> CODEC = RecordCodecBuilder.mapCodec(inst ->
             inst.group(Codec.INT.fieldOf("entity").forGetter(EntityFollowData::entity),
-                    Vec3.CODEC.optionalFieldOf("offset").forGetter(EntityFollowData::offset)
+                    Vec3.CODEC.optionalFieldOf("offset").forGetter(EntityFollowData::offset),
+                    Codec.BOOL.fieldOf("difference_only").forGetter(EntityFollowData::differenceOnly)
             ).apply(inst, EntityFollowData::new));
     public static final StreamCodec<ByteBuf, EntityFollowData> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.INT, EntityFollowData::entity,
-            ByteBufCodecs.optional(StreamCodecs.VEC3), EntityFollowData::offset, EntityFollowData::new);
+            ByteBufCodecs.INT, EntityFollowData::entity, ByteBufCodecs.optional(StreamCodecs.VEC3), EntityFollowData::offset,
+            ByteBufCodecs.BOOL, EntityFollowData::differenceOnly, EntityFollowData::new);
 
     public EntityFollowData(Entity entity) {
-        this(entity.getId(), Optional.empty());
+        this(entity.getId(), Optional.empty(), false);
     }
 
     public EntityFollowData(Entity entity, Vec3 offset) {
-        this(entity.getId(), Optional.of(offset));
+        this(entity.getId(), Optional.of(offset), false);
+    }
+
+    public EntityFollowData(Entity entity, boolean differenceOnly) {
+        this(entity.getId(), Optional.empty(), differenceOnly);
     }
 
     @Override

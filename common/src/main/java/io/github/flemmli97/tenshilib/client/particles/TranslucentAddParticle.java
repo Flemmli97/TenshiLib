@@ -15,7 +15,7 @@ public class TranslucentAddParticle extends TextureSheetParticle {
     protected boolean randomMovements, gravity;
     /**
      * The size of the particles texture.
-     * This is important since we reduce the size of uv by one pixel to prevent texture atlas overflow from using a blurred texture (e.g. by using {@link ParticleRenderTypes#TRANSLUCENTADD}.
+     * This is important since we reduce the size of uv by one pixel to prevent texture atlas overflow from using a blurred texture (e.g. by using {@link ParticleRenderTypes#TRANSLUCENT_ADD_BLURRED}.
      * Set to 0 to disable
      */
     protected int textureSizeX = 16, textureSizeY = 16;

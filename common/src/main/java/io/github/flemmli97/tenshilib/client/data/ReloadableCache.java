@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * Instance holder to easily reload the content during a resource reload
+ */
 public class ReloadableCache<T> {
 
     private final List<Consumer<T>> listeners = new ArrayList<>();

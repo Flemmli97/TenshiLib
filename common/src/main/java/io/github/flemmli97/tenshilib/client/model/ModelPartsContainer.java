@@ -6,6 +6,7 @@ import com.mojang.math.Axis;
 import io.github.flemmli97.tenshilib.mixin.ModelPartAccessor;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.util.FastColor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -219,6 +220,8 @@ public class ModelPartsContainer {
         }
 
         private void compile(PoseStack.Pose pose, VertexConsumer vertexConsumer, int i, int j, int color) {
+            if (FastColor.ARGB32.alpha(color) == 0)
+                return;
             for (ModelPart.Cube cube : this.cubes) {
                 cube.compile(pose, vertexConsumer, i, j, color);
             }

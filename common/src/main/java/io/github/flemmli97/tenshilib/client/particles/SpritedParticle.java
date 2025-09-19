@@ -8,6 +8,9 @@ import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.core.particles.ParticleOptions;
 
+/**
+ * A simple particle with a sprite that is updated depending on the particles age
+ */
 public class SpritedParticle extends TextureSheetParticle {
 
     public final SpriteSet spriteProvider;

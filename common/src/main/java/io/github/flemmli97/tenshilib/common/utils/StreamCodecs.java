@@ -32,7 +32,7 @@ public class StreamCodecs {
         public void encode(ByteBuf buf, Vector4f data) {
             buf.writeFloat(data.x());
             buf.writeFloat(data.y());
-            buf.writeFloat(data.x());
+            buf.writeFloat(data.z());
             buf.writeFloat(data.w());
         }
     };
