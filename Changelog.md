@@ -1,3 +1,13 @@
+TenshiLib 2.2.0
+================
+
+- Advanced particle system allowing customizable particle movements etc.
+- Multipart entity base
+- Change shader blurr to atlas instead of shader
+- Add crossplat shader registration
+- Fabric: Add entity start tracking event (yes fapi has one but its at head...)
+- Some internal changes
+
 TenshiLib 2.1.3
 ================
 - Add neos separate transform model for fabric
