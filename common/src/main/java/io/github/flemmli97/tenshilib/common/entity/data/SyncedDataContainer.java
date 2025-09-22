@@ -94,7 +94,8 @@ public class SyncedDataContainer<T extends Entity & SyncedMobDataHandler> {
         if (!Objects.equals(source.syncedEntityData, target.syncedEntityData)) {
             throw new IllegalStateException(String.format("Invalid entity data for entity %s - [source: %s, target: %s]", this.entity, source, target));
         } else {
-            target.setValue((D) source.value);
+            SyncedContainer<D> current = (SyncedContainer<D>) source;
+            current.setValue(target.value);
         }
     }
 
