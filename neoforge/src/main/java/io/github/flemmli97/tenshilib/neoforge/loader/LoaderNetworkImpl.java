@@ -1,7 +1,9 @@
 package io.github.flemmli97.tenshilib.neoforge.loader;
 
 import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -25,6 +27,13 @@ public class LoaderNetworkImpl implements LoaderNetwork {
     @Override
     public void sendToTracking(CustomPacketPayload message, Entity entity) {
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(entity, message);
+    }
+
+    @Override
+    public void sendVanillaToTracking(Packet<?> message, Entity entity) {
+        if (entity.level().getChunkSource() instanceof ServerChunkCache chunkCache) {
+            chunkCache.broadcastAndSend(entity, message);
+        }
     }
 
     @Override

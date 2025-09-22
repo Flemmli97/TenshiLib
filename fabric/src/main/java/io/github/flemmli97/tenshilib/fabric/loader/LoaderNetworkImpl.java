@@ -4,6 +4,7 @@ import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -31,6 +32,11 @@ public class LoaderNetworkImpl implements LoaderNetwork {
                 .forEach(player -> ServerPlayNetworking.send(player, message));
         if (entity instanceof ServerPlayer player)
             ServerPlayNetworking.send(player, message);
+    }
+
+    @Override
+    public void sendVanillaToTracking(Packet<?> message, Entity entity) {
+        PlayerLookup.tracking(entity).forEach(player -> player.connection.send(message));
     }
 
     @Override

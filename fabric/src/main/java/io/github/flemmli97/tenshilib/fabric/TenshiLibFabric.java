@@ -3,6 +3,7 @@ package io.github.flemmli97.tenshilib.fabric;
 import com.mojang.datafixers.util.Pair;
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.common.data.AnimationDataManager;
+import io.github.flemmli97.tenshilib.common.effect.SyncedMobEffect;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimationState;
 import io.github.flemmli97.tenshilib.common.entity.data.SyncedMobDataHandler;
@@ -25,12 +26,16 @@ import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.DispenserBlock;
 
 import java.util.ArrayList;
@@ -52,6 +57,12 @@ public class TenshiLibFabric implements ModInitializer, DedicatedServerModInitia
             }
             if (entity instanceof SyncedMobDataHandler handler) {
                 handler.getDataContainer().sendEntriesTo(player);
+            }
+            if (!(entity instanceof Player) && entity instanceof LivingEntity living) {
+                for (MobEffectInstance instance : living.getActiveEffects()) {
+                    if (instance.getEffect().value() instanceof SyncedMobEffect)
+                        player.connection.send(new ClientboundUpdateMobEffectPacket(living.getId(), instance, false));
+                }
             }
         }));
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new IdentifiableResourceReloadListener() {

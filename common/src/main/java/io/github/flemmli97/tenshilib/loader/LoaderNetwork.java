@@ -1,5 +1,6 @@
 package io.github.flemmli97.tenshilib.loader;
 
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -24,6 +25,8 @@ public interface LoaderNetwork {
     void sendToPlayer(CustomPacketPayload message, ServerPlayer player);
 
     void sendToTracking(CustomPacketPayload message, Entity entity);
+
+    void sendVanillaToTracking(Packet<?> message, Entity entity);
 
     void sendToTracking(CustomPacketPayload message, ServerLevel level, ChunkPos pos);
 
