@@ -1,6 +1,6 @@
 package io.github.flemmli97.tenshilib.neoforge.events;
 
-import io.github.flemmli97.tenshilib.common.effect.SyncedMobEffect;
+import io.github.flemmli97.tenshilib.common.effect.ExtendedMobEffect;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimationState;
 import io.github.flemmli97.tenshilib.common.entity.data.SyncedMobDataHandler;
@@ -42,7 +42,7 @@ public class CommonEvents {
         }
         if (!(event.getTarget() instanceof Player) && event.getTarget() instanceof LivingEntity living && event.getEntity() instanceof ServerPlayer player) {
             for (MobEffectInstance instance : living.getActiveEffects()) {
-                if (instance.getEffect().value() instanceof SyncedMobEffect)
+                if (instance.getEffect().value() instanceof ExtendedMobEffect ext && ext.shouldSync())
                     player.connection.send(new ClientboundUpdateMobEffectPacket(living.getId(), instance, false));
             }
         }

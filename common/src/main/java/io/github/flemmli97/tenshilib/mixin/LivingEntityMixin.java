@@ -1,6 +1,6 @@
 package io.github.flemmli97.tenshilib.mixin;
 
-import io.github.flemmli97.tenshilib.common.effect.SyncedMobEffect;
+import io.github.flemmli97.tenshilib.common.effect.ExtendedMobEffect;
 import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
 import net.minecraft.network.protocol.game.ClientboundRemoveMobEffectPacket;
 import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket;
@@ -16,20 +16,38 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {
 
-    @Inject(method = "onEffectAdded", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/effect/MobEffect;addAttributeModifiers(Lnet/minecraft/world/entity/ai/attributes/AttributeMap;I)V"))
-    private void onAddedEffect(MobEffectInstance effectInstance, Entity entity, CallbackInfo ci) {
-        if (!((Object) this instanceof Player) && effectInstance.getEffect().value() instanceof SyncedMobEffect) {
-            LoaderNetwork.INSTANCE.sendVanillaToTracking(new ClientboundUpdateMobEffectPacket(((LivingEntity) (Object) this).getId(), effectInstance, false),
-                    (LivingEntity) (Object) this);
+    @Inject(method = "onEffectAdded", at = @At("RETURN"))
+    private void onAddedEffect(MobEffectInstance instance, Entity entity, CallbackInfo ci) {
+        if (instance.getEffect().value() instanceof ExtendedMobEffect ext) {
+            ext.onEffectAdded(((LivingEntity) (Object) this), instance);
+            if (ext.shouldSync() && !((Object) this instanceof Player) && !((LivingEntity) (Object) this).level().isClientSide) {
+                if (ext.shouldSync()) {
+                    LoaderNetwork.INSTANCE.sendVanillaToTracking(new ClientboundUpdateMobEffectPacket(((LivingEntity) (Object) this).getId(), instance, true),
+                            (LivingEntity) (Object) this);
+                }
+            }
         }
     }
 
-    @Inject(method = "onEffectRemoved", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/effect/MobEffect;removeAttributeModifiers(Lnet/minecraft/world/entity/ai/attributes/AttributeMap;)V"))
-    private void onAddedEffect(MobEffectInstance effectInstance, CallbackInfo ci) {
-        if (!((Object) this instanceof Player) && effectInstance.getEffect().value() instanceof SyncedMobEffect) {
-            LoaderNetwork.INSTANCE.sendVanillaToTracking(new ClientboundRemoveMobEffectPacket(((LivingEntity) (Object) this).getId(), effectInstance.getEffect()),
-                    (LivingEntity) (Object) this);
+    @Inject(method = "onEffectUpdated", at = @At("RETURN"))
+    private void onUpdatedEffect(MobEffectInstance instance, boolean forced, Entity entity, CallbackInfo ci) {
+        if (instance.getEffect().value() instanceof ExtendedMobEffect ext) {
+            ext.onEffectUpdated(((LivingEntity) (Object) this), instance);
+            if (ext.shouldSync() && !((Object) this instanceof Player) && !((LivingEntity) (Object) this).level().isClientSide) {
+                LoaderNetwork.INSTANCE.sendVanillaToTracking(new ClientboundUpdateMobEffectPacket(((LivingEntity) (Object) this).getId(), instance, false),
+                        (LivingEntity) (Object) this);
+            }
+        }
+    }
 
+    @Inject(method = "onEffectRemoved", at = @At("RETURN"))
+    private void onAddedEffect(MobEffectInstance instance, CallbackInfo ci) {
+        if (instance.getEffect().value() instanceof ExtendedMobEffect ext) {
+            ext.onEffectRemoved(((LivingEntity) (Object) this), instance);
+            if (ext.shouldSync() && !((Object) this instanceof Player) && !((LivingEntity) (Object) this).level().isClientSide) {
+                LoaderNetwork.INSTANCE.sendVanillaToTracking(new ClientboundRemoveMobEffectPacket(((LivingEntity) (Object) this).getId(), instance.getEffect()),
+                        (LivingEntity) (Object) this);
+            }
         }
     }
 }

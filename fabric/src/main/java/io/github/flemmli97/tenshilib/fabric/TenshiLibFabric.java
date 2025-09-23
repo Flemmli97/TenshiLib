@@ -3,7 +3,7 @@ package io.github.flemmli97.tenshilib.fabric;
 import com.mojang.datafixers.util.Pair;
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.common.data.AnimationDataManager;
-import io.github.flemmli97.tenshilib.common.effect.SyncedMobEffect;
+import io.github.flemmli97.tenshilib.common.effect.ExtendedMobEffect;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimatedEntity;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimationState;
 import io.github.flemmli97.tenshilib.common.entity.data.SyncedMobDataHandler;
@@ -60,7 +60,7 @@ public class TenshiLibFabric implements ModInitializer, DedicatedServerModInitia
             }
             if (!(entity instanceof Player) && entity instanceof LivingEntity living) {
                 for (MobEffectInstance instance : living.getActiveEffects()) {
-                    if (instance.getEffect().value() instanceof SyncedMobEffect)
+                    if (instance.getEffect().value() instanceof ExtendedMobEffect ext && ext.shouldSync())
                         player.connection.send(new ClientboundUpdateMobEffectPacket(living.getId(), instance, false));
                 }
             }
