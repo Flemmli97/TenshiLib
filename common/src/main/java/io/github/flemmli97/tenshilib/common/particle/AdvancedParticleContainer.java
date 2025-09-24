@@ -76,6 +76,14 @@ public record AdvancedParticleContainer(ParticleOptions options, List<AdvancedPa
             return this;
         }
 
+        public void add(Level level, double x, double y, double z) {
+            this.add(level, null, x, y, z, false);
+        }
+
+        public void add(Level level, @Nullable Player player, double x, double y, double z, boolean longDistance) {
+            this.build().add(level, player, x, y, z, longDistance);
+        }
+
         public AdvancedParticleContainer build() {
             return new AdvancedParticleContainer(this.options, List.copyOf(this.data));
         }
