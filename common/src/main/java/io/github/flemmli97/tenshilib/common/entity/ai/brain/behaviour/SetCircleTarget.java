@@ -4,7 +4,6 @@ import com.mojang.datafixers.util.Pair;
 import io.github.flemmli97.tenshilib.common.entity.ai.brain.data.CircleData;
 import io.github.flemmli97.tenshilib.common.registry.TenshilibMemoryModules;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.behavior.BlockPosTracker;
 import net.minecraft.world.entity.ai.behavior.PositionTracker;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -17,7 +16,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-public class SetCircleTarget<E extends Mob> extends ExtendedBehaviour<E> {
+public class SetCircleTarget<E extends LivingEntity> extends ExtendedBehaviour<E> {
 
     private static final MemoryTest MEMORIES = MemoryTest.builder(2).hasMemory(MemoryModuleType.ATTACK_TARGET).usesMemories(TenshilibMemoryModules.CIRCLE_DATA.get());
 
