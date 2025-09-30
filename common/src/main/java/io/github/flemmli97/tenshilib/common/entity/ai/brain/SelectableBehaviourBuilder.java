@@ -9,19 +9,14 @@ import net.tslat.smartbrainlib.api.core.behaviour.SequentialBehaviour;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
  * Helper in building a selectable behaviour sequence
  * Using only {@link OneRandomBehaviour} with {@link SequentialBehaviour} will cause a switch to another
  * sequence if the current one fails/stops/aborts
- * Using this will make it so the selected one runs till its stopped from other sources.
- * <pre>
- * {@code
- *  # Stop example
- *  SelectableBehaviourBuilder.builder().build().stopIf(Condition)
- * }
- * </pre>
+ * Using this will make it so the selected one runs till it's stopped from other sources.
  */
 public class SelectableBehaviourBuilder<E extends LivingEntity> {
 
@@ -33,11 +28,16 @@ public class SelectableBehaviourBuilder<E extends LivingEntity> {
 
     @SafeVarargs
     public final SelectableBehaviourBuilder<E> add(int weight, ExtendedBehaviour<E>... behaviours) {
-        return this.add(weight, null, behaviours);
+        return this.add(weight, (Consumer<ExtendedBehaviour<E>>) null, behaviours);
     }
 
     @SafeVarargs
     public final SelectableBehaviourBuilder<E> add(int weight, Predicate<E> condition, ExtendedBehaviour<E>... behaviours) {
+        return this.add(weight, (Consumer<ExtendedBehaviour<E>>) behavior -> behavior.startCondition(condition), behaviours);
+    }
+
+    @SafeVarargs
+    public final SelectableBehaviourBuilder<E> add(int weight, Consumer<ExtendedBehaviour<E>> setup, ExtendedBehaviour<E>... behaviours) {
         if (behaviours.length == 0)
             return this;
         ExtendedBehaviour<E> behaviour;
@@ -46,8 +46,8 @@ public class SelectableBehaviourBuilder<E extends LivingEntity> {
         } else {
             behaviour = new RepeatingBehaviour<>(new SequentialBehaviour<>(behaviours));
         }
-        if (condition != null) {
-            behaviour.startCondition(condition);
+        if (setup != null) {
+            setup.accept(behaviour);
         }
         this.behaviors.add(Pair.of(behaviour, weight));
         return this;
