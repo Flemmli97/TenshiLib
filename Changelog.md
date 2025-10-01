@@ -1,3 +1,9 @@
+TenshiLib 2.2.1
+================
+- Add mob effect extension
+  - Allows syncing some effects to client which isn't done for non players
+- Some AI stuff
+
 TenshiLib 2.2.0
 ================
 - Advanced particle system allowing customizable particle movements etc.
