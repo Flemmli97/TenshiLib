@@ -66,7 +66,7 @@ public abstract class BeamRenderer<T extends BeamEntity> extends EntityRenderer<
     public void render(T entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         entity.updateYawPitch();
         float dist = (float) entity.hitVec().distanceTo(entity.startVec());
-        float width = this.widthFunc(entity);
+        float width = this.widthFunc(entity, partialTicks);
         poseStack.pushPose();
         poseStack.mulPose(Axis.YN.rotationDegrees(Mth.lerp(partialTicks, entity.yRotO, entity.getYRot()) + 90));
         poseStack.mulPose(Axis.ZP.rotationDegrees(-Mth.lerp(partialTicks, entity.xRotO, entity.getXRot())));
@@ -183,8 +183,8 @@ public abstract class BeamRenderer<T extends BeamEntity> extends EntityRenderer<
      */
     public abstract ResourcePair endTexture(T entity);
 
-    public float widthFunc(T entity) {
-        float prog = Math.min(entity.livingTicks() / (float) entity.livingTickMax(), 1);
+    public float widthFunc(T entity, float partialTicks) {
+        float prog = Math.clamp((entity.livingTicks() + partialTicks) / (float) entity.livingTickMax(), 0, 1);
         return (float) (entity.radius() * 2 * (Math.sin(Math.sqrt(prog) * Math.PI)));
     }
 

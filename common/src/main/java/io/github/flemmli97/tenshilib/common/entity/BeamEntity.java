@@ -128,7 +128,7 @@ public abstract class BeamEntity extends Entity implements TraceableEntity {
 
     public void updateHitDetectBox() {
         double dist = this.hitVec != null ? this.hitVec.subtract(this.position()).length() : 0;
-        this.hitObb = new OrientedBoundingBox(OrientedBoundingBox.baseBox(this.radius() * 2, this.radius() * 2, dist + 1.5),
+        this.hitObb = new OrientedBoundingBox(OrientedBoundingBox.baseBox(this.radius() * 2, this.radius() * 2, dist + 0.5),
                 this.getYRot(), -this.getXRot(), this.position());
     }
 
