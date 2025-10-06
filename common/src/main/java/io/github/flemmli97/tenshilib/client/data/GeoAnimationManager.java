@@ -27,6 +27,7 @@ public class GeoAnimationManager extends SimpleJsonResourceReloadListener {
     private static final GeoAnimationManager INSTANCE = new GeoAnimationManager();
 
     private final Map<ResourceLocation, ReloadableCache<BedrockAnimations>> animations = new HashMap<>();
+    private final Set<ResourceLocation> optional = new HashSet<>();
     private boolean reloaded;
 
     private GeoAnimationManager() {
@@ -51,14 +52,29 @@ public class GeoAnimationManager extends SimpleJsonResourceReloadListener {
         });
         this.reloaded = true;
         List<ResourceLocation> missing = new ArrayList<>();
+        List<ResourceLocation> optionalMissing = new ArrayList<>();
         this.animations.keySet().forEach(id -> {
             if (!present.contains(id)) {
-                missing.add(id);
+                if (!this.optional.contains(id)) {
+                    missing.add(id);
+                } else {
+                    optionalMissing.add(id);
+                }
             }
         });
         if (!missing.isEmpty()) {
-            throw new IllegalStateException("Following animations could not be found! " + missing);
+            throw new IllegalStateException("Following animations could not be found: " + missing);
         }
+        if (!optionalMissing.isEmpty()) {
+            TenshiLib.LOGGER.error("Following optional animations could not be found: {}", optionalMissing);
+        }
+    }
+
+    public ReloadableCache<BedrockAnimations> getOptionalAnimation(ResourceLocation id) {
+        this.optional.add(id);
+        ReloadableCache<BedrockAnimations> cache = this.getAnimation(id);
+        cache.update(BedrockAnimations.empty());
+        return cache;
     }
 
     public ReloadableCache<BedrockAnimations> getAnimation(ResourceLocation id) {

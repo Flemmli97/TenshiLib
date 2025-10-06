@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 public class ModelPartsContainer {
@@ -166,6 +167,23 @@ public class ModelPartsContainer {
             }
         }
 
+        /**
+         * Renders child parts even if current part is invisible
+         */
+        public void renderForced(PoseStack poseStack, VertexConsumer vertexConsumer, int i, int j, int color) {
+            if (!this.cubes.isEmpty() || !this.children.isEmpty()) {
+                poseStack.pushPose();
+                this.translateAndRotate(poseStack);
+                if (this.visible) {
+                    this.compile(poseStack.last(), vertexConsumer, i, j, color);
+                }
+                for (ModelPartExtended modelPart : this.children.values()) {
+                    modelPart.renderForced(poseStack, vertexConsumer, i, j, color);
+                }
+                poseStack.popPose();
+            }
+        }
+
         public void visit(PoseStack poseStack, ModelPart.Visitor visitor) {
             this.visit(poseStack, visitor, "");
         }
@@ -241,6 +259,13 @@ public class ModelPartsContainer {
                     throw new IllegalStateException("Part with name " + key + " already exists!");
                 map.put(key, value);
                 value.getMappedParts(map);
+            });
+        }
+
+        public void forEach(BiConsumer<String, ModelPartExtended> consumer) {
+            this.children.forEach((name, part) -> {
+                consumer.accept(name, part);
+                part.forEach(consumer);
             });
         }
 

@@ -60,6 +60,10 @@ public class BedrockAnimations {
         };
     }
 
+    public static BedrockAnimations empty() {
+        return new BedrockAnimations(Map.of());
+    }
+
     public static float wrapDegrees(float value) {
         float f = value % 360.0F;
         if (f < 0) {

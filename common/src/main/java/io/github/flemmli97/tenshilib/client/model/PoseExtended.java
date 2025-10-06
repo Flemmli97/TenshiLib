@@ -49,4 +49,10 @@ public class PoseExtended {
     public PartPose asPartPose() {
         return PartPose.offsetAndRotation(this.x, this.y, this.z, this.xRot, this.yRot, this.zRot);
     }
+
+    @Override
+    public String toString() {
+        return String.format("Pose: [x:%s, y:%s z:%s, xRot: %s, yRot: %s, zRot: %s, xScale: %s, yScale: %s, zScale: %s]", this.x, this.y, this.z,
+                this.xRot, this.yRot, this.zRot, this.xScale, this.yScale, this.zScale);
+    }
 }

@@ -3,6 +3,7 @@ package io.github.flemmli97.tenshilib.client.data;
 import com.google.gson.JsonElement;
 import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.client.model.BedrockGeometryParser;
+import io.github.flemmli97.tenshilib.client.model.DeformationChange;
 import io.github.flemmli97.tenshilib.client.model.ModelPartsContainer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -28,7 +29,7 @@ public class GeoModelManager extends SimpleJsonResourceReloadListener {
 
     private static final GeoModelManager INSTANCE = new GeoModelManager();
 
-    private final Map<ResourceLocation, ReloadableCache<ModelPartsContainer>> models = new HashMap<>();
+    private final Map<ResourceLocation, ModelCache> models = new HashMap<>();
     private boolean reloaded;
 
     private GeoModelManager() {
@@ -44,9 +45,9 @@ public class GeoModelManager extends SimpleJsonResourceReloadListener {
         Set<ResourceLocation> present = new HashSet<>();
         map.forEach((res, json) -> {
             try {
-                ModelPartsContainer read = BedrockGeometryParser.GSON.fromJson(json, ModelPartsContainer.class);
+                BedrockGeometryParser.BedrockGeometry read = BedrockGeometryParser.GSON.fromJson(json, BedrockGeometryParser.BedrockGeometry.class);
                 ResourceLocation id = ResourceLocation.fromNamespaceAndPath(res.getNamespace(), res.getPath().replace(".geo", ""));
-                this.getModel(id).update(read);
+                this.getUnbaked(id).update(read);
                 present.add(id);
             } catch (Exception e) {
                 TenshiLib.LOGGER.error("Unable to parse geo model file {}", res, e);
@@ -64,15 +65,23 @@ public class GeoModelManager extends SimpleJsonResourceReloadListener {
         }
     }
 
+    private ModelCache getUnbaked(ResourceLocation id) {
+        return this.models.computeIfAbsent(id, r -> {
+            if (this.reloaded)
+                TenshiLib.LOGGER.error("Model {} is not present! Returned result will be empty!", r);
+            return new ModelCache();
+        });
+    }
+
     public ReloadableCache<ModelPartsContainer> getModel(ResourceLocation id) {
         return this.getModel(id, null);
     }
 
     public ReloadableCache<ModelPartsContainer> getModel(ResourceLocation id, Consumer<ModelPartsContainer> onChange) {
-        return this.models.computeIfAbsent(id, r -> {
-            if (this.reloaded)
-                TenshiLib.LOGGER.error("Model {} is not present! Returned result will be empty!", r);
-            return new ReloadableCache<>();
-        }).onChange(onChange);
+        return this.getModel(id, DeformationChange.NONE, onChange);
+    }
+
+    public ReloadableCache<ModelPartsContainer> getModel(ResourceLocation id, DeformationChange deformation, Consumer<ModelPartsContainer> onChange) {
+        return this.getUnbaked(id).bake(deformation, onChange);
     }
 }

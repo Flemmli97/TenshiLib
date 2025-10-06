@@ -9,6 +9,7 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import io.github.flemmli97.tenshilib.mixinhelper.CubeDefinitionExtension;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -32,17 +33,9 @@ import java.util.stream.Collectors;
 public class BedrockGeometryParser {
 
     public static final Gson GSON = new GsonBuilder().setLenient()
-            .registerTypeAdapter(ModelPartsContainer.class, deserializer())
             .registerTypeAdapter(BedrockGeometry.class, BedrockGeometry.deserializer())
             .registerTypeAdapter(Bone.class, Bone.deserializer())
             .registerTypeAdapter(Cube.class, Cube.deserializer()).create();
-
-    private static JsonDeserializer<ModelPartsContainer> deserializer() {
-        return (json, type, ctx) -> {
-            BedrockGeometry geometry = ctx.deserialize(json, BedrockGeometry.class);
-            return geometry.bake();
-        };
-    }
 
     private static Vector3f calculateOrigin(Bone bone, Map<String, Bone> boneMap) {
         Vector3f origin = new Vector3f(bone.pivot());
@@ -78,14 +71,14 @@ public class BedrockGeometryParser {
             };
         }
 
-        public ModelPartsContainer bake() {
+        public ModelPartsContainer bake(DeformationChange deformation) {
             Map<String, Bone> boneMap = new HashMap<>();
             this.bones().forEach(b -> boneMap.put(b.name(), b));
 
             ModelPartBuilder root = new ModelPartBuilder();
             Map<String, ModelPartBuilder> parts = new HashMap<>();
             this.bones().forEach(bone -> this.bakeBone(bone, parts, boneMap, root));
-            return new ModelPartsContainer(root.bake(this.textureWidth, this.textureHeight));
+            return new ModelPartsContainer(root.bake(deformation, this.textureWidth, this.textureHeight));
         }
 
         private void bakeBone(Bone bone, Map<String, ModelPartBuilder> map, Map<String, Bone> boneMap, ModelPartBuilder root) {
@@ -193,11 +186,15 @@ public class BedrockGeometryParser {
             this.children.put(name, child);
         }
 
-        public ModelPart bake(int texWidth, int texHeight) {
+        public ModelPart bake(DeformationChange deformation, int texWidth, int texHeight) {
             Object2ObjectArrayMap<String, ModelPart> map = this.children.entrySet().stream()
-                    .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().bake(texWidth, texHeight),
+                    .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().bake(deformation, texWidth, texHeight),
                             (modelPart, modelPart2) -> modelPart, Object2ObjectArrayMap::new));
-            List<ModelPart.Cube> cubes = this.cubes.stream().map(cubeDefinition -> cubeDefinition.bake(texWidth, texHeight)).collect(ImmutableList.toImmutableList());
+            List<ModelPart.Cube> cubes = this.cubes.stream().map(cubeDefinition -> {
+                if (deformation.equals(DeformationChange.NONE))
+                    return cubeDefinition.bake(texWidth, texHeight);
+                return ((CubeDefinitionExtension) (Object) cubeDefinition).tenshilib$bakeWith(deformation, texWidth, texHeight);
+            }).collect(ImmutableList.toImmutableList());
             ModelPart modelPart3 = new ModelPart(cubes, map);
             modelPart3.setInitialPose(this.partPose);
             modelPart3.loadPose(this.partPose);
