@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.function.Predicate;
 
 @Mixin(ParticleEngine.class)
-public class NeoForgeParticleEngineMixin {
+public abstract class NeoForgeParticleEngineMixin {
 
     @Shadow
     @Final

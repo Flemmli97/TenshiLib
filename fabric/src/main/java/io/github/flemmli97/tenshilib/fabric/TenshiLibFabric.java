@@ -9,6 +9,7 @@ import io.github.flemmli97.tenshilib.common.entity.animated.AnimationState;
 import io.github.flemmli97.tenshilib.common.entity.data.SyncedMobDataHandler;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import io.github.flemmli97.tenshilib.common.network.S2CEntityAnimation;
+import io.github.flemmli97.tenshilib.fabric.attachment.AttachmentHandler;
 import io.github.flemmli97.tenshilib.fabric.events.CommonEvents;
 import io.github.flemmli97.tenshilib.fabric.events.EntityStartTrackEvent;
 import io.github.flemmli97.tenshilib.fabric.loader.TenshiLibCrossPlatImpl;
@@ -21,6 +22,9 @@ import io.github.flemmli97.tenshilib.fabric.network.PacketHandler;
 import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
@@ -81,6 +85,16 @@ public class TenshiLibFabric implements ModInitializer, DedicatedServerModInitia
 
         PacketHandler.register();
         TenshiLibPatreonImpl.initPatreonData();
+
+        ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) ->
+                AttachmentHandler.copyAttachments(oldPlayer, newPlayer, !alive)
+        );
+        ServerEntityWorldChangeEvents.AFTER_ENTITY_CHANGE_WORLD.register(((originalEntity, newEntity, origin, destination) ->
+                AttachmentHandler.copyAttachments(originalEntity, newEntity, false))
+        );
+        ServerLivingEntityEvents.MOB_CONVERSION.register((previous, converted, keepEquipment) ->
+                AttachmentHandler.copyAttachments(previous, converted, true)
+        );
     }
 
     /**

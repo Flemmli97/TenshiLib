@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.OptionalDouble;
 
 @Mixin(AttributeSupplier.class)
-public class AttributeSupplierMixin implements EntityAttributeModifierEvent.AttributeSupplierMerger {
+public abstract class AttributeSupplierMixin implements EntityAttributeModifierEvent.AttributeSupplierMerger {
 
     @Shadow
     @Final

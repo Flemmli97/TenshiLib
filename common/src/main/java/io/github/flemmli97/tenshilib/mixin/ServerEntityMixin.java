@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerEntity.class)
-public class ServerEntityMixin {
+public abstract class ServerEntityMixin {
 
     @Shadow
     @Final
