@@ -1,3 +1,9 @@
+TenshiLib 2.2.2
+================
+- Update model handling
+- Update beam renderer
+- Add crossplatform attachment system
+
 TenshiLib 2.2.1
 ================
 - Add mob effect extension
