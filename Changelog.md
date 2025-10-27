@@ -1,3 +1,7 @@
+TenshiLib 2.2.3
+================
+- Add attachment shortcut
+
 TenshiLib 2.2.2
 ================
 - Update model handling
