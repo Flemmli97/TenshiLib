@@ -22,7 +22,7 @@ public interface AOEWeapon extends ExtendedWeapon {
 
     static OrientedBoundingBox createOBB(LivingEntity entity, double length, double width, double height) {
         AABB aabb = new AABB(-width * 0.5, 0, 0, width * 0.5, height, length);
-        float yRot = entity.getYRot();
+        float yRot = entity.getYHeadRot();
         float xRot = -entity.getXRot();
         return new OrientedBoundingBox(aabb
                 .move(0, -aabb.getYsize() * 0.5, 0), yRot, xRot, entity.getEyePosition());

@@ -3,6 +3,7 @@ package io.github.flemmli97.tenshilib.common.entity.animated;
 import io.github.flemmli97.tenshilib.common.data.AnimationDataManager;
 import io.github.flemmli97.tenshilib.common.network.S2CEntityAnimation;
 import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.ToFloatFunction;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class AnimationHandler<T extends Entity & AnimatedEntity> {
+public class AnimationHandler<T extends Entity> {
 
     public static final int DEFAULT_TRANSIT_TIME = 3;
     public static final int FALLBACK_TRANSIT_TIME = -1;
@@ -32,8 +33,7 @@ public class AnimationHandler<T extends Entity & AnimatedEntity> {
     private int timeSinceLastChange = -1;
 
     public AnimationHandler(T entity, AnimationDefinitionContainer defaulted) {
-        this.entity = entity;
-        this.definitions = AnimationDataManager.getInstance().getAnimation(entity.getType(), defaulted);
+        this(entity, BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()), defaulted);
     }
 
     public AnimationHandler(T entity, ResourceLocation id, AnimationDefinitionContainer defaulted) {
@@ -124,19 +124,25 @@ public class AnimationHandler<T extends Entity & AnimatedEntity> {
             this.timeSinceLastChange = 0;
             if (animation != null) {
                 startTransition = startTransition > 0 ? startTransition : this.lastAnimation.getEndTransitionTime();
-                this.lastAnimation = AnimationState.create(animation, this.currentAnimation.getStartTransition(),
+                this.lastAnimation = AnimationState.create(this.currentAnimation.definition(), this.currentAnimation.getStartTransition(),
                         startTransition, this.currentAnimation.getTick(1),
                         this.currentAnimation.getSpeed());
             }
         } else if (this.lastAnimation != null && animation != null) {
-            this.lastAnimation = AnimationState.create(animation, this.lastAnimation.getStartTransition(),
+            this.lastAnimation = AnimationState.create(this.lastAnimation.definition(), this.lastAnimation.getStartTransition(),
                     startTransition + this.timeSinceLastChange, this.lastAnimation.getTick(1),
                     this.lastAnimation.getSpeed());
         }
         this.currentAnimation = animation == null ? null : AnimationState.create(animation, startTransition, endTransition,
                 offset, this.animationSpeedHandler == null ? 1 : this.animationSpeedHandler.apply(animation));
-        if (!this.entity.level().isClientSide) {
-            LoaderNetwork.INSTANCE.sendToTracking(S2CEntityAnimation.create(this.entity, startTransition, endTransition, offset), this.entity);
+        if (!this.getEntity().level().isClientSide) {
+            this.syncToClient(startTransition, endTransition, offset);
+        }
+    }
+
+    protected void syncToClient(int startTransition, int endTransition, double offset) {
+        if (this.getEntity() instanceof AnimatedEntity) {
+            LoaderNetwork.INSTANCE.sendToTracking(S2CEntityAnimation.create((Entity & AnimatedEntity) this.getEntity(), startTransition, endTransition, offset), this.getEntity());
         }
     }
 
