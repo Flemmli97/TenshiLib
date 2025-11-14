@@ -1,5 +1,7 @@
 package io.github.flemmli97.tenshilib.common.entity.animated;
 
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Mth;
 
 /**
@@ -8,18 +10,18 @@ import net.minecraft.util.Mth;
 public class AnimationState {
 
     private final AnimationDefinition data;
-    private final double speed;
+    private final double speed, offset;
 
     private final int startTransition, endTransition;
 
-    private double offset;
     private double ticker;
 
-    private AnimationState(AnimationDefinition data, double speed, int startTransition, int endTransition) {
+    private AnimationState(AnimationDefinition data, double speed, int startTransition, int endTransition, double offset) {
         this.data = data;
         this.speed = speed;
         this.startTransition = startTransition;
         this.endTransition = endTransition;
+        this.offset = offset;
     }
 
     public static AnimationState create(AnimationDefinition data) {
@@ -37,9 +39,9 @@ public class AnimationState {
         AnimationState state = new AnimationState(data,
                 data.speed() * speed,
                 data.startTransition() > 0 && startTransition == AnimationHandler.FALLBACK_TRANSIT_TIME ? data.startTransition() : startTransition,
-                data.endTransition() > 0 && endTransition == AnimationHandler.FALLBACK_TRANSIT_TIME ? data.endTransition() : endTransition);
+                data.endTransition() > 0 && endTransition == AnimationHandler.FALLBACK_TRANSIT_TIME ? data.endTransition() : endTransition,
+                offset);
         state.ticker = offset;
-        state.offset = offset;
         return state;
     }
 
@@ -248,5 +250,31 @@ public class AnimationState {
     @Override
     public int hashCode() {
         return this.toString().hashCode();
+    }
+
+    public SyncableState forSync() {
+        return new SyncableState(this.data.id(), this.speed, this.startTransition, this.endTransition, this.offset);
+    }
+
+    public record SyncableState(String id, double speed, int startTransition, int endTransition, double offset) {
+        public static final StreamCodec<FriendlyByteBuf, SyncableState> STREAM_CODEC = new StreamCodec<>() {
+            @Override
+            public SyncableState decode(FriendlyByteBuf buf) {
+                return new SyncableState(buf.readUtf(), buf.readDouble(), buf.readInt(), buf.readInt(), buf.readDouble());
+            }
+
+            @Override
+            public void encode(FriendlyByteBuf buf, SyncableState state) {
+                buf.writeUtf(state.id);
+                buf.writeDouble(state.speed);
+                buf.writeInt(state.startTransition);
+                buf.writeInt(state.endTransition);
+                buf.writeDouble(state.offset);
+            }
+        };
+
+        public SyncableState withOffset(double offset) {
+            return new SyncableState(this.id, this.speed, this.startTransition, this.endTransition, offset);
+        }
     }
 }

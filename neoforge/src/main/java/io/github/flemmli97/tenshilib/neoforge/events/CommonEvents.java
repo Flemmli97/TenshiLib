@@ -34,8 +34,7 @@ public class CommonEvents {
     public static void onTracking(PlayerEvent.StartTracking event) {
         AnimationState anim;
         if (event.getTarget() instanceof AnimatedEntity animated && (anim = animated.getAnimationHandler().getAnimation()) != null) {
-            LoaderNetwork.INSTANCE.sendToPlayer(S2CEntityAnimation.create((Entity & AnimatedEntity) event.getTarget(),
-                    anim.getStartTransition(), anim.getEndTransitionTime(), anim.getTick(1)), (ServerPlayer) event.getEntity());
+            LoaderNetwork.INSTANCE.sendToPlayer(S2CEntityAnimation.create((Entity & AnimatedEntity) event.getTarget(), anim.getTick(1)), (ServerPlayer) event.getEntity());
         }
         if (event.getTarget() instanceof SyncedMobDataHandler handler) {
             handler.getDataContainer().sendEntriesTo((ServerPlayer) event.getEntity());

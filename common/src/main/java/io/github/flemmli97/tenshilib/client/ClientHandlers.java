@@ -20,15 +20,6 @@ public class ClientHandlers {
 
     public static final Set<UUID> RIDING_RENDER_BLACKLIST = new HashSet<>();
 
-    public static void updateAnim(int entityID, String animID, int startTransition, int endTransition, double start) {
-        Minecraft mc = Minecraft.getInstance();
-        Entity e = mc.level.getEntity(entityID);
-        if (e instanceof AnimatedEntity anim) {
-            anim.getAnimationHandler().setAnimation(animID.isEmpty() ? null : anim.getAnimationHandler().getAnimations().get(animID),
-                    startTransition, endTransition, start);
-        }
-    }
-
     public static int getColor(LivingEntity entity, float f) {
         OverlayEntityRender overlay = (OverlayEntityRender) entity;
         int oV = (int) (f * 15);

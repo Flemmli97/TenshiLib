@@ -95,7 +95,7 @@ public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehav
                 this.chainedIndex++;
                 AnimationHandler<?> handler = entity.getAnimationHandler();
                 handler.setAnimation(handler.getAnimations().get(selected.animation()),
-                        selected.transitionTime(), -1, selected.offset());
+                        selected.transitionTime(), -1, selected.offset(), 1);
                 this.currentPlaying = selected.animation();
             }
         }

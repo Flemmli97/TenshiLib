@@ -56,8 +56,7 @@ public class TenshiLibFabric implements ModInitializer, DedicatedServerModInitia
         EntityStartTrackEvent.START_TRACKING.register(((entity, player) -> {
             if (entity instanceof AnimatedEntity animated && animated.getAnimationHandler().hasAnimation()) {
                 AnimationState anim = animated.getAnimationHandler().getAnimation();
-                LoaderNetwork.INSTANCE.sendToPlayer(S2CEntityAnimation.create((Entity & AnimatedEntity) entity,
-                        anim.getStartTransition(), anim.getEndTransitionTime(), anim.getTick(1)), player);
+                LoaderNetwork.INSTANCE.sendToPlayer(S2CEntityAnimation.create((Entity & AnimatedEntity) entity, anim.getTick(1)), player);
             }
             if (entity instanceof SyncedMobDataHandler handler) {
                 handler.getDataContainer().sendEntriesTo(player);

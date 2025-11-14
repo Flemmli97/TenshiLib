@@ -6,7 +6,6 @@ import io.github.flemmli97.tenshilib.loader.LoaderNetwork;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.util.ToFloatFunction;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +25,7 @@ public class AnimationHandler<T extends Entity> {
     private final AnimationDefinitionContainer definitions;
 
     private final List<PriorityEntry<Predicate<AnimationDefinition>>> animationChangeListener = new ArrayList<>();
-    private ToFloatFunction<AnimationDefinition> animationSpeedHandler;
+    private SpeedHandler animationSpeedHandler;
 
     private AnimationState currentAnimation, lastAnimation;
 
@@ -58,7 +57,7 @@ public class AnimationHandler<T extends Entity> {
         return this;
     }
 
-    public AnimationHandler<T> withAnimationSpeedHandler(ToFloatFunction<AnimationDefinition> animationSpeedHandler) {
+    public AnimationHandler<T> withAnimationSpeedHandler(SpeedHandler animationSpeedHandler) {
         this.animationSpeedHandler = animationSpeedHandler;
         return this;
     }
@@ -105,7 +104,7 @@ public class AnimationHandler<T extends Entity> {
     }
 
     public void setAnimationDef(@Nullable AnimationDefinition animation) {
-        this.setAnimation(animation, AnimationHandler.FALLBACK_TRANSIT_TIME, AnimationHandler.FALLBACK_TRANSIT_TIME, 0);
+        this.setAnimation(animation, AnimationHandler.FALLBACK_TRANSIT_TIME, AnimationHandler.FALLBACK_TRANSIT_TIME, 0, 1);
     }
 
     /**
@@ -114,7 +113,7 @@ public class AnimationHandler<T extends Entity> {
      * @param endTransition   Duration in ticks to transition OUT of this animation. -1 for fallback
      * @param offset          Start the animation with the given offset
      */
-    public void setAnimation(@Nullable AnimationDefinition animation, int startTransition, int endTransition, double offset) {
+    public void setAnimation(@Nullable AnimationDefinition animation, int startTransition, int endTransition, double offset, double speed) {
         for (PriorityEntry<Predicate<AnimationDefinition>> listener : this.animationChangeListener) {
             if (listener.val().test(animation))
                 return;
@@ -134,15 +133,15 @@ public class AnimationHandler<T extends Entity> {
                     this.lastAnimation.getSpeed());
         }
         this.currentAnimation = animation == null ? null : AnimationState.create(animation, startTransition, endTransition,
-                offset, this.animationSpeedHandler == null ? 1 : this.animationSpeedHandler.apply(animation));
+                offset, this.animationSpeedHandler == null ? speed : this.animationSpeedHandler.getSpeed(speed, animation));
         if (!this.getEntity().level().isClientSide) {
-            this.syncToClient(startTransition, endTransition, offset);
+            this.syncToClient();
         }
     }
 
-    protected void syncToClient(int startTransition, int endTransition, double offset) {
+    protected void syncToClient() {
         if (this.getEntity() instanceof AnimatedEntity) {
-            LoaderNetwork.INSTANCE.sendToTracking(S2CEntityAnimation.create((Entity & AnimatedEntity) this.getEntity(), startTransition, endTransition, offset), this.getEntity());
+            LoaderNetwork.INSTANCE.sendToTracking(S2CEntityAnimation.create((Entity & AnimatedEntity) this.getEntity()), this.getEntity());
         }
     }
 
@@ -221,5 +220,10 @@ public class AnimationHandler<T extends Entity> {
         public int compareTo(@NotNull AnimationHandler.PriorityEntry<T> other) {
             return Integer.compare(this.priority(), other.priority());
         }
+    }
+
+    public interface SpeedHandler {
+
+        double getSpeed(double current, AnimationDefinition animation);
     }
 }
