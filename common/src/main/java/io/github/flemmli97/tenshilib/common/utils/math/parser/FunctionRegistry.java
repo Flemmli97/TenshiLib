@@ -15,6 +15,7 @@ import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Max
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Min;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Random;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.RandomInt;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Round;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Sin;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Sqrt;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions.Tan;
@@ -99,6 +100,10 @@ public class FunctionRegistry {
         builtin.put("ceil", stack -> {
             ExpValue value = stack.pop();
             return new Ceil(value);
+        });
+        builtin.put("round", stack -> {
+            ExpValue value = stack.pop();
+            return new Round(value);
         });
         builtin.put("random", stack -> {
             ExpValue second = stack.pop();
