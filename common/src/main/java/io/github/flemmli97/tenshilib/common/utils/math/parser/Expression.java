@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 public class Expression {
 
     private static final String NUMBER = "\\d+(?:\\.\\d+)?";
-    private static final String VARIABLE = "(?<!\\.)[A-z][A-z._]*";
+    private static final String VARIABLE = "(?<!\\.)[A-Za-z][A-Za-z._]*";
     private static final String OPERATOR = Operators.regex() + "|(?:[?:])|[()]";
 
     private static final Pattern PATTERN = Pattern.compile(String.format("(?:%1$s)|(?:%2$s)|%3$s|,", NUMBER, VARIABLE, OPERATOR));
