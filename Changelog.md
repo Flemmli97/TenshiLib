@@ -1,3 +1,10 @@
+TenshiLib 2.2.4
+================
+- Fix animation interpolation
+- Allow setting animation speed directly
+- Fix expression variable regex
+- Add round func to expression
+
 TenshiLib 2.2.3
 ================
 - Add attachment shortcut
