@@ -16,6 +16,7 @@ import io.github.flemmli97.tenshilib.fabric.loader.TenshiLibCrossPlatImpl;
 import io.github.flemmli97.tenshilib.fabric.loader.events.CommonSetupEvent;
 import io.github.flemmli97.tenshilib.fabric.loader.events.EntityAttributeModifierEvent;
 import io.github.flemmli97.tenshilib.fabric.loader.patreon.TenshiLibPatreonImpl;
+import io.github.flemmli97.tenshilib.fabric.loader.registry.AttachmentRegisterImpl;
 import io.github.flemmli97.tenshilib.fabric.loader.registry.DeferredRegistrationHandler;
 import io.github.flemmli97.tenshilib.fabric.mixin.DefaultAttributeSupplierAccessor;
 import io.github.flemmli97.tenshilib.fabric.network.PacketHandler;
@@ -51,6 +52,7 @@ public class TenshiLibFabric implements ModInitializer, DedicatedServerModInitia
 
     @Override
     public void onInitialize() {
+        AttachmentRegisterImpl.init();
         TenshiLib.registerRegistry();
         UseItemCallback.EVENT.register(CommonEvents::disableOffhand);
         EntityStartTrackEvent.START_TRACKING.register(((entity, player) -> {

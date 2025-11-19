@@ -19,6 +19,10 @@ public class AttachmentRegisterImpl implements AttachmentRegister {
     public static final ResourceKey<? extends Registry<AttachmentType<?>>> KEY = ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "attachment_types"));
     public static final Registry<AttachmentType<?>> REGISTRY = LoaderRegistryAccess.INSTANCE.newRegistry(KEY, null, true, false).registry();
 
+    // To initialize static fields
+    public static void init() {
+    }
+
     @Override
     public AttachmentRegistry of(String modid) {
         return new AttachmenRegistryImpl(modid);

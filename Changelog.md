@@ -1,3 +1,7 @@
+TenshiLib 2.2.4.b
+================
+- Fabric: Fix attachment registry not always initialized
+
 TenshiLib 2.2.4
 ================
 - Fix animation interpolation
