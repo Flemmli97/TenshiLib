@@ -7,10 +7,23 @@ import net.minecraft.world.phys.Vec3;
 
 public record TargetPosition(Vec3 position, double minHeight, double maxHeight) {
 
+    @Deprecated
     public static TargetPosition of(LivingEntity target) {
-        Vec3 pos = target.position();
+        return reducedRangeOf(target);
+    }
+
+    public static TargetPosition reducedRangeOf(LivingEntity target) {
         double yRed = Mth.clamp(target.getBbHeight() - target.getEyeHeight(), 0, 0.3);
-        return new TargetPosition(pos, pos.y() + yRed, pos.y() + target.getBbHeight() - yRed);
+        return of(target, yRed);
+    }
+
+    public static TargetPosition fullRangeOf(LivingEntity target) {
+        return of(target, 0);
+    }
+
+    public static TargetPosition of(LivingEntity target, double heightMod) {
+        Vec3 pos = target.position();
+        return new TargetPosition(pos, pos.y() + heightMod, pos.y() + target.getBbHeight() - heightMod);
     }
 
     public static TargetPosition of(Vec3 target) {
