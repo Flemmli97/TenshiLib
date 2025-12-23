@@ -51,8 +51,8 @@ public record AnimationBone(String name, String mirroredName, List<BoneKeyFrame>
                 if (vals != null) {
                     frames.add(new BoneKeyFrame(time, vals[0], vals[1], vals[2]));
                 } else if (val instanceof JsonObject data) {
-                    String[] pre = tryParseFrameData(data.getAsJsonPrimitive("pre"));
-                    String[] post = tryParseFrameData(data.getAsJsonPrimitive("post"));
+                    String[] pre = tryParseFrameData(data.get("pre"));
+                    String[] post = tryParseFrameData(data.get("post"));
 //                  String lerp = GsonHelper.getAsString(data, "lerp_mode"); Sometimes in future maybe...
                     if (pre != null) {
                         frames.add(new BoneKeyFrame(time - 0.001, pre[0], pre[1], pre[2]));
