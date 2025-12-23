@@ -14,6 +14,8 @@ public interface LoaderRegister<T> {
 
     <I extends T> RegistryEntrySupplier<T, I> register(String name, Function<ResourceLocation, I> func);
 
+    void addAlias(ResourceLocation from, ResourceLocation to);
+
     void registerContent();
 
     Collection<? extends RegistryEntrySupplier<T, ? extends T>> getEntries();

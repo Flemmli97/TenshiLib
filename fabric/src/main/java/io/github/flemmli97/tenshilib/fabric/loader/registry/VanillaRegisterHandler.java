@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +22,7 @@ public class VanillaRegisterHandler<T> implements LoaderRegister<T> {
     private final String modid;
     private final Map<VanillaEntrySupplier<T, ? extends T>, Supplier<? extends T>> entries = new LinkedHashMap<>();
     private final Set<VanillaEntrySupplier<T, ? extends T>> entriesView = Collections.unmodifiableSet(this.entries.keySet());
+    private final Map<ResourceLocation, ResourceLocation> alias = new HashMap<>();
 
     public VanillaRegisterHandler(ResourceKey<? extends Registry<T>> key, String modid) {
         this.key = key;
@@ -33,6 +35,11 @@ public class VanillaRegisterHandler<T> implements LoaderRegister<T> {
         VanillaEntrySupplier<T, I> v = new VanillaEntrySupplier<>(ResourceKey.create(this.key, id));
         this.entries.putIfAbsent(v, () -> func.apply(id));
         return v;
+    }
+
+    @Override
+    public void addAlias(ResourceLocation from, ResourceLocation to) {
+        this.alias.put(from, to);
     }
 
     @Override
@@ -54,6 +61,7 @@ public class VanillaRegisterHandler<T> implements LoaderRegister<T> {
             Registry.register(registry, v.getID(), s.get());
             v.bind(registry);
         });
+        this.alias.forEach(registry::addAlias);
     }
 
     @Override

@@ -33,6 +33,11 @@ public class DeferredRegisterHandler<T> implements LoaderRegister<T> {
     }
 
     @Override
+    public void addAlias(ResourceLocation from, ResourceLocation to) {
+        this.deferredRegister.addAlias(from, to);
+    }
+
+    @Override
     public void registerContent() {
         IEventBus bus = ModList.get().getModContainerById(this.deferredRegister.getNamespace())
                 .map(ModContainer::getEventBus).orElse(null);
