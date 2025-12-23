@@ -1,3 +1,9 @@
+TenshiLib 2.2.5
+================
+- Fix error with some animation parsing
+- Add registry alias support
+- Add more `TargetPosition` helper
+
 TenshiLib 2.2.4.b
 ================
 - Fabric: Fix attachment registry not always initialized
