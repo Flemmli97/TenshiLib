@@ -2,6 +2,7 @@ package io.github.flemmli97.tenshilib.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Axis;
 import io.github.flemmli97.tenshilib.common.utils.math.OrientedBoundingBox;
 import net.minecraft.client.Minecraft;
@@ -176,7 +177,7 @@ public class RenderUtils {
     }
 
     /**
-     * Renders a gradient triangular cone shaped beam similar to the beams displayed during the enderdragons death
+     * Renders a gradient triangular cone-shaped beam similar to the beams displayed during the enderdragons death
      *
      * @param builder Structure containing rendering info like color etc. Is mutable so cache an instance of it.
      */
@@ -215,7 +216,7 @@ public class RenderUtils {
     }
 
     /**
-     * Like {@link RenderUtils#renderGradientBeam3d} but 2d instead of cone shaped
+     * Like {@link RenderUtils#renderGradientBeam3d} but 2d instead of cone-shaped
      *
      * @param builder Structure containing rendering info like color etc. Is mutable so cache an instance of it.
      */
@@ -235,8 +236,65 @@ public class RenderUtils {
     }
 
     /**
+     * Renders a sphere. Can handle both quads and triangle strips rendertypes
+     *
+     * @param precision       How many points should be used along the axis. Higher creates more spherical shapes
+     * @param drawImmediately If true draws the content immediately to the buffer
+     */
+    public static void renderSphere(MultiBufferSource buffer, RenderType renderType, PoseStack stack,
+                                    float red, float green, float blue, float alpha,
+                                    float radius, int precision, int light, boolean drawImmediately) {
+        VertexConsumer consumer = buffer.getBuffer(renderType);
+        renderSphere(consumer, renderType.mode() == VertexFormat.Mode.QUADS, stack, red, green, blue, alpha, radius, precision, light);
+        if (drawImmediately && buffer instanceof MultiBufferSource.BufferSource)
+            ((MultiBufferSource.BufferSource) buffer).endBatch();
+    }
+
+    /**
+     * Renders a sphere. Can handle both quads and triangle strips rendertypes
+     *
+     * @param quad      Whether the rendertype used is quads or trigs
+     * @param precision How many points should be used along the axis. Higher creates more spherical shapes
+     */
+    public static void renderSphere(VertexConsumer consumer, boolean quad, PoseStack stack,
+                                    float red, float green, float blue, float alpha,
+                                    float radius, int precision, int light) {
+        stack.pushPose();
+        stack.mulPose(Axis.XN.rotationDegrees(90));
+        PoseStack.Pose pose = stack.last();
+        float step = Mth.PI / precision;
+        for (float t = 0; t < precision; t++) {
+            for (float p = 0; p < precision * 2; p++) {
+                float theta = t * step;
+                float phi = p * step;
+                float thetaNext = theta + step;
+                float phiNext = phi + step;
+                float x = radius * Mth.sin(theta) * net.minecraft.util.Mth.cos(phi);
+                float y = radius * Mth.sin(theta) * net.minecraft.util.Mth.sin(phi);
+                float z = radius * Mth.cos(theta);
+                consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+                x = radius * Mth.sin(thetaNext) * Mth.cos(phi);
+                y = radius * Mth.sin(thetaNext) * Mth.sin(phi);
+                z = radius * Mth.cos(thetaNext);
+                consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+                if (quad) {
+                    x = radius * Mth.sin(thetaNext) * Mth.cos(phiNext);
+                    y = radius * Mth.sin(thetaNext) * Mth.sin(phiNext);
+                    z = radius * Mth.cos(thetaNext);
+                    consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+                    x = radius * Mth.sin(theta) * Mth.cos(phiNext);
+                    y = radius * Mth.sin(theta) * Mth.sin(phiNext);
+                    z = radius * Mth.cos(theta);
+                    consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+                }
+            }
+        }
+        stack.popPose();
+    }
+
+    /**
      * Improved version of {@link InventoryScreen#renderEntityInInventory}.
-     * Automatically scales the entity if its too big
+     * Automatically scales the entity if it's too big
      *
      * @param x     Top left x position
      * @param y     Top left y positon
