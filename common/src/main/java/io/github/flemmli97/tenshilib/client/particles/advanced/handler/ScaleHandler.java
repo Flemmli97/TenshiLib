@@ -9,11 +9,24 @@ import net.minecraft.util.Mth;
 public class ScaleHandler implements AdvancedParticleHandler {
 
     private final ScaleData data;
+
+    private float scaleO, scale, partialTicks;
     private int tick;
 
     public ScaleHandler(ScaleData data, Particle particle) {
         this.data = data;
         this.setScaleParticle(particle, data.start());
+        this.scaleO = this.scale;
+    }
+
+    /**
+     * We handle scaling in render tick for smooth transition as scaling is not interpolated by vanilla
+     * Since scaling affects the bounding box though the partial ticks is saved and used in the tick method too
+     */
+    @Override
+    public void renderTick(Particle particle, float partialTicks) {
+        this.partialTicks = partialTicks;
+        particle.scale(Mth.lerp(partialTicks, this.scaleO, this.scale));
     }
 
     @Override
@@ -21,6 +34,7 @@ public class ScaleHandler implements AdvancedParticleHandler {
         if (this.data.duration() <= 0)
             return;
         this.tick++;
+        this.scaleO = this.scale;
         float prog = Mth.clamp((float) this.tick / this.data.duration(), 0, 1);
         this.setScaleParticle(particle, Mth.lerp(prog, this.data.start(), this.data.end()));
     }
@@ -30,6 +44,7 @@ public class ScaleHandler implements AdvancedParticleHandler {
             float current = quad.getQuadSize(1);
             scale = scale / current;
         }
-        particle.scale(scale);
+        this.scale = scale;
+        particle.scale(Mth.lerp(this.partialTicks, this.scaleO, this.scale));
     }
 }

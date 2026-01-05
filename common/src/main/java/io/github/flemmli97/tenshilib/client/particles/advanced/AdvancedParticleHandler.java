@@ -10,4 +10,7 @@ public interface AdvancedParticleHandler {
 
     default void tick(Particle particle) {
     }
+
+    default void renderTick(Particle particle, float partialTicks) {
+    }
 }

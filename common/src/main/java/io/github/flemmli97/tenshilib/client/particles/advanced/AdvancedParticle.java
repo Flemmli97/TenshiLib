@@ -27,6 +27,7 @@ public class AdvancedParticle extends Particle {
 
     @Override
     public void render(VertexConsumer buffer, Camera camera, float partialTicks) {
+        this.handlers.forEach(d -> d.renderTick(this.wrapped, partialTicks));
         this.wrapped.render(buffer, camera, partialTicks);
     }
 
