@@ -26,11 +26,11 @@ public class ColorHandler implements AdvancedParticleHandler {
      * We handle color setting in render tick for smooth transition as color is not interpolated by vanilla
      */
     @Override
-    public void renderTick(Particle particle, float partialTicks) {
-        particle.setColor(Mth.lerp(partialTicks, this.colorO.x(), this.color.x()),
-                Mth.lerp(partialTicks, this.colorO.y(), this.color.y()),
-                Mth.lerp(partialTicks, this.colorO.z(), this.color.z()));
-        ((ParticleAccessor) particle).setAlpha(Mth.lerp(partialTicks, this.colorO.w(), this.color.w()));
+    public void renderTick(Particle particle, float partialTick) {
+        particle.setColor(Mth.lerp(partialTick, this.colorO.x(), this.color.x()),
+                Mth.lerp(partialTick, this.colorO.y(), this.color.y()),
+                Mth.lerp(partialTick, this.colorO.z(), this.color.z()));
+        ((ParticleAccessor) particle).setAlpha(Mth.lerp(partialTick, this.colorO.w(), this.color.w()));
     }
 
     @Override

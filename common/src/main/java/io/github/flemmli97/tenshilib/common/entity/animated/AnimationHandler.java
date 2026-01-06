@@ -200,18 +200,18 @@ public class AnimationHandler<T extends Entity> {
         }
     }
 
-    public float getCurrentTransitionProgress(float partialTicks) {
+    public float getCurrentTransitionProgress(float partialTick) {
         if (this.currentAnimation == null) {
             return 1;
         }
-        return (float) this.currentAnimation.getStartTransitionProgress(partialTicks);
+        return (float) this.currentAnimation.getStartTransitionProgress(partialTick);
     }
 
-    public float getLastTransitionProgress(float partialTicks) {
+    public float getLastTransitionProgress(float partialTick) {
         if (this.lastAnimation == null || this.lastAnimation.getEndTransitionTime() <= 0) {
             return 0;
         }
-        return 1 - Mth.clamp((this.getTimeSinceLastChange() - 1 + partialTicks) / this.lastAnimation.getEndTransitionTime(), 0, 1);
+        return 1 - Mth.clamp((this.getTimeSinceLastChange() - 1 + partialTick) / this.lastAnimation.getEndTransitionTime(), 0, 1);
     }
 
     private record PriorityEntry<T>(int priority, T val) implements Comparable<PriorityEntry<T>> {

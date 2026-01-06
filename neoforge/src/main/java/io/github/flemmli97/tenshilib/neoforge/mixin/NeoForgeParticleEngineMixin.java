@@ -36,7 +36,7 @@ public abstract class NeoForgeParticleEngineMixin {
 
     @Inject(method = "render(Lnet/minecraft/client/renderer/LightTexture;Lnet/minecraft/client/Camera;FLnet/minecraft/client/renderer/culling/Frustum;Ljava/util/function/Predicate;)V",
             at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferUploader;drawWithShader(Lcom/mojang/blaze3d/vertex/MeshData;)V", shift = At.Shift.AFTER))
-    private void onEnd(LightTexture texture, Camera camera, float partialTicks, Frustum frustum, Predicate<ParticleRenderType> renderTypePredicate, CallbackInfo info, @Local ParticleRenderType type) {
+    private void onEnd(LightTexture texture, Camera camera, float partialTick, Frustum frustum, Predicate<ParticleRenderType> renderTypePredicate, CallbackInfo info, @Local ParticleRenderType type) {
         if (type instanceof AdvancedParticleType adv)
             adv.end(this.textureManager);
     }

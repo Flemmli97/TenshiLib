@@ -7,15 +7,13 @@ import io.github.flemmli97.tenshilib.client.data.GeoAnimationManager;
 import io.github.flemmli97.tenshilib.client.data.GeoModelManager;
 import io.github.flemmli97.tenshilib.client.data.ReloadableCache;
 import io.github.flemmli97.tenshilib.client.model.BedrockAnimations;
-import io.github.flemmli97.tenshilib.client.model.ExtendedModel;
+import io.github.flemmli97.tenshilib.client.model.ExtendedEntityModel;
 import io.github.flemmli97.tenshilib.client.model.ModelPartsContainer;
-import io.github.flemmli97.tenshilib.client.render.RenderUtils;
 import io.github.flemmli97.tenshilib.patreon.RenderLocation;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
-public class CatModel extends EntityModel<Player> implements ExtendedModel, PatreonModelData<Player> {
+public class CatModel extends ExtendedEntityModel<Player> implements  PatreonModelData<Player> {
 
     public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "textures/model/cat.png");
 
@@ -32,11 +30,11 @@ public class CatModel extends EntityModel<Player> implements ExtendedModel, Patr
     @Override
     public void setupAnim(Player entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.model.get().resetPoses();
-        float partialTicks = RenderUtils.getPartialTicks(entity);
+        float partialTick = this.getPartialTick();
         if (RenderLocation.isHead(this.location))
-            this.anim.get().doAnimation(this, "head", entity.tickCount, partialTicks);
+            this.anim.get().doAnimation(this, "head", entity.tickCount, partialTick);
         else
-            this.anim.get().doAnimation(this, "idle", entity.tickCount, partialTicks);
+            this.anim.get().doAnimation(this, "idle", entity.tickCount, partialTick);
     }
 
     @Override

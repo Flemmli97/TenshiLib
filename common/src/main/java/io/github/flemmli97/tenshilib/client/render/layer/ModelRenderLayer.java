@@ -26,7 +26,7 @@ public class ModelRenderLayer<T extends LivingEntity, M extends EntityModel<T>> 
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLightIn, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLightIn, T entity, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
         if (entity.isInvisible())
             return;
         poseStack.pushPose();
@@ -38,7 +38,7 @@ public class ModelRenderLayer<T extends LivingEntity, M extends EntityModel<T>> 
         if (entity.isShiftKeyDown()) {
             poseStack.translate(0.0F, 0.2F, 0.0F);
         }
-        this.model.prepareMobModel(entity, limbSwing, limbSwingAmount, partialTicks);
+        this.model.prepareMobModel(entity, limbSwing, limbSwingAmount, partialTick);
         this.model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
         Minecraft mc = Minecraft.getInstance();
         boolean flag = !entity.isInvisible();

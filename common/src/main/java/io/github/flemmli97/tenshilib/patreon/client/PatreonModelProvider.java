@@ -29,7 +29,7 @@ public class PatreonModelProvider {
     private static final EffectRenderer<CatModel> CAT = register(PatreonEffects.CAT, new EffectRenderer<>(CatModel::new));
     private static final EffectRenderer<HaloModel> HALO = register(PatreonEffects.HALO, new EffectRenderer<>(HaloModel::new) {
         @Override
-        public void render(PoseStack stack, MultiBufferSource buffer, int packedLight, Player entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, int color, RenderLocation location) {
+        public void render(PoseStack stack, MultiBufferSource buffer, int packedLight, Player entity, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch, int color, RenderLocation location) {
             HaloModel model = this.get();
             model.setRenderLocation(location);
             model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
@@ -66,9 +66,10 @@ public class PatreonModelProvider {
             return this.val;
         }
 
-        public void render(PoseStack stack, MultiBufferSource buffer, int packedLight, Player entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, int color, RenderLocation location) {
+        public void render(PoseStack stack, MultiBufferSource buffer, int packedLight, Player entity, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch, int color, RenderLocation location) {
             T model = this.get();
             model.setRenderLocation(location);
+            model.prepareMobModel(entity, limbSwing, limbSwingAmount, partialTick);
             model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
             int i = LivingEntityRenderer.getOverlayCoords(entity, 0);
             model.renderToBuffer(stack, buffer.getBuffer((color >> 24 & 0xFF) != 255 ? RenderType.entityTranslucent(model.texture(entity)) : model.renderType(model.texture(entity))), packedLight, i, color);

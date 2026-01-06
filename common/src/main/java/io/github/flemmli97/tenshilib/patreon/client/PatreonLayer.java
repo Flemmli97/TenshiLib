@@ -20,7 +20,7 @@ public class PatreonLayer<T extends Player, M extends EntityModel<T> & HeadedMod
     }
 
     @Override
-    public void render(PoseStack stack, MultiBufferSource buffer, int packedLight, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void render(PoseStack stack, MultiBufferSource buffer, int packedLight, T entity, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
         if (entity.isInvisible())
             return;
         PatreonPlayerSetting setting = TenshiLibPatreonPlatform.INSTANCE.playerSettings(entity);
@@ -37,14 +37,14 @@ public class PatreonLayer<T extends Player, M extends EntityModel<T> & HeadedMod
         switch (setting.getRenderLocation()) {
             case CIRCLING -> {
                 stack.scale(0.7f, 0.7f, 0.7f);
-                float tick = entity.tickCount + partialTicks;
+                float tick = entity.tickCount + partialTick;
                 stack.translate(Mth.cos(Mth.DEG_TO_RAD * tick * 5),
                         Mth.sin(Mth.DEG_TO_RAD * tick * 1.25f) * 1.4 - 1,
                         Mth.sin(Mth.DEG_TO_RAD * tick * 5));
             }
             case CIRCLINGREVERSE -> {
                 stack.scale(0.7f, 0.7f, 0.7f);
-                float tick = entity.tickCount + partialTicks;
+                float tick = entity.tickCount + partialTick;
                 stack.translate(-Mth.cos(Mth.DEG_TO_RAD * tick * 5),
                         Mth.sin(Mth.DEG_TO_RAD * tick * 1.25f) * 1.4 - 1,
                         -Mth.sin(Mth.DEG_TO_RAD * tick * 5));
@@ -80,7 +80,7 @@ public class PatreonLayer<T extends Player, M extends EntityModel<T> & HeadedMod
             }
         }
         int hexColor = setting.getColor();
-        renderer.render(stack, buffer, packedLight, entity, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, hexColor, setting.getRenderLocation());
+        renderer.render(stack, buffer, packedLight, entity, limbSwing, limbSwingAmount, partialTick, ageInTicks, netHeadYaw, headPitch, hexColor, setting.getRenderLocation());
         stack.popPose();
     }
 }

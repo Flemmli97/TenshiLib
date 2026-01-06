@@ -34,18 +34,13 @@ public class RenderUtils {
     private static final float TRIANGLE_MULT = (float) (Math.sqrt(3.0D) / 2.0D);
     private static final Random RANDOM = new Random(432);
 
-    public static float getPartialTicks() {
-        return Minecraft.getInstance().getTimer()
-                .getGameTimeDeltaTicks();
-    }
-
     public static float getPartialTicks(Entity entity) {
         return Minecraft.getInstance().getTimer()
                 .getGameTimeDeltaPartialTick(!entity.level().tickRateManager().isEntityFrozen(entity));
     }
 
-    public static void renderBlockOutline(PoseStack poseStack, MultiBufferSource buffer, Player player, BlockPos pos, float partialTicks, boolean drawImmediately) {
-        renderBlockOutline(poseStack, buffer, player, pos, partialTicks, 0, 0, 0, 1, drawImmediately);
+    public static void renderBlockOutline(PoseStack poseStack, MultiBufferSource buffer, Player player, BlockPos pos, float partialTick, boolean drawImmediately) {
+        renderBlockOutline(poseStack, buffer, player, pos, partialTick, 0, 0, 0, 1, drawImmediately);
     }
 
     /**
@@ -54,7 +49,7 @@ public class RenderUtils {
      * @param drawImmediately Most of the time this should be true.
      *                        Else it will get drawn next frame and the position will be offset by player movement
      */
-    public static void renderBlockOutline(PoseStack poseStack, MultiBufferSource buffer, Player player, BlockPos pos, float partialTicks, float red, float green, float blue, float alpha,
+    public static void renderBlockOutline(PoseStack poseStack, MultiBufferSource buffer, Player player, BlockPos pos, float partialTick, float red, float green, float blue, float alpha,
                                           boolean drawImmediately) {
         BlockState state = player.level().getBlockState(pos);
         RenderType renderType = RenderType.lines();
@@ -163,11 +158,11 @@ public class RenderUtils {
         builder.addVertex(matrix4f, -xSize, -ySize, 0).setColor(textureBuilder.red, textureBuilder.green, textureBuilder.blue, textureBuilder.alpha).setUv(textureBuilder.u, textureBuilder.v + textureBuilder.vLength).setOverlay(textureBuilder.overlay).setLight(textureBuilder.light).setNormal(pose, 0, 0, 1);
     }
 
-    public static void renderGradientBeams3d(PoseStack stack, MultiBufferSource renderTypeBuffer, float length, float width, int ticks, float partialTicks, float rotationPerTick, int amount, BeamBuilder builder) {
+    public static void renderGradientBeams3d(PoseStack stack, MultiBufferSource renderTypeBuffer, float length, float width, int ticks, float partialTick, float rotationPerTick, int amount, BeamBuilder builder) {
         stack.pushPose();
         RANDOM.setSeed(432L);
         for (int i = 0; i < amount; i++) {
-            float ticker = ticks + partialTicks;
+            float ticker = ticks + partialTick;
             stack.mulPose(Axis.XP.rotationDegrees(RANDOM.nextFloat() * 360.0F));
             stack.mulPose(Axis.YP.rotationDegrees(RANDOM.nextFloat() * 360.0F));
             stack.mulPose(Axis.ZP.rotationDegrees(RANDOM.nextFloat() * 360.0F + ticker * rotationPerTick));
@@ -202,11 +197,11 @@ public class RenderUtils {
         buffer.addVertex(matrix4f, -widthHalf, length, -heightHalf).setColor(builder.endRed, builder.endGreen, builder.endBlue, builder.endAlpha);
     }
 
-    public static void renderGradientBeams(PoseStack poseStack, MultiBufferSource renderTypeBuffer, float length, float width, int ticks, float partialTicks, float rotationPerTick, int amount, BeamBuilder builder) {
+    public static void renderGradientBeams(PoseStack poseStack, MultiBufferSource renderTypeBuffer, float length, float width, int ticks, float partialTick, float rotationPerTick, int amount, BeamBuilder builder) {
         poseStack.pushPose();
         RANDOM.setSeed(432L);
         for (int i = 0; i < amount; i++) {
-            float ticker = ticks + partialTicks;
+            float ticker = ticks + partialTick;
             poseStack.mulPose(Axis.XP.rotationDegrees(RANDOM.nextFloat() * 360.0F));
             poseStack.mulPose(Axis.YP.rotationDegrees(RANDOM.nextFloat() * 360.0F));
             poseStack.mulPose(Axis.ZP.rotationDegrees(RANDOM.nextFloat() * 360.0F + ticker * rotationPerTick));

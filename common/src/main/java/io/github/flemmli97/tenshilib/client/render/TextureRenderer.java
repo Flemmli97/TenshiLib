@@ -38,22 +38,22 @@ public abstract class TextureRenderer<T extends Entity> extends EntityRenderer<T
     }
 
     @Override
-    public void render(T entity, float rotation, float partialTicks, PoseStack stack, MultiBufferSource buffer, int packedLight) {
-        float yaw = entity.yRotO + (entity.getYRot() - entity.yRotO) * partialTicks + 180;
-        float pitch = entity.xRotO + (entity.getXRot() - entity.xRotO) * partialTicks;
-        this.adjustYawPitch(stack, entity, partialTicks, yaw, pitch);
+    public void render(T entity, float rotation, float partialTick, PoseStack stack, MultiBufferSource buffer, int packedLight) {
+        float yaw = entity.yRotO + (entity.getYRot() - entity.yRotO) * partialTick + 180;
+        float pitch = entity.xRotO + (entity.getXRot() - entity.xRotO) * partialTick;
+        this.adjustYawPitch(stack, entity, partialTick, yaw, pitch);
         float[] uvOffset = this.uvOffset(entity.tickCount);
         this.textureBuilder.setUV(uvOffset[0], uvOffset[1]);
         this.textureBuilder.setLight(packedLight);
-        this.doRender(entity, partialTicks, stack, buffer);
-        super.render(entity, rotation, partialTicks, stack, buffer, packedLight);
+        this.doRender(entity, partialTick, stack, buffer);
+        super.render(entity, rotation, partialTick, stack, buffer, packedLight);
     }
 
-    public void doRender(T entity, float partialTicks, PoseStack stack, MultiBufferSource buffer) {
+    public void doRender(T entity, float partialTick, PoseStack stack, MultiBufferSource buffer) {
         RenderUtils.renderTexture(stack, buffer.getBuffer(this.getRenderType(entity, this.getTextureLocation(entity))), this.xSize, this.ySize, this.textureBuilder);
     }
 
-    public void adjustYawPitch(PoseStack stack, T entity, float partialTicks, float yaw, float pitch) {
+    public void adjustYawPitch(PoseStack stack, T entity, float partialTick, float yaw, float pitch) {
         if (this.facePlayer()) {
             stack.mulPose(this.entityRenderDispatcher.cameraOrientation());
             stack.mulPose(Axis.YP.rotationDegrees(180));

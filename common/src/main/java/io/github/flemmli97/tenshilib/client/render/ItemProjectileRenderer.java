@@ -23,7 +23,7 @@ public abstract class ItemProjectileRenderer<T extends Entity> extends EntityRen
     }
 
     @Override
-    public void render(T entity, float rotation, float partialTicks, PoseStack stack, MultiBufferSource buffer, int packedLight) {
+    public void render(T entity, float rotation, float partialTick, PoseStack stack, MultiBufferSource buffer, int packedLight) {
         stack.pushPose();
         stack.scale(this.scaleX, this.scaleY, this.scaleZ);
         stack.translate(0, 0.15, 0);
@@ -33,13 +33,13 @@ public abstract class ItemProjectileRenderer<T extends Entity> extends EntityRen
                 stack.mulPose(Axis.YP.rotationDegrees(180.0F));
             }
             case WEAPON -> {
-                stack.mulPose(Axis.YP.rotationDegrees(90 + Mth.lerp(partialTicks, entity.yRotO, entity.getYRot())));
-                stack.mulPose(Axis.ZP.rotationDegrees(135 - Mth.lerp(partialTicks, entity.xRotO, entity.getXRot())));
+                stack.mulPose(Axis.YP.rotationDegrees(90 + Mth.lerp(partialTick, entity.yRotO, entity.getYRot())));
+                stack.mulPose(Axis.ZP.rotationDegrees(135 - Mth.lerp(partialTick, entity.xRotO, entity.getXRot())));
             }
         }
         Minecraft.getInstance().getItemRenderer().renderStatic(this.getRenderItemStack(entity), ItemDisplayContext.GROUND, packedLight, OverlayTexture.NO_OVERLAY, stack, buffer, entity.level(), entity.getId());
         stack.popPose();
-        super.render(entity, rotation, partialTicks, stack, buffer, packedLight);
+        super.render(entity, rotation, partialTick, stack, buffer, packedLight);
     }
 
     @Override

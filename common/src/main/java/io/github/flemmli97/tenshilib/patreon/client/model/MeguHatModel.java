@@ -7,15 +7,14 @@ import io.github.flemmli97.tenshilib.client.data.GeoAnimationManager;
 import io.github.flemmli97.tenshilib.client.data.GeoModelManager;
 import io.github.flemmli97.tenshilib.client.data.ReloadableCache;
 import io.github.flemmli97.tenshilib.client.model.BedrockAnimations;
+import io.github.flemmli97.tenshilib.client.model.ExtendedEntityModel;
 import io.github.flemmli97.tenshilib.client.model.ExtendedModel;
 import io.github.flemmli97.tenshilib.client.model.ModelPartsContainer;
-import io.github.flemmli97.tenshilib.client.render.RenderUtils;
 import io.github.flemmli97.tenshilib.patreon.RenderLocation;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
-public class MeguHatModel extends EntityModel<Player> implements ExtendedModel, PatreonModelData<Player> {
+public class MeguHatModel extends ExtendedEntityModel<Player> implements ExtendedModel, PatreonModelData<Player> {
 
     public static final ResourceLocation MEGU_TEXTURE = ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "textures/model/megumin_hat.png");
 
@@ -32,7 +31,7 @@ public class MeguHatModel extends EntityModel<Player> implements ExtendedModel, 
     @Override
     public void setupAnim(Player entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.model.get().resetPoses();
-        this.anim.get().doAnimation(this, "idle", entity.tickCount, RenderUtils.getPartialTicks(entity));
+        this.anim.get().doAnimation(this, "idle", entity.tickCount, this.getPartialTick());
     }
 
     @Override

@@ -37,7 +37,7 @@ public class RiderEntityLayer<T extends LivingEntity, M extends EntityModel<T> &
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
-    public void render(PoseStack stack, MultiBufferSource buffer, int light, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void render(PoseStack stack, MultiBufferSource buffer, int light, T entity, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
         for (int i = 0; i < entity.getPassengers().size(); i++) {
             Entity rider = entity.getPassengers().get(i);
             if (rider == null || (Minecraft.getInstance().cameraEntity == rider && Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON))
@@ -46,7 +46,7 @@ public class RiderEntityLayer<T extends LivingEntity, M extends EntityModel<T> &
             stack.pushPose();
             EntityRenderer<?> entityRenderer = this.dispatcher.getRenderer(rider);
             boolean transformed = this.getParentModel().transform(entity, this.renderer, rider, entityRenderer, stack, i);
-            this.renderPassenger(entity, (EntityRenderer) entityRenderer, rider, partialTicks, stack, buffer, light, transformed);
+            this.renderPassenger(entity, (EntityRenderer) entityRenderer, rider, partialTick, stack, buffer, light, transformed);
             stack.popPose();
             ClientHandlers.RIDING_RENDER_BLACKLIST.remove(rider.getUUID());
         }
@@ -56,10 +56,10 @@ public class RiderEntityLayer<T extends LivingEntity, M extends EntityModel<T> &
      * Undo transforms of the stacks from {@link LivingEntityRenderer} for the entity T
      * For renderer with different transforms than vanilla this also needs to be adjusted
      */
-    protected void undoLivingRendererTransform(EntityRenderer<?> entityRenderer, PoseStack stack, T entity, Entity rider, float partialTicks, boolean transformed) {
-        float yaw = Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
+    protected void undoLivingRendererTransform(EntityRenderer<?> entityRenderer, PoseStack stack, T entity, Entity rider, float partialTick, boolean transformed) {
+        float yaw = Mth.rotLerp(partialTick, entity.yBodyRotO, entity.yBodyRot);
         if (rider instanceof LivingEntity livingRider) {
-            float headRot = Mth.rotLerp(partialTicks, livingRider.yHeadRotO, livingRider.yHeadRot);
+            float headRot = Mth.rotLerp(partialTick, livingRider.yHeadRotO, livingRider.yHeadRot);
             float diff = Mth.wrapDegrees(headRot - yaw);
             if (diff < -85.0f) {
                 diff = -85.0f;
@@ -78,14 +78,14 @@ public class RiderEntityLayer<T extends LivingEntity, M extends EntityModel<T> &
         stack.mulPose(Axis.YP.rotationDegrees(yaw + 180.0F));
     }
 
-    public <E extends Entity> void renderPassenger(T vehicle, EntityRenderer<E> entityRenderer, E entity, float partialTicks, PoseStack stack, MultiBufferSource buffer, int packedLight, boolean transformed) {
+    public <E extends Entity> void renderPassenger(T vehicle, EntityRenderer<E> entityRenderer, E entity, float partialTick, PoseStack stack, MultiBufferSource buffer, int packedLight, boolean transformed) {
         try {
-            this.undoLivingRendererTransform(entityRenderer, stack, vehicle, entity, partialTicks, transformed);
+            this.undoLivingRendererTransform(entityRenderer, stack, vehicle, entity, partialTick, transformed);
             if (!transformed) {
                 Vec3 diff = entity.position().subtract(vehicle.position());
                 stack.translate(diff.x, diff.y, diff.z);
             }
-            entityRenderer.render(entity, 0, partialTicks, stack, buffer, packedLight);
+            entityRenderer.render(entity, 0, partialTick, stack, buffer, packedLight);
         } catch (Throwable throwable) {
             CrashReport crashReport = CrashReport.forThrowable(throwable, "Rendering entity in level from " + this.getClass());
             CrashReportCategory crashReportCategory = crashReport.addCategory("Entity being rendered");
@@ -93,7 +93,7 @@ public class RiderEntityLayer<T extends LivingEntity, M extends EntityModel<T> &
             CrashReportCategory crashReportCategory2 = crashReport.addCategory("Renderer details");
             crashReportCategory2.setDetail("Assigned renderer", entityRenderer);
             crashReportCategory2.setDetail("Location", CrashReportCategory.formatLocation(entity.level(), entity.position().x, entity.position().y, entity.position().z));
-            crashReportCategory2.setDetail("Delta", partialTicks);
+            crashReportCategory2.setDetail("Delta", partialTick);
             throw new ReportedException(crashReport);
         }
     }

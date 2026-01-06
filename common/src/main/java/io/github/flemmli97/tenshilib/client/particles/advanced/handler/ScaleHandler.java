@@ -10,7 +10,7 @@ public class ScaleHandler implements AdvancedParticleHandler {
 
     private final ScaleData data;
 
-    private float scaleO, scale, partialTicks;
+    private float scaleO, scale, partialTick;
     private int tick;
 
     public ScaleHandler(ScaleData data, Particle particle) {
@@ -24,9 +24,9 @@ public class ScaleHandler implements AdvancedParticleHandler {
      * Since scaling affects the bounding box though the partial ticks is saved and used in the tick method too
      */
     @Override
-    public void renderTick(Particle particle, float partialTicks) {
-        this.partialTicks = partialTicks;
-        particle.scale(Mth.lerp(partialTicks, this.scaleO, this.scale));
+    public void renderTick(Particle particle, float partialTick) {
+        this.partialTick = partialTick;
+        particle.scale(Mth.lerp(partialTick, this.scaleO, this.scale));
     }
 
     @Override
@@ -45,6 +45,6 @@ public class ScaleHandler implements AdvancedParticleHandler {
             scale = scale / current;
         }
         this.scale = scale;
-        particle.scale(Mth.lerp(this.partialTicks, this.scaleO, this.scale));
+        particle.scale(Mth.lerp(this.partialTick, this.scaleO, this.scale));
     }
 }

@@ -63,13 +63,13 @@ public abstract class BeamRenderer<T extends BeamEntity> extends EntityRenderer<
     }
 
     @Override
-    public void render(T entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+    public void render(T entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         entity.updateYawPitch();
         float dist = (float) entity.hitVec().distanceTo(entity.startVec());
-        float width = this.widthFunc(entity, partialTicks);
+        float width = this.widthFunc(entity, partialTick);
         poseStack.pushPose();
-        poseStack.mulPose(Axis.YN.rotationDegrees(Mth.lerp(partialTicks, entity.yRotO, entity.getYRot()) + 90));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(-Mth.lerp(partialTicks, entity.xRotO, entity.getXRot())));
+        poseStack.mulPose(Axis.YN.rotationDegrees(Mth.lerp(partialTick, entity.yRotO, entity.getYRot()) + 90));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(-Mth.lerp(partialTick, entity.xRotO, entity.getXRot())));
         boolean playerView = !entity.shouldRender3d(Minecraft.getInstance().cameraEntity, Minecraft.getInstance().options.getCameraType().ordinal());
         if (playerView) {
             poseStack.mulPose(Axis.XP.rotationDegrees(30));
@@ -79,7 +79,7 @@ public abstract class BeamRenderer<T extends BeamEntity> extends EntityRenderer<
             poseStack.scale(1, width, width);
         this.renderBeam(entity, dist, width, poseStack, buffer, packedLight, playerView);
         poseStack.popPose();
-        super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
+        super.render(entity, entityYaw, partialTick, poseStack, buffer, packedLight);
     }
 
     protected void renderBeam(T entity, float dist, float width, PoseStack poseStack, MultiBufferSource buffer, int packedLight, boolean playerView) {
@@ -183,8 +183,8 @@ public abstract class BeamRenderer<T extends BeamEntity> extends EntityRenderer<
      */
     public abstract ResourcePair endTexture(T entity);
 
-    public float widthFunc(T entity, float partialTicks) {
-        float prog = Math.clamp((entity.livingTicks() + partialTicks) / (float) entity.livingTickMax(), 0, 1);
+    public float widthFunc(T entity, float partialTick) {
+        float prog = Math.clamp((entity.livingTicks() + partialTick) / (float) entity.livingTickMax(), 0, 1);
         return (float) (entity.radius() * 2 * (Math.sin(Math.sqrt(prog) * Math.PI)));
     }
 

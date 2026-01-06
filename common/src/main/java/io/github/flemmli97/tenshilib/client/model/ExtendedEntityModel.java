@@ -29,7 +29,6 @@ public abstract class ExtendedEntityModel<T extends Entity> extends EntityModel<
         this.partialTick = partialTick;
     }
 
-    @Override
     public float getPartialTick() {
         return this.partialTick;
     }

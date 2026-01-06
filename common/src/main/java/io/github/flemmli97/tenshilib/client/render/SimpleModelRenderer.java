@@ -26,25 +26,25 @@ public abstract class SimpleModelRenderer<T extends Entity> extends EntityRender
     }
 
     @Override
-    public void render(T entity, float rotation, float partialTicks, PoseStack stack, MultiBufferSource buffer, int packedLight) {
+    public void render(T entity, float rotation, float partialTick, PoseStack stack, MultiBufferSource buffer, int packedLight) {
         stack.pushPose();
-        float yaw = Mth.lerp(partialTicks, entity.yRotO, entity.getYRot()) + this.yawOffset();
-        float pitch = Mth.lerp(partialTicks, entity.xRotO, entity.getXRot()) + this.pitchOffset();
-        float partialLivingTicks = entity.tickCount + partialTicks;
+        float yaw = Mth.lerp(partialTick, entity.yRotO, entity.getYRot()) + this.yawOffset();
+        float pitch = Mth.lerp(partialTick, entity.xRotO, entity.getXRot()) + this.pitchOffset();
+        float partialLivingTicks = entity.tickCount + partialTick;
 
-        this.translate(entity, stack, pitch, yaw, partialTicks);
+        this.translate(entity, stack, pitch, yaw, partialTick);
 
-        this.model.prepareMobModel(entity, 0, 0, partialTicks);
+        this.model.prepareMobModel(entity, 0, 0, partialTick);
         this.model.setupAnim(entity, 0, 0, partialLivingTicks, yaw, pitch);
 
         VertexConsumer ivertexbuilder = buffer.getBuffer(this.model.renderType(this.getTextureLocation(entity)));
         this.model.renderToBuffer(stack, ivertexbuilder, packedLight, OverlayTexture.NO_OVERLAY, FastColor.ARGB32.colorFromFloat(this.red, this.green, this.blue, this.alpha));
-        this.afterModelRender(entity, rotation, partialTicks, stack, buffer, packedLight);
+        this.afterModelRender(entity, rotation, partialTick, stack, buffer, packedLight);
         stack.popPose();
-        super.render(entity, rotation, partialTicks, stack, buffer, packedLight);
+        super.render(entity, rotation, partialTick, stack, buffer, packedLight);
     }
 
-    public void translate(T entity, PoseStack stack, float pitch, float yaw, float partialTicks) {
+    public void translate(T entity, PoseStack stack, float pitch, float yaw, float partialTick) {
         stack.mulPose(Axis.YP.rotationDegrees(180 + yaw));
         stack.mulPose(Axis.XP.rotationDegrees(pitch));
         stack.scale(-1.0f, -1.0f, 1.0f);
@@ -59,7 +59,7 @@ public abstract class SimpleModelRenderer<T extends Entity> extends EntityRender
         return 0;
     }
 
-    public void afterModelRender(T entity, float rotation, float partialTicks, PoseStack stack, MultiBufferSource buffer, int packedLight) {
+    public void afterModelRender(T entity, float rotation, float partialTick, PoseStack stack, MultiBufferSource buffer, int packedLight) {
 
     }
 }

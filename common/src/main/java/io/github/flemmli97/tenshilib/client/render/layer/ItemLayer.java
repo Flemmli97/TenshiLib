@@ -27,7 +27,7 @@ public class ItemLayer<T extends LivingEntity, M extends EntityModel<T> & ItemHo
     }
 
     @Override
-    public void render(PoseStack stack, MultiBufferSource buffer, int light, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void render(PoseStack stack, MultiBufferSource buffer, int light, T entity, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
         boolean flag = entity.getMainArm() == HumanoidArm.RIGHT;
         ItemStack leftStack = this.heldItemLeft(entity, flag);
         ItemStack rightStack = this.heldItemRight(entity, flag);

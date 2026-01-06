@@ -22,14 +22,14 @@ public interface CameraViewEvent {
     class Instance {
 
         private final Camera camera;
-        private final float partialTicks;
+        private final float partialTick;
         private float yaw;
         private float pitch;
         private float roll;
 
-        public Instance(Camera camera, float partialTicks, float yaw, float pitch, float roll) {
+        public Instance(Camera camera, float partialTick, float yaw, float pitch, float roll) {
             this.camera = camera;
-            this.partialTicks = partialTicks;
+            this.partialTick = partialTick;
             this.setYaw(yaw);
             this.setPitch(pitch);
             this.setRoll(roll);
@@ -40,7 +40,7 @@ public interface CameraViewEvent {
         }
 
         public float getPartialTicks() {
-            return this.partialTicks;
+            return this.partialTick;
         }
 
         public float getYaw() {

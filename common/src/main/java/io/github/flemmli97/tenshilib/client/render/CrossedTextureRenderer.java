@@ -16,7 +16,7 @@ public abstract class CrossedTextureRenderer<T extends Entity> extends TextureRe
     }
 
     @Override
-    public void doRender(T entity, float partialTicks, PoseStack stack, MultiBufferSource buffer) {
+    public void doRender(T entity, float partialTick, PoseStack stack, MultiBufferSource buffer) {
         stack.pushPose();
         stack.mulPose(Axis.XP.rotationDegrees(45.0F));
         for (int j = 0; j < 2; ++j) {

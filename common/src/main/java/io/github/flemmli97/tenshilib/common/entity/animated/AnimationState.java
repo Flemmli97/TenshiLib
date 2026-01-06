@@ -68,8 +68,8 @@ public class AnimationState {
     /**
      * How far the animation has progressed towards the end
      */
-    public double progress(float partialTicks) {
-        return this.progress(0, this.data.length(), partialTicks, 0);
+    public double progress(float partialTick) {
+        return this.progress(0, this.data.length(), partialTick, 0);
     }
 
     /**
@@ -78,17 +78,17 @@ public class AnimationState {
      * @param start Start value in ticks
      * @param end   End value in ticks
      */
-    public double progress(double start, double end, float partialTicks, int offset) {
-        double tick = this.getTick(partialTicks) + offset * this.speed;
+    public double progress(double start, double end, float partialTick, int offset) {
+        double tick = this.getTick(partialTick) + offset * this.speed;
         double length = end - start;
         return Mth.clamp((tick - start) / length, 0, 1);
     }
 
-    public double getStartTransitionProgress(float partialTicks) {
+    public double getStartTransitionProgress(float partialTick) {
         if (this.getStartTransition() <= 0) {
             return 1;
         }
-        double tick = Math.max(0, this.ticker - this.offset - 1 + partialTicks * this.speed);
+        double tick = Math.max(0, this.ticker - this.offset - 1 + partialTick * this.speed);
         return Mth.clamp(tick / this.getStartTransition(), 0, 1);
     }
 
@@ -100,8 +100,8 @@ public class AnimationState {
         return this.endTransition;
     }
 
-    public float getTick(float partialTicks) {
-        return (float) Math.max(this.offset, this.ticker - this.startTransition - 1 + partialTicks * this.speed);
+    public float getTick(float partialTick) {
+        return (float) Math.max(this.offset, this.ticker - this.startTransition - 1 + partialTick * this.speed);
     }
 
     public boolean isAt(double time) {

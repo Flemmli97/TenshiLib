@@ -81,12 +81,12 @@ public class BedrockAnimations {
         return diff;
     }
 
-    public void doAnimation(ExtendedModel model, String name, int ticker, float partialTicks) {
-        this.doAnimation(model, name, ticker, partialTicks, 1);
+    public void doAnimation(ExtendedModel model, String name, int ticker, float partialTick) {
+        this.doAnimation(model, name, ticker, partialTick, 1);
     }
 
-    public void doAnimation(ExtendedModel model, String name, int ticker, float partialTicks, float interpolation) {
-        this.doAnimation(model, name, ticker, partialTicks, interpolation, false, false);
+    public void doAnimation(ExtendedModel model, String name, int ticker, float partialTick, float interpolation) {
+        this.doAnimation(model, name, ticker, partialTick, interpolation, false, false);
     }
 
     /**
@@ -95,35 +95,35 @@ public class BedrockAnimations {
      * @param model         The model to run the animation on
      * @param name          The name of the animation
      * @param ticker        Animation ticker
-     * @param partialTicks  Partial tick for lerping
+     * @param partialTick  Partial tick for lerping
      * @param interpolation An interpolation value between 0-1 indicating
      * @param mirror        If true mirrors the animation. Components with "left"/"right" in their names will be swapped
      * @param add           By default animations overwrite eachother. Setting this to true will instead add the poses ontop
      * @return True if the animation is being played
      */
-    public boolean doAnimation(ExtendedModel model, String name, int ticker, float partialTicks, float interpolation, boolean mirror, boolean add) {
-        return this.doAnimation(model, name, Math.max(ticker - 1 + partialTicks, 0), interpolation, mirror, add);
+    public boolean doAnimation(ExtendedModel model, String name, int ticker, float partialTick, float interpolation, boolean mirror, boolean add) {
+        return this.doAnimation(model, name, Math.max(ticker - 1 + partialTick, 0), interpolation, mirror, add);
     }
 
-    public boolean doAnimation(ExtendedModel model, AnimationHandler<?> handler, float partialTicks) {
-        return this.doAnimation(model, handler, partialTicks, false);
+    public boolean doAnimation(ExtendedModel model, AnimationHandler<?> handler, float partialTick) {
+        return this.doAnimation(model, handler, partialTick, false);
     }
 
-    public boolean doAnimation(ExtendedModel model, AnimationHandler<?> handler, float partialTicks, boolean mirror) {
-        return this.doAnimation(model, handler, partialTicks, a -> mirror, null);
+    public boolean doAnimation(ExtendedModel model, AnimationHandler<?> handler, float partialTick, boolean mirror) {
+        return this.doAnimation(model, handler, partialTick, a -> mirror, null);
     }
 
-    public boolean doAnimation(ExtendedModel model, AnimationHandler<?> handler, float partialTicks, @Nullable Predicate<AnimationState> mirror, @Nullable Function<AnimationState, String> animationID) {
+    public boolean doAnimation(ExtendedModel model, AnimationHandler<?> handler, float partialTick, @Nullable Predicate<AnimationState> mirror, @Nullable Function<AnimationState, String> animationID) {
         AnimationState current = handler.getAnimation();
         AnimationState last = handler.getLastAnimation();
-        float interpolationLast = handler.getLastTransitionProgress(partialTicks);
-        float interpolation = handler.getCurrentTransitionProgress(partialTicks);
+        float interpolationLast = handler.getLastTransitionProgress(partialTick);
+        float interpolation = handler.getCurrentTransitionProgress(partialTick);
         boolean changed = false;
         if (last != null && interpolationLast > 0) {
-            changed = this.doAnimation(model, animationID != null ? animationID.apply(last) : last.getAnimation(), last.getTick(partialTicks), interpolationLast, mirror != null && mirror.test(last), false);
+            changed = this.doAnimation(model, animationID != null ? animationID.apply(last) : last.getAnimation(), last.getTick(partialTick), interpolationLast, mirror != null && mirror.test(last), false);
         }
         if (current != null) {
-            if (this.doAnimation(model, animationID != null ? animationID.apply(current) : current.getAnimation(), current.getTick(partialTicks), interpolation, mirror != null && mirror.test(current), false) && !changed) {
+            if (this.doAnimation(model, animationID != null ? animationID.apply(current) : current.getAnimation(), current.getTick(partialTick), interpolation, mirror != null && mirror.test(current), false) && !changed) {
                 changed = true;
             }
         }
