@@ -4,9 +4,11 @@ import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.client.CustomRiderRendererManager;
 import io.github.flemmli97.tenshilib.client.data.GeoAnimationManager;
 import io.github.flemmli97.tenshilib.client.data.GeoModelManager;
+import io.github.flemmli97.tenshilib.client.particles.ParticleRenderTypes;
 import io.github.flemmli97.tenshilib.client.particles.advanced.AdvancedParticleRegistry;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import io.github.flemmli97.tenshilib.fabric.TenshiLibFabric;
+import io.github.flemmli97.tenshilib.fabric.client.events.ParticleTypeRegisterEvent;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
@@ -32,6 +34,7 @@ public class TenshiLibFabricClient implements ClientModInitializer, ClientSetupM
 
     @Override
     public void clientSetup() {
+        ParticleTypeRegisterEvent.EVENT.register(register -> register.addRenderType(ParticleRenderTypes.TRANSLUCENT_ADD_BLURRED));
         AdvancedParticleRegistry.init();
         itemColors();
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new IdentifiableResourceReloadListener() {

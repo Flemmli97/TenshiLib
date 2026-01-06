@@ -6,7 +6,7 @@ import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.blaze3d.vertex.MeshData;
 import io.github.flemmli97.tenshilib.client.particles.AdvancedParticleType;
-import io.github.flemmli97.tenshilib.client.particles.ParticleRenderTypes;
+import io.github.flemmli97.tenshilib.fabric.client.events.ParticleTypeRegisterEvent;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleEngine;
@@ -42,8 +42,10 @@ public abstract class ParticleEngineMixin {
 
     @Inject(at = @At("RETURN"), method = "<init>")
     private void customTypes(ClientLevel level, TextureManager textureManager, CallbackInfo ci) {
+        ParticleTypeRegisterEvent.RenderTypeRegister register = new ParticleTypeRegisterEvent.RenderTypeRegister();
+        ParticleTypeRegisterEvent.EVENT.invoker().handle(register);
         RENDER_ORDER = ImmutableList.<ParticleRenderType>builder().addAll(RENDER_ORDER)
-                .add(ParticleRenderTypes.TRANSLUCENT_ADD_BLURRED)
+                .addAll(register.renderTypes())
                 .build();
     }
 
