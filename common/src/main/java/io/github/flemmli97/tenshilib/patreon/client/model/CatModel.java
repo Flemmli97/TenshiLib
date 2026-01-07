@@ -13,7 +13,7 @@ import io.github.flemmli97.tenshilib.patreon.RenderLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
-public class CatModel extends ExtendedEntityModel<Player> implements  PatreonModelData<Player> {
+public class CatModel extends ExtendedEntityModel<Player> implements PatreonModelData<Player> {
 
     public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "textures/model/cat.png");
 

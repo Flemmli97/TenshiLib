@@ -16,8 +16,8 @@ import java.util.function.Supplier;
 
 public class AttachmentRegisterImpl implements AttachmentRegister {
 
-    public static final ResourceKey<? extends Registry<AttachmentType<?>>> KEY = ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "attachment_types"));
-    public static final Registry<AttachmentType<?>> REGISTRY = LoaderRegistryAccess.INSTANCE.newRegistry(KEY, null, true, false).registry();
+    public static final ResourceKey<? extends Registry<AttachmentType<?, ?>>> KEY = ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(TenshiLib.MODID, "attachment_types"));
+    public static final Registry<AttachmentType<?, ?>> REGISTRY = LoaderRegistryAccess.INSTANCE.newRegistry(KEY, null, true, false).registry();
 
     // To initialize static fields
     public static void init() {
@@ -29,35 +29,35 @@ public class AttachmentRegisterImpl implements AttachmentRegister {
     }
 
     @Override
-    public <T> T getAttachment(Entity entity, AttachmentType<T> type) {
+    public <T> T getAttachment(Entity entity, AttachmentType<?, T> type) {
         return ((AttachmentHolder) entity).tenshilib$getAttachment(type);
     }
 
     @Override
-    public <T> Optional<T> getOptionalAttachment(Entity entity, AttachmentType<T> type) {
+    public <T> Optional<T> getOptionalAttachment(Entity entity, AttachmentType<?, T> type) {
         return ((AttachmentHolder) entity).tenshilib$getExistingAttachment(type);
     }
 
     @Override
-    public <T> T getAttachment(BlockEntity blockEntity, AttachmentType<T> type) {
+    public <T> T getAttachment(BlockEntity blockEntity, AttachmentType<?, T> type) {
         return ((AttachmentHolder) blockEntity).tenshilib$getAttachment(type);
     }
 
     @Override
-    public <T> Optional<T> getOptionalAttachment(BlockEntity blockEntity, AttachmentType<T> type) {
+    public <T> Optional<T> getOptionalAttachment(BlockEntity blockEntity, AttachmentType<?, T> type) {
         return ((AttachmentHolder) blockEntity).tenshilib$getExistingAttachment(type);
     }
 
     static class AttachmenRegistryImpl implements AttachmentRegistry {
 
-        private final VanillaRegisterHandler<AttachmentType<?>> register;
+        private final VanillaRegisterHandler<AttachmentType<?, ?>> register;
 
         AttachmenRegistryImpl(String modid) {
             this.register = new VanillaRegisterHandler<>(KEY, modid);
         }
 
         @Override
-        public <T> Supplier<AttachmentType<T>> register(String name, AttachmentType.Builder<T> builder) {
+        public <H, T> Supplier<AttachmentType<H, T>> register(String name, AttachmentType.Builder<H, T> builder) {
             return this.register.register(name, builder::build);
         }
 

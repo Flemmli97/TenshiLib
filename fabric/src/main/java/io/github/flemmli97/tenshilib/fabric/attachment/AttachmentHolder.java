@@ -9,9 +9,9 @@ import java.util.Optional;
  */
 public interface AttachmentHolder {
 
-    <T> T tenshilib$getAttachment(AttachmentType<T> type);
+    <T> T tenshilib$getAttachment(AttachmentType<?, T> type);
 
-    <T> Optional<T> tenshilib$getExistingAttachment(AttachmentType<T> type);
+    <T> Optional<T> tenshilib$getExistingAttachment(AttachmentType<?, T> type);
 
-    <T> void tenshilib$setAttachment(AttachmentType<T> type, T value);
+    <T> void tenshilib$setAttachment(AttachmentType<?, T> type, T value);
 }

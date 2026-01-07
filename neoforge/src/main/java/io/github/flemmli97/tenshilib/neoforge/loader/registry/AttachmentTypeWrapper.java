@@ -22,13 +22,13 @@ import java.util.Set;
  * Allows converstion from the cross-platform type to a {@link net.neoforged.neoforge.attachment.AttachmentType}
  */
 @EventBusSubscriber(modid = TenshiLib.MODID)
-public class AttachmentTypeWrapper<T> extends AttachmentType<T> {
+public class AttachmentTypeWrapper<H, T> extends AttachmentType<H, T> {
 
-    private static final Set<AttachmentTypeWrapper<?>> NEO_ATTACHMENTS = new HashSet<>();
+    private static final Set<AttachmentTypeWrapper<?, ?>> NEO_ATTACHMENTS = new HashSet<>();
 
     private net.neoforged.neoforge.attachment.AttachmentType<T> neoAttachment;
 
-    public AttachmentTypeWrapper(AttachmentType<T> type) {
+    public AttachmentTypeWrapper(AttachmentType<H, T> type) {
         super(type);
     }
 
@@ -63,7 +63,7 @@ public class AttachmentTypeWrapper<T> extends AttachmentType<T> {
 
     @SuppressWarnings("unchecked")
     private static void copyAttachments(Entity from, Entity to, boolean wasDeath) {
-        for (AttachmentTypeWrapper<?> type : NEO_ATTACHMENTS) {
+        for (AttachmentTypeWrapper<?, ?> type : NEO_ATTACHMENTS) {
             Object data = from.getExistingData(type.getNeoAttachment()).orElse(null);
             if (data == null)
                 continue;
@@ -74,6 +74,7 @@ public class AttachmentTypeWrapper<T> extends AttachmentType<T> {
                         .copy(data, to, wasDeath);
                 if (newAttachment != null) {
                     to.setData(attachmentType, newAttachment);
+                    handler.onCopy(to);
                 }
             }
         }

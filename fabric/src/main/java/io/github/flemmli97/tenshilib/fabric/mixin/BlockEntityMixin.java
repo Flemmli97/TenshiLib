@@ -19,7 +19,7 @@ import java.util.Optional;
 public abstract class BlockEntityMixin implements AttachmentHolder {
 
     @Unique
-    private IdentityHashMap<AttachmentType<?>, Object> tenshilib$dataAttachments = new IdentityHashMap<>();
+    private IdentityHashMap<AttachmentType<?, ?>, Object> tenshilib$dataAttachments = new IdentityHashMap<>();
 
     @Inject(method = "loadAdditional", at = @At("HEAD"))
     private void loadData(CompoundTag compound, HolderLookup.Provider registries, CallbackInfo info) {
@@ -36,18 +36,18 @@ public abstract class BlockEntityMixin implements AttachmentHolder {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T tenshilib$getAttachment(AttachmentType<T> type) {
+    public <T> T tenshilib$getAttachment(AttachmentType<?, T> type) {
         return (T) this.tenshilib$dataAttachments.computeIfAbsent(type, k -> type.defaultValueSupplier().apply(this));
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> Optional<T> tenshilib$getExistingAttachment(AttachmentType<T> type) {
+    public <T> Optional<T> tenshilib$getExistingAttachment(AttachmentType<?, T> type) {
         return (Optional<T>) Optional.of(this.tenshilib$dataAttachments.get(type));
     }
 
     @Override
-    public <T> void tenshilib$setAttachment(AttachmentType<T> type, T value) {
+    public <T> void tenshilib$setAttachment(AttachmentType<?, T> type, T value) {
         this.tenshilib$dataAttachments.put(type, value);
     }
 }

@@ -32,7 +32,8 @@ public class ChomusukeModel extends ExtendedEntityModel<Player> implements Exten
     @Override
     public void setupAnim(Player entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.model.get().resetPoses();
-        float partialTick = this.getPartialTick();;
+        float partialTick = this.getPartialTick();
+        ;
         if (RenderLocation.isHead(this.location))
             this.anim.get().doAnimation(this, "head", entity.tickCount, partialTick);
         else

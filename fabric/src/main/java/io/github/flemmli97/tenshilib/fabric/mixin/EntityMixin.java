@@ -24,7 +24,7 @@ public abstract class EntityMixin implements AttachmentHolder {
     public abstract RegistryAccess registryAccess();
 
     @Unique
-    private IdentityHashMap<AttachmentType<?>, Object> tenshilib$dataAttachments = new IdentityHashMap<>();
+    private IdentityHashMap<AttachmentType<?, ?>, Object> tenshilib$dataAttachments = new IdentityHashMap<>();
 
     @Inject(method = "load", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;readAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V"))
     private void loadData(CompoundTag compound, CallbackInfo info) {
@@ -41,18 +41,18 @@ public abstract class EntityMixin implements AttachmentHolder {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T tenshilib$getAttachment(AttachmentType<T> type) {
+    public <T> T tenshilib$getAttachment(AttachmentType<?, T> type) {
         return (T) this.tenshilib$dataAttachments.computeIfAbsent(type, k -> type.defaultValueSupplier().apply(this));
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> Optional<T> tenshilib$getExistingAttachment(AttachmentType<T> type) {
+    public <T> Optional<T> tenshilib$getExistingAttachment(AttachmentType<?, T> type) {
         return (Optional<T>) Optional.of(this.tenshilib$dataAttachments.get(type));
     }
 
     @Override
-    public <T> void tenshilib$setAttachment(AttachmentType<T> type, T value) {
+    public <T> void tenshilib$setAttachment(AttachmentType<?, T> type, T value) {
         this.tenshilib$dataAttachments.put(type, value);
     }
 }

@@ -95,7 +95,7 @@ public class BedrockAnimations {
      * @param model         The model to run the animation on
      * @param name          The name of the animation
      * @param ticker        Animation ticker
-     * @param partialTick  Partial tick for lerping
+     * @param partialTick   Partial tick for lerping
      * @param interpolation An interpolation value between 0-1 indicating
      * @param mirror        If true mirrors the animation. Components with "left"/"right" in their names will be swapped
      * @param add           By default animations overwrite eachother. Setting this to true will instead add the poses ontop

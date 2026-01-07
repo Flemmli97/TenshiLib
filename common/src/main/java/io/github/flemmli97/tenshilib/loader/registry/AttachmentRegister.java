@@ -24,7 +24,7 @@ public interface AttachmentRegister {
      */
     AttachmentRegistry of(String modid);
 
-    default <T> T getAttachment(Entity entity, Supplier<AttachmentType<T>> type) {
+    default <T> T getAttachment(Entity entity, Supplier<AttachmentType<?, T>> type) {
         return this.getAttachment(entity, type.get());
     }
 
@@ -32,11 +32,11 @@ public interface AttachmentRegister {
      * Get the attachment on the entity.
      * If it doesn't exist a new one will be created
      */
-    <T> T getAttachment(Entity entity, AttachmentType<T> type);
+    <T> T getAttachment(Entity entity, AttachmentType<?, T> type);
 
-    <T> Optional<T> getOptionalAttachment(Entity entity, AttachmentType<T> type);
+    <T> Optional<T> getOptionalAttachment(Entity entity, AttachmentType<?, T> type);
 
-    default <T> T getAttachment(BlockEntity blockEntity, Supplier<AttachmentType<T>> type) {
+    default <T> T getAttachment(BlockEntity blockEntity, Supplier<AttachmentType<?, T>> type) {
         return this.getAttachment(blockEntity, type.get());
     }
 
@@ -44,13 +44,13 @@ public interface AttachmentRegister {
      * Get the attachment on the block entity.
      * If it doesn't exist a new one will be created
      */
-    <T> T getAttachment(BlockEntity blockEntity, AttachmentType<T> type);
+    <T> T getAttachment(BlockEntity blockEntity, AttachmentType<?, T> type);
 
-    <T> Optional<T> getOptionalAttachment(BlockEntity blockEntity, AttachmentType<T> type);
+    <T> Optional<T> getOptionalAttachment(BlockEntity blockEntity, AttachmentType<?, T> type);
 
     interface AttachmentRegistry {
 
-        <T> Supplier<AttachmentType<T>> register(String name, AttachmentType.Builder<T> builder);
+        <H, T> Supplier<AttachmentType<H, T>> register(String name, AttachmentType.Builder<H, T> builder);
 
         void registerContent();
     }

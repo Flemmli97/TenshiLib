@@ -15,4 +15,11 @@ public interface AttachmentTransferHandler<T> {
      * @return The new attachment
      */
     T copy(T from, Object targetHolder, boolean wasDead);
+
+    /**
+     * Callback for after the transfer. Useful for e.g. sending a sync packet
+     *
+     * @param targetHolder The new attachment holder
+     */
+    void onCopy(Object targetHolder);
 }

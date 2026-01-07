@@ -22,29 +22,29 @@ public class AttachmentRegisterImpl implements AttachmentRegister {
     }
 
     @Override
-    public <T> T getAttachment(Entity entity, AttachmentType<T> type) {
-        if (!(type instanceof AttachmentTypeWrapper<T> wrapper))
+    public <T> T getAttachment(Entity entity, AttachmentType<?, T> type) {
+        if (!(type instanceof AttachmentTypeWrapper<?, T> wrapper))
             throw new IllegalStateException("Unsupported type");
         return entity.getData(wrapper.getNeoAttachment());
     }
 
     @Override
-    public <T> Optional<T> getOptionalAttachment(Entity entity, AttachmentType<T> type) {
-        if (!(type instanceof AttachmentTypeWrapper<T> wrapper))
+    public <T> Optional<T> getOptionalAttachment(Entity entity, AttachmentType<?, T> type) {
+        if (!(type instanceof AttachmentTypeWrapper<?, T> wrapper))
             throw new IllegalStateException("Unsupported type");
         return entity.getExistingData(wrapper.getNeoAttachment());
     }
 
     @Override
-    public <T> T getAttachment(BlockEntity blockEntity, AttachmentType<T> type) {
-        if (!(type instanceof AttachmentTypeWrapper<T> wrapper))
+    public <T> T getAttachment(BlockEntity blockEntity, AttachmentType<?, T> type) {
+        if (!(type instanceof AttachmentTypeWrapper<?, T> wrapper))
             throw new IllegalStateException("Unsupported type");
         return blockEntity.getData(wrapper.getNeoAttachment());
     }
 
     @Override
-    public <T> Optional<T> getOptionalAttachment(BlockEntity blockEntity, AttachmentType<T> type) {
-        if (!(type instanceof AttachmentTypeWrapper<T> wrapper))
+    public <T> Optional<T> getOptionalAttachment(BlockEntity blockEntity, AttachmentType<?, T> type) {
+        if (!(type instanceof AttachmentTypeWrapper<?, T> wrapper))
             throw new IllegalStateException("Unsupported type");
         return blockEntity.getExistingData(wrapper.getNeoAttachment());
     }
@@ -58,8 +58,8 @@ public class AttachmentRegisterImpl implements AttachmentRegister {
         }
 
         @Override
-        public <T> Supplier<AttachmentType<T>> register(String name, AttachmentType.Builder<T> builder) {
-            AttachmentTypeWrapper<T> wrapper = new AttachmentTypeWrapper<>(builder.build());
+        public <H, T> Supplier<AttachmentType<H, T>> register(String name, AttachmentType.Builder<H, T> builder) {
+            AttachmentTypeWrapper<H, T> wrapper = new AttachmentTypeWrapper<>(builder.build());
             DeferredHolder<?, ?> value = this.register.register(name, wrapper::getNeoAttachment);
             return () -> {
                 // This makes it throw if it's not registered

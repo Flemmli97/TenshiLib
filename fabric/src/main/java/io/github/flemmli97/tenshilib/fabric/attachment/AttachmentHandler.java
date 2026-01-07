@@ -25,21 +25,22 @@ public class AttachmentHandler {
         AttachmentRegisterImpl.REGISTRY.forEach(type -> {
             AttachmentTransferHandler<Object> handler = (AttachmentTransferHandler<Object>) type.transferHandler().orElse(null);
             if (handler != null) {
-                AttachmentType<Object> attachmentType = (AttachmentType<Object>) type;
+                AttachmentType<Object, Object> attachmentType = (AttachmentType<Object, Object>) type;
                 Object newAttachment = handler
                         .copy(((AttachmentHolder) from).tenshilib$getAttachment(type), to, wasDeath);
                 if (newAttachment != null) {
                     ((AttachmentHolder) to).tenshilib$setAttachment(attachmentType, newAttachment);
+                    handler.onCopy(to);
                 }
             }
         });
     }
 
     @SuppressWarnings("unchecked")
-    public static IdentityHashMap<AttachmentType<?>, Object> readAttachments(Object holder, CompoundTag tag, HolderLookup.Provider provider) {
-        IdentityHashMap<AttachmentType<?>, Object> map = new IdentityHashMap<>();
+    public static IdentityHashMap<AttachmentType<?, ?>, Object> readAttachments(Object holder, CompoundTag tag, HolderLookup.Provider provider) {
+        IdentityHashMap<AttachmentType<?, ?>, Object> map = new IdentityHashMap<>();
         for (String key : tag.getAllKeys()) {
-            AttachmentType<?> type = AttachmentRegisterImpl.REGISTRY.get(ResourceLocation.parse(key));
+            AttachmentType<?, ?> type = AttachmentRegisterImpl.REGISTRY.get(ResourceLocation.parse(key));
             if (type == null) {
                 TenshiLib.LOGGER.warn("No such attachment type {} registered!", key);
                 continue;
@@ -57,11 +58,11 @@ public class AttachmentHandler {
         return map;
     }
 
-    public static CompoundTag saveAttachments(IdentityHashMap<AttachmentType<?>, ?> attachments, HolderLookup.Provider provider) {
+    public static CompoundTag saveAttachments(IdentityHashMap<AttachmentType<?, ?>, ?> attachments, HolderLookup.Provider provider) {
         if (attachments.isEmpty())
             return null;
         CompoundTag tag = new CompoundTag();
-        for (Map.Entry<AttachmentType<?>, ?> entry : attachments.entrySet()) {
+        for (Map.Entry<AttachmentType<?, ?>, ?> entry : attachments.entrySet()) {
             ResourceLocation key = AttachmentRegisterImpl.REGISTRY.getKey(entry.getKey());
             if (key == null) {
                 TenshiLib.LOGGER.warn("Attachment type {} is not registered!", entry.getKey());
