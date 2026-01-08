@@ -33,8 +33,15 @@ public class AdvancedParticle extends Particle {
 
     @Override
     public void tick() {
+        ParticleAccessor acc = (ParticleAccessor) this.getWrapped();
+        double xo = acc.getX();
+        double yo = acc.getY();
+        double zo = acc.getZ();
         this.handlers.forEach(d -> d.tick(this.wrapped));
         this.wrapped.tick();
+        acc.setXo(xo);
+        acc.setYo(yo);
+        acc.setZo(zo);
     }
 
     @Override
