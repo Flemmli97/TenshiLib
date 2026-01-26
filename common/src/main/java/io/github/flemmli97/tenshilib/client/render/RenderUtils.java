@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Axis;
 import io.github.flemmli97.tenshilib.common.utils.math.OrientedBoundingBox;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -27,12 +28,18 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.Random;
+import java.util.function.Function;
 
 public class RenderUtils {
 
     public static final int DEFAULT_COLOR = 0xFFFFFFFF;
     private static final float TRIANGLE_MULT = (float) (Math.sqrt(3.0D) / 2.0D);
     private static final Random RANDOM = new Random(432);
+
+    private static final Function<RenderType, RenderType> TRIG_STRIP = Util.memoize((wrapped) ->
+            new RenderType("rendertype_trig_wrapped_" + wrapped.toString(), wrapped.format(), VertexFormat.Mode.TRIANGLE_STRIP, wrapped.bufferSize(),
+                    wrapped.affectsCrumbling(), wrapped.sortOnUpload(), wrapped::setupRenderState, wrapped::clearRenderState) {
+            });
 
     public static float getPartialTicks(Entity entity) {
         return Minecraft.getInstance().getTimer()
@@ -238,50 +245,46 @@ public class RenderUtils {
      */
     public static void renderSphere(MultiBufferSource buffer, RenderType renderType, PoseStack stack,
                                     float red, float green, float blue, float alpha,
-                                    float radius, int precision, int light, boolean drawImmediately) {
+                                    float radius, int precision, int light, boolean drawImmediately,
+                                    float u0, float v0, float u1, float v1) {
+        if (renderType.mode() != VertexFormat.Mode.TRIANGLE_STRIP) {
+            renderType = TRIG_STRIP.apply(renderType);
+        }
         VertexConsumer consumer = buffer.getBuffer(renderType);
-        renderSphere(consumer, renderType.mode() == VertexFormat.Mode.QUADS, stack, red, green, blue, alpha, radius, precision, light);
-        if (drawImmediately && buffer instanceof MultiBufferSource.BufferSource)
-            ((MultiBufferSource.BufferSource) buffer).endBatch();
+        renderSphere(consumer, stack, red, green, blue, alpha, radius, precision, light, u0, v0, u1, v1);
+        if (drawImmediately && buffer instanceof MultiBufferSource.BufferSource source)
+            source.endBatch();
     }
 
     /**
-     * Renders a sphere. Can handle both quads and triangle strips rendertypes
+     * Renders a sphere. Requires a triangle stripe rendertype being used
      *
-     * @param quad      Whether the rendertype used is quads or trigs
      * @param precision How many points should be used along the axis. Higher creates more spherical shapes
      */
-    public static void renderSphere(VertexConsumer consumer, boolean quad, PoseStack stack,
+    public static void renderSphere(VertexConsumer consumer, PoseStack stack,
                                     float red, float green, float blue, float alpha,
-                                    float radius, int precision, int light) {
+                                    float radius, int precision, int light,
+                                    float u0, float v0, float u1, float v1) {
         stack.pushPose();
         stack.mulPose(Axis.XN.rotationDegrees(90));
         PoseStack.Pose pose = stack.last();
         float step = Mth.PI / precision;
+        float uL = u1 - u0;
+        float vL = v1 - v0;
         for (float t = 0; t < precision; t++) {
-            for (float p = 0; p < precision * 2; p++) {
+            for (float p = 0; p <= precision * 2; p++) {
                 float theta = t * step;
                 float phi = p * step;
                 float thetaNext = theta + step;
-                float phiNext = phi + step;
-                float x = radius * Mth.sin(theta) * net.minecraft.util.Mth.cos(phi);
-                float y = radius * Mth.sin(theta) * net.minecraft.util.Mth.sin(phi);
+                float x = radius * Mth.sin(theta) * Mth.cos(phi);
+                float y = radius * Mth.sin(theta) * Mth.sin(phi);
                 float z = radius * Mth.cos(theta);
-                consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+                float u = p / (precision * 2) * uL;
+                consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(u0 + u, v0 + vL * t / precision).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
                 x = radius * Mth.sin(thetaNext) * Mth.cos(phi);
                 y = radius * Mth.sin(thetaNext) * Mth.sin(phi);
                 z = radius * Mth.cos(thetaNext);
-                consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
-                if (quad) {
-                    x = radius * Mth.sin(thetaNext) * Mth.cos(phiNext);
-                    y = radius * Mth.sin(thetaNext) * Mth.sin(phiNext);
-                    z = radius * Mth.cos(thetaNext);
-                    consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
-                    x = radius * Mth.sin(theta) * Mth.cos(phiNext);
-                    y = radius * Mth.sin(theta) * Mth.sin(phiNext);
-                    z = radius * Mth.cos(theta);
-                    consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
-                }
+                consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(u0 + u, v0 + vL * (t + 1) / precision).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
             }
         }
         stack.popPose();

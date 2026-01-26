@@ -15,8 +15,9 @@ public class ScaleHandler implements AdvancedParticleHandler {
 
     public ScaleHandler(ScaleData data, Particle particle) {
         this.data = data;
-        this.setScaleParticle(particle, data.start());
-        this.scaleO = this.scale;
+        this.scaleO = data.start();
+        this.scale = this.scaleO;
+        this.setParticleScale(particle, this.scale);
     }
 
     /**
@@ -26,7 +27,7 @@ public class ScaleHandler implements AdvancedParticleHandler {
     @Override
     public void renderTick(Particle particle, float partialTick) {
         this.partialTick = partialTick;
-        particle.scale(Mth.lerp(partialTick, this.scaleO, this.scale));
+        this.setParticleScale(particle, Mth.lerp(partialTick, this.scaleO, this.scale));
     }
 
     @Override
@@ -36,15 +37,16 @@ public class ScaleHandler implements AdvancedParticleHandler {
         this.tick++;
         this.scaleO = this.scale;
         float prog = Mth.clamp((float) this.tick / this.data.duration(), 0, 1);
-        this.setScaleParticle(particle, Mth.lerp(prog, this.data.start(), this.data.end()));
+        this.scale = Mth.lerp(prog, this.data.start(), this.data.end());
+        this.setParticleScale(particle, Mth.lerp(this.partialTick, this.scaleO, this.scale));
     }
 
-    protected void setScaleParticle(Particle particle, float scale) {
+    protected void setParticleScale(Particle particle, float scale) {
+        // Quad Particles multiply the current scale instead so we undo it here
         if (particle instanceof SingleQuadParticle quad) {
             float current = quad.getQuadSize(1);
             scale = scale / current;
         }
-        this.scale = scale;
-        particle.scale(Mth.lerp(this.partialTick, this.scaleO, this.scale));
+        particle.scale(scale);
     }
 }
