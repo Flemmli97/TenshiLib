@@ -1,5 +1,6 @@
 package io.github.flemmli97.tenshilib.common.utils.math.parser;
 
+import io.github.flemmli97.tenshilib.TenshiLib;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.BuiltinValues;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.operators.Operators;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.operators.logic.Condition;
@@ -30,6 +31,15 @@ public class Expression {
     }
 
     public static ExpValue of(String exp) {
+        try {
+            return ofInternal(exp);
+        } catch (Exception e) {
+            TenshiLib.LOGGER.error("Could't parse expression {}", exp);
+            throw e;
+        }
+    }
+
+    private static ExpValue ofInternal(String exp) {
         exp = exp.replace(" ", "").replace("\n", "");
         try {
             // Quick resolve
@@ -118,7 +128,7 @@ public class Expression {
                         throw new IllegalStateException("Mismatched brackets!");
                     }
                     operators.pop();
-                    if (operators.peek().type == Type.FUNC) {
+                    if (!operators.empty() && operators.peek().type == Type.FUNC) {
                         output.add(operators.pop());
                     }
                 }
@@ -226,6 +236,8 @@ public class Expression {
         verify("5+7+3+1*6*3+9", new VariableMap(), 0, 42);
         verify("5+(44+1)*4*1/6+99", new VariableMap(), 0, 134);
         verify("-5+5+(-3*5)", new VariableMap(), 0, -15);
+        verify("10 * (x + 5)", new VariableMap().setVariable("x", 2), 0, 70);
+        verify("(x + 5) * 10", new VariableMap().setVariable("x", 2), 0, 70);
 
         verify("math.sin(time*(44+1)+3)*4*1/6", new VariableMap().setVariable("query.anim_time", 5), 5, -0.49543);
         verify("99*math.cos(1)", new VariableMap(), 5, 98.98492);
