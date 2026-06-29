@@ -22,7 +22,7 @@ public class TagManagerMixin {
     private RegistryAccess registryAccess;
 
     @SuppressWarnings("unchecked")
-    @ModifyVariable(method = "createLoader", at = @At("RETURN"), name = "tagloader")
+    @ModifyVariable(method = "createLoader", at = @At("RETURN"))
     private <T> TagLoader<Holder<T>> load(TagLoader<Holder<T>> tagloader, ResourceManager resourceManager, Executor backgroundExecutor, RegistryAccess.RegistryEntry<T> entry) {
         ((TagLoaderRegistryContext<T>) tagloader).tenshilib$setRegistry(entry.value().key(), this.registryAccess);
         return tagloader;
