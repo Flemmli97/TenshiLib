@@ -280,11 +280,20 @@ public class RenderUtils {
                 float y = radius * Mth.sin(theta) * Mth.sin(phi);
                 float z = radius * Mth.cos(theta);
                 float u = p / (precision * 2) * uL;
+                // Degenerate vertices to break trig strips
+                if (t == 0 && p == 0) {
+                    consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(u0 + u, v0 + vL * t / precision).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+                }
                 consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(u0 + u, v0 + vL * t / precision).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
                 x = radius * Mth.sin(thetaNext) * Mth.cos(phi);
                 y = radius * Mth.sin(thetaNext) * Mth.sin(phi);
                 z = radius * Mth.cos(thetaNext);
-                consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(u0 + u, v0 + vL * (t + 1) / precision).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+                float v = v0 + vL * (t + 1) / precision;
+                consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(u0 + u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+                // Degenerate vertices to break trig strips
+                if (t == precision - 1 && p == precision * 2) {
+                    consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(u0 + u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+                }
             }
         }
         stack.popPose();
