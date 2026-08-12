@@ -317,7 +317,7 @@ public abstract class AdvancedProjectile extends Projectile {
     }
 
     protected boolean canHit(Entity target) {
-        if (target.isSpectator() || !target.isAlive() || !target.isPickable() || this.checkedEntities.contains(target.getUUID())) {
+        if (target.isSpectator() || !target.isAlive() || !target.canBeHitByProjectile() || this.checkedEntities.contains(target.getUUID())) {
             return false;
         }
         Entity entity = this.getOwner();

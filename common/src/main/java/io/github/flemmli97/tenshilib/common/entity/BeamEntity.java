@@ -176,7 +176,7 @@ public abstract class BeamEntity extends Entity implements TraceableEntity {
     }
 
     protected boolean canHitEntity(Entity target) {
-        if (target.isSpectator() || !target.isAlive() || !target.isPickable()) {
+        if (target.isSpectator() || !target.isAlive() || !target.canBeHitByProjectile()) {
             return false;
         }
         Entity entity = this.getOwner();
@@ -199,7 +199,7 @@ public abstract class BeamEntity extends Entity implements TraceableEntity {
     }
 
     protected boolean check(Entity e, Predicate<AABB> intersects) {
-        if (e.isSpectator() || !e.isAlive() || !e.isPickable())
+        if (e.isSpectator() || !e.isAlive() || !e.canBeHitByProjectile())
             return false;
         AABB aabb = e.getBoundingBox();
         return intersects.test(aabb);

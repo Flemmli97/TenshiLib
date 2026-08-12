@@ -125,7 +125,7 @@ public abstract class DamageCloudEntity extends Entity implements TraceableEntit
     }
 
     protected boolean canHit(LivingEntity target) {
-        if (target.isSpectator() || !target.isAlive() || !target.isPickable()) {
+        if (target.isSpectator() || !target.isAlive() || !target.canBeHitByProjectile()) {
             return false;
         }
         Entity entity = this.getOwner();
