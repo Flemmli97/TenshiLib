@@ -1,6 +1,7 @@
 package io.github.flemmli97.tenshilib.client.model.animation;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonObject;
 import io.github.flemmli97.tenshilib.client.model.animation.keyframe.ParticleKeyFrame;
 import io.github.flemmli97.tenshilib.client.model.animation.keyframe.SoundKeyFrame;
@@ -10,10 +11,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public record Animation(double length, boolean loop, Map<String, AnimationBone> bones,
                         List<ParticleKeyFrame> particleFrames, List<SoundKeyFrame> soundFrames,
-                        Map<String, double[]> markerFrames) {
+                        Map<String, double[]> markerFrames, Set<String> variables) {
+
+    public Animation(double length, boolean loop, Map<String, AnimationBone> bones, List<ParticleKeyFrame> particleFrames, List<SoundKeyFrame> soundFrames, Map<String, double[]> markerFrames) {
+        this(length, loop, bones, particleFrames, soundFrames, markerFrames, collectVariables(bones));
+    }
+
+    private static Set<String> collectVariables(Map<String, AnimationBone> boneAnimations) {
+        ImmutableSet.Builder<String> builder = ImmutableSet.builder();
+        boneAnimations.values().forEach(bone -> {
+            bone.rotations().forEach(frame -> builder.addAll(frame.collectVariables()));
+            bone.translations().forEach(frame -> builder.addAll(frame.collectVariables()));
+            bone.scales().forEach(frame -> builder.addAll(frame.collectVariables()));
+        });
+        return builder.build();
+    }
 
     public static List<ParticleKeyFrame> parseParticles(JsonObject obj) {
         List<ParticleKeyFrame> frames = new ArrayList<>();

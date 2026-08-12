@@ -24,12 +24,6 @@ public class Expression {
 
     private static final Pattern PATTERN = Pattern.compile(String.format("(?:%1$s)|(?:%2$s)|%3$s|,", NUMBER, VARIABLE, OPERATOR));
 
-    private static String variableEquivalent(String variable) {
-        if (variable.equals("anim_time") || variable.equals("time"))
-            variable = "query.anim_time";
-        return variable;
-    }
-
     public static ExpValue of(String exp) {
         try {
             return ofInternal(exp);
@@ -59,7 +53,7 @@ public class Expression {
                     if (op.token.equals("pi") || op.token.equals("PI")) {
                         vars.push(new BuiltinValues.ConstantValue(Math.PI));
                     } else {
-                        vars.push(new BuiltinValues.VariableValue(variableEquivalent(op.token)));
+                        vars.push(new BuiltinValues.VariableValue(op.token));
                     }
                 }
                 case UNARY_OP -> {

@@ -2,8 +2,18 @@ package io.github.flemmli97.tenshilib.common.utils.math.parser.impl.operators.lo
 
 import io.github.flemmli97.tenshilib.common.utils.math.parser.ExpValue;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.VariableMap;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.FunctionalValue;
 
-public record Greater(ExpValue first, ExpValue second) implements ExpValue {
+public final class Greater extends FunctionalValue {
+
+    private final ExpValue first;
+    private final ExpValue second;
+
+    public Greater(ExpValue first, ExpValue second) {
+        super(first, second);
+        this.first = first;
+        this.second = second;
+    }
 
     @Override
     public double get(VariableMap vars) {

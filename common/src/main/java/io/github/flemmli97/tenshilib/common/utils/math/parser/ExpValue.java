@@ -2,6 +2,8 @@ package io.github.flemmli97.tenshilib.common.utils.math.parser;
 
 import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.BuiltinValues;
 
+import java.util.Set;
+
 public interface ExpValue {
 
     ExpValue DEFAULT = new BuiltinValues.ConstantValue(0);
@@ -21,5 +23,9 @@ public interface ExpValue {
 
     default float asFloat(VariableMap variables) {
         return (float) this.get(variables);
+    }
+
+    default Set<String> variables() {
+        return Set.of();
     }
 }

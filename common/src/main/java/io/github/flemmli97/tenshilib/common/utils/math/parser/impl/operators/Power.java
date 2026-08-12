@@ -2,8 +2,18 @@ package io.github.flemmli97.tenshilib.common.utils.math.parser.impl.operators;
 
 import io.github.flemmli97.tenshilib.common.utils.math.parser.ExpValue;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.VariableMap;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.FunctionalValue;
 
-public record Power(ExpValue base, ExpValue exponent) implements ExpValue {
+public final class Power extends FunctionalValue {
+
+    private final ExpValue base;
+    private final ExpValue exponent;
+
+    public Power(ExpValue base, ExpValue exponent) {
+        super(base, exponent);
+        this.base = base;
+        this.exponent = exponent;
+    }
 
     @Override
     public double get(VariableMap vars) {

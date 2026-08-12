@@ -131,9 +131,14 @@ public class BedrockAnimations {
     }
 
     public boolean doAnimation(ExtendedModel model, String name, float tick, float interpolation, boolean mirror, boolean add) {
+        return this.doAnimation(model, null, name, tick, interpolation, mirror, add);
+    }
+
+    public boolean doAnimation(ExtendedModel model, @Nullable AnimationState state, String name, float tick, float interpolation, boolean mirror, boolean add) {
         Animation animation = this.animations.get(name);
         if (animation != null && interpolation != 0) {
-            this.animate(model, animation, tick, Mth.clamp(interpolation, 0, 1), mirror, add);
+            this.variables.clear();
+            this.animate(model, state, animation, tick, Mth.clamp(interpolation, 0, 1), mirror, add);
             return true;
         }
         return false;
@@ -225,10 +230,10 @@ public class BedrockAnimations {
     }
 
     // Actually animate the model
-
-    private void animate(ExtendedModel model, Animation animation, float tick, float interpolation, boolean mirror, boolean add) {
+    private void animate(ExtendedModel model, AnimationState state, Animation animation, float tick, float interpolation, boolean mirror, boolean add) {
         if (animation.loop() && animation.length() > 0)
             tick = (float) (tick % animation.length());
+        model.onPlayAnimation(state, animation, tick * 0.05f, this.variables);
         for (AnimationBone bone : animation.bones().values()) {
             this.animateBone(model, bone, tick, interpolation, mirror, add);
         }
@@ -243,7 +248,6 @@ public class BedrockAnimations {
         }
         if (modelPart == null)
             return;
-        this.variables.setVariable("query.anim_time", actualTick * 0.05);
         float mirrorMult = (mirror ? -1 : 1);
         if (!bone.translations().isEmpty()) {
             if (bone.translations().size() == 1) {

@@ -3,6 +3,8 @@ package io.github.flemmli97.tenshilib.common.utils.math.parser.impl;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.ExpValue;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.VariableMap;
 
+import java.util.Set;
+
 public class BuiltinValues {
 
     public record ConstantValue(double constant) implements ExpValue {
@@ -26,6 +28,11 @@ public class BuiltinValues {
         }
 
         @Override
+        public Set<String> variables() {
+            return this.val.variables();
+        }
+
+        @Override
         public String toString() {
             return "-" + this.val;
         }
@@ -39,6 +46,11 @@ public class BuiltinValues {
         }
 
         @Override
+        public Set<String> variables() {
+            return Set.of(this.variable);
+        }
+
+        @Override
         public String toString() {
             return this.variable;
         }
@@ -49,6 +61,11 @@ public class BuiltinValues {
         @Override
         public double get(VariableMap vars) {
             return this.val.asBool(vars) ? 0 : 1;
+        }
+
+        @Override
+        public Set<String> variables() {
+            return this.val.variables();
         }
 
         @Override

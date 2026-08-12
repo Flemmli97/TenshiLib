@@ -23,6 +23,7 @@
     "CubeDefinitionMixin",
     "EntityRenderDispatcherMixin",
     "HumanoidArmorMixin",
+    "LevelRendererAccessor",
     "LivingEntityRendererAccessor",
     "LivingOverlayMixin",
     "ModelPartAccessor",

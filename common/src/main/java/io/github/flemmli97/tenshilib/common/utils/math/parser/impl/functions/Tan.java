@@ -2,8 +2,16 @@ package io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions;
 
 import io.github.flemmli97.tenshilib.common.utils.math.parser.ExpValue;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.VariableMap;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.FunctionalValue;
 
-public record Tan(ExpValue value) implements ExpValue {
+public final class Tan extends FunctionalValue {
+
+    private final ExpValue value;
+
+    public Tan(ExpValue value) {
+        super(value);
+        this.value = value;
+    }
 
     @Override
     public double get(VariableMap vars) {

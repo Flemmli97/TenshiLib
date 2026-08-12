@@ -2,8 +2,16 @@ package io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions;
 
 import io.github.flemmli97.tenshilib.common.utils.math.parser.ExpValue;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.VariableMap;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.FunctionalValue;
 
-public record Floor(ExpValue value) implements ExpValue {
+public class Floor extends FunctionalValue {
+
+    private final ExpValue value;
+
+    public Floor(ExpValue value) {
+        super(value);
+        this.value = value;
+    }
 
     @Override
     public double get(VariableMap vars) {

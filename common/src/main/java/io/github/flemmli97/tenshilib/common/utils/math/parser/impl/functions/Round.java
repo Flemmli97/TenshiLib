@@ -2,8 +2,16 @@ package io.github.flemmli97.tenshilib.common.utils.math.parser.impl.functions;
 
 import io.github.flemmli97.tenshilib.common.utils.math.parser.ExpValue;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.VariableMap;
+import io.github.flemmli97.tenshilib.common.utils.math.parser.impl.FunctionalValue;
 
-public record Round(ExpValue value) implements ExpValue {
+public final class Round extends FunctionalValue {
+
+    private final ExpValue value;
+
+    public Round(ExpValue value) {
+        super(value);
+        this.value = value;
+    }
 
     @Override
     public double get(VariableMap vars) {
