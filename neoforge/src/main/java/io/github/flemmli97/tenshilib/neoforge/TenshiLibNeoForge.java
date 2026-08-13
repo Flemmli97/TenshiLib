@@ -1,6 +1,7 @@
 package io.github.flemmli97.tenshilib.neoforge;
 
 import io.github.flemmli97.tenshilib.TenshiLib;
+import io.github.flemmli97.tenshilib.client.shader.TenshiLibShaders;
 import io.github.flemmli97.tenshilib.common.data.AnimationDataManager;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import io.github.flemmli97.tenshilib.neoforge.client.events.ClientEvents;
@@ -31,6 +32,7 @@ public class TenshiLibNeoForge {
         TenshiLib.registerRegistry();
         TenshiLibPatreonImpl.initPatreonData(modBus);
         if (FMLEnvironment.dist == Dist.CLIENT) {
+            TenshiLibShaders.registerShader();
             modBus.addListener(ClientEvents::clientSetup);
             modBus.addListener(ClientEvents::reloadListener);
             modBus.addListener(ClientEvents::itemColors);

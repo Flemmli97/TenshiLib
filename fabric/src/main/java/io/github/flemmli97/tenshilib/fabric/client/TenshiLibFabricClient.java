@@ -6,6 +6,7 @@ import io.github.flemmli97.tenshilib.client.data.GeoAnimationManager;
 import io.github.flemmli97.tenshilib.client.data.GeoModelManager;
 import io.github.flemmli97.tenshilib.client.particles.ParticleRenderTypes;
 import io.github.flemmli97.tenshilib.client.particles.advanced.AdvancedParticleRegistry;
+import io.github.flemmli97.tenshilib.client.shader.TenshiLibShaders;
 import io.github.flemmli97.tenshilib.common.item.SpawnEgg;
 import io.github.flemmli97.tenshilib.fabric.TenshiLibFabric;
 import io.github.flemmli97.tenshilib.fabric.client.events.ParticleTypeRegisterEvent;
@@ -30,6 +31,7 @@ public class TenshiLibFabricClient implements ClientModInitializer, ClientSetupM
         TenshiLibFabric.postInit();
         FabricLoader.getInstance().invokeEntrypoints("tenshilib_client", ClientSetupModInitializer.class, ClientSetupModInitializer::clientSetup);
         AdvancedParticleRegistry.verify();
+        TenshiLibShaders.registerShader();
     }
 
     @Override

@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(VertexFormatElement.class)
-public interface VertexFormatElementMixin {
+public interface VertexFormatElementAccessor {
 
     @Accessor("BY_ID")
     static VertexFormatElement[] fetchIdLookup() {

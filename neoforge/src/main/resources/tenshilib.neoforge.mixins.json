@@ -7,7 +7,6 @@
     "NeoForgeSweepCheck"
   ],
   "client": [
-    "NeoForgeParticleEngineMixin"
   ],
   "injectors": {
     "defaultRequire": 1

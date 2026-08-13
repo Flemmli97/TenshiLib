@@ -16,8 +16,6 @@
     "dual.PlayerMixin",
     "dual.HumanoidModelMixin",
     "dual.ItemInHandRendererMixin",
-    "VertexFormatElementMixin",
-    "ScreenAccessor",
     "AbstractTextureAccessor",
     "BufferBuilderAccessor",
     "CubeDefinitionMixin",
@@ -30,7 +28,10 @@
     "OptionsScreenMixin",
     "OverlayTextureMixin",
     "ParticleAccessor",
-    "ParticleEngineAccessor"
+    "ParticleEngineAccessor",
+    "ScreenAccessor",
+    "VertexFormatElementAccessor",
+    "VertexFormatMixin"
   ],
   "injectors": {
     "defaultRequire": 1
