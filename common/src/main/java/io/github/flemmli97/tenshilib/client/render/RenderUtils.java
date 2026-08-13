@@ -11,6 +11,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -36,10 +37,23 @@ public class RenderUtils {
     private static final float TRIANGLE_MULT = (float) (Math.sqrt(3.0D) / 2.0D);
     private static final Random RANDOM = new Random(432);
 
-    private static final Function<RenderType, RenderType> TRIG_STRIP = Util.memoize((wrapped) ->
-            new RenderType("rendertype_trig_wrapped_" + wrapped.toString(), wrapped.format(), VertexFormat.Mode.TRIANGLE_STRIP, wrapped.bufferSize(),
-                    wrapped.affectsCrumbling(), wrapped.sortOnUpload(), wrapped::setupRenderState, wrapped::clearRenderState) {
-            });
+    private static class StateAccess extends RenderStateShard {
+
+        private static final Function<RenderType, RenderType> TRIG_STRIP = Util.memoize((wrapped) ->
+                new RenderType("rendertype_trig_wrapped_" + wrapped.toString(), wrapped.format(), VertexFormat.Mode.TRIANGLE_STRIP, wrapped.bufferSize(),
+                        wrapped.affectsCrumbling(), wrapped.sortOnUpload(), () -> {
+                    wrapped.setupRenderState();
+                    RenderStateShard.NO_CULL.setupRenderState();
+                }, () -> {
+                    wrapped.clearRenderState();
+                    RenderStateShard.NO_CULL.clearRenderState();
+                }) {
+                });
+
+        private StateAccess(String name, Runnable setupState, Runnable clearState) {
+            super(name, setupState, clearState);
+        }
+    }
 
     public static float getPartialTicks(Entity entity) {
         return Minecraft.getInstance().getTimer()
@@ -248,7 +262,7 @@ public class RenderUtils {
                                     float radius, int precision, int light, boolean drawImmediately,
                                     float u0, float v0, float u1, float v1) {
         if (renderType.mode() != VertexFormat.Mode.TRIANGLE_STRIP) {
-            renderType = TRIG_STRIP.apply(renderType);
+            renderType = StateAccess.TRIG_STRIP.apply(renderType);
         }
         VertexConsumer consumer = buffer.getBuffer(renderType);
         renderSphere(consumer, stack, red, green, blue, alpha, radius, precision, light, u0, v0, u1, v1);
@@ -297,6 +311,56 @@ public class RenderUtils {
             }
         }
         stack.popPose();
+    }
+
+    /**
+     * Renders a cylinder. Can handle both quads and triangle strips rendertypes
+     *
+     * @param precision       How many points on the circle to render
+     * @param drawImmediately If true draws the content immediately to the buffer
+     */
+    public static void renderCylinder(MultiBufferSource buffer, RenderType renderType, PoseStack stack,
+                                      float red, float green, float blue, float alpha,
+                                      float radius, int precision, float height, int light, boolean drawImmediately,
+                                      float u0, float v0, float u1, float v1) {
+        if (renderType.mode() != VertexFormat.Mode.TRIANGLE_STRIP) {
+            renderType = StateAccess.TRIG_STRIP.apply(renderType);
+        }
+        VertexConsumer consumer = buffer.getBuffer(renderType);
+        renderCylinder(consumer, stack, red, green, blue, alpha, radius, precision, height, light, u0, v0, u1, v1);
+        if (drawImmediately && buffer instanceof MultiBufferSource.BufferSource source)
+            source.endBatch();
+    }
+
+    /**
+     * Renders a cylinder. Requires a triangle stripe rendertype being used
+     *
+     * @param precision How many points on the circle to render
+     */
+    public static void renderCylinder(VertexConsumer consumer, PoseStack stack,
+                                      float red, float green, float blue, float alpha,
+                                      float radius, int precision, float height, int light,
+                                      float u0, float v0, float u1, float v1) {
+        PoseStack.Pose pose = stack.last();
+        float step = Mth.PI / precision;
+        float uL = u1 - u0;
+        for (float p = 0; p <= precision * 2; p++) {
+            float phi = p * step;
+            float x = radius * Mth.cos(phi);
+            float z = radius * Mth.sin(phi);
+            float u = p / (precision * 2) * uL;
+            // Degenerate vertices to break trig strips
+            if (p == 0) {
+                consumer.addVertex(pose, x, height, z).setColor(red, green, blue, alpha).setUv(u0 - u, v0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+            }
+            consumer.addVertex(pose, x, height, z).setColor(red, green, blue, alpha).setUv(u1 - u, v0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+
+            consumer.addVertex(pose, x, 0, z).setColor(red, green, blue, alpha).setUv(u1 - u, v1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+            // Degenerate vertices to break trig strips
+            if (p == precision * 2) {
+                consumer.addVertex(pose, x, 0, z).setColor(red, green, blue, alpha).setUv(u1 - u, v1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+            }
+        }
     }
 
     /**
