@@ -279,8 +279,6 @@ public class RenderUtils {
                                     float red, float green, float blue, float alpha,
                                     float radius, int precision, int light,
                                     float u0, float v0, float u1, float v1) {
-        stack.pushPose();
-        stack.mulPose(Axis.XN.rotationDegrees(90));
         PoseStack.Pose pose = stack.last();
         float step = Mth.PI / precision;
         float uL = u1 - u0;
@@ -291,26 +289,25 @@ public class RenderUtils {
                 float phi = p * step;
                 float thetaNext = theta + step;
                 float x = radius * Mth.sin(theta) * Mth.cos(phi);
-                float y = radius * Mth.sin(theta) * Mth.sin(phi);
-                float z = radius * Mth.cos(theta);
+                float y = radius * Mth.cos(theta);
+                float z = radius * Mth.sin(theta) * Mth.sin(phi);
                 float u = p / (precision * 2) * uL;
                 // Degenerate vertices to break trig strips
                 if (t == 0 && p == 0) {
-                    consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(u0 + u, v0 + vL * t / precision).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+                    consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(u1 - u, v0 + vL * t / precision).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
                 }
-                consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(u0 + u, v0 + vL * t / precision).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+                consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(u1 - u, v0 + vL * t / precision).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
                 x = radius * Mth.sin(thetaNext) * Mth.cos(phi);
-                y = radius * Mth.sin(thetaNext) * Mth.sin(phi);
-                z = radius * Mth.cos(thetaNext);
+                y = radius * Mth.cos(thetaNext);
+                z = radius * Mth.sin(thetaNext) * Mth.sin(phi);
                 float v = v0 + vL * (t + 1) / precision;
-                consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(u0 + u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+                consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(u1 - u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
                 // Degenerate vertices to break trig strips
                 if (t == precision - 1 && p == precision * 2) {
-                    consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(u0 + u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+                    consumer.addVertex(pose, x, y, z).setColor(red, green, blue, alpha).setUv(u1 - u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
                 }
             }
         }
-        stack.popPose();
     }
 
     /**
@@ -321,13 +318,13 @@ public class RenderUtils {
      */
     public static void renderCylinder(MultiBufferSource buffer, RenderType renderType, PoseStack stack,
                                       float red, float green, float blue, float alpha,
-                                      float radius, int precision, float height, int light, boolean drawImmediately,
+                                      float lowerRadius, float upperRadius, int precision, float height, int light, boolean drawImmediately,
                                       float u0, float v0, float u1, float v1) {
         if (renderType.mode() != VertexFormat.Mode.TRIANGLE_STRIP) {
             renderType = StateAccess.TRIG_STRIP.apply(renderType);
         }
         VertexConsumer consumer = buffer.getBuffer(renderType);
-        renderCylinder(consumer, stack, red, green, blue, alpha, radius, precision, height, light, u0, v0, u1, v1);
+        renderCylinder(consumer, stack, red, green, blue, alpha, lowerRadius, upperRadius, precision, height, light, u0, v0, u1, v1);
         if (drawImmediately && buffer instanceof MultiBufferSource.BufferSource source)
             source.endBatch();
     }
@@ -339,22 +336,25 @@ public class RenderUtils {
      */
     public static void renderCylinder(VertexConsumer consumer, PoseStack stack,
                                       float red, float green, float blue, float alpha,
-                                      float radius, int precision, float height, int light,
+                                      float lowerRadius, float upperRadius, int precision, float height, int light,
                                       float u0, float v0, float u1, float v1) {
         PoseStack.Pose pose = stack.last();
         float step = Mth.PI / precision;
         float uL = u1 - u0;
         for (float p = 0; p <= precision * 2; p++) {
             float phi = p * step;
-            float x = radius * Mth.cos(phi);
-            float z = radius * Mth.sin(phi);
+            float x = upperRadius * Mth.cos(phi);
+            float z = upperRadius * Mth.sin(phi);
             float u = p / (precision * 2) * uL;
             // Degenerate vertices to break trig strips
             if (p == 0) {
-                consumer.addVertex(pose, x, height, z).setColor(red, green, blue, alpha).setUv(u0 - u, v0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+                consumer.addVertex(pose, x, height, z).setColor(red, green, blue, alpha).setUv(u1 - u, v0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
             }
             consumer.addVertex(pose, x, height, z).setColor(red, green, blue, alpha).setUv(u1 - u, v0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
-
+            if (upperRadius != lowerRadius) {
+                x = lowerRadius * Mth.cos(phi);
+                z = lowerRadius * Mth.sin(phi);
+            }
             consumer.addVertex(pose, x, 0, z).setColor(red, green, blue, alpha).setUv(u1 - u, v1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
             // Degenerate vertices to break trig strips
             if (p == precision * 2) {
