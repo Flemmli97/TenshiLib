@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.function.Function;
 
-public abstract class ExtendedEntityModel<T extends Entity> extends EntityModel<T> implements ExtendedModel {
+public class ExtendedEntityModel<T extends Entity> extends EntityModel<T> implements ExtendedModel {
 
     protected float partialTick;
 
@@ -25,19 +25,19 @@ public abstract class ExtendedEntityModel<T extends Entity> extends EntityModel<
     protected final ReloadableCache<ModelPartsContainer> model;
     protected final ReloadableCache<BedrockAnimations> animation;
 
-    protected ExtendedEntityModel(ResourceLocation model) {
+    public ExtendedEntityModel(ResourceLocation model) {
         this(model, null);
     }
 
-    protected ExtendedEntityModel(Function<ResourceLocation, RenderType> renderType,ResourceLocation model) {
+    public ExtendedEntityModel(Function<ResourceLocation, RenderType> renderType, ResourceLocation model) {
         this(renderType, model, null);
     }
 
-    protected ExtendedEntityModel(ResourceLocation model, ResourceLocation animation) {
+    public ExtendedEntityModel(ResourceLocation model, ResourceLocation animation) {
         this(RenderType::entityCutoutNoCull, model, animation);
     }
 
-    protected ExtendedEntityModel(Function<ResourceLocation, RenderType> renderType,
+    public ExtendedEntityModel(Function<ResourceLocation, RenderType> renderType,
                                   ResourceLocation model, ResourceLocation animation) {
         super(renderType);
         this.model = GeoModelManager.getInstance().getModel(model, this::onModelReload);

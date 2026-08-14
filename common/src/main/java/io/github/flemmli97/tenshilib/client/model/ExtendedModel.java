@@ -9,7 +9,7 @@ public interface ExtendedModel {
 
     ModelPartsContainer getModel();
 
-    default void onPlayAnimation(@Nullable AnimationState name, Animation animation, float tick, VariableMap variables) {
+    default void onPlayAnimation(@Nullable AnimationState state, Animation animation, float tick, VariableMap variables) {
         if (animation.variables().contains("query.anim_time")) {
             variables.setVariable("query.anim_time", tick * 0.05);
         }
