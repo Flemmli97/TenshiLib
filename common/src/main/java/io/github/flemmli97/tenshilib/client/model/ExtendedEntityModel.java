@@ -9,15 +9,12 @@ import io.github.flemmli97.tenshilib.client.model.animation.Animation;
 import io.github.flemmli97.tenshilib.common.entity.animated.AnimationState;
 import io.github.flemmli97.tenshilib.common.utils.math.parser.VariableMap;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 public abstract class ExtendedEntityModel<T extends Entity> extends EntityModel<T> implements ExtendedModel {
@@ -28,18 +25,12 @@ public abstract class ExtendedEntityModel<T extends Entity> extends EntityModel<
     protected final ReloadableCache<ModelPartsContainer> model;
     protected final ReloadableCache<BedrockAnimations> animation;
 
-    @Deprecated(forRemoval = true)
-    protected ExtendedEntityModel() {
-        this(null, null);
-    }
-
-    @Deprecated(forRemoval = true)
-    protected ExtendedEntityModel(Function<ResourceLocation, RenderType> renderType) {
-        this(renderType, null, null);
-    }
-
     protected ExtendedEntityModel(ResourceLocation model) {
         this(model, null);
+    }
+
+    protected ExtendedEntityModel(Function<ResourceLocation, RenderType> renderType,ResourceLocation model) {
+        this(renderType, model, null);
     }
 
     protected ExtendedEntityModel(ResourceLocation model, ResourceLocation animation) {
@@ -49,8 +40,7 @@ public abstract class ExtendedEntityModel<T extends Entity> extends EntityModel<
     protected ExtendedEntityModel(Function<ResourceLocation, RenderType> renderType,
                                   ResourceLocation model, ResourceLocation animation) {
         super(renderType);
-        // Legacy with empty model
-        this.model = model == null ? ReloadableCache.of(new ModelPartsContainer(new ModelPart(List.of(), Map.of()))) : GeoModelManager.getInstance().getModel(model, this::onModelReload);
+        this.model = GeoModelManager.getInstance().getModel(model, this::onModelReload);
         this.animation = animation == null ? null : GeoAnimationManager.getInstance().getAnimation(animation);
     }
 

@@ -7,11 +7,6 @@ import net.minecraft.world.phys.Vec3;
 
 public record TargetPosition(Vec3 position, double minHeight, double maxHeight) {
 
-    @Deprecated
-    public static TargetPosition of(LivingEntity target) {
-        return reducedRangeOf(target);
-    }
-
     public static TargetPosition reducedRangeOf(LivingEntity target) {
         double yRed = Mth.clamp(target.getBbHeight() - target.getEyeHeight(), 0, 0.3);
         return of(target, yRed);

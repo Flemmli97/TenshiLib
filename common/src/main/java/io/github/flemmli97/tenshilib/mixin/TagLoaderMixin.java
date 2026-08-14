@@ -30,6 +30,7 @@ public class TagLoaderMixin<T> implements TagLoaderRegistryContext<T> {
         this.tenshilib$RegistryAccess = registryAccess;
     }
 
+    @SuppressWarnings("unchecked")
     @ModifyReturnValue(method = "build(Ljava/util/Map;)Ljava/util/Map;", at = @At("RETURN"))
     private Map<ResourceLocation, Collection<?>> onBuild(Map<ResourceLocation, Collection<?>> original) {
         if (this.tenshilib$Registry != null) {
