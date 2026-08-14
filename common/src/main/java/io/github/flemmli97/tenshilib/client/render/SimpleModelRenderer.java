@@ -38,7 +38,7 @@ public abstract class SimpleModelRenderer<T extends Entity> extends EntityRender
         this.model.setupAnim(entity, 0, 0, partialLivingTicks, yaw, pitch);
 
         VertexConsumer ivertexbuilder = buffer.getBuffer(this.model.renderType(this.getTextureLocation(entity)));
-        this.model.renderToBuffer(stack, ivertexbuilder, packedLight, OverlayTexture.NO_OVERLAY, FastColor.ARGB32.colorFromFloat(this.red, this.green, this.blue, this.alpha));
+        this.model.renderToBuffer(stack, ivertexbuilder, packedLight, OverlayTexture.NO_OVERLAY, FastColor.ARGB32.colorFromFloat(this.alpha, this.red, this.green, this.blue));
         this.afterModelRender(entity, rotation, partialTick, stack, buffer, packedLight);
         stack.popPose();
         super.render(entity, rotation, partialTick, stack, buffer, packedLight);
