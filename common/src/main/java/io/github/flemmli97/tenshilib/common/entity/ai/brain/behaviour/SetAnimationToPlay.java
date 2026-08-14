@@ -48,8 +48,7 @@ public class SetAnimationToPlay<E extends Mob & AnimatedEntity> extends Extended
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
         if (entity.getAnimationHandler().hasAnimation())
             return false;
-        this.selectable = this.filter == null ? this.animations : this.animations.stream().filter(h -> this.filter.test(h.animation(), entity))
-                .toList();
+        this.selectable = this.filter == null ? this.animations : this.animations.stream().filter(h -> this.filter.test(h.animation(), entity)).toList();
         return !this.selectable.isEmpty();
     }
 

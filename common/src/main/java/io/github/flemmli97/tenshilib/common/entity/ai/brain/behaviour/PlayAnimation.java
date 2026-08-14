@@ -68,7 +68,6 @@ public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehav
             if (this.onStartCallback != null)
                 this.onStartCallback.onStart(this.currentPlaying, entity);
         });
-        BrainUtils.clearMemory(entity, TenshilibMemoryModules.ANIMATION_TO_PLAY.get());
     }
 
     @Override
