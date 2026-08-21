@@ -98,8 +98,12 @@ public class PlayAnimation<E extends Mob & AnimatedEntity> extends ExtendedBehav
                 this.currentPlaying = selected.animation();
             }
         }
-        if (this.onAnimating != null)
-            this.onAnimating.onTick(entity, BrainUtils.getTargetOfEntity(entity), entity.getAnimationHandler().getAnimation());
+        if (this.onAnimating != null) {
+            AnimationState state = entity.getAnimationHandler().getAnimation();
+            if (state != null) {
+                this.onAnimating.onTick(entity, BrainUtils.getTargetOfEntity(entity), entity.getAnimationHandler().getAnimation());
+            }
+        }
     }
 
     @Override
