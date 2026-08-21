@@ -35,7 +35,7 @@
   ],
   "accessWidener": "tenshilib.accesswidener",
   "depends": {
-    "fabric": ">=${fabric_version}",
-    "minecraft": ">=${mcversion}"
+    "fabric": ">=${fabric_api_version}",
+    "minecraft": ">=${minecraft_version}"
   }
 }
