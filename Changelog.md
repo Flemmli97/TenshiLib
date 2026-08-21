@@ -1,3 +1,16 @@
+TenshiLib 2.3.0
+================
+- Adds sphere & cylinder rendering logic
+- Update advanced particle scaling, color and position interpolation
+- Add ParticleTypeRegisterEvent event
+- Add ExtendedEntityModel for some basic features
+- Update attachment system with more generics for better sanity checks
+- Fix math parse breaking with brackets at beginning
+- Add tag modification event
+- Change atlas blurring to use shaders instead. Should fix various incompat with texture blurring
+- Fix projectile hit detection to use correct vanilla call
+- Add dynamic bedrock molang queries for animations
+
 TenshiLib 2.2.5
 ================
 - Fix error with some animation parsing
