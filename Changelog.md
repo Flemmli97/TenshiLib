@@ -10,6 +10,7 @@ TenshiLib 2.3.0
 - Change atlas blurring to use shaders instead. Should fix various incompat with texture blurring
 - Fix projectile hit detection to use correct vanilla call
 - Add dynamic bedrock molang queries for animations
+- Fix playanimation behaviour nullpointer
 
 TenshiLib 2.2.5
 ================
