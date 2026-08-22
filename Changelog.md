@@ -1,3 +1,7 @@
+TenshiLib 2.3.0.b
+================
+- Fix neoforge toml
+
 TenshiLib 2.3.0
 ================
 - Adds sphere & cylinder rendering logic
