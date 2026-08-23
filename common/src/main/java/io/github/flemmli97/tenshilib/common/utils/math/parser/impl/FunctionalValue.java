@@ -15,7 +15,7 @@ public abstract class FunctionalValue implements ExpValue {
         this.values = values;
         ImmutableSet.Builder<String> builder = ImmutableSet.builder();
         for (ExpValue value : values) {
-            builder.add(value.toString());
+            builder.addAll(value.variables());
         }
         this.variables = builder.build();
     }
