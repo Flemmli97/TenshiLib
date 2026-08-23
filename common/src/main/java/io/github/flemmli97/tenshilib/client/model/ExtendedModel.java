@@ -13,11 +13,11 @@ public interface ExtendedModel {
         if (animation.variables().contains("query.anim_time")) {
             variables.setVariable("query.anim_time", tick * 0.05);
         }
-        if (animation.variables().contains("tick")) {
-            variables.setVariable("tick", tick * 0.05);
-        }
         if (animation.variables().contains("anim_time")) {
             variables.setVariable("anim_time", tick * 0.05);
+        }
+        if (animation.variables().contains("time")) {
+            variables.setVariable("time", tick * 0.05);
         }
     }
 }

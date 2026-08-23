@@ -233,7 +233,7 @@ public class BedrockAnimations {
     private void animate(ExtendedModel model, AnimationState state, Animation animation, float tick, float interpolation, boolean mirror, boolean add) {
         if (animation.loop() && animation.length() > 0)
             tick = (float) (tick % animation.length());
-        model.onPlayAnimation(state, animation, tick * 0.05f, this.variables);
+        model.onPlayAnimation(state, animation, tick, this.variables);
         for (AnimationBone bone : animation.bones().values()) {
             this.animateBone(model, bone, tick, interpolation, mirror, add);
         }
