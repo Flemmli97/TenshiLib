@@ -43,9 +43,11 @@ public class RenderUtils {
                 new RenderType("rendertype_trig_wrapped_" + wrapped.toString(), wrapped.format(), VertexFormat.Mode.TRIANGLE_STRIP, wrapped.bufferSize(),
                         wrapped.affectsCrumbling(), wrapped.sortOnUpload(), () -> {
                     wrapped.setupRenderState();
+                    RenderStateShard.COLOR_WRITE.setupRenderState();
                     RenderStateShard.NO_CULL.setupRenderState();
                 }, () -> {
                     wrapped.clearRenderState();
+                    RenderStateShard.COLOR_WRITE.clearRenderState();
                     RenderStateShard.NO_CULL.clearRenderState();
                 }) {
                 });
