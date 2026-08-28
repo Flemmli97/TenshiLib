@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class AnimationScreen<T extends LivingEntity & AnimatedEntity> extends Screen {
@@ -32,6 +33,7 @@ public class AnimationScreen<T extends LivingEntity & AnimatedEntity> extends Sc
         super(Component.translatable("tenshilib.gui.animation"));
         this.entity = entity;
         this.animations = entity.getAnimationHandler().getAnimations().all()
+                .stream().sorted()
                 .toArray(String[]::new);
         this.hand = hand;
         this.selected = id;

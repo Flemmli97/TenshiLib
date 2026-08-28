@@ -15,6 +15,8 @@ import java.util.function.Consumer;
 
 public class SuggestionEditBox extends EditBox {
 
+    public static final int UNSELECTED = -1000;
+
     /**
      * Sorted ids but with default namespace first
      */
@@ -72,7 +74,7 @@ public class SuggestionEditBox extends EditBox {
     }
 
     public static Collection<SuggestionContent> ofResourceLocation(Collection<ResourceLocation> strings) {
-        return strings.stream().sorted().<SuggestionContent>map(res -> new SuggestionContent() {
+        return strings.stream().sorted(ID_SORT).<SuggestionContent>map(res -> new SuggestionContent() {
 
             @Override
             public boolean matches(String input) {
@@ -99,8 +101,8 @@ public class SuggestionEditBox extends EditBox {
             return;
         if (this.suggestions.length == 1 && this.getValue().equals(this.suggestions[0]))
             return;
-        int idx = this.indexFromMouse(mouseY);
-        if (idx >= 0 && idx < this.suggestions.length) {
+        int idx = this.rect.contains(mouseX, mouseY) ? this.indexFromMouse(mouseY) : UNSELECTED;
+        if (idx == UNSELECTED || (idx >= 0 && idx < this.suggestions.length)) {
             this.select(idx);
         }
         guiGraphics.pose().pushPose();
@@ -124,12 +126,11 @@ public class SuggestionEditBox extends EditBox {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        boolean suggestion = !this.suggestionsHidden() && this.rect.contains((int) mouseX, (int) mouseY);
-        if (!suggestion && super.mouseClicked(mouseX, mouseY, button)) {
+        if (super.mouseClicked(mouseX, mouseY, button)) {
             this.hidden = false;
             return true;
         }
-        if (!suggestion) {
+        if (this.suggestionsHidden() || !this.rect.contains((int) mouseX, (int) mouseY)) {
             return false;
         }
         int i = this.indexFromMouse(mouseY);
@@ -146,7 +147,6 @@ public class SuggestionEditBox extends EditBox {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
         if (this.rect.contains((int) mouseX, (int) mouseY)) {
             this.offset = Mth.clamp((int) (this.offset - scrollY), 0, Math.max(this.suggestions.length - this.limit, 0));
             return true;
@@ -214,6 +214,7 @@ public class SuggestionEditBox extends EditBox {
         }
         this.rect = new Rect2i(this.getX(), y, width, sizeY + this.paddingY);
         this.hidden = false;
+        this.offset = Mth.clamp(this.offset, 0, Math.max(this.suggestions.length - this.limit, 0));
     }
 
     public void cycle(int change) {
@@ -229,6 +230,8 @@ public class SuggestionEditBox extends EditBox {
 
     public void select(int index) {
         this.current = index;
+        if (this.current == UNSELECTED)
+            return;
         if (this.current < 0) {
             this.current += this.suggestions.length;
         }
@@ -238,6 +241,8 @@ public class SuggestionEditBox extends EditBox {
     }
 
     public void useSuggestion() {
+        if (this.current == UNSELECTED)
+            return;
         String suggestion = this.suggestions[this.current];
         this.setValue(suggestion);
         this.setCursorPosition(suggestion.length());
