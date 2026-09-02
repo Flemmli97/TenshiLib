@@ -44,12 +44,15 @@ public class GeoAnimationManager extends SimpleJsonResourceReloadListener {
     protected void apply(Map<ResourceLocation, JsonElement> map, ResourceManager resourceManager, ProfilerFiller profiler) {
         Set<ResourceLocation> present = new HashSet<>();
         map.forEach((id, json) -> {
+            BedrockAnimations read = null;
             try {
-                BedrockAnimations read = BedrockAnimations.GSON.fromJson(json, BedrockAnimations.class);
-                this.getAnimation(id).update(read);
+                read = BedrockAnimations.GSON.fromJson(json, BedrockAnimations.class);
                 present.add(id);
             } catch (Exception e) {
                 TenshiLib.LOGGER.error("Unable to parse animation file {}", id, e);
+            }
+            if (read != null) {
+                this.getAnimation(id).update(read);
             }
         });
         this.reloaded = true;

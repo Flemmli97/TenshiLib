@@ -44,13 +44,16 @@ public class GeoModelManager extends SimpleJsonResourceReloadListener {
     protected void apply(Map<ResourceLocation, JsonElement> map, ResourceManager manager, ProfilerFiller profiler) {
         Set<ResourceLocation> present = new HashSet<>();
         map.forEach((res, json) -> {
+            BedrockGeometryParser.BedrockGeometry read = null;
+            ResourceLocation id = ResourceLocation.fromNamespaceAndPath(res.getNamespace(), res.getPath().replace(".geo", ""));
             try {
-                BedrockGeometryParser.BedrockGeometry read = BedrockGeometryParser.GSON.fromJson(json, BedrockGeometryParser.BedrockGeometry.class);
-                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(res.getNamespace(), res.getPath().replace(".geo", ""));
-                this.getUnbaked(id).update(read);
+                read = BedrockGeometryParser.GSON.fromJson(json, BedrockGeometryParser.BedrockGeometry.class);
                 present.add(id);
             } catch (Exception e) {
                 TenshiLib.LOGGER.error("Unable to parse geo model file {}", res, e);
+            }
+            if (read != null) {
+                this.getUnbaked(id).update(read);
             }
         });
         this.reloaded = true;

@@ -320,13 +320,16 @@ public class RenderUtils {
      */
     public static void renderCylinder(MultiBufferSource buffer, RenderType renderType, PoseStack stack,
                                       float red, float green, float blue, float alpha,
+                                      float redUp, float greenUp, float blueUp, float alphaUp,
                                       float lowerRadius, float upperRadius, int precision, float height, int light, boolean drawImmediately,
                                       float u0, float v0, float u1, float v1) {
         if (renderType.mode() != VertexFormat.Mode.TRIANGLE_STRIP) {
             renderType = StateAccess.TRIG_STRIP.apply(renderType);
         }
         VertexConsumer consumer = buffer.getBuffer(renderType);
-        renderCylinder(consumer, stack, red, green, blue, alpha, lowerRadius, upperRadius, precision, height, light, u0, v0, u1, v1);
+        renderCylinder(consumer, stack,
+                red, green, blue, alpha, redUp, greenUp, blueUp, alphaUp,
+                lowerRadius, upperRadius, precision, height, light, u0, v0, u1, v1);
         if (drawImmediately && buffer instanceof MultiBufferSource.BufferSource source)
             source.endBatch();
     }
@@ -338,6 +341,7 @@ public class RenderUtils {
      */
     public static void renderCylinder(VertexConsumer consumer, PoseStack stack,
                                       float red, float green, float blue, float alpha,
+                                      float redUp, float greenUp, float blueUp, float alphaUp,
                                       float lowerRadius, float upperRadius, int precision, float height, int light,
                                       float u0, float v0, float u1, float v1) {
         PoseStack.Pose pose = stack.last();
@@ -350,9 +354,9 @@ public class RenderUtils {
             float u = p / (precision * 2) * uL;
             // Degenerate vertices to break trig strips
             if (p == 0) {
-                consumer.addVertex(pose, x, height, z).setColor(red, green, blue, alpha).setUv(u1 - u, v0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+                consumer.addVertex(pose, x, height, z).setColor(redUp, greenUp, blueUp, alphaUp).setUv(u1 - u, v0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
             }
-            consumer.addVertex(pose, x, height, z).setColor(red, green, blue, alpha).setUv(u1 - u, v0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+            consumer.addVertex(pose, x, height, z).setColor(redUp, greenUp, blueUp, alphaUp).setUv(u1 - u, v0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
             if (upperRadius != lowerRadius) {
                 x = lowerRadius * Mth.cos(phi);
                 z = lowerRadius * Mth.sin(phi);
