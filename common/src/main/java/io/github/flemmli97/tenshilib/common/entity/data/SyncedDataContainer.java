@@ -65,14 +65,14 @@ public class SyncedDataContainer<T extends Entity & SyncedMobDataHandler> {
     }
 
     public void sendDirtyEntriesToTracking() {
+        this.isDirty = false;
         List<SyncedDataContainer.SyncedContainer<?>> list = new ArrayList<>();
         for (SyncedContainer<?> container : this.map.values()) {
             if (container.dirty) {
-                list.add(container);
                 container.dirty = false;
+                list.add(container);
             }
         }
-        this.isDirty = false;
         S2CSyncedMobData.send(this.entity, list);
     }
 
@@ -142,9 +142,10 @@ public class SyncedDataContainer<T extends Entity & SyncedMobDataHandler> {
         public void write(RegistryFriendlyByteBuf buf) {
             TypedResource.STREAM_CODEC.encode(buf, this.id);
             SyncedEntityData.STREAM_CODEC.encode(buf, this.syncedEntityData);
-            buf.writeBoolean(this.value != null);
-            if (this.value != null)
-                this.syncedEntityData.serializer().encode(buf, this.value);
+            T value = this.value;
+            buf.writeBoolean(value != null);
+            if (value != null)
+                this.syncedEntityData.serializer().encode(buf, value);
         }
 
         private void setValue(T value) {
