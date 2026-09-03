@@ -227,14 +227,22 @@ public class MultiPartEntity extends Entity implements OwnableEntity {
         } else {
             this.setOnGround(true);
             double vy = y - old.y;
-            if (vy >= 0 && vy < 1.5) {
-                if (vy <= 1)
+            if (vy >= 0 && vy < this.jumpHeight()) {
+                if (vy <= this.maxVerticalDistFromOwner())
                     vy = -0.08;
                 else
                     vy = 0;
             }
             this.move(MoverType.SELF, new Vec3(x - old.x, vy, z - old.z));
         }
+    }
+
+    protected float jumpHeight() {
+        return 1.5f;
+    }
+
+    protected float maxVerticalDistFromOwner() {
+        return 1;
     }
 
     /**
