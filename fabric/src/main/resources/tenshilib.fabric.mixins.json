@@ -12,6 +12,7 @@
     "PlayerMixin",
     "PoiTypesAccessor",
     "ServerEntityMixin",
+    "ServerLevelMixin",
     "ServerPlayerGameModeMixin",
     "ServerPlayerMixin",
     "TrackingMixin"
@@ -20,6 +21,7 @@
     "BlockModelAccessor",
     "BlockModelDeserializerMixin",
     "CameraMixin",
+    "ClientLevelMixin",
     "EntityRendererDispatcherMixin",
     "GameRendererMixin",
     "HumanoidArmorLayerMixin",
