@@ -25,13 +25,15 @@ public class AttachmentHandler {
         AttachmentRegisterImpl.REGISTRY.forEach(type -> {
             AttachmentTransferHandler<Object> handler = (AttachmentTransferHandler<Object>) type.transferHandler().orElse(null);
             if (handler != null) {
-                AttachmentType<Object, Object> attachmentType = (AttachmentType<Object, Object>) type;
-                Object newAttachment = handler
-                        .copy(((AttachmentHolder) from).tenshilib$getAttachment(type), to, wasDeath);
-                if (newAttachment != null) {
-                    ((AttachmentHolder) to).tenshilib$setAttachment(attachmentType, newAttachment);
-                    handler.onCopy(to);
-                }
+                ((AttachmentHolder) from).tenshilib$getExistingAttachment(type).ifPresent(attachment -> {
+                    AttachmentType<Object, Object> attachmentType = (AttachmentType<Object, Object>) type;
+                    Object newAttachment = handler
+                            .copy(attachment, to, wasDeath);
+                    if (newAttachment != null) {
+                        ((AttachmentHolder) to).tenshilib$setAttachment(attachmentType, newAttachment);
+                        handler.onCopy(to);
+                    }
+                });
             }
         });
     }

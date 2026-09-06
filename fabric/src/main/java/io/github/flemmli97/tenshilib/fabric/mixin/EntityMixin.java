@@ -48,7 +48,7 @@ public abstract class EntityMixin implements AttachmentHolder {
     @SuppressWarnings("unchecked")
     @Override
     public <T> Optional<T> tenshilib$getExistingAttachment(AttachmentType<?, T> type) {
-        return (Optional<T>) Optional.of(this.tenshilib$dataAttachments.get(type));
+        return (Optional<T>) Optional.ofNullable(this.tenshilib$dataAttachments.get(type));
     }
 
     @Override
