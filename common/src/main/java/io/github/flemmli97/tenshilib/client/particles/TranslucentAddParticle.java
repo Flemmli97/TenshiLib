@@ -1,7 +1,7 @@
 package io.github.flemmli97.tenshilib.client.particles;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import io.github.flemmli97.tenshilib.client.VertexUtils;
+import io.github.flemmli97.tenshilib.client.render.vertex.VertexUtils;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
@@ -11,6 +11,7 @@ import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.core.particles.ParticleOptions;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 public class TranslucentAddParticle extends TextureSheetParticle {
 
@@ -36,19 +37,16 @@ public class TranslucentAddParticle extends TextureSheetParticle {
         float v0 = this.getV0();
         float v1 = this.getV1();
         int light = this.getLightColor(partialTicks);
-        VertexUtils.addVertexData(this.renderVertex(buffer, quaternion, x, y, z, 1.0F, -1.0F, size, u1, v1, light),
-                VertexUtils.VEC4f.get(), u0, v0, u1, v1);
-        VertexUtils.addVertexData(this.renderVertex(buffer, quaternion, x, y, z, 1.0F, 1.0F, size, u1, v0, light),
-                VertexUtils.VEC4f.get(), u0, v0, u1, v1);
-        VertexUtils.addVertexData(this.renderVertex(buffer, quaternion, x, y, z, -1.0F, 1.0F, size, u0, v0, light),
-                VertexUtils.VEC4f.get(), u0, v0, u1, v1);
-        VertexUtils.addVertexData(this.renderVertex(buffer, quaternion, x, y, z, -1.0F, -1.0F, size, u0, v1, light),
-                VertexUtils.VEC4f.get(), u0, v0, u1, v1);
+        buffer = VertexUtils.VEC4f.create(buffer, new Vector4f(u0, v0, u1, v1));
+        this.renderVertex(buffer, quaternion, x, y, z, 1.0F, -1.0F, size, u1, v1, light);
+        this.renderVertex(buffer, quaternion, x, y, z, 1.0F, 1.0F, size, u1, v0, light);
+        this.renderVertex(buffer, quaternion, x, y, z, -1.0F, 1.0F, size, u0, v0, light);
+        this.renderVertex(buffer, quaternion, x, y, z, -1.0F, -1.0F, size, u0, v1, light);
     }
 
-    private VertexConsumer renderVertex(VertexConsumer buffer, Quaternionf quaternion, float x, float y, float z, float xOffset, float yOffset, float quadSize, float u, float v, int packedLight) {
+    private void renderVertex(VertexConsumer buffer, Quaternionf quaternion, float x, float y, float z, float xOffset, float yOffset, float quadSize, float u, float v, int packedLight) {
         Vector3f vector3f = (new Vector3f(xOffset, yOffset, 0.0F)).rotate(quaternion).mul(quadSize).add(x, y, z);
-        return buffer.addVertex(vector3f.x(), vector3f.y(), vector3f.z()).setUv(u, v).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(packedLight);
+        buffer.addVertex(vector3f.x(), vector3f.y(), vector3f.z()).setUv(u, v).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(packedLight);
     }
 
     public static class Factory<T extends ParticleOptions> implements ParticleProvider<T> {

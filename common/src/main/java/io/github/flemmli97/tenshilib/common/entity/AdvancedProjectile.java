@@ -163,8 +163,8 @@ public abstract class AdvancedProjectile extends Projectile {
     private void setMotionWithRotation(Vec3 motion) {
         this.setDeltaMovement(motion);
         double f = Math.sqrt(horizontalMag(motion));
-        this.setYRot((float) (Mth.atan2(motion.x, motion.z) * (180F / (float) Math.PI)));
-        this.setXRot((float) (Mth.atan2(motion.y, f) * (180F / (float) Math.PI)));
+        this.setYRot((float) (Mth.atan2(motion.x, motion.z) * (180D / Math.PI)));
+        this.setXRot((float) (Mth.atan2(motion.y, f) * (180F / Math.PI)));
         this.yRotO = this.getYRot();
         this.xRotO = this.getXRot();
         this.ticksInGround = 0;
@@ -175,8 +175,8 @@ public abstract class AdvancedProjectile extends Projectile {
         this.setDeltaMovement(x, y, z);
         if (this.xRotO == 0.0F && this.yRotO == 0.0F) {
             double f = Math.sqrt(x * x + z * z);
-            this.setXRot((float) (Mth.atan2(y, f) * (180F / (float) Math.PI)));
-            this.setYRot((float) (Mth.atan2(x, z) * (180F / (float) Math.PI)));
+            this.setYRot((float) (Mth.atan2(x, z) * (180 / Math.PI)));
+            this.setXRot((float) (Mth.atan2(y, f) * (180 / Math.PI)));
             this.xRotO = this.getXRot();
             this.yRotO = this.getYRot();
             this.moveTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
@@ -207,8 +207,8 @@ public abstract class AdvancedProjectile extends Projectile {
         Vec3 motion = this.getDeltaMovement();
         if (this.xRotO == 0.0F && this.yRotO == 0.0F) {
             double f = Math.sqrt(horizontalMag(motion));
-            this.setXRot((float) (Mth.atan2(motion.x, motion.z) * (180F / (float) Math.PI)));
-            this.setYRot((float) (Mth.atan2(motion.y, f) * (180F / (float) Math.PI)));
+            this.setYRot((float) (Mth.atan2(motion.x, motion.z) * (180D / Math.PI)));
+            this.setXRot((float) (Mth.atan2(motion.y, f) * (180F / Math.PI)));
             this.xRotO = this.getXRot();
             this.yRotO = this.getYRot();
         }
@@ -240,8 +240,8 @@ public abstract class AdvancedProjectile extends Projectile {
         double newZ = this.getZ() + motion.z;
 
         double f = Math.sqrt(horizontalMag(motion));
-        this.setYRot(this.updateRotation(this.yRotO, (float) (Mth.atan2(motion.x, motion.z) * (180D / Math.PI))));
-        this.setXRot(this.updateRotation(this.xRotO, (float) (Mth.atan2(motion.y, f) * (double) (180F / (float) Math.PI))));
+        this.setYRot(this.updateRotation(this.yRotO, (float) (Mth.atan2(motion.x, motion.z) * (180 / Math.PI))));
+        this.setXRot(this.updateRotation(this.xRotO, (float) (Mth.atan2(motion.y, f) * (180 / Math.PI))));
 
         boolean water = this.isInWater();
         if (water) {

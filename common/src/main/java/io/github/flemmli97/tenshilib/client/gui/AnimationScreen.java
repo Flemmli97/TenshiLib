@@ -12,7 +12,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class AnimationScreen<T extends LivingEntity & AnimatedEntity> extends Screen {

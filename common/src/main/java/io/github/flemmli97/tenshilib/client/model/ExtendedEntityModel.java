@@ -38,7 +38,7 @@ public class ExtendedEntityModel<T extends Entity> extends EntityModel<T> implem
     }
 
     public ExtendedEntityModel(Function<ResourceLocation, RenderType> renderType,
-                                  ResourceLocation model, ResourceLocation animation) {
+                               ResourceLocation model, ResourceLocation animation) {
         super(renderType);
         this.model = GeoModelManager.getInstance().getModel(model, this::onModelReload);
         this.animation = animation == null ? null : GeoAnimationManager.getInstance().getAnimation(animation);
