@@ -38,7 +38,7 @@ public class CustomRiderRendererManager implements ResourceManagerReloadListener
         ImmutableSet.Builder<EntityType<?>> builder = ImmutableSet.builder();
         for (Map.Entry<EntityType<?>, EntityRenderer<?>> entry : renderers.entrySet()) {
             if (entry.getValue() instanceof LivingEntityRenderer lR) {
-                for (Object layer : ((LivingEntityRendererAccessor) lR).getLayers()) {
+                for (Object layer : ((LivingEntityRendererAccessor) lR).tenshilib$layers()) {
                     if (layer instanceof RiderEntityLayer)
                         builder.add(entry.getKey());
                 }

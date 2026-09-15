@@ -13,8 +13,10 @@ public interface ModelPartAccessor {
 
     @Accessor("cubes")
     @Final
-    List<ModelPart.Cube> getCubes();
+    List<ModelPart.Cube> tenshilib$cubes();
 
+    // Cant rename yet as another mod uses this
+    // TODO: change when other mod updates
     @Accessor("children")
     @Final
     Map<String, ModelPart> getChildren();

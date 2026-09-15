@@ -9,5 +9,5 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface BufferBuilderAccessor {
 
     @Invoker("beginElement")
-    long doBeginElement(VertexFormatElement element);
+    long tenshilib$beginElement(VertexFormatElement element);
 }

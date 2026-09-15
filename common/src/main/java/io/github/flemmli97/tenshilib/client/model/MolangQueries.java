@@ -35,7 +35,7 @@ public class MolangQueries {
     }
 
     private static void applyEntityQueriesTo(QueryContext context, @Nullable Entity entity) {
-        setQuery(context, "query.actor_count", ctx -> ((LevelRendererAccessor) ctx.mc().levelRenderer).getRenderedEntities());
+        setQuery(context, "query.actor_count", ctx -> ((LevelRendererAccessor) ctx.mc().levelRenderer).tenshilib$renderedEntities());
         setQuery(context, "query.cardinal_facing", ctx -> ctx.mc().player.getDirection().ordinal());
         setQuery(context, "query.cardinal_player_facing", ctx -> ctx.mc().player.getDirection().get2DDataValue() == -1 ? 6 : ctx.mc().player.getDirection().ordinal());
         setQuery(context, "query.cardinal_facing_2d", ctx -> ctx.mc().player.getDirection().ordinal());

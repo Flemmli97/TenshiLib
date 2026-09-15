@@ -40,7 +40,7 @@ public class VertexUtils {
     }
 
     private static int findNextId() {
-        VertexFormatElement[] lookup = VertexFormatElementAccessor.fetchIdLookup();
+        VertexFormatElement[] lookup = VertexFormatElementAccessor.tenshilib$BY_ID();
         for (int i = 0; i < lookup.length; i++) {
             if (lookup[i] == null) {
                 return i;
@@ -51,7 +51,7 @@ public class VertexUtils {
         // Vanilla seems to work fine
         VertexFormatElement[] newLookup = new VertexFormatElement[lookup.length * 2];
         System.arraycopy(lookup, 0, newLookup, 0, lookup.length);
-        VertexFormatElementAccessor.updateIdLookup(newLookup);
+        VertexFormatElementAccessor.tenshilib$set_BY_ID(newLookup);
         return lookup.length;
     }
 
@@ -61,7 +61,7 @@ public class VertexUtils {
         if (data.length != element.count() || element.type() != VertexFormatElement.Type.BYTE) {
             throw new IllegalStateException("Data doesn't match VertexFormatElement");
         }
-        long l = ((BufferBuilderAccessor) builder).doBeginElement(element);
+        long l = ((BufferBuilderAccessor) builder).tenshilib$beginElement(element);
         for (int i = 0; i < data.length; i++) {
             MemoryUtil.memPutByte(l + (long) i * element.type().size(), data[i]);
         }
@@ -74,7 +74,7 @@ public class VertexUtils {
         if (data.length != element.count() || element.type() != VertexFormatElement.Type.INT) {
             throw new IllegalStateException("Data doesn't match VertexFormatElement");
         }
-        long l = ((BufferBuilderAccessor) builder).doBeginElement(element);
+        long l = ((BufferBuilderAccessor) builder).tenshilib$beginElement(element);
         for (int i = 0; i < data.length; i++) {
             MemoryUtil.memPutInt(l + (long) i * element.type().size(), data[i]);
         }
@@ -87,7 +87,7 @@ public class VertexUtils {
         if (data.length != element.count() || element.type() != VertexFormatElement.Type.FLOAT) {
             throw new IllegalStateException("Data doesn't match VertexFormatElement");
         }
-        long l = ((BufferBuilderAccessor) builder).doBeginElement(element);
+        long l = ((BufferBuilderAccessor) builder).tenshilib$beginElement(element);
         for (int i = 0; i < data.length; i++) {
             MemoryUtil.memPutFloat(l + (long) i * element.type().size(), data[i]);
         }

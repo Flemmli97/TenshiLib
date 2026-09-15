@@ -26,8 +26,8 @@ public class VertexFormatMixin {
 
     @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Ljava/util/stream/IntStream;reduce(ILjava/util/function/IntBinaryOperator;)I", shift = At.Shift.AFTER, unsafe = true))
     private void onUpdateArray(List<VertexFormatElement> elements, List<String> names, IntList offsets, int vertexSize, CallbackInfo ci) {
-        if (VertexFormatElement.MAX_COUNT != VertexFormatElementAccessor.fetchIdLookup().length) {
-            this.offsetsByElement = new int[VertexFormatElementAccessor.fetchIdLookup().length];
+        if (VertexFormatElement.MAX_COUNT != VertexFormatElementAccessor.tenshilib$BY_ID().length) {
+            this.offsetsByElement = new int[VertexFormatElementAccessor.tenshilib$BY_ID().length];
         }
     }
 }

@@ -13,5 +13,5 @@ import java.util.List;
 public interface LivingEntityRendererAccessor<T extends LivingEntity, M extends EntityModel<T>> {
 
     @Accessor("layers")
-    List<RenderLayer<T, M>> getLayers();
+    List<RenderLayer<T, M>> tenshilib$layers();
 }

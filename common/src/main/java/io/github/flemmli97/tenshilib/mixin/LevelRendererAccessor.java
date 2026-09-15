@@ -8,5 +8,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface LevelRendererAccessor {
 
     @Accessor("renderedEntities")
-    int getRenderedEntities();
+    int tenshilib$renderedEntities();
 }

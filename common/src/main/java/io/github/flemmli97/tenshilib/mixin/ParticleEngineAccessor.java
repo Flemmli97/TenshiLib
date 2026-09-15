@@ -10,5 +10,5 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface ParticleEngineAccessor {
 
     @Invoker("makeParticle")
-    <T extends ParticleOptions> Particle makeParticleInvoker(T particleData, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed);
+    <T extends ParticleOptions> Particle tenshilib$makeParticle(T particleData, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed);
 }

@@ -17,8 +17,8 @@ public class PatreonClientUtil {
     public static void addPatreonButton(Screen screen) {
         if (screen instanceof SkinCustomizationScreen skin) {
             if (last != null)
-                ((ScreenAccessor) screen).removeWidgetFrom(last);
-            ((ScreenAccessor) screen).addRenderableWidgetTo(last = new PatreonButton(skin.width - 32, skin.height - 32, skin));
+                ((ScreenAccessor) screen).tenshilib$removeWidget(last);
+            ((ScreenAccessor) screen).tenshilib$addRenderableWidget(last = new PatreonButton(skin.width - 32, skin.height - 32, skin));
         } else {
             last = null;
         }

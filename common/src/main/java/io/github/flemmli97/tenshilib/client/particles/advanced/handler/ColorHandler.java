@@ -19,7 +19,7 @@ public class ColorHandler implements AdvancedParticleHandler {
         particle.setColor(data.start().x(), data.start().y(), data.start().z());
         this.colorO = new Vector4f(data.start());
         this.color = new Vector4f(data.start());
-        ((ParticleAccessor) particle).setAlpha(data.start().w());
+        ((ParticleAccessor) particle).tenshilib$set_alpha(data.start().w());
     }
 
     /**
@@ -30,7 +30,7 @@ public class ColorHandler implements AdvancedParticleHandler {
         particle.setColor(Mth.lerp(partialTick, this.colorO.x(), this.color.x()),
                 Mth.lerp(partialTick, this.colorO.y(), this.color.y()),
                 Mth.lerp(partialTick, this.colorO.z(), this.color.z()));
-        ((ParticleAccessor) particle).setAlpha(Mth.lerp(partialTick, this.colorO.w(), this.color.w()));
+        ((ParticleAccessor) particle).tenshilib$set_alpha(Mth.lerp(partialTick, this.colorO.w(), this.color.w()));
     }
 
     @Override

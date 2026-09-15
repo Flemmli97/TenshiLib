@@ -28,9 +28,9 @@ public class SinMotionHandler implements AdvancedParticleHandler {
         double dy = dir.y();
         double dz = dir.z();
         if (this.data.add()) {
-            dx += acc.getXD();
-            dy += acc.getYD();
-            dz += acc.getZD();
+            dx += acc.tenshilib$xd();
+            dy += acc.tenshilib$yd();
+            dz += acc.tenshilib$zd();
         }
         particle.setParticleSpeed(dx, dy, dz);
     }

@@ -9,7 +9,7 @@ public class ParticleMetaHandler implements AdvancedParticleHandler {
 
     public ParticleMetaHandler(ParticleMetaData data, Particle particle) {
         particle.setLifetime(data.duration());
-        ((ParticleAccessor) particle).setHasPhysics(data.physics());
-        ((ParticleAccessor) particle).setGravity(data.gravityScale());
+        ((ParticleAccessor) particle).tenshilib$set_hasPhysics(data.physics());
+        ((ParticleAccessor) particle).tenshilib$set_gravity(data.gravityScale());
     }
 }

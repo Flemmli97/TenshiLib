@@ -19,9 +19,9 @@ public class AdvancedParticle extends Particle {
         super(level, x, y, z);
         this.wrapped = wrapped;
         ParticleAccessor acc = (ParticleAccessor) wrapped;
-        acc.setXo(acc.getX());
-        acc.setYo(acc.getY());
-        acc.setZo(acc.getZ());
+        acc.tenshilib$set_xo(acc.tenshilib$x());
+        acc.tenshilib$set_yo(acc.tenshilib$y());
+        acc.tenshilib$set_zo(acc.tenshilib$z());
         this.handlers = handlers;
     }
 
@@ -34,14 +34,14 @@ public class AdvancedParticle extends Particle {
     @Override
     public void tick() {
         ParticleAccessor acc = (ParticleAccessor) this.getWrapped();
-        double xo = acc.getX();
-        double yo = acc.getY();
-        double zo = acc.getZ();
+        double xo = acc.tenshilib$x();
+        double yo = acc.tenshilib$y();
+        double zo = acc.tenshilib$z();
         this.handlers.forEach(d -> d.tick(this.wrapped));
         this.wrapped.tick();
-        acc.setXo(xo);
-        acc.setYo(yo);
-        acc.setZo(zo);
+        acc.tenshilib$set_xo(xo);
+        acc.tenshilib$set_yo(yo);
+        acc.tenshilib$set_zo(zo);
     }
 
     @Override

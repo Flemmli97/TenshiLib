@@ -8,38 +8,38 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface ParticleAccessor {
 
     @Accessor("hasPhysics")
-    void setHasPhysics(boolean hasPhysics);
+    void tenshilib$set_hasPhysics(boolean hasPhysics);
 
     @Accessor("alpha")
-    void setAlpha(float alpha);
+    void tenshilib$set_alpha(float alpha);
 
     @Accessor("gravity")
-    void setGravity(float gravity);
+    void tenshilib$set_gravity(float gravity);
 
     @Accessor("xo")
-    void setXo(double xo);
+    void tenshilib$set_xo(double xo);
 
     @Accessor("yo")
-    void setYo(double yo);
+    void tenshilib$set_yo(double yo);
 
     @Accessor("zo")
-    void setZo(double zo);
+    void tenshilib$set_zo(double zo);
 
     @Accessor("x")
-    double getX();
+    double tenshilib$x();
 
     @Accessor("y")
-    double getY();
+    double tenshilib$y();
 
     @Accessor("z")
-    double getZ();
+    double tenshilib$z();
 
     @Accessor("xd")
-    double getXD();
+    double tenshilib$xd();
 
     @Accessor("yd")
-    double getYD();
+    double tenshilib$yd();
 
     @Accessor("zd")
-    double getZD();
+    double tenshilib$zd();
 }

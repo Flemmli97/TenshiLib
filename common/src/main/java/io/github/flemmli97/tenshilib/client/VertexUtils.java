@@ -21,7 +21,7 @@ public class VertexUtils {
     }
 
     private static int findNextId() {
-        VertexFormatElement[] lookup = VertexFormatElementAccessor.fetchIdLookup();
+        VertexFormatElement[] lookup = VertexFormatElementAccessor.tenshilib$BY_ID();
         for (int i = 0; i < lookup.length; i++) {
             if (lookup[i] == null) {
                 return i;
@@ -32,7 +32,7 @@ public class VertexUtils {
         // Vanilla seems to work fine
         VertexFormatElement[] newLookup = new VertexFormatElement[lookup.length * 2];
         System.arraycopy(lookup, 0, newLookup, 0, lookup.length);
-        VertexFormatElementAccessor.updateIdLookup(newLookup);
+        VertexFormatElementAccessor.tenshilib$set_BY_ID(newLookup);
         return lookup.length;
     }
 

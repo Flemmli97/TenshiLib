@@ -15,7 +15,7 @@ public class MoveToHandler implements AdvancedParticleHandler {
 
     public MoveToHandler(MoveToData data, Particle particle) {
         this.data = data;
-        this.start = new Vec3(((ParticleAccessor) particle).getX(), ((ParticleAccessor) particle).getY(), ((ParticleAccessor) particle).getZ());
+        this.start = new Vec3(((ParticleAccessor) particle).tenshilib$x(), ((ParticleAccessor) particle).tenshilib$y(), ((ParticleAccessor) particle).tenshilib$z());
     }
 
     @Override

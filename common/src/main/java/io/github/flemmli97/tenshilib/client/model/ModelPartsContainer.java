@@ -76,7 +76,7 @@ public class ModelPartsContainer {
         public ModelPartExtended(String name, ModelPartExtended parent, ModelPart orig) {
             this.name = name;
             this.parent = parent;
-            this.cubes = ((ModelPartAccessor) (Object) orig).getCubes();
+            this.cubes = ((ModelPartAccessor) (Object) orig).tenshilib$cubes();
             this.children = ((ModelPartAccessor) (Object) orig).getChildren()
                     .entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new ModelPartExtended(e.getKey(), this, e.getValue())));
             this.updateDefaultPose(new PoseExtended(orig.storePose()));

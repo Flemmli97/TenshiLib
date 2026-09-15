@@ -80,7 +80,7 @@ public class AdvancedParticleRegistry {
 
     public static void createParticle(AdvancedParticleContainer container, double x, double y, double z) {
         ParticleEngine engine = Minecraft.getInstance().particleEngine;
-        Particle inner = ((ParticleEngineAccessor) engine).makeParticleInvoker(container.options(), x, y, z, 0, 0, 0);
+        Particle inner = ((ParticleEngineAccessor) engine).tenshilib$makeParticle(container.options(), x, y, z, 0, 0, 0);
         inner.setPos(x, y, z);
         inner.setParticleSpeed(0, 0, 0);
         List<AdvancedParticleHandler> list = new ArrayList<>();

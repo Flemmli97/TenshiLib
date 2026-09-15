@@ -9,13 +9,13 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface VertexFormatElementAccessor {
 
     @Accessor("BY_ID")
-    static VertexFormatElement[] fetchIdLookup() {
+    static VertexFormatElement[] tenshilib$BY_ID() {
         throw new IllegalStateException();
     }
 
     @Accessor("BY_ID")
     @Mutable
-    static void updateIdLookup(VertexFormatElement[] array) {
+    static void tenshilib$set_BY_ID(VertexFormatElement[] array) {
         throw new IllegalStateException();
     }
 }

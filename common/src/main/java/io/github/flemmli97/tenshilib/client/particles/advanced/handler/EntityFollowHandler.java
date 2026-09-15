@@ -38,7 +38,7 @@ public class EntityFollowHandler implements AdvancedParticleHandler {
         Vec3 pos = this.entity.position();
         if (this.data.differenceOnly()) {
             pos = pos.subtract(this.lastPos)
-                    .add(((ParticleAccessor) particle).getX(), ((ParticleAccessor) particle).getY(), ((ParticleAccessor) particle).getZ());
+                    .add(((ParticleAccessor) particle).tenshilib$x(), ((ParticleAccessor) particle).tenshilib$y(), ((ParticleAccessor) particle).tenshilib$z());
         } else if (this.data.offset().isPresent()) {
             pos = pos.add(this.data.offset().get().yRot(-this.entity.getYRot() * Mth.DEG_TO_RAD));
         }

@@ -25,9 +25,9 @@ public class CirclingHandler implements AdvancedParticleHandler {
         this.initOffY = offset.y();
         this.radius = data.radius();
         this.angle = data.angle() * Mth.DEG_TO_RAD;
-        this.centerX = ((ParticleAccessor) particle).getX();
-        this.centerY = ((ParticleAccessor) particle).getY();
-        this.centerZ = ((ParticleAccessor) particle).getZ();
+        this.centerX = ((ParticleAccessor) particle).tenshilib$x();
+        this.centerY = ((ParticleAccessor) particle).tenshilib$y();
+        this.centerZ = ((ParticleAccessor) particle).tenshilib$z();
         this.last = new Vector3d(this.centerX, this.centerY, this.centerZ);
         this.moveParticle(particle);
     }
@@ -42,9 +42,9 @@ public class CirclingHandler implements AdvancedParticleHandler {
     protected void moveParticle(Particle particle) {
         Vector3d offset = new Vector3d(this.initOffX * this.radius, this.initOffY * this.radius, 0);
         offset.rotateAxis(this.angle, this.data.rotationAxis().x(), this.data.rotationAxis().y(), this.data.rotationAxis().z());
-        double dX = ((ParticleAccessor) particle).getX() - this.last.x();
-        double dY = ((ParticleAccessor) particle).getY() - this.last.y();
-        double dZ = ((ParticleAccessor) particle).getZ() - this.last.z();
+        double dX = ((ParticleAccessor) particle).tenshilib$x() - this.last.x();
+        double dY = ((ParticleAccessor) particle).tenshilib$y() - this.last.y();
+        double dZ = ((ParticleAccessor) particle).tenshilib$z() - this.last.z();
         this.centerX += dX;
         this.centerY += dY;
         this.centerZ += dZ;

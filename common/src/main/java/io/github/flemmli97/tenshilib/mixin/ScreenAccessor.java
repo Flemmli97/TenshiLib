@@ -10,8 +10,8 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface ScreenAccessor {
 
     @Invoker("addRenderableWidget")
-    <T extends GuiEventListener & Renderable> T addRenderableWidgetTo(T widget);
+    <T extends GuiEventListener & Renderable> T tenshilib$addRenderableWidget(T widget);
 
     @Invoker("removeWidget")
-    void removeWidgetFrom(GuiEventListener widget);
+    void tenshilib$removeWidget(GuiEventListener widget);
 }
