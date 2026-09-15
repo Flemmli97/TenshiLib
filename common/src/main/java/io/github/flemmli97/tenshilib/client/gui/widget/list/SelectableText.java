@@ -25,6 +25,8 @@ public class SelectableText implements SelectableEntry {
     private FormattedCharSequence blankSequence;
     private int lastWidth, width, height;
 
+    private PostRenderCallback postRenderCallback;
+
     public SelectableText(String text, ChatFormatting... chatFormattings) {
         this(Component.translatable(text).withStyle(chatFormattings));
     }
@@ -55,6 +57,20 @@ public class SelectableText implements SelectableEntry {
 
     public SelectableText noSelect() {
         this.selectable = false;
+        return this;
+    }
+
+    public SelectableText postRender(PostRenderCallback callback) {
+        this.postRenderCallback = callback;
+        return this;
+    }
+
+    public SelectableText withSimpleHoverComponent(Component component, BooleanSupplier shouldRender) {
+        this.postRenderCallback = ((current, widget, graphics, mouseX, mouseY, partialTick, x, y, selected, hovered) -> {
+            if (mouseX >= x && mouseY >= y && mouseX <= x + current.width && mouseY <= y + current.height && shouldRender.getAsBoolean()) {
+                graphics.renderTooltip(widget.getFont(), component, mouseX, mouseY);
+            }
+        });
         return this;
     }
 
@@ -93,6 +109,10 @@ public class SelectableText implements SelectableEntry {
         graphics.drawString(widget.getFont(), this.getText(widget.getFont(), textWidth - this.paddingX, selected || hovered),
                 x + this.paddingX, y + (int) (0.5 * this.height - 3.5),
                 selected ? ChatFormatting.LIGHT_PURPLE.getColor() : hovered ? ChatFormatting.YELLOW.getColor() : 0xFFFFFF);
+        if (this.postRenderCallback != null) {
+            this.postRenderCallback.postRender(this, widget, graphics, mouseX, mouseY, partialTick,
+                    x, y, selected, hovered);
+        }
     }
 
     @Override
@@ -143,5 +163,10 @@ public class SelectableText implements SelectableEntry {
         public SelectButton(WidgetSprites texture, Runnable onClick) {
             this(texture, onClick, ALWAYS);
         }
+    }
+
+    public interface PostRenderCallback {
+
+        void postRender(SelectableText current, SelectableListWidget widget, GuiGraphics graphics, int mouseX, int mouseY, float partialTick, int x, int y, boolean selected, boolean hovered);
     }
 }
