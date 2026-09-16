@@ -41,7 +41,7 @@ public class MolangQueries {
         setQuery(context, "query.cardinal_facing_2d", ctx -> ctx.mc().player.getDirection().ordinal());
         setQuery(context, "query.client_max_render_distance", ctx -> ctx.mc().options.renderDistance().get());
         setQuery(context, "query.day", ctx -> ctx.mc().level.getDayTime() / 24000L);
-        setQuery(context, "query.delta_time", ctx -> ctx.partialTicks());
+        setQuery(context, "query.delta_time", QueryContext::partialTicks);
         setQuery(context, "query.has_cape", ctx -> ctx.mc().player != null && ctx.mc().player.getSkin().capeTexture() != null ? 1 : 0);
         setQuery(context, "query.is_first_person", ctx -> ctx.mc().options.getCameraType().isFirstPerson() ? 1 : 0);
         setQuery(context, "query.moon_brightness", ctx -> ctx.mc().level.getMoonBrightness());

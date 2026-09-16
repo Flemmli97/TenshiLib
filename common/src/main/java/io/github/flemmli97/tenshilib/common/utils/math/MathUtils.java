@@ -75,7 +75,7 @@ public class MathUtils {
         if (dir.equals(Vec3.ZERO))
             return from;
         double lengthSq = dir.lengthSqr();
-        double x = Math.max(0, Math.min(1, point.subtract(from).dot(dir) / lengthSq));
+        double x = Math.clamp(point.subtract(from).dot(dir) / lengthSq, 0, 1);
         return from.add(dir.scale(x));
     }
 
