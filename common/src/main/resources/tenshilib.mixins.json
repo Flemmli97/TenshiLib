@@ -18,6 +18,7 @@
     "dual.ItemInHandRendererMixin",
     "BufferBuilderAccessor",
     "BufferSourceAccessor",
+    "ClientPacketListenerMixin",
     "CubeDefinitionMixin",
     "EntityRenderDispatcherMixin",
     "HumanoidArmorMixin",
