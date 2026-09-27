@@ -1,3 +1,16 @@
+TenshiLib 2.3.1
+================
+- Add tick event on fabric
+- Update custom vertex element handling to be easier to use
+- Add render callback for e.g. tooltips for suggestion widget
+- Better error when loading models/animations
+- Add custom FollowEntity behavior
+- Fix some molang vars using wrong values
+- Fix suggestion widget selection
+- Fix entity data syncing using wrong values sometimes
+- Fix attachments loading on fabric
+- Backport fix for MC-273361 invisible entities with teleporting cause some of my mods use this
+
 TenshiLib 2.3.0.b
 ================
 - Fix neoforge toml
